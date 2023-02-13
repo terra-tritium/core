@@ -1,0 +1,141 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('aliances', function (Blueprint $table) {
+            $table->id();
+            $table->string("description");
+            $table->bigInteger("energy");
+            $table->bigInteger("score");
+            $table->bigInteger("buildScore");
+            $table->bigInteger("labScore");
+            $table->bigInteger("tradeScore");
+            $table->bigInteger("attackScore");
+            $table->bigInteger("defenseScore");
+            $table->bigInteger("warScore");
+        });
+        Schema::create('resources', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+        });
+        Schema::create('planets', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->foreignId('resource')->constrained("resources");
+            $table->integer("level");
+            $table->integer("region");
+            $table->integer("quadrant");
+            $table->integer("position");
+        });
+        Schema::create('logbook', function (Blueprint $table) {
+            $table->id();
+            $table->string("text");
+            $table->foreignId('player')->constrained("players");
+            $table->foreignId('planet')->constrained("planets");
+        });
+        Schema::create('messages', function (Blueprint $table) {
+            $table->id();
+            $table->string("text");
+            $table->string("from");
+            $table->string("to");
+            $table->bollean("read");
+        });
+        Schema::create('builds', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->string("image");
+            $table->string("description");
+            $table->integer("maxLevel");
+            $table->string("effect");
+            $table->foreignId('require')->constrained("requires");
+        });
+        Schema::create('buildings', function (Blueprint $table) {
+            $table->id();
+            $table->string("build");
+            $table->foreignId('build')->constrained("builds");
+            $table->foreignId('planet')->constrained("planets");
+            $table->integer("level");
+            $table->integer("slot");
+            $table->integer("workers");
+            $table->bigInteger("ready");
+        });
+        Schema::create('requires', function (Blueprint $table) {
+            $table->id();
+            $table->integer("level");
+            $table->bigInteger("metal");
+            $table->bigInteger("deuterium");
+            $table->bigInteger("crystal");
+            $table->bigInteger("time");
+        });
+        Schema::create('travels', function (Blueprint $table) {
+            $table->id();
+            $table->string("from");
+            $table->string("to");
+            $table->bigInteger("duration");
+            $table->bigInteger("start");
+            $table->foreignId('action')->constrained("actions");
+        });
+        Schema::create('actions', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->string("description");           
+        });
+        Schema::create('countrys', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->string("code");
+            $table->string("image");           
+        });
+        Schema::create('players', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->string("address");
+            $table->timestamp("since");
+            $table->foreignId('country')->constrained("countrys");
+            $table->foreignId('aliance')->constrained("aliances");
+            $table->timestamp("ready");
+            $table->bigInteger("metal");
+            $table->bigInteger("deuterium");
+            $table->bigInteger("crystal");
+            $table->bigInteger("energy");
+            $table->integer("pwMetal");
+            $table->integer("pwDeuterium");
+            $table->integer("pwCrystal");
+            $table->integer("pwEnergy");
+            $table->timestamp("timeMetal");
+            $table->timestamp("timeDeuterium");
+            $table->timestamp("timeCrystal");
+            $table->timestamp("timeEnergy");
+            $table->bigInteger("battery");
+            $table->bigInteger("merchantShips");
+            $table->bigInteger("score");
+            $table->bigInteger("buildScore");
+            $table->bigInteger("labScore");
+            $table->bigInteger("tradeScore");
+            $table->bigInteger("attackScore");
+            $table->bigInteger("defenseScore");
+            $table->bigInteger("warScore");   
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        //
+    }
+};
