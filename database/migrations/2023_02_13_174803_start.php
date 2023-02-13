@@ -38,59 +38,6 @@ return new class extends Migration
             $table->integer("quadrant");
             $table->integer("position");
         });
-        Schema::create('logbook', function (Blueprint $table) {
-            $table->id();
-            $table->string("text");
-            $table->foreignId('player')->constrained("players");
-            $table->foreignId('planet')->constrained("planets");
-        });
-        Schema::create('messages', function (Blueprint $table) {
-            $table->id();
-            $table->string("text");
-            $table->string("from");
-            $table->string("to");
-            $table->bollean("read");
-        });
-        Schema::create('builds', function (Blueprint $table) {
-            $table->id();
-            $table->string("name");
-            $table->string("image");
-            $table->string("description");
-            $table->integer("maxLevel");
-            $table->string("effect");
-            $table->foreignId('require')->constrained("requires");
-        });
-        Schema::create('buildings', function (Blueprint $table) {
-            $table->id();
-            $table->string("build");
-            $table->foreignId('build')->constrained("builds");
-            $table->foreignId('planet')->constrained("planets");
-            $table->integer("level");
-            $table->integer("slot");
-            $table->integer("workers");
-            $table->bigInteger("ready");
-        });
-        Schema::create('requires', function (Blueprint $table) {
-            $table->id();
-            $table->integer("level");
-            $table->bigInteger("metal");
-            $table->bigInteger("deuterium");
-            $table->bigInteger("crystal");
-            $table->bigInteger("time");
-        });
-        Schema::create('travels', function (Blueprint $table) {
-            $table->id();
-            $table->string("from");
-            $table->string("to");
-            $table->bigInteger("duration");
-            $table->bigInteger("start");
-            $table->foreignId('action')->constrained("actions");
-        });
-        Schema::create('actions', function (Blueprint $table) {
-            $table->id();
-            $table->string("name");
-            $table->string("description");           
-        });
         Schema::create('countrys', function (Blueprint $table) {
             $table->id();
             $table->string("name");
@@ -104,7 +51,7 @@ return new class extends Migration
             $table->timestamp("since");
             $table->foreignId('country')->constrained("countrys");
             $table->foreignId('aliance')->constrained("aliances");
-            $table->timestamp("ready");
+            $table->timestamp("ready")->nullable();
             $table->bigInteger("metal");
             $table->bigInteger("deuterium");
             $table->bigInteger("crystal");
@@ -113,10 +60,10 @@ return new class extends Migration
             $table->integer("pwDeuterium");
             $table->integer("pwCrystal");
             $table->integer("pwEnergy");
-            $table->timestamp("timeMetal");
-            $table->timestamp("timeDeuterium");
-            $table->timestamp("timeCrystal");
-            $table->timestamp("timeEnergy");
+            $table->timestamp("timeMetal")->nullable();
+            $table->timestamp("timeDeuterium")->nullable();
+            $table->timestamp("timeCrystal")->nullable();
+            $table->timestamp("timeEnergy")->nullable();
             $table->bigInteger("battery");
             $table->bigInteger("merchantShips");
             $table->bigInteger("score");
@@ -125,7 +72,59 @@ return new class extends Migration
             $table->bigInteger("tradeScore");
             $table->bigInteger("attackScore");
             $table->bigInteger("defenseScore");
-            $table->bigInteger("warScore");   
+            $table->bigInteger("warScore");
+        });
+        Schema::create('logbook', function (Blueprint $table) {
+            $table->id();
+            $table->string("text");
+            $table->foreignId('player')->constrained("players");
+            $table->foreignId('planet')->constrained("planets");
+        });
+        Schema::create('messages', function (Blueprint $table) {
+            $table->id();
+            $table->string("text");
+            $table->string("from");
+            $table->string("to");
+            $table->boolean("read");
+        });
+        Schema::create('requires', function (Blueprint $table) {
+            $table->id();
+            $table->integer("level");
+            $table->bigInteger("metal");
+            $table->bigInteger("deuterium");
+            $table->bigInteger("crystal");
+            $table->bigInteger("time");
+        });
+        Schema::create('builds', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->string("image");
+            $table->string("description");
+            $table->integer("maxLevel");
+            $table->string("effect");
+            $table->foreignId('require')->constrained("requires");
+        });
+        Schema::create('buildings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('build')->constrained("builds");
+            $table->foreignId('planet')->constrained("planets");
+            $table->integer("level");
+            $table->integer("slot");
+            $table->integer("workers");
+            $table->timestamp("ready")->nullable();
+        });
+        Schema::create('actions', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->string("description");           
+        });
+        Schema::create('travels', function (Blueprint $table) {
+            $table->id();
+            $table->string("from");
+            $table->string("to");
+            $table->bigInteger("duration");
+            $table->bigInteger("start");
+            $table->foreignId('action')->constrained("actions");
         });
     }
 
