@@ -54,6 +54,6 @@ class PlanetController extends Controller
     }
 
     public function list($address) {
-        return Planet::where("address", $address);
+        return Planet::where("address", $address)->get();
     }
 }

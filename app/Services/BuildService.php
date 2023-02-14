@@ -160,21 +160,21 @@ class BuildService
 
     public function listAvailableBuilds($planetId) {
 
-        $allBuilds = Build::findAll();
-        $buildeds = Building::where("planet", $planetId);
+        $allBuilds = Build::orderBy("code")->get();
+        $buildeds = Building::where("planet", $planetId)->get();
 
-        if (count($buildeds) > 0) {
+        if (!$buildeds->isEmpty()) {
             foreach($buildeds as $iBuilded) {
                 foreach($allBuilds as $iBuild) {
                     if ($iBuilded->code == $iBuild->code) {
-                        $allBuilds->remove($iBuild);
+                        $allBuilds->forget($iBuild->id);
                     }
                 }
-            } 
+            }
         } else {
-            foreach($allBuilds as $iBuild) {
-                if ($iBuilded->code != 1) {
-                    $allBuilds->remove($iBuild);
+            foreach($allBuilds as $key => $iBuild) {
+                if ($iBuild->code != 1) {
+                    $allBuilds->forget($key);
                 }
             }
         }

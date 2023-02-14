@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Player;
+use App\Models\Planet;
 
 use Carbon\Carbon;
 
@@ -170,7 +171,17 @@ class PlayerService
     $player->defenseScore = 0;
     $player->warScore = 0;
     $player->save();
+
+    $planet = new Planet();
+    $planet->level = 1;
+    $planet->name = "First Planet";
+    $planet->resource = "crystal";
+    $planet->region = 1;
+    $planet->quadrant = 1;
+    $planet->position = 1;
+    $planet->address = $player->address;
+    $planet->humanoids = 30;
+    $planet->status = "pacific";
+    $planet->save();
   }
-
-
 }

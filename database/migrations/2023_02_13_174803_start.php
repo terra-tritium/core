@@ -25,18 +25,17 @@ return new class extends Migration
             $table->bigInteger("defenseScore");
             $table->bigInteger("warScore");
         });
-        Schema::create('resources', function (Blueprint $table) {
-            $table->id();
-            $table->string("name");
-        });
         Schema::create('planets', function (Blueprint $table) {
             $table->id();
+            $table->string("address");
             $table->string("name");
-            $table->foreignId('resource')->constrained("resources");
+            $table->string('resource');
             $table->integer("level");
             $table->integer("region");
             $table->integer("quadrant");
             $table->integer("position");
+            $table->integer("humanoids");
+            $table->string('status');
         });
         Schema::create('countrys', function (Blueprint $table) {
             $table->id();
@@ -89,6 +88,7 @@ return new class extends Migration
         });
         Schema::create('requires', function (Blueprint $table) {
             $table->id();
+            $table->integer('build');
             $table->integer("level");
             $table->bigInteger("metal");
             $table->bigInteger("deuterium");
@@ -98,11 +98,11 @@ return new class extends Migration
         Schema::create('builds', function (Blueprint $table) {
             $table->id();
             $table->string("name");
+            $table->string("code");
             $table->string("image");
-            $table->string("description");
+            $table->text("description");
             $table->integer("maxLevel");
             $table->string("effect");
-            $table->foreignId('require')->constrained("requires");
         });
         Schema::create('buildings', function (Blueprint $table) {
             $table->id();

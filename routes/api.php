@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::controller(BuildController::class)->group(function () {
     Route::get('/build/list', 'list');
-    Route::get('/build/availables', 'availables');
+    Route::get('/build/availables/{planet}', 'availables');
     Route::post('/build/plant', 'plant');
 });
 
@@ -34,7 +34,7 @@ Route::controller(CountryController::class)->group(function () {
 });
 
 Route::controller(PlanetController::class)->group(function () {
-    Route::get('/planet/list', 'list');
+    Route::get('/planet/list/{address}', 'list');
 });
 
 Route::controller(PlayerController::class)->group(function () {

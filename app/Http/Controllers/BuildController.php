@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Build;
 use App\Models\Building;
 use App\Services\BuildService;
 
@@ -19,15 +20,15 @@ class BuildController extends Controller
         //
     }
 
-    public function list(Request $request)
+    public function list()
     {
-        return Building::where("planet", $request->planetId);
+        return Build::orderBy('code')->get();
     }
 
-    public function availables(Request $request)
+    public function availables($planet)
     {
         $buildSerivice = new BuildService();
-        return $buildSerivice->listAvailableBuilds($request->planetId);
+        return $buildSerivice->listAvailableBuilds($planet);
     }
 
     public function plant(Request $request) {
