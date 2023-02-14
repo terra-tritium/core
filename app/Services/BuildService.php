@@ -7,8 +7,9 @@ use App\Models\Player;
 use App\Models\Build;
 use App\Models\Building;
 use App\Models\Requires;
-
 use App\Services\PlayerService;
+
+use Carbon\Carbon;
 
 class BuildService
 {
@@ -28,7 +29,7 @@ class BuildService
                 if ($hasBalance) { $p1 = $playerService->removeMetal($p1, $require); }
                 break;
             case 2:
-                $hasBalance = $playerService.enoughBalance($p1, $require, $resourceSpend);
+                $hasBalance = $playerService->enoughBalance($p1, $require, $resourceSpend);
                 if ($hasBalance) { $p1 = $playerService->removeDeuterium($p1, $require); }
                 break;
             case 3:
@@ -54,20 +55,18 @@ class BuildService
         $planet = Planet::find($building->planet);
         $p1 = Player::where("address", $planet->address)->firstOrFail();
         $build = Build::find($building->build);
-        $require = Requires::find($building->require);
+        $require = Requires::where([
+            ["build", "=", $building->build],
+            ["level", "=", 1]
+        ])->firstOrFail();
 
-        # verify busy onBuilding
-        if ($building.ready > time()) {
-            return false;
-        }
-
-        $building->ready = time() + ($require->time * env(TRITIUM_BUILD_SPEED));
+        $building->ready = Carbon::now()->timestamp + ($require->time * env("TRITIUM_BUILD_SPEED"));
 
         // Colonization
         if ($building->code == 1) {
             if ($playerService->enoughBalance($p1, $require->metal, 1)) {
                 $p1 = $playerService->removeMetal($p1, $require->metal);
-                $p1.save();
+                $p1->save();
             } else {
                 return false;
             }
@@ -79,21 +78,21 @@ class BuildService
         }
 
         // Metal Mining
-        if ($building.code == 4) {
-            $this.starNewMining($p1, $building, 1, 1, $require->metal);
+        if ($building->code == 4) {
+            $this->starNewMining($p1, $building, 1, 1, $require->metal);
         }
 
         // Deuterium Mining
-        if ($building.code == 5) {
-            $this.starNewMining($p1, $building, 2, 1, $require->metal);
+        if ($building->code == 5) {
+            $this->starNewMining($p1, $building, 2, 1, $require->metal);
         }
 
         // Crystal Mining
-        if ($building.code == 6) {
-            $this.starNewMining($p1, $building, 3, 1, $require->metal);
+        if ($building->code == 6) {
+            $this->starNewMining($p1, $building, 3, 1, $require->metal);
         }
 
-        if ($building.code == 3 || $building.code > 6) {
+        if ($building->code == 3 || $building->code > 6) {
             if ($playerService->enoughBalance($p1, $require->metal, 1)) {
                 $p1 = $playerService->removeMetal(p1, $require->metal);
             } else {
@@ -104,16 +103,16 @@ class BuildService
             } else {
                 return false;
             }
-            if ($playerService.enoughBalance($p1, $require->crystal, 3)) {
-                $p1 = $playerService.removeCrystal($p1, $require->crystal);
+            if ($playerService->enoughBalance($p1, $require->crystal, 3)) {
+                $p1 = $playerService->removeCrystal($p1, $require->crystal);
             } else {
                 return false;
             }
         }
             
         $building->save();
-        $p1.save();
-        $planet.save();
+        $p1->save();
+        $planet->save();
     }
 
     public function suficientFunds($p1, $require) {
@@ -141,11 +140,11 @@ class BuildService
         $building = Building::find($buildingId);
 
         $planet = Planet::find($building->planet);
-        $player = Player::where("address", $planet->address).firstOrFail();
+        $player = Player::where("address", $planet->address)->firstOrFail();
         $build = Build::find($building->build);
         $require = Requires::where("id", $build->require)->andWhere("level", $building->level)->firstOrFail();
 
-        $building->ready = time() + ($requrire.time * env("TRITIUM_BUILD_SPEED"));
+        $building->ready = time() + ($requrire->time * env("TRITIUM_BUILD_SPEED"));
 
         if ($this->suficientFunds($player, $require)) {
             $this->spendResources($player, $require);
@@ -155,7 +154,7 @@ class BuildService
 
         $building->level += 1;
 
-        $building.save();
+        $building->save();
     }
 
     public function listAvailableBuilds($planetId) {
@@ -185,7 +184,7 @@ class BuildService
     public function configWorkers ($planetId, $workers, $buildingId) {
 
         $planet = Planet::find($planetId);
-        $p1 = Player::where("address", $planet->address).firstOrFail();
+        $p1 = Player::where("address", $planet->address)->firstOrFail();
         $buildings = Building::where("planet", $planet->id);
         
         if ($workers > $planet->humanoids || $workers < 1) {
@@ -203,21 +202,21 @@ class BuildService
 
                     // Deuterium
                     case 5 : 
-                        $p1->deuterium = $playerService.currentBalance($p1, 2);
+                        $p1->deuterium = $playerService->currentBalance($p1, 2);
                         $p1->timeDeuterium = time();
                         $p1->pwDeuterium = $workers;
                         break;
 
                     // Crystal
                     case 6 : 
-                        $p1->crystal = $playerService.currentBalance($p1, 3);
+                        $p1->crystal = $playerService->currentBalance($p1, 3);
                         $p1->timeCrystal = time();
                         $p1->pwCrystal = $workers;
                         break;
                 }
             }
             
-            $p1.save();
+            $p1->save();
         }
     }
 }

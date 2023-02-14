@@ -9,4 +9,5 @@ class Building extends Model
 {
     use HasFactory;
     protected $table = 'buildings';
+    public $timestamps = false;
 }

@@ -10,6 +10,13 @@ use Illuminate\Http\Request;
 
 class BuildController extends Controller
 {
+
+    protected $buildService;
+
+    public function __construct(BuildService $buildService) {
+        $this->buildService = $buildService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -27,28 +34,24 @@ class BuildController extends Controller
 
     public function availables($planet)
     {
-        $buildSerivice = new BuildService();
-        return $buildSerivice->listAvailableBuilds($planet);
+        return $this->buildService->listAvailableBuilds($planet);
     }
 
     public function plant(Request $request) {
         $building = new Building();
-        $building->build = $request->build;
-        $building->planet = $request->planetId;
-        $building->slot = $request->slot;
+        $building->build = $request->input("build");
+        $building->planet = $request->input("planet");
+        $building->slot = $request->input("slot");
 
-        $buildSerivice = new BuildService();
-        $buildService->plant($building);
+        $this->buildService->plant($building);
     }
 
     public function upgrade(Request $request) {
-        $buildSerivice = new BuildService();
         $buildService->upgrade($request->buildingId);
     }
 
     public function worker(Request $request) {
-        $buildSerivice = new BuildService();
-        $buildService->configWorkers(
+        $this->buildService->configWorkers(
             $request->planetId,
             $request->workers,
             $request->buildingId

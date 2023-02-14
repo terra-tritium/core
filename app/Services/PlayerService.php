@@ -5,8 +5,6 @@ namespace App\Services;
 use App\Models\Player;
 use App\Models\Planet;
 
-use Carbon\Carbon;
-
 class PlayerService
 {
 
@@ -152,11 +150,10 @@ class PlayerService
   }
 
   public function register(Player $player) {
-    //$player->since = Carbon::now()->timestamp;
-    $player->metal = 0;
+    $player->metal = 1500;
     $player->deuterium = 0;
     $player->crystal = 0;
-    $player->energy = 0;
+    $player->energy = 100;
     $player->pwMetal = 0;
     $player->pwDeuterium = 0;
     $player->pwCrystal = 0;
