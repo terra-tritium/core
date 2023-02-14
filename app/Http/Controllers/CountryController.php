@@ -63,6 +63,6 @@ class CountryController extends Controller
     }
 
     public function list() {
-        return Country::findAll();
+        return Country::orderBy('name')->get();
     }
 }

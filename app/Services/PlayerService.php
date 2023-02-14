@@ -2,6 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Player;
+
+use Carbon\Carbon;
+
 class PlayerService
 {
 
@@ -144,6 +148,28 @@ class PlayerService
       $p1->crystal -= $units;
     }
     return $p1;
+  }
+
+  public function register(Player $player) {
+    //$player->since = Carbon::now()->timestamp;
+    $player->metal = 0;
+    $player->deuterium = 0;
+    $player->crystal = 0;
+    $player->energy = 0;
+    $player->pwMetal = 0;
+    $player->pwDeuterium = 0;
+    $player->pwCrystal = 0;
+    $player->pwEnergy = 0;
+    $player->battery = 0;
+    $player->merchantShips = 0;
+    $player->score = 0;
+    $player->buildScore = 0;
+    $player->labScore = 0;
+    $player->tradeScore = 0;
+    $player->attackScore = 0;
+    $player->defenseScore = 0;
+    $player->warScore = 0;
+    $player->save();
   }
 
 

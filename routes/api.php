@@ -3,6 +3,7 @@
 use App\Http\Controllers\BuildController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\PlanetController;
+use App\Http\Controllers\PlayerController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +38,6 @@ Route::controller(PlanetController::class)->group(function () {
 });
 
 Route::controller(PlayerController::class)->group(function () {
-    Route::get('/player/show', 'show');
+    Route::get('/player/show/{address}', 'show');
     Route::post('/player/register', 'register');
 });

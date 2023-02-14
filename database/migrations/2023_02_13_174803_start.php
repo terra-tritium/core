@@ -48,10 +48,10 @@ return new class extends Migration
             $table->id();
             $table->string("name");
             $table->string("address");
-            $table->timestamp("since");
+            $table->timestamp("since")->useCurrent();
             $table->foreignId('country')->constrained("countrys");
-            $table->foreignId('aliance')->constrained("aliances");
-            $table->timestamp("ready")->nullable();
+            $table->integer('aliance')->nullable()->unsigned();
+            $table->bigInteger("ready")->nullable();
             $table->bigInteger("metal");
             $table->bigInteger("deuterium");
             $table->bigInteger("crystal");
@@ -60,10 +60,10 @@ return new class extends Migration
             $table->integer("pwDeuterium");
             $table->integer("pwCrystal");
             $table->integer("pwEnergy");
-            $table->timestamp("timeMetal")->nullable();
-            $table->timestamp("timeDeuterium")->nullable();
-            $table->timestamp("timeCrystal")->nullable();
-            $table->timestamp("timeEnergy")->nullable();
+            $table->bigInteger("timeMetal")->nullable();
+            $table->bigInteger("timeDeuterium")->nullable();
+            $table->bigInteger("timeCrystal")->nullable();
+            $table->bigInteger("timeEnergy")->nullable();
             $table->bigInteger("battery");
             $table->bigInteger("merchantShips");
             $table->bigInteger("score");
@@ -111,7 +111,7 @@ return new class extends Migration
             $table->integer("level");
             $table->integer("slot");
             $table->integer("workers");
-            $table->timestamp("ready")->nullable();
+            $table->bigInteger("ready")->nullable();
         });
         Schema::create('actions', function (Blueprint $table) {
             $table->id();

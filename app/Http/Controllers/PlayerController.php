@@ -3,10 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Player;
+use App\Services\PlayerService;
 use Illuminate\Http\Request;
 
 class PlayerController extends Controller
 {
+
+    protected $playerService;
+
+    public function __construct(PlayerService $playerService)
+    {
+        $this->playerService = $playerService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -34,9 +43,9 @@ class PlayerController extends Controller
      * @param  \App\Models\Player  $player
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request)
+    public function show(String $address)
     {
-        return Player::where("address", $request->address)->firstOrFail();
+        return Player::where("address", $address)->first();
     }
 
     /**
@@ -62,7 +71,11 @@ class PlayerController extends Controller
         //
     }
 
-    public function register(Player $player) {
-        $player->save();
+    public function register(Request $request) {
+        $player = new Player();
+        $player->address = $request->input("address");
+        $player->country = $request->input("country");
+        $player->name = $request->input("name");
+        $this->playerService->register($player);
     }
 }
