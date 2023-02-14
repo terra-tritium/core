@@ -136,7 +136,10 @@ class BuildService
         return $p1;
     }
 
-    public function upgrade($building) {
+    public function upgrade($buildingId) {
+
+        $building = Building::find($buildingId);
+
         $planet = Planet::find($building->planet);
         $player = Player::where("address", $planet->address).firstOrFail();
         $build = Build::find($building->build);
