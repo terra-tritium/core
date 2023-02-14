@@ -37,6 +37,10 @@ class BuildController extends Controller
         return $this->buildService->listAvailableBuilds($planet);
     }
 
+    public function listBildings($planet) {
+        return $this->buildService->listBildings($planet);
+    }
+
     public function plant(Request $request) {
         $building = new Building();
         $building->build = $request->input("build");
@@ -56,6 +60,10 @@ class BuildController extends Controller
             $request->workers,
             $request->buildingId
         );
+    }
+
+    public function requires($build) {
+        $buildService->requires($build);
     }
 
     /**

@@ -26,7 +26,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::controller(BuildController::class)->group(function () {
     Route::get('/build/list', 'list');
     Route::get('/build/availables/{planet}', 'availables');
+    Route::get('/building/list/{planet}', 'listBildings');
     Route::post('/build/plant', 'plant');
+    Route::post('/build/requires/{build}', 'requires');
 });
 
 Route::controller(CountryController::class)->group(function () {

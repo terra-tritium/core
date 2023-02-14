@@ -181,6 +181,14 @@ class BuildService
         return $allBuilds;
     }
 
+    public function listBildings ($planet) {
+        return Building::where("planet", $planet)->get();
+    }
+
+    public function requires($build) {
+        return Requires::where("build", $build)->get();
+    }
+
     public function configWorkers ($planetId, $workers, $buildingId) {
 
         $planet = Planet::find($planetId);
