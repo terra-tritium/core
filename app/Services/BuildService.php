@@ -25,16 +25,16 @@ class BuildService
 
         switch ($resourceSpend) {
             case 1:
-                $hasBalance = $playerService->enoughBalance($p1, $require, $resourceSpend);
-                if ($hasBalance) { $p1 = $playerService->removeMetal($p1, $require); }
+                $hasBalance = $this->playerService->enoughBalance($p1, $require, $resourceSpend);
+                if ($hasBalance) { $p1 = $this->playerService->removeMetal($p1, $require); }
                 break;
             case 2:
-                $hasBalance = $playerService->enoughBalance($p1, $require, $resourceSpend);
-                if ($hasBalance) { $p1 = $playerService->removeDeuterium($p1, $require); }
+                $hasBalance = $this->playerService->enoughBalance($p1, $require, $resourceSpend);
+                if ($hasBalance) { $p1 = $this->playerService->removeDeuterium($p1, $require); }
                 break;
             case 3:
-                $hasBalance = $playerService->enoughBalance($p1, $require, $resourceSpend);
-                if ($hasBalance) { $p1 = $playerService->removeCrystal($p1, $require); }
+                $hasBalance = $this->playerService->enoughBalance($p1, $require, $resourceSpend);
+                if ($hasBalance) { $p1 = $this->playerService->removeCrystal($p1, $require); }
                 break;
         
             default:
@@ -42,7 +42,7 @@ class BuildService
         }
 
         if ($hasBalance) {
-            $player = $playerService->startMining($p1, $resourceMining);
+            $player = $this->playerService->startMining($p1, $resourceMining);
             $player->save();
         }
     }
@@ -55,6 +55,7 @@ class BuildService
         $planet = Planet::find($building->planet);
         $p1 = Player::where("address", $planet->address)->firstOrFail();
         $build = Build::find($building->build);
+
         $require = Requires::where([
             ["build", "=", $building->build],
             ["level", "=", 1]
@@ -62,10 +63,11 @@ class BuildService
 
         $building->ready = (Carbon::now()->timestamp * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
 
+
         // Colonization
-        if ($building->code == 1) {
-            if ($playerService->enoughBalance($p1, $require->metal, 1)) {
-                $p1 = $playerService->removeMetal($p1, $require->metal);
+        if ($building->build == 1) {
+            if ($this->playerService->enoughBalance($p1, $require->metal, 1)) {
+                $p1 = $this->playerService->removeMetal($p1, $require->metal);
                 $p1->save();
             } else {
                 return false;
@@ -73,38 +75,38 @@ class BuildService
         }
 
         // Power Core
-        if ($building->code == 2) {
+        if ($building->build == 2) {
             $this->starNewMining($p1, $building, 0, 1, $require->metal);
         }
 
         // Metal Mining
-        if ($building->code == 4) {
+        if ($building->build == 4) {
             $this->starNewMining($p1, $building, 1, 1, $require->metal);
         }
 
         // Deuterium Mining
-        if ($building->code == 5) {
+        if ($building->build == 5) {
             $this->starNewMining($p1, $building, 2, 1, $require->metal);
         }
 
         // Crystal Mining
-        if ($building->code == 6) {
+        if ($building->build == 6) {
             $this->starNewMining($p1, $building, 3, 1, $require->metal);
         }
 
-        if ($building->code == 3 || $building->code > 6) {
-            if ($playerService->enoughBalance($p1, $require->metal, 1)) {
-                $p1 = $playerService->removeMetal(p1, $require->metal);
+        if ($building->build == 3 || $building->code > 6) {
+            if ($this->playerService->enoughBalance($p1, $require->metal, 1)) {
+                $p1 = $this->playerService->removeMetal(p1, $require->metal);
             } else {
                 return false;
             }
-            if ($playerService->enoughBalance(p1, reqDeuterium, 2)) {
-                $p1 = $playerService->removeDeuterium($p1, $require->deuterium);
+            if ($this->playerService->enoughBalance(p1, reqDeuterium, 2)) {
+                $p1 = $this->playerService->removeDeuterium($p1, $require->deuterium);
             } else {
                 return false;
             }
-            if ($playerService->enoughBalance($p1, $require->crystal, 3)) {
-                $p1 = $playerService->removeCrystal($p1, $require->crystal);
+            if ($this->playerService->enoughBalance($p1, $require->crystal, 3)) {
+                $p1 = $this->playerService->removeCrystal($p1, $require->crystal);
             } else {
                 return false;
             }
@@ -116,22 +118,22 @@ class BuildService
     }
 
     public function suficientFunds($p1, $require) {
-        if (!$playerService->enoughBalance($p1, $require->metal, 1)) {
+        if (!$this->playerService->enoughBalance($p1, $require->metal, 1)) {
             return false;
         }
-        if (!$playerService->enoughBalance($p1, $require->deuterium, 2)) {
+        if (!$this->playerService->enoughBalance($p1, $require->deuterium, 2)) {
             return false;
         }
-        if (!$playerService->enoughBalance($p1, $require->crystal, 3)) {
+        if (!$this->playerService->enoughBalance($p1, $require->crystal, 3)) {
             return false;
         }
         return true;
     }
 
     public function spendResources($p1, $require) {
-        $p1 = $playerService->removeMetal($p1, $require->metal);
-        $p1 = $playerService->removeDeuterium($p1, $require->deuterium);
-        $p1 = $playerService->removeCrystal($p1, $require->crystal);
+        $p1 = $this->playerService->removeMetal($p1, $require->metal);
+        $p1 = $this->playerService->removeDeuterium($p1, $require->deuterium);
+        $p1 = $this->playerService->removeCrystal($p1, $require->crystal);
         return $p1;
     }
 
@@ -205,21 +207,21 @@ class BuildService
                 switch ($iBuilding->code) {
                     // Metal
                     case 4 : 
-                        $p1->metal = $playerService->currentBalance($p1, 1);
+                        $p1->metal = $this->playerService->currentBalance($p1, 1);
                         $p1->timeMetal = time();
                         $p1->pwMetal = $workers;
                         break;
 
                     // Deuterium
                     case 5 : 
-                        $p1->deuterium = $playerService->currentBalance($p1, 2);
+                        $p1->deuterium = $this->playerService->currentBalance($p1, 2);
                         $p1->timeDeuterium = time();
                         $p1->pwDeuterium = $workers;
                         break;
 
                     // Crystal
                     case 6 : 
-                        $p1->crystal = $playerService->currentBalance($p1, 3);
+                        $p1->crystal = $this->playerService->currentBalance($p1, 3);
                         $p1->timeCrystal = time();
                         $p1->pwCrystal = $workers;
                         break;

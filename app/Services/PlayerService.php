@@ -8,13 +8,19 @@ use App\Models\Planet;
 class PlayerService
 {
 
+  protected $timeNow;
+
+  public function __construct () {
+    $this->timeNow = time() * 1000;
+  }
+
   public function currentBalance($p1, $type) {
 
     $msInHour = 3600000;
-    $activeEnergyMining = (time() - $p1->timeEnergy) / $msInHour;
-    $activeMetalMining = (time() - $p1->timeMetal) / $msInHour;
-    $activeDeuteriumMining = (time() - $p1->timeDeuterium) / $msInHour;
-    $activeCrystalMining = (time() - $p1->timeCrystal) / $msInHour;
+    $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $msInHour;
+    $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $msInHour;
+    $activeDeuteriumMining = ($this->timeNow - $p1->timeDeuterium) / $msInHour;
+    $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $msInHour;
 
     switch ($type) {
       case 0: 
@@ -41,17 +47,17 @@ class PlayerService
         }
         break;
       case 1:
-        if ($this.currentBalance($p1, 1) >= $units) {
+        if ($this->currentBalance($p1, 1) >= $units) {
           return true;
         }
         break;
       case 2:
-        if ($this.currentBalance($p1, 2) >= $units) {
+        if ($this->currentBalance($p1, 2) >= $units) {
           return true;
         }
         break;
       case 3:
-        if ($this.currentBalance($p1, 3) >= $units) {
+        if ($this->currentBalance($p1, 3) >= $units) {
           return true;
         }
         break;
@@ -64,26 +70,22 @@ class PlayerService
 
     switch ($resource) {
       case 0:
-        $player->timeEnergy = time();
-        $player->onEnergy = true;
+        $player->timeEnergy = $this->timeNow;
         $player->pwEnergy = 1;
         break;
 
       case 1:
-        $player->timeMetal = time();
-        $player->onMetal = true;
+        $player->timeMetal = $this->timeNow;
         $player->pwMetal = 0;
         break;
     
       case 2:
-        $player->timeDeuterium = time();
-        $player->onDeuterium = true;
+        $player->timeDeuterium = $this->timeNow;
         $player->pwDeuterium = 0;
         break;
 
       case 3:
-        $player->timeCrystal = time();
-        $player->onCrystal = true;
+        $player->timeCrystal = $this->timeNow;
         $player->pwCrystal = 0;
         break;
     }
@@ -103,47 +105,47 @@ class PlayerService
 
   public function addMetal($p1, $units) {
     $p1->metal = $this->currentBalance($p1, 1);
-    $p1->timeMetal = time();
+    $p1->timeMetal = $this->timeNow;
     $p1->metal += $units;
     return $p1;
   }
 
   public function removeMetal($p1, $units) {
-    if ($this.currentBalance($p1, 1) > $units) {
+    if ($this->currentBalance($p1, 1) > $units) {
       $p1->metal = $this->currentBalance($p1, 1);
-      $p1->timeMetal = time();
+      $p1->timeMetal = $this->timeNow;
       $p1->metal -= $units;
     }
     return $p1;
   }
 
   public function addDeuterium($p1, $units) {
-    $p1->deuterium = this.currentBalance($p1, 2);
-    $p1->timeDeuterium = time();
+    $p1->deuterium = $this->currentBalance($p1, 2);
+    $p1->timeDeuterium = $this->timeNow;
     $p1->deuterium += $units;
     return $p1;
   }
 
   public function removeDeuterium($p1, $units) {
-    if (this.currentBalance(p1, 2) > $units) {
-      $p1->deuterium = this.currentBalance(p1, 2);
-      $p1->timeDeuterium = time();
-      $p1->deuterium -= units;
+    if ($this->currentBalance(p1, 2) > $units) {
+      $p1->deuterium = $this->currentBalance($p1, 2);
+      $p1->timeDeuterium = $this->timeNow;
+      $p1->deuterium -= $units;
     }
     return $p1;
   }
 
   public function addCrystal($p1, $units) {
-    $p1->deuterium = this.currentBalance(p1, 2);
-    $p1->timeDeuterium = time();
+    $p1->deuterium = $this->currentBalance($p1, 2);
+    $p1->timeDeuterium = $this->timeNow;
     $p1->deuterium += $units;
     return $p1;
   }
 
   public function removeCrystal(Player $p1, long $units) {
-    if (this.currentBalance(p1, 2) > $units) {
-      $p1->crystal = $this.currentBalance(p1, 2);
-      $p1->timeCrystal = time();
+    if ($this->currentBalance($p1, 2) > $units) {
+      $p1->crystal = $this->currentBalance(p1, 2);
+      $p1->timeCrystal = $this->timeNow;
       $p1->crystal -= $units;
     }
     return $p1;
