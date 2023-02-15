@@ -98,7 +98,7 @@ return new class extends Migration
         Schema::create('builds', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->string("code");
+            $table->integer("code");
             $table->string("image");
             $table->text("description");
             $table->integer("maxLevel");
