@@ -60,7 +60,7 @@ class BuildService
             ["level", "=", 1]
         ])->firstOrFail();
 
-        $building->ready = Carbon::now()->timestamp + ($require->time * env("TRITIUM_BUILD_SPEED"));
+        $building->ready = (Carbon::now()->timestamp * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
 
         // Colonization
         if ($building->code == 1) {
