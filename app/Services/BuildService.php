@@ -201,37 +201,38 @@ class BuildService
 
         $planet = Planet::find($planetId);
         $p1 = Player::where("address", $planet->address)->firstOrFail();
-        $buildings = Building::where("planet", $planet->id);
+        $building = Building::find($buildingId);
         
         if ($workers > $planet->humanoids || $workers < 1) {
-            return 2;
+            return "Humanoids insuficients or workers invalid";
         } else {
+        
+            switch ($building->build) {
+                // Metal
+                case 4 : 
+                    $p1->metal = $this->playerService->currentBalance($p1, 1);
+                    $p1->timeMetal = time() * 1000;
+                    $p1->pwMetal = $workers;
+                    break;
 
-            foreach ($buildings as $iBuilding) {
-                switch ($iBuilding->code) {
-                    // Metal
-                    case 4 : 
-                        $p1->metal = $this->playerService->currentBalance($p1, 1);
-                        $p1->timeMetal = time();
-                        $p1->pwMetal = $workers;
-                        break;
+                // Deuterium
+                case 5 : 
+                    $p1->deuterium = $this->playerService->currentBalance($p1, 2);
+                    $p1->timeDeuterium = time() * 1000;
+                    $p1->pwDeuterium = $workers;
+                    break;
 
-                    // Deuterium
-                    case 5 : 
-                        $p1->deuterium = $this->playerService->currentBalance($p1, 2);
-                        $p1->timeDeuterium = time();
-                        $p1->pwDeuterium = $workers;
-                        break;
-
-                    // Crystal
-                    case 6 : 
-                        $p1->crystal = $this->playerService->currentBalance($p1, 3);
-                        $p1->timeCrystal = time();
-                        $p1->pwCrystal = $workers;
-                        break;
-                }
+                // Crystal
+                case 6 : 
+                    $p1->crystal = $this->playerService->currentBalance($p1, 3);
+                    $p1->timeCrystal = time() * 1000;
+                    $p1->pwCrystal = $workers;
+                    break;
             }
-            
+
+            $building->workers = $workers;
+    
+            $building->save();        
             $p1->save();
         }
     }
