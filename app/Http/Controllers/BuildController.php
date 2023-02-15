@@ -51,7 +51,7 @@ class BuildController extends Controller
     }
 
     public function upgrade(Request $request) {
-        $buildService->upgrade($request->buildingId);
+        $this->buildService->upgrade($request->buildingId);
     }
 
     public function worker(Request $request) {
@@ -63,7 +63,7 @@ class BuildController extends Controller
     }
 
     public function requires($build) {
-        $buildService->requires($build);
+        return $this->buildService->requires($build);
     }
 
     /**

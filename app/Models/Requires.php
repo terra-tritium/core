@@ -9,4 +9,5 @@ class Requires extends Model
 {
     use HasFactory;
     protected $table = 'requires';
+    public $timestamps = false;
 }
