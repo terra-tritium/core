@@ -157,28 +157,30 @@ class BuildService
         $building->save();
     }
 
-    public function listAvailableBuilds($planetId) {
+    public function listAvailableBuilds($planet) {
 
         $allBuilds = Build::orderBy("code")->get();
-        $buildeds = Building::where("planet", $planetId)->get();
+        $buildings = Building::where("planet", $planet)->get();
 
-        if (!$buildeds->isEmpty()) {
-            foreach($buildeds as $iBuilded) {
-                foreach($allBuilds as $iBuild) {
-                    if ($iBuilded->code == $iBuild->code) {
-                        $allBuilds->forget($iBuild->id);
+        $availables = [];
+
+        if (!$buildings->isEmpty()) {
+            foreach($allBuilds as $iBuild) {
+                foreach($buildings as $iBuilding) {
+                    if ($iBuilding->build != $iBuild->code) {
+                        array_push($availables, $iBuild);
                     }
                 }
             }
         } else {
             foreach($allBuilds as $key => $iBuild) {
-                if ($iBuild->code != 1) {
-                    $allBuilds->forget($key);
+                if ($iBuild->code == 1) {
+                    array_push($availables, $iBuild);
                 }
             }
         }
 
-        return $allBuilds;
+        return $availables;
     }
 
     public function listBildings ($planet) {
