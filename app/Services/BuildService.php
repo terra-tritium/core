@@ -167,19 +167,23 @@ class BuildService
         $availables = [];
 
         if (!$buildings->isEmpty()) {
-            foreach($allBuilds as $iBuild) {
+            foreach($allBuilds as $key => $iBuild) {
                 foreach($buildings as $iBuilding) {
-                    if ($iBuilding->build != $iBuild->code) {
-                        array_push($availables, $iBuild);
+                    if ($iBuilding->build == $iBuild->code) {
+                        $allBuilds->forget($key);
                     }
                 }
             }
         } else {
-            foreach($allBuilds as $key => $iBuild) {
-                if ($iBuild->code == 1) {
-                    array_push($availables, $iBuild);
+            foreach($allBuilds as $iBuild) {
+                if ($iBuild->code != 1) {
+                    $allBuilds->forget($key);
                 }
             }
+        }
+
+        foreach($allBuilds as $temp) {
+            array_push($availables, $temp);
         }
 
         return $availables;
