@@ -175,7 +175,7 @@ class BuildService
                 }
             }
         } else {
-            foreach($allBuilds as $iBuild) {
+            foreach($allBuilds as $key => $iBuild) {
                 if ($iBuild->code != 1) {
                     $allBuilds->forget($key);
                 }
