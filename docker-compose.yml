@@ -1,0 +1,60 @@
+version: "3.7"
+name: core
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        WWWGROUP: '${WWWGROUP}'
+    image: origin-app
+    container_name: core-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - tritiumnet
+    environment:
+      WWWUSER: '${WWWUSER}'
+      LARAVEL_SAIL: 1
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: origin
+      DB_USERNAME: origin
+      DB_PASSWORD: 123456
+    ports:
+      - 8080:80
+  db:
+    image: mysql:5.7
+    container_name: origin-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - app_vol:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - tritiumnet
+  compose:
+    image: composer/composer 
+    container_name: compose-local    
+    command: composer install
+    working_dir: /var/www/html
+    volumes:
+      - ./dotquest_api:/var/www/html
+    networks: 
+      - tritiumnet
+
+networks:
+  tritiumnet:
+    driver: bridge
+
+volumes:
+  app_vol:

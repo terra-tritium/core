@@ -24,26 +24,34 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::controller(BuildController::class)->group(function () {
-    Route::get('/build/list', 'list');
-    Route::get('/build/availables/{planet}', 'availables');
-    Route::get('/building/list/{planet}', 'listBildings');
-    Route::post('/build/plant', 'plant');
-    Route::post('/build/up', 'upgrade');
-    Route::post('/build/workers', 'workers');
-    Route::get('/build/requires/{build}', 'requires');
-    Route::get('/build/require/{build}/{level}', 'require');
+Route::controller(AuthController::class)->group(function () {
+    Route::post('/create-token','createToken');
 });
 
-Route::controller(CountryController::class)->group(function () {
-    Route::get('/country/list', 'list');
-});
+Route::middleware('auth:sanctum')->group(function () {  
 
-Route::controller(PlanetController::class)->group(function () {
-    Route::get('/planet/list/{address}', 'list');
-});
+    Route::controller(BuildController::class)->group(function () {
+        Route::get('/build/list', 'list');
+        Route::get('/build/availables/{planet}', 'availables');
+        Route::get('/building/list/{planet}', 'listBildings');
+        Route::post('/build/plant', 'plant');
+        Route::post('/build/up', 'upgrade');
+        Route::post('/build/workers', 'workers');
+        Route::get('/build/requires/{build}', 'requires');
+        Route::get('/build/require/{build}/{level}', 'require');
+    });
 
-Route::controller(PlayerController::class)->group(function () {
-    Route::get('/player/show/{address}', 'show');
-    Route::post('/player/register', 'register');
+    Route::controller(CountryController::class)->group(function () {
+        Route::get('/country/list', 'list');
+    });
+
+    Route::controller(PlanetController::class)->group(function () {
+        Route::get('/planet/list/{address}', 'list');
+    });
+
+    Route::controller(PlayerController::class)->group(function () {
+        Route::get('/player/show/{address}', 'show');
+        Route::post('/player/register', 'register');
+    });
+
 });

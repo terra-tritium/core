@@ -332,5 +332,11 @@ class DatabaseSeeder extends Seeder
             "crystal" => 0,
             "time" => 2
         ]);
+
+        DB::table('users')->insert([
+            'name' => 'Admin',
+            'email' => 'admin@com.br',
+            'password' => bcrypt('123456'),
+       ]);
     }
 }
