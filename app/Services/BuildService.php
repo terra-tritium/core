@@ -196,6 +196,10 @@ class BuildService
         return Requires::where("build", $build)->get();
     }
 
+    public function require($build, $level) {
+        return Requires::where([["build", $build],["level", $level]])->firstOrFail();
+    }
+
     public function configWorkers ($planetId, $workers, $buildingId) {
 
         $planet = Planet::find($planetId);

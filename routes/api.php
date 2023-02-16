@@ -31,6 +31,7 @@ Route::controller(BuildController::class)->group(function () {
     Route::post('/build/up', 'upgrade');
     Route::post('/build/workers', 'workers');
     Route::get('/build/requires/{build}', 'requires');
+    Route::get('/build/require/{build}/{level}', 'require');
 });
 
 Route::controller(CountryController::class)->group(function () {

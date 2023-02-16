@@ -48,6 +48,10 @@ class BuildController extends Controller
         return $this->buildService->requires($build);
     }
 
+    public function require($build, $level) {
+        return $this->buildService->require($build, $level);
+    }
+
     public function workers (Request $request) {
         return $this->buildService->configWorkers (
             $request->input("planetId"),
