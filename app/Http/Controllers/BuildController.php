@@ -41,7 +41,7 @@ class BuildController extends Controller
     }
 
     public function upgrade(Request $request) {
-        $this->buildService->upgrade($request->buildingId);
+        $this->buildService->upgrade($request->input("id"));
     }
 
     public function requires($build) {

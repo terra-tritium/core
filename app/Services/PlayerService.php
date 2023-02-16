@@ -127,7 +127,7 @@ class PlayerService
   }
 
   public function removeDeuterium($p1, $units) {
-    if ($this->currentBalance(p1, 2) > $units) {
+    if ($this->currentBalance($p1, 2) > $units) {
       $p1->deuterium = $this->currentBalance($p1, 2);
       $p1->timeDeuterium = $this->timeNow;
       $p1->deuterium -= $units;
@@ -142,9 +142,9 @@ class PlayerService
     return $p1;
   }
 
-  public function removeCrystal(Player $p1, long $units) {
+  public function removeCrystal($p1, $units) {
     if ($this->currentBalance($p1, 2) > $units) {
-      $p1->crystal = $this->currentBalance(p1, 2);
+      $p1->crystal = $this->currentBalance($p1, 2);
       $p1->timeCrystal = $this->timeNow;
       $p1->crystal -= $units;
     }

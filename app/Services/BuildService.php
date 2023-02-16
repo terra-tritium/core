@@ -96,11 +96,11 @@ class BuildService
 
         if ($building->build == 3 || $building->code > 6) {
             if ($this->playerService->enoughBalance($p1, $require->metal, 1)) {
-                $p1 = $this->playerService->removeMetal(p1, $require->metal);
+                $p1 = $this->playerService->removeMetal($p1, $require->metal);
             } else {
                 return false;
             }
-            if ($this->playerService->enoughBalance(p1, reqDeuterium, 2)) {
+            if ($this->playerService->enoughBalance($p1, $require->deuterium, 2)) {
                 $p1 = $this->playerService->removeDeuterium($p1, $require->deuterium);
             } else {
                 return false;
@@ -143,19 +143,18 @@ class BuildService
 
         $planet = Planet::find($building->planet);
         $player = Player::where("address", $planet->address)->firstOrFail();
-        $build = Build::find($building->build);
-        $require = Requires::where("id", $build->require)->andWhere("level", $building->level)->firstOrFail();
+        $require = Requires::where([["build", $building->build], ["level", $building->level + 1]])->firstOrFail();
 
-        $building->ready = time() + ($requrire->time * env("TRITIUM_BUILD_SPEED"));
+        $building->ready = (time() * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
 
         if ($this->suficientFunds($player, $require)) {
-            $this->spendResources($player, $require);
+            $player = $this->spendResources($player, $require);
         } else {
             return false;
         }
 
         $building->level += 1;
-
+        $player->save();
         $building->save();
     }
 
