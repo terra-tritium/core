@@ -4,14 +4,17 @@ namespace App\Services;
 
 use App\Models\Player;
 use App\Models\Planet;
+use App\Services\RankingService;
 
 class PlayerService
 {
 
   protected $timeNow;
+  protected $rankingService;
 
   public function __construct () {
     $this->timeNow = time() * 1000;
+    $this->rankingService = new RankingService();
   }
 
   public function currentBalance($p1, $type) {
@@ -115,6 +118,7 @@ class PlayerService
       $p1->metal = $this->currentBalance($p1, 1);
       $p1->timeMetal = $this->timeNow;
       $p1->metal -= $units;
+      $p1 = $this->rankingService->addPoints($p1, $units / 100);
     }
     return $p1;
   }
@@ -131,6 +135,7 @@ class PlayerService
       $p1->deuterium = $this->currentBalance($p1, 2);
       $p1->timeDeuterium = $this->timeNow;
       $p1->deuterium -= $units;
+      $p1 = $this->rankingService->addPoints($p1, $units / 20);
     }
     return $p1;
   }
@@ -147,6 +152,7 @@ class PlayerService
       $p1->crystal = $this->currentBalance($p1, 2);
       $p1->timeCrystal = $this->timeNow;
       $p1->crystal -= $units;
+      $p1 = $this->rankingService->addPoints($p1, $units / 20);
     }
     return $p1;
   }
