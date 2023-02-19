@@ -135,6 +135,15 @@ class DatabaseSeeder extends Seeder
             "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
         ]);
 
+        DB::table('builds')->insert([
+            "name" => "Military Camp",
+            "code" => 12,
+            "image" => "build-12.png",
+            "description" => "Descricao para military camp.",
+            "maxLevel" => 52,
+            "effect" => "A cada nível de expanção libera a construção de novas unidades"
+        ]);
+
         DB::table('requires')->insert([
             "build" => 1,
             "level" => 1,
