@@ -346,6 +346,188 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@com.br',
             'password' => bcrypt('123456'),
-       ]);
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Soldier T1',
+            'nick' => 'Soldier',
+            'description' => 'Texto de descrição do T1',
+            'type' => "droid",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Marine FFR02',
+            'nick' => 'Marine',
+            'description' => 'Texto de descrição do FFR02',
+            'type' => "droid",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Sentinela BALT3',
+            'nick' => 'Sentinela',
+            'description' => 'Texto de descrição do BALT3',
+            'type' => "droid",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Trooper Archer ARW4',
+            'nick' => 'Trooper',
+            'description' => 'Texto de descrição do ARW4',
+            'type' => "droid",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Laucher CMC5',
+            'nick' => 'Laucher',
+            'description' => 'Texto de descrição do CMC5',
+            'type' => "droid",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Bomber PHP6',
+            'nick' => 'Bomber',
+            'description' => 'Texto de descrição do PHP6',
+            'type' => "droid",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Screw Laucher SWL123',
+            'nick' => 'Screw',
+            'description' => 'Texto de descrição do SWL123',
+            'type' => "especial",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Killer Drone KD250',
+            'nick' => 'Killer',
+            'description' => 'Texto de descrição do KD250',
+            'type' => "especial",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'MovTermShield MTS20',
+            'nick' => 'MovTermShield',
+            'description' => 'Texto de descrição do MTS20',
+            'type' => "vehicle",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Energy Claw ENC30',
+            'nick' => 'Claw',
+            'description' => 'Texto de descrição do ENC30',
+            'type' => "vehicle",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Glower Sky GSY40',
+            'nick' => 'Glower',
+            'description' => 'Texto de descrição do GSY40',
+            'type' => "launcher",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Rocket Rainer RR50',
+            'nick' => 'Rocket',
+            'description' => 'Texto de descrição do RR50',
+            'type' => "launcher",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
+
+        DB::table('units')->insert([
+            'name' => 'Purple Storm PS60',
+            'nick' => 'Storm',
+            'description' => 'Texto de descrição do PS60',
+            'type' => "launcher",
+            'defense' => 5,
+            'attack' => 5,
+            'life' => 100,
+            'metal' => 500,
+            'deuterium' => 0,
+            'crystal' => 0,
+            'time' => 5
+        ]);
     }
 }

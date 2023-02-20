@@ -126,6 +126,27 @@ return new class extends Migration
             $table->bigInteger("start");
             $table->foreignId('action')->constrained("actions");
         });
+        Schema::create('units', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->string("nick");
+            $table->text("description");
+            $table->string("type");
+            $table->integer("defense");
+            $table->integer("attack");
+            $table->integer("life");
+            $table->bigInteger("metal");
+            $table->bigInteger("deuterium");
+            $table->bigInteger("crystal");
+            $table->bigInteger("time");
+        });
+        Schema::create('troop', function (Blueprint $table) {
+            $table->id();
+            $table->string("address");
+            $table->foreignId('planet')->constrained("planets");
+            $table->foreignId('unit')->constrained("units");
+            $table->bigInteger("quantity");
+        });
     }
 
     /**
