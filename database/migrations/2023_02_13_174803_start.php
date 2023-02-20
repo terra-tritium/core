@@ -131,6 +131,7 @@ return new class extends Migration
             $table->string("name");
             $table->string("nick");
             $table->text("description");
+            $table->string("image");
             $table->string("type");
             $table->integer("defense");
             $table->integer("attack");
