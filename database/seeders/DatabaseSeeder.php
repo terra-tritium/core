@@ -470,7 +470,7 @@ class DatabaseSeeder extends Seeder
 
         DB::table('units')->insert([
             'name' => 'MovTermShield MTS20',
-            'nick' => 'MovTermShield',
+            'nick' => 'MovShield',
             'description' => 'Texto de descrição do MTS20',
             'image' => 'droid-09.png',
             'type' => "vehicle",
