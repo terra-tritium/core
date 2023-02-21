@@ -60,3 +60,7 @@ Route::controller(PlayerController::class)->group(function () {
 Route::controller(UnitController::class)->group(function () {
     Route::get('/unit/list', 'list');
 });
+
+Route::controller(TroopController::class)->group(function () {
+    Route::post('/troop/build/{address}/{planet}', 'build');
+});

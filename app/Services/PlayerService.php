@@ -162,6 +162,12 @@ class PlayerService
     $player->deuterium = 0;
     $player->crystal = 0;
     $player->energy = 100;
+    $player->capMetal = 10000;
+    $player->capDeuterium = 10000;
+    $player->capCrystal = 10000;
+    $player->proMetal = 1000;
+    $player->proDeuterium = 1000;
+    $player->proCrystal = 1000;
     $player->pwMetal = 0;
     $player->pwDeuterium = 0;
     $player->pwCrystal = 0;

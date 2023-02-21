@@ -55,6 +55,12 @@ return new class extends Migration
             $table->bigInteger("deuterium");
             $table->bigInteger("crystal");
             $table->bigInteger("energy");
+            $table->bigInteger("capMetal");
+            $table->bigInteger("capDeuterium");
+            $table->bigInteger("capCrystal");
+            $table->bigInteger("proMetal");
+            $table->bigInteger("proDeuterium");
+            $table->bigInteger("proCrystal");
             $table->integer("pwMetal");
             $table->integer("pwDeuterium");
             $table->integer("pwCrystal");
