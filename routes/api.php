@@ -5,6 +5,7 @@ use App\Http\Controllers\CountryController;
 use App\Http\Controllers\PlanetController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\TroopController;
 //use App\Http\Controllers\AuthController;
 
 use Illuminate\Http\Request;
@@ -62,5 +63,5 @@ Route::controller(UnitController::class)->group(function () {
 });
 
 Route::controller(TroopController::class)->group(function () {
-    Route::post('/troop/build/{address}/{planet}', 'build');
+    Route::post('/troop/production/{address}/{planet}', 'production');
 });

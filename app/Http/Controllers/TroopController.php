@@ -3,13 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Troop;
+use App\Services\TroopService;
 use Illuminate\Http\Request;
 
 class TroopController extends Controller
 {
 
-    public function build() {
-        
-        //return Unit::orderBy('name')->get();
+    protected $troopService;
+
+    public function __construct(TroopService $troopService)
+    {
+        $this->troopService = $troopService;
+    }
+
+    public function production(Request $request, $address, $planet) {
+        return $this->troopService->production($address, $planet, $request->collect());
     }
 }
