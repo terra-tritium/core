@@ -130,18 +130,18 @@ class DatabaseSeeder extends Seeder
             "name" => "Batery House",
             "code" => 11,
             "image" => "build-11.png",
-            "description" => "Descricao para casa de baterias.",
+            "description" => "A Casa de Bateria é um monumento à inovação e à sustentabilidade, onde a tecnologia avançada se une a preocupação com o meio ambiente para garantir uma fonte de energia limpa e renovável. É um santuário da eficiência energética, onde painéis solares, baterias avançadas e outras tecnologias trabalham juntos para armazenar e distribuir energia de forma eficiente e confiável. É a visão de um futuro onde a humanidade pode satisfazer suas necessidades energéticas sem prejudicar o planeta, mas sim protegê-lo para as gerações futuras.",
             "maxLevel" => 52,
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
+            "effect" => "A cada nível, aumenta a eficiencia de armazenamento de energia"
         ]);
 
         DB::table('builds')->insert([
             "name" => "Military Camp",
             "code" => 12,
             "image" => "build-12.png",
-            "description" => "Descricao para military camp.",
+            "description" => "O campo de treinamento militar é uma academia celestial de excelência, onde as mentes brilhantes e os corpos fortes se unem para formar os guerreiros espaciais. É um ambiente sofisticado e avançado, equipado com tecnologias de simulação e treinamento avançadas, desenvolvidas para preparar os guerreiros para as missões mais desafiadoras no espaço. É a visão de um futuro onde a humanidade está preparada para explorar, proteger e preservar o universo. É um testemunho da dedicação humana à segurança e à defesa da vida e da liberdade, trazendo esperança e paz para as gerações futuras.",
             "maxLevel" => 52,
-            "effect" => "A cada nível de expanção libera a construção de novas unidades"
+            "effect" => "A cada nível, permite o desenvolvimento de novas armas e máquinas, além do aumento de capacidade de criação de novos rôbos militares."
         ]);
 
         DB::table('requires')->insert([
