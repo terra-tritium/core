@@ -54,12 +54,12 @@ class TroopService
         $crystal = 0;
 
         foreach ($units as $key => $unit) {
-            $metal += $unit->metal;
-            $deuterium += $unit->deuterium;
-            $crystal += $unit->crystal;
+            $metal += $unit["metal"];
+            $deuterium += $unit["deuterium"];
+            $crystal += $unit["crystal"];
         }
 
-        $p1 = Player::where("address", $address)->findOrFail();
+        $p1 = Player::where("address", $address)->firstOrFail();
         $p1 = $this->playerService->removeMetal($p1, $metal);
         $p1 = $this->playerService->removeDeuterium($p1, $deuterium);
         $p1 = $this->playerService->removeCrystal($p1, $crystal);

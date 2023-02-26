@@ -12,13 +12,23 @@ class ProductionService
     $production->address = $address;
     $production->planet = $planet;
     $finalTime = 0;
+    $newUnits = [];
     foreach ($units as $key => $unit) {
+      if (array_key_exists("quantity", $unit)) {
         $finalTime += $unit["time"];
+        $newUnits[] = $unit;
+      }
     }
     $production->ready = time() + $finalTime;
-    $production->objects = json_encode($units);
+    $production->objects = json_encode($newUnits);
+    $production->executed = false;
     $production->save();
 
-    TroopJob::dispatch($planet, $units)->delay(now()->addSecounds($finalTime * env("TRITIUM_PRODUCTION_SPEED")));
+    TroopJob::dispatch(
+      $planet,
+      $address,
+      $newUnits,
+      $production->id
+    )->delay(now()->addSeconds($finalTime * ( env("TRITIUM_PRODUCTION_SPEED") / 1000 ) ));
   }
 }

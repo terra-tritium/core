@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 use App\Models\Troop;
+use App\Models\Production;
 
 class TroopJob implements ShouldQueue
 {
@@ -17,16 +18,20 @@ class TroopJob implements ShouldQueue
 
     private $planet;
     private $units;
+    private $address;
+    private $production;
     
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($planet, $units)
+    public function __construct($planet, $address, $units, $production)
     {
         $this->planet = $planet;
         $this->units = $units;
+        $this->address = $address;
+        $this->production = $production;
     }
 
     /**
@@ -37,19 +42,22 @@ class TroopJob implements ShouldQueue
     public function handle()
     {
         foreach ($this->units as $key => $unit) {
-            $troop = Troop::where([["planet", $this->planet],["unit", $unit->id]])->first();
-            if (array_key_exists("quantity", $unit)) {
-                if ($troop) {
-                    $troop->quantity += $unit["quantity"];
-                    $troop->save();
-                } else {
-                    $troop = new Troop();
-                    $troop->planet = $this->planet;
-                    $troop->unit = $unit["id"];
-                    $troop->quantity = $unit["quantity"];
-                    $troop->save();
-                }
+
+            $troop = Troop::where([["planet", $this->planet],["unit", $unit["id"]]])->first();
+            $prod = Production::find($this->production);
+            $prod->executed = true;
+            
+            if ($troop) {
+                $troop->quantity += $unit["quantity"];
+            } else {
+                $troop = new Troop();
+                $troop->address = $this->address;
+                $troop->planet = $this->planet;
+                $troop->unit = $unit["id"];
+                $troop->quantity = $unit["quantity"];
             }
+            $prod->save();
+            $troop->save();
         }
     }
 }

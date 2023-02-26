@@ -8,5 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Troop extends Model
 {
     use HasFactory;
-    protected $table = 'troops';
+    protected $table = 'troop';
+    public $timestamps = false;
 }

@@ -158,7 +158,7 @@ return new class extends Migration
             $table->id();
             $table->string("address");
             $table->foreignId('planet')->constrained("planets");
-            $table->text("objects");
+            $table->json('objects');
             $table->bigInteger("ready");
             $table->boolean("executed");
         });
