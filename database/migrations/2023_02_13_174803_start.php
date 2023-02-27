@@ -154,6 +154,13 @@ return new class extends Migration
             $table->foreignId('unit')->constrained("units");
             $table->bigInteger("quantity");
         });
+        Schema::create('fleet', function (Blueprint $table) {
+            $table->id();
+            $table->string("address");
+            $table->foreignId('planet')->constrained("planets");
+            $table->foreignId('unit')->constrained("units");
+            $table->bigInteger("quantity");
+        });
         Schema::create('production', function (Blueprint $table) {
             $table->id();
             $table->string("address");
