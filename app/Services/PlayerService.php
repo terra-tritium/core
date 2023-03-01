@@ -176,11 +176,9 @@ class PlayerService
     $player->merchantShips = 0;
     $player->score = 0;
     $player->buildScore = 0;
-    $player->labScore = 0;
-    $player->tradeScore = 0;
     $player->attackScore = 0;
     $player->defenseScore = 0;
-    $player->warScore = 0;
+    $player->militaryScore = 0;
     $player->save();
 
     $planet = new Planet();
@@ -194,5 +192,10 @@ class PlayerService
     $planet->humanoids = 30;
     $planet->status = "pacific";
     $planet->save();
+  }
+
+  public function addBuildScore ($p1, $units) {
+    $p1->buildScore += $units;
+    return $p1;
   }
 }

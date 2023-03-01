@@ -8,6 +8,7 @@ use App\Http\Controllers\PlanetController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\TroopController;
+use App\Http\Controllers\RankingController;
 //use App\Http\Controllers\AuthController;
 
 use Illuminate\Http\Request;
@@ -66,4 +67,9 @@ Route::controller(UnitController::class)->group(function () {
 
 Route::controller(TroopController::class)->group(function () {
     Route::post('/troop/production/{address}/{planet}', 'production');
+});
+
+Route::controller(RankingController::class)->group(function () {
+    Route::get('/ranking/players/{address}/{type}', 'players');
+    Route::get('/ranking/aliances/{address}/{type}', 'aliances');
 });

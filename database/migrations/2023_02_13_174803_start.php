@@ -73,11 +73,9 @@ return new class extends Migration
             $table->bigInteger("merchantShips");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
-            $table->bigInteger("labScore");
-            $table->bigInteger("tradeScore");
             $table->bigInteger("attackScore");
             $table->bigInteger("defenseScore");
-            $table->bigInteger("warScore");
+            $table->bigInteger("militaryScore");
         });
         Schema::create('logbook', function (Blueprint $table) {
             $table->id();
