@@ -55,6 +55,8 @@ return new class extends Migration
             $table->bigInteger("deuterium");
             $table->bigInteger("crystal");
             $table->bigInteger("energy");
+            $table->bigInteger("battery");
+            $table->bigInteger("extraBattery");
             $table->bigInteger("capMetal");
             $table->bigInteger("capDeuterium");
             $table->bigInteger("capCrystal");
@@ -69,7 +71,6 @@ return new class extends Migration
             $table->bigInteger("timeDeuterium")->nullable();
             $table->bigInteger("timeCrystal")->nullable();
             $table->bigInteger("timeEnergy")->nullable();
-            $table->bigInteger("battery");
             $table->bigInteger("merchantShips");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");

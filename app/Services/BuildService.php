@@ -18,6 +18,7 @@ class BuildService
     private $basicScoreFator = 0.01;
     private $premiumScoreFator = 0.03;
     private $levelFactor = 100;
+    private $initialBattery = 10000;
 
     public function __construct() {
         $this->playerService = new PlayerService();
@@ -163,6 +164,11 @@ class BuildService
             $player = $this->spendResources($player, $require);
         } else {
             return false;
+        }
+
+        // Battery House
+        if ($building->build == 11) {
+            $player = $this->playerService->incrementBattery($p1, $this->initialBattery * $building->level);
         }
 
         $building->level += 1;
