@@ -15,6 +15,10 @@ class BuildService
 {
     private $playerService;
 
+    private $basicScoreFator = 0.01;
+    private $premiumScoreFator = 0.03;
+    private $levelFactor = 100;
+
     public function __construct() {
         $this->playerService = new PlayerService();
     }
@@ -97,20 +101,25 @@ class BuildService
         if ($building->build == 3 || $building->code > 6) {
             if ($this->playerService->enoughBalance($p1, $require->metal, 1)) {
                 $p1 = $this->playerService->removeMetal($p1, $require->metal);
+                $p1 = $this->playerService->addBuildScore($p1, $require->metal * $this->basicScoreFator);
             } else {
                 return false;
             }
             if ($this->playerService->enoughBalance($p1, $require->deuterium, 2)) {
                 $p1 = $this->playerService->removeDeuterium($p1, $require->deuterium);
+                $p1 = $this->playerService->addBuildScore($p1, $require->deuterium * $this->premiumScoreFator);
             } else {
                 return false;
             }
             if ($this->playerService->enoughBalance($p1, $require->crystal, 3)) {
                 $p1 = $this->playerService->removeCrystal($p1, $require->crystal);
+                $p1 = $this->playerService->addBuildScore($p1, $require->mecrystaltal * $this->premiumScoreFator);
             } else {
                 return false;
             }
         }
+
+        $p1 = $this->playerService->addBuildScore($p1, $this->levelFactor);
             
         $building->save();
         $p1->save();
@@ -134,6 +143,9 @@ class BuildService
         $p1 = $this->playerService->removeMetal($p1, $require->metal);
         $p1 = $this->playerService->removeDeuterium($p1, $require->deuterium);
         $p1 = $this->playerService->removeCrystal($p1, $require->crystal);
+        $p1 = $this->playerService->addBuildScore($p1, $require->metal * $this->basicScoreFator);
+        $p1 = $this->playerService->addBuildScore($p1, $require->deuterium * $this->premiumScoreFator);
+        $p1 = $this->playerService->addBuildScore($p1, $require->mecrystaltal * $this->premiumScoreFator);
         return $p1;
     }
 
@@ -154,6 +166,9 @@ class BuildService
         }
 
         $building->level += 1;
+
+        $player = $this->playerService->addBuildScore($player, $building->level * $this->levelFactor);
+
         $player->save();
         $building->save();
     }
