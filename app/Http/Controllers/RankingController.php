@@ -15,7 +15,7 @@ class RankingController extends Controller
 
         switch ($type) {
             case "top":
-                return Player::orderBy('score', 'DESC')->limit(10);
+                return Player::orderBy('score', 'DESC')->take(10)->get();
             case "general": 
                 return Player::orderBy('score', 'DESC')->paginate($this->itensPerPage);
             case "builder": 
