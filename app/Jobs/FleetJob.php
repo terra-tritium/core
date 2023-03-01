@@ -9,10 +9,10 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-use App\Models\Troop;
+use App\Models\Fleet;
 use App\Models\Production;
 
-class TroopJob implements ShouldQueue
+class FleetJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -43,21 +43,21 @@ class TroopJob implements ShouldQueue
     {
         foreach ($this->units as $key => $unit) {
 
-            $troop = Troop::where([["planet", $this->planet],["unit", $unit["id"]]])->first();
+            $fleet = Fleet::where([["planet", $this->planet],["unit", $unit["id"]]])->first();
             $prod = Production::find($this->production);
             $prod->executed = true;
             
-            if ($troop) {
-                $troop->quantity += $unit["quantity"];
+            if ($fleet) {
+                $fleet->quantity += $unit["quantity"];
             } else {
-                $troop = new Troop();
-                $troop->address = $this->address;
-                $troop->planet = $this->planet;
-                $troop->unit = $unit["id"];
-                $troop->quantity = $unit["quantity"];
+                $fleet = new Fleet();
+                $fleet->address = $this->address;
+                $fleet->planet = $this->planet;
+                $fleet->unit = $unit["id"];
+                $fleet->quantity = $unit["quantity"];
             }
             $prod->save();
-            $troop->save();
+            $fleet->save();
         }
     }
 }

@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Services\ProductionService;
 
-class TroopService
+class FleetService
 {
     private $productionService;
 
@@ -14,7 +14,7 @@ class TroopService
 
     public function production ($address, $planet, $units) {
         if ($this->productionService->hasFunds($units, $address)) {
-            $this->productionService->add($address, $planet, $units, "troop");
+            $this->productionService->add($address, $planet, $units, "fleet");
             $this->productionService->spendFunds($address, $units);
         } else {
             return "No suficients Funds";
