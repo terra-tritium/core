@@ -162,6 +162,8 @@ class PlayerService
     $player->deuterium = 0;
     $player->crystal = 0;
     $player->energy = 100;
+    $player->battery = 10000;
+    $player->extraBattery = 0;
     $player->capMetal = 10000;
     $player->capDeuterium = 10000;
     $player->capCrystal = 10000;
@@ -172,7 +174,6 @@ class PlayerService
     $player->pwDeuterium = 0;
     $player->pwCrystal = 0;
     $player->pwEnergy = 0;
-    $player->battery = 0;
     $player->merchantShips = 0;
     $player->score = 0;
     $player->buildScore = 0;
@@ -196,6 +197,11 @@ class PlayerService
 
   public function addBuildScore ($p1, $units) {
     $p1->buildScore += $units;
+    return $p1;
+  }
+
+  public function incrementBattery($p1, $units) {
+    $p1->battery += $units;
     return $p1;
   }
 }
