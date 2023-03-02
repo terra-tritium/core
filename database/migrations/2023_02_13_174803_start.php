@@ -168,6 +168,21 @@ return new class extends Migration
             $table->bigInteger("ready");
             $table->boolean("executed");
         });
+        Schema::create('researchs', function (Blueprint $table) {
+            $table->id();
+            $table->string("code");
+            $table->string("title");
+            $table->text("description");
+            $table->bigInteger("cost");
+            $table->string("dependence");
+            $table->integer("category");
+        });
+        Schema::create('researcheds', function (Blueprint $table) {
+            $table->id();
+            $table->string("address");
+            $table->foreignId('research')->constrained("researchs");
+        });
+        
     }
 
     /**
