@@ -529,7 +529,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "100",
+            'code' => 100,
             'title' => 'Economia de Energia',
             'description' => 'Descrição',
             'cost' => 100,
@@ -538,7 +538,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "200",
+            'code' => 200,
             'title' => 'Extração de minerio nobre',
             'description' => 'Descrição',
             'cost' => 100,
@@ -547,7 +547,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "300",
+            'code' => 300,
             'title' => 'Defesa',
             'description' => 'Descrição',
             'cost' => 100,
@@ -556,7 +556,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "400",
+            'code' => 400,
             'title' => 'Mecanica espacial',
             'description' => 'Descrição',
             'cost' => 100,
@@ -565,7 +565,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "500",
+            'code' => 500,
             'title' => 'Explorador',
             'description' => 'Descrição',
             'cost' => 100,
@@ -574,7 +574,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "600",
+            'code' => 600,
             'title' => 'Robotica',
             'description' => 'Descrição',
             'cost' => 100,
@@ -583,7 +583,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "700",
+            'code' => 700,
             'title' => 'Comercio',
             'description' => 'Descrição',
             'cost' => 100,
@@ -592,7 +592,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "800",
+            'code' => 800,
             'title' => 'Nanotecnologia',
             'description' => 'Descrição',
             'cost' => 100,
@@ -601,7 +601,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "900",
+            'code' => 900,
             'title' => 'Expansão',
             'description' => 'Descrição',
             'cost' => 100,
@@ -610,7 +610,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "1000",
+            'code' => 1000,
             'title' => 'Tritium',
             'description' => 'Descrição',
             'cost' => 100,
@@ -619,7 +619,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "1100",
+            'code' => 1100,
             'title' => 'Bateria',
             'description' => 'Descrição',
             'cost' => 100,
@@ -628,7 +628,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "1200",
+            'code' => 1200,
             'title' => 'Diplomacia',
             'description' => 'Descrição',
             'cost' => 100,
@@ -637,7 +637,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "1300",
+            'code' => 1300,
             'title' => 'Plasma',
             'description' => 'Descrição',
             'cost' => 100,
@@ -646,7 +646,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "1400",
+            'code' => 1400,
             'title' => 'Centro de Armazenamento',
             'description' => 'Descrição',
             'cost' => 100,
@@ -655,7 +655,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "1500",
+            'code' => 1500,
             'title' => 'Gravidade',
             'description' => 'Descrição',
             'cost' => 100,
@@ -664,7 +664,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "1600",
+            'code' => 1600,
             'title' => 'Reflexo de Lux',
             'description' => 'Descrição',
             'cost' => 100,
@@ -673,7 +673,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "1700",
+            'code' => 1700,
             'title' => 'Reflexo de Lux',
             'description' => 'Descrição',
             'cost' => 100,
@@ -682,7 +682,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "1800",
+            'code' => 1800,
             'title' => 'Hipervelocidade',
             'description' => 'Descrição',
             'cost' => 100,
@@ -691,7 +691,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "1900",
+            'code' => 1900,
             'title' => 'Fabrica',
             'description' => 'Descrição',
             'cost' => 100,
@@ -700,7 +700,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "2000",
+            'code' => 2000,
             'title' => 'Governo',
             'description' => 'Descrição',
             'cost' => 100,
@@ -709,7 +709,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "2100",
+            'code' => 2100,
             'title' => 'Localizador',
             'description' => 'Descrição',
             'cost' => 100,
@@ -718,7 +718,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "2200",
+            'code' => 2200,
             'title' => 'Fonte de energia',
             'description' => 'Descrição',
             'cost' => 100,
@@ -727,7 +727,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "2300",
+            'code' => 2300,
             'title' => 'Destroyer',
             'description' => 'Descrição',
             'cost' => 100,
@@ -736,7 +736,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "2400",
+            'code' => 2400,
             'title' => 'Black trade',
             'description' => 'Descrição',
             'cost' => 100,
@@ -745,7 +745,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "2500",
+            'code' => 2500,
             'title' => 'Tecnologia Alien',
             'description' => 'Descrição',
             'cost' => 100,
@@ -754,7 +754,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "2600",
+            'code' => 2600,
             'title' => 'Filtro de tritium',
             'description' => 'Descrição',
             'cost' => 100,
@@ -763,7 +763,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "2700",
+            'code' => 2700,
             'title' => 'Transcendência tecnologica 1',
             'description' => 'Descrição',
             'cost' => 100,
@@ -772,7 +772,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "2800",
+            'code' => 2800,
             'title' => 'Transcendência militar 1',
             'description' => 'Descrição',
             'cost' => 100,
@@ -781,7 +781,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "2900",
+            'code' => 2900,
             'title' => 'Transcendência espacial 1',
             'description' => 'Descrição',
             'cost' => 100,
@@ -790,7 +790,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "3000",
+            'code' => 3000,
             'title' => 'Tritium power mining 1',
             'description' => 'Descrição',
             'cost' => 100,
@@ -799,7 +799,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "3100",
+            'code' => 3100,
             'title' => 'Transcendência tecnologica 2',
             'description' => 'Descrição',
             'cost' => 100,
@@ -808,7 +808,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "3200",
+            'code' => 3200,
             'title' => 'Transcendência militar 2',
             'description' => 'Descrição',
             'cost' => 100,
@@ -817,7 +817,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "3300",
+            'code' => 3300,
             'title' => 'Transcendência espacial 2',
             'description' => 'Descrição',
             'cost' => 100,
@@ -826,7 +826,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "3400",
+            'code' => 3400,
             'title' => 'Tritium power mining 2',
             'description' => 'Descrição',
             'cost' => 100,
@@ -835,7 +835,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "3500",
+            'code' => 3500,
             'title' => 'Transcendência tecnologica 3',
             'description' => 'Descrição',
             'cost' => 100,
@@ -844,7 +844,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "3600",
+            'code' => 3600,
             'title' => 'Transcendência militar 3',
             'description' => 'Descrição',
             'cost' => 100,
@@ -853,7 +853,7 @@ class DatabaseSeeder extends Seeder
         ]);
         
         DB::table('researchs')->insert([
-            'code' => "3700",
+            'code' => 3700,
             'title' => 'Transcendência espacial 3',
             'description' => 'Descrição',
             'cost' => 100,
@@ -862,7 +862,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => "3800",
+            'code' => 3800,
             'title' => 'Tritium power mining 3',
             'description' => 'Descrição',
             'cost' => 100,

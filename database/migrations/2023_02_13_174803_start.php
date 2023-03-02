@@ -170,19 +170,23 @@ return new class extends Migration
         });
         Schema::create('researchs', function (Blueprint $table) {
             $table->id();
-            $table->string("code");
+            $table->integer("code");
             $table->string("title");
             $table->text("description");
-            $table->bigInteger("cost");
+            $table->integer("cost");
             $table->string("dependence");
             $table->integer("category");
         });
         Schema::create('researcheds', function (Blueprint $table) {
             $table->id();
             $table->string("address");
-            $table->foreignId('research')->constrained("researchs");
+            $table->integer("code");
+            $table->integer("points");
+            $table->integer("cost");
+            $table->integer("power");
+            $table->bigInteger("timer");
+            $table->integer("status");
         });
-        
     }
 
     /**

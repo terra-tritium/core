@@ -7,6 +7,7 @@ use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\TroopController;
 use App\Http\Controllers\RankingController;
+use App\Http\Controllers\ResearchController;
 //use App\Http\Controllers\AuthController;
 
 use Illuminate\Http\Request;
@@ -70,4 +71,11 @@ Route::controller(TroopController::class)->group(function () {
 Route::controller(RankingController::class)->group(function () {
     Route::get('/ranking/players/{address}/{type}', 'players');
     Route::get('/ranking/aliances/{address}/{type}', 'aliances');
+});
+
+Route::controller(ResearchController::class)->group(function () {
+    Route::get('/research/list', 'list');
+    Route::get('/researched/{address}', 'researched');
+    Route::post('/research/start/{address}/{code}', 'start');
+    Route::post('/research/done/{address}/{code}', 'done');
 });
