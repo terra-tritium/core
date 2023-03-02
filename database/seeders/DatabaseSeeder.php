@@ -579,7 +579,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "400",
-            'category' => 3,
+            'category' => 1,
         ]);
 
         DB::table('researchs')->insert([
@@ -597,7 +597,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "600",
-            'category' => 3,
+            'category' => 1,
         ]);
 
         DB::table('researchs')->insert([
@@ -606,7 +606,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "300,600,700",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -624,7 +624,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "800",
-            'category' => 3,
+            'category' => 1,
         ]);
 
         DB::table('researchs')->insert([
@@ -633,7 +633,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "900",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -642,7 +642,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "1100",
-            'category' => 3,
+            'category' => 1,
         ]);
 
         DB::table('researchs')->insert([
@@ -660,7 +660,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "1300,1400",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -678,7 +678,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "1500",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -687,7 +687,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "1700",
-            'category' => 3,
+            'category' => 1,
         ]);
 
         DB::table('researchs')->insert([
@@ -696,7 +696,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "1700",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -705,7 +705,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "1900",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -723,7 +723,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "1900",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -732,7 +732,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2200",
-            'category' => 3,
+            'category' => 1,
         ]);
 
         DB::table('researchs')->insert([
@@ -741,7 +741,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2200",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -750,7 +750,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2300",
-            'category' => 3,
+            'category' => 1,
         ]);
 
         DB::table('researchs')->insert([
@@ -768,7 +768,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2500",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -777,7 +777,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2500",
-            'category' => 3,
+            'category' => 1,
         ]);
 
         DB::table('researchs')->insert([
@@ -795,7 +795,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2700,2800,2900",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -804,7 +804,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2700",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -813,7 +813,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2800",
-            'category' => 3,
+            'category' => 1,
         ]);
 
         DB::table('researchs')->insert([
@@ -831,7 +831,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "3100,3200,3300",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -840,7 +840,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "3100",
-            'category' => 3,
+            'category' => 2,
         ]);
 
         DB::table('researchs')->insert([
@@ -849,7 +849,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "3200",
-            'category' => 3,
+            'category' => 1,
         ]);
         
         DB::table('researchs')->insert([
@@ -867,7 +867,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "3500,3600,3700",
-            'category' => 3,
+            'category' => 2,
         ]);
     }
 }
