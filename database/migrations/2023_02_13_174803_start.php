@@ -43,12 +43,20 @@ return new class extends Migration
             $table->string("code");
             $table->string("image");           
         });
+        Schema::create('modes', function (Blueprint $table) {
+            $table->id();
+            $table->integer("code");
+            $table->string("name");
+            $table->string("image");
+            $table->string("description");
+        });
         Schema::create('players', function (Blueprint $table) {
             $table->id();
             $table->string("name");
             $table->string("address");
             $table->timestamp("since")->useCurrent();
             $table->foreignId('country')->constrained("countrys");
+            $table->integer('gameMode');
             $table->integer('aliance')->nullable()->unsigned();
             $table->bigInteger("ready")->nullable();
             $table->bigInteger("metal");
@@ -186,6 +194,19 @@ return new class extends Migration
             $table->integer("power");
             $table->bigInteger("timer");
             $table->integer("status");
+        });
+        Schema::create('effects', function (Blueprint $table) {
+            $table->id();
+            $table->string("address");
+            $table->integer("speedProduceUnit");
+            $table->integer("speedProduceShip");
+            $table->integer("speedBuild");
+            $table->integer("speedResearch");
+            $table->integer("speedTravel");
+            $table->integer("speedMining");
+            $table->integer("costBuild");
+            $table->integer("protect");
+            $table->integer("extraAttack");
         });
     }
 
