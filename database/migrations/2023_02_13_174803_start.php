@@ -168,6 +168,25 @@ return new class extends Migration
             $table->bigInteger("ready");
             $table->boolean("executed");
         });
+        Schema::create('researchs', function (Blueprint $table) {
+            $table->id();
+            $table->integer("code");
+            $table->string("title");
+            $table->text("description");
+            $table->integer("cost");
+            $table->string("dependence");
+            $table->integer("category");
+        });
+        Schema::create('researcheds', function (Blueprint $table) {
+            $table->id();
+            $table->string("address");
+            $table->integer("code");
+            $table->integer("points");
+            $table->integer("cost");
+            $table->integer("power");
+            $table->bigInteger("timer");
+            $table->integer("status");
+        });
     }
 
     /**
