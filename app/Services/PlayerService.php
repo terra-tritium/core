@@ -180,6 +180,7 @@ class PlayerService
     $player->attackScore = 0;
     $player->defenseScore = 0;
     $player->militaryScore = 0;
+    $player->gameMode = 1;
     $player->save();
 
     $planet = new Planet();
