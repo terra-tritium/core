@@ -137,18 +137,22 @@ return new class extends Migration
             $table->integer("workers");
             $table->bigInteger("ready")->nullable();
         });
-        Schema::create('actions', function (Blueprint $table) {
-            $table->id();
-            $table->string("name");
-            $table->string("description");           
-        });
         Schema::create('travels', function (Blueprint $table) {
             $table->id();
+            $table->string("address");
+            $table->string("receptor");
             $table->string("from");
             $table->string("to");
-            $table->bigInteger("duration");
+            $table->bigInteger("arrival");
             $table->bigInteger("start");
-            $table->foreignId('action')->constrained("actions");
+            $table->integer('action');
+            $table->integer('status');
+            $table->json("troop");
+            $table->json("fleet");
+            $table->integer("metal");
+            $table->integer("crystal");
+            $table->integer("uranium");
+            $table->integer("merchantShips");
         });
         Schema::create('units', function (Blueprint $table) {
             $table->id();
