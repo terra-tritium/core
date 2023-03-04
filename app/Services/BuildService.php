@@ -35,7 +35,7 @@ class BuildService
                 break;
             case 2:
                 $hasBalance = $this->playerService->enoughBalance($p1, $require, $resourceSpend);
-                if ($hasBalance) { $p1 = $this->playerService->removeDeuterium($p1, $require); }
+                if ($hasBalance) { $p1 = $this->playerService->removeUranium($p1, $require); }
                 break;
             case 3:
                 $hasBalance = $this->playerService->enoughBalance($p1, $require, $resourceSpend);
@@ -89,7 +89,7 @@ class BuildService
             $this->starNewMining($p1, $building, 1, 1, $require->metal);
         }
 
-        // Deuterium Mining
+        // Uranium Mining
         if ($building->build == 5) {
             $this->starNewMining($p1, $building, 2, 1, $require->metal);
         }
@@ -106,9 +106,9 @@ class BuildService
             } else {
                 return false;
             }
-            if ($this->playerService->enoughBalance($p1, $require->deuterium, 2)) {
-                $p1 = $this->playerService->removeDeuterium($p1, $require->deuterium);
-                $p1 = $this->playerService->addBuildScore($p1, $require->deuterium * $this->premiumScoreFator);
+            if ($this->playerService->enoughBalance($p1, $require->uranium, 2)) {
+                $p1 = $this->playerService->removeUranium($p1, $require->uranium);
+                $p1 = $this->playerService->addBuildScore($p1, $require->uranium * $this->premiumScoreFator);
             } else {
                 return false;
             }
@@ -131,7 +131,7 @@ class BuildService
         if (!$this->playerService->enoughBalance($p1, $require->metal, 1)) {
             return false;
         }
-        if (!$this->playerService->enoughBalance($p1, $require->deuterium, 2)) {
+        if (!$this->playerService->enoughBalance($p1, $require->uranium, 2)) {
             return false;
         }
         if (!$this->playerService->enoughBalance($p1, $require->crystal, 3)) {
@@ -142,10 +142,10 @@ class BuildService
 
     public function spendResources($p1, $require) {
         $p1 = $this->playerService->removeMetal($p1, $require->metal);
-        $p1 = $this->playerService->removeDeuterium($p1, $require->deuterium);
+        $p1 = $this->playerService->removeUranium($p1, $require->uranium);
         $p1 = $this->playerService->removeCrystal($p1, $require->crystal);
         $p1 = $this->playerService->addBuildScore($p1, $require->metal * $this->basicScoreFator);
-        $p1 = $this->playerService->addBuildScore($p1, $require->deuterium * $this->premiumScoreFator);
+        $p1 = $this->playerService->addBuildScore($p1, $require->uranium * $this->premiumScoreFator);
         $p1 = $this->playerService->addBuildScore($p1, $require->mecrystaltal * $this->premiumScoreFator);
         return $p1;
     }
@@ -239,11 +239,11 @@ class BuildService
                     $p1->pwMetal = $workers;
                     break;
 
-                // Deuterium
+                // Uranium
                 case 5 : 
-                    $p1->deuterium = $this->playerService->currentBalance($p1, 2);
-                    $p1->timeDeuterium = time() * 1000;
-                    $p1->pwDeuterium = $workers;
+                    $p1->uranium = $this->playerService->currentBalance($p1, 2);
+                    $p1->timeUranium = time() * 1000;
+                    $p1->pwUranium = $workers;
                     break;
 
                 // Crystal

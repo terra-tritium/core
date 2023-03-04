@@ -22,7 +22,7 @@ class PlayerService
     $msInHour = 3600000;
     $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $msInHour;
     $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $msInHour;
-    $activeDeuteriumMining = ($this->timeNow - $p1->timeDeuterium) / $msInHour;
+    $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $msInHour;
     $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $msInHour;
 
     switch ($type) {
@@ -31,7 +31,7 @@ class PlayerService
       case 1: 
         return $p1->metal + ($p1->pwMetal * (env("TRITIUM_METAL") * $activeMetalMining));
       case 2: 
-        return $p1->deuterium + ($p1->pwDeuterium * (env("TRITIUM_DEUTERIUM") * $activeDeuteriumMining));
+        return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM") * $activeUraniumMining));
       case 3:
         return $p1->crystal + ($p1->pwCrysttal * (env("TRITIUM_Crystal") * $activeCrystalMining));
     }
@@ -83,8 +83,8 @@ class PlayerService
         break;
     
       case 2:
-        $player->timeDeuterium = $this->timeNow;
-        $player->pwDeuterium = 0;
+        $player->timeUranium = $this->timeNow;
+        $player->pwUranium = 0;
         break;
 
       case 3:
@@ -123,27 +123,27 @@ class PlayerService
     return $p1;
   }
 
-  public function addDeuterium($p1, $units) {
-    $p1->deuterium = $this->currentBalance($p1, 2);
-    $p1->timeDeuterium = $this->timeNow;
-    $p1->deuterium += $units;
+  public function addUranium($p1, $units) {
+    $p1->uranium = $this->currentBalance($p1, 2);
+    $p1->timeUranium = $this->timeNow;
+    $p1->uranium += $units;
     return $p1;
   }
 
-  public function removeDeuterium($p1, $units) {
+  public function removeUranium($p1, $units) {
     if ($this->currentBalance($p1, 2) > $units) {
-      $p1->deuterium = $this->currentBalance($p1, 2);
-      $p1->timeDeuterium = $this->timeNow;
-      $p1->deuterium -= $units;
+      $p1->uranium = $this->currentBalance($p1, 2);
+      $p1->timeUranium = $this->timeNow;
+      $p1->uranium -= $units;
       $p1 = $this->rankingService->addPoints($p1, $units / 20);
     }
     return $p1;
   }
 
   public function addCrystal($p1, $units) {
-    $p1->deuterium = $this->currentBalance($p1, 2);
-    $p1->timeDeuterium = $this->timeNow;
-    $p1->deuterium += $units;
+    $p1->uranium = $this->currentBalance($p1, 2);
+    $p1->timeUranium = $this->timeNow;
+    $p1->uranium += $units;
     return $p1;
   }
 
@@ -159,19 +159,19 @@ class PlayerService
 
   public function register(Player $player) {
     $player->metal = 1500;
-    $player->deuterium = 0;
+    $player->uranium = 0;
     $player->crystal = 0;
     $player->energy = 100;
     $player->battery = 10000;
     $player->extraBattery = 0;
     $player->capMetal = 10000;
-    $player->capDeuterium = 10000;
+    $player->capUranium = 10000;
     $player->capCrystal = 10000;
     $player->proMetal = 1000;
-    $player->proDeuterium = 1000;
+    $player->proUranium = 1000;
     $player->proCrystal = 1000;
     $player->pwMetal = 0;
-    $player->pwDeuterium = 0;
+    $player->pwUranium = 0;
     $player->pwCrystal = 0;
     $player->pwEnergy = 0;
     $player->merchantShips = 0;
