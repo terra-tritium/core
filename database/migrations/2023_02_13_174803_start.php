@@ -50,6 +50,20 @@ return new class extends Migration
             $table->string("image");
             $table->string("description");
         });
+        Schema::create('attackmodes', function (Blueprint $table) {
+            $table->id();
+            $table->integer("code");
+            $table->string("name");
+            $table->string("image");
+            $table->string("description");
+        });
+        Schema::create('defensemodes', function (Blueprint $table) {
+            $table->id();
+            $table->integer("code");
+            $table->string("name");
+            $table->string("image");
+            $table->string("description");
+        });
         Schema::create('players', function (Blueprint $table) {
             $table->id();
             $table->string("name");
@@ -57,6 +71,8 @@ return new class extends Migration
             $table->timestamp("since")->useCurrent();
             $table->foreignId('country')->constrained("countrys");
             $table->integer('gameMode');
+            $table->integer('attackMode');
+            $table->integer('defenseMode');
             $table->integer('aliance')->nullable()->unsigned();
             $table->bigInteger("ready")->nullable();
             $table->bigInteger("metal");
