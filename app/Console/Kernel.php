@@ -5,6 +5,9 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
+use App\Models\Player;
+use App\Models\Ranking;
+
 class Kernel extends ConsoleKernel
 {
     /**
@@ -15,7 +18,24 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        # Ranking
+        $schedule->call(function () {
+
+            $players = Player::all();
+
+            foreach($players as $p) {
+                $ranking = new Ranking();
+                $ranking->name = $p->name;
+                $ranking->address = $p->address;
+                $ranking->energy = $p->energy;
+                $ranking->score = $p->score;
+                $ranking->buildScore = $p->buildScore;
+                $ranking->attackScore = $p->attackScore;
+                $ranking->defenseScore = $p->defenseScore;
+                $ranking->militaryScore = $p->militaryScore;
+                $ranking->save();
+            }
+        })->everyThirtyMinutes();
     }
 
     /**

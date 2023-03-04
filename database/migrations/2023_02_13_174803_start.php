@@ -86,6 +86,17 @@ return new class extends Migration
             $table->bigInteger("defenseScore");
             $table->bigInteger("militaryScore");
         });
+        Schema::create('ranking', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->string("address");
+            $table->bigInteger("energy");
+            $table->bigInteger("score");
+            $table->bigInteger("buildScore");
+            $table->bigInteger("attackScore");
+            $table->bigInteger("defenseScore");
+            $table->bigInteger("militaryScore");
+        });
         Schema::create('logbook', function (Blueprint $table) {
             $table->id();
             $table->string("text");

@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Aliance extends Model
+class Ranking extends Model
 {
     use HasFactory;
-    protected $table = 'aliances';
+    protected $table = 'ranking';
     public $timestamps = false;
 }
