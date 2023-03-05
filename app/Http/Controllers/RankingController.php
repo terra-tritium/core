@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Player;
+use App\Models\Ranking;
 use App\Models\Aliance;
 use Illuminate\Http\Request;
 
@@ -15,19 +15,19 @@ class RankingController extends Controller
 
         switch ($type) {
             case "top":
-                return Player::orderBy('score', 'DESC')->take(10)->get();
+                return Ranking::orderBy('score', 'DESC')->take(10)->get();
             case "general": 
-                return Player::orderBy('score', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy('score', 'DESC')->paginate($this->itensPerPage);
             case "builder": 
-                return Player::orderBy('buildScore', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy('buildScore', 'DESC')->paginate($this->itensPerPage);
             case "military": 
-                return Player::orderBy('militaryScore', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy('militaryScore', 'DESC')->paginate($this->itensPerPage);
             case "attack":
-                return Player::orderBy('attackScore', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy('attackScore', 'DESC')->paginate($this->itensPerPage);
             case "defense":
-                return Player::orderBy('defenseScore', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy('defenseScore', 'DESC')->paginate($this->itensPerPage);
             case "energy":
-                return Player::orderBy('energy', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy('energy', 'DESC')->paginate($this->itensPerPage);
         }
     }
 

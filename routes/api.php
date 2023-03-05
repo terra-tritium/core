@@ -11,6 +11,8 @@ use App\Http\Controllers\TroopController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\GameModeController;
+use App\Http\Controllers\TravelController;
+use App\Http\Controllers\BattleController;
 //use App\Http\Controllers\AuthController;
 
 use Illuminate\Http\Request;
@@ -86,4 +88,18 @@ Route::controller(ResearchController::class)->group(function () {
 Route::controller(GameModeController::class)->group(function () {
     Route::get('/mode/list', 'list');
     Route::post('/mode/change/{address}/{code}', 'change');
+});
+
+Route::controller(TravelController::class)->group(function () {
+    Route::get('/travel/list/{address}', 'list');
+    Route::get('/travel/current/{address}', 'current');
+    Route::post('/travel/start/{address}', 'start');
+    Route::post('/travel/back/{address}', 'back');
+});
+
+Route::controller(BattleController::class)->group(function () {
+    Route::get('/battle/attackmode/list', 'attackModeList');
+    Route::get('/battle/defensemode/list', 'defenseModeList');
+    Route::post('/battle/attackmode/{address}/{option}', 'changeAttackMode');
+    Route::post('/battle/defensemode/{address}/{option}', 'changeDefenseMode');
 });

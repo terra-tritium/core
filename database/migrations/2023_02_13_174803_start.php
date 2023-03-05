@@ -50,6 +50,20 @@ return new class extends Migration
             $table->string("image");
             $table->string("description");
         });
+        Schema::create('attackmodes', function (Blueprint $table) {
+            $table->id();
+            $table->integer("code");
+            $table->string("name");
+            $table->string("image");
+            $table->string("description");
+        });
+        Schema::create('defensemodes', function (Blueprint $table) {
+            $table->id();
+            $table->integer("code");
+            $table->string("name");
+            $table->string("image");
+            $table->string("description");
+        });
         Schema::create('players', function (Blueprint $table) {
             $table->id();
             $table->string("name");
@@ -57,29 +71,42 @@ return new class extends Migration
             $table->timestamp("since")->useCurrent();
             $table->foreignId('country')->constrained("countrys");
             $table->integer('gameMode');
+            $table->integer('attackMode');
+            $table->integer('defenseMode');
             $table->integer('aliance')->nullable()->unsigned();
             $table->bigInteger("ready")->nullable();
             $table->bigInteger("metal");
-            $table->bigInteger("deuterium");
+            $table->bigInteger("uranium");
             $table->bigInteger("crystal");
             $table->bigInteger("energy");
             $table->bigInteger("battery");
             $table->bigInteger("extraBattery");
             $table->bigInteger("capMetal");
-            $table->bigInteger("capDeuterium");
+            $table->bigInteger("capUranium");
             $table->bigInteger("capCrystal");
             $table->bigInteger("proMetal");
-            $table->bigInteger("proDeuterium");
+            $table->bigInteger("proUranium");
             $table->bigInteger("proCrystal");
             $table->integer("pwMetal");
-            $table->integer("pwDeuterium");
+            $table->integer("pwUranium");
             $table->integer("pwCrystal");
             $table->integer("pwEnergy");
             $table->bigInteger("timeMetal")->nullable();
-            $table->bigInteger("timeDeuterium")->nullable();
+            $table->bigInteger("timeUranium")->nullable();
             $table->bigInteger("timeCrystal")->nullable();
             $table->bigInteger("timeEnergy")->nullable();
             $table->bigInteger("merchantShips");
+            $table->bigInteger("score");
+            $table->bigInteger("buildScore");
+            $table->bigInteger("attackScore");
+            $table->bigInteger("defenseScore");
+            $table->bigInteger("militaryScore");
+        });
+        Schema::create('ranking', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->string("address");
+            $table->bigInteger("energy");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
             $table->bigInteger("attackScore");
@@ -104,7 +131,7 @@ return new class extends Migration
             $table->integer('build');
             $table->integer("level");
             $table->bigInteger("metal");
-            $table->bigInteger("deuterium");
+            $table->bigInteger("uranium");
             $table->bigInteger("crystal");
             $table->bigInteger("time");
         });
@@ -126,18 +153,22 @@ return new class extends Migration
             $table->integer("workers");
             $table->bigInteger("ready")->nullable();
         });
-        Schema::create('actions', function (Blueprint $table) {
-            $table->id();
-            $table->string("name");
-            $table->string("description");           
-        });
         Schema::create('travels', function (Blueprint $table) {
             $table->id();
+            $table->string("address");
+            $table->string("receptor");
             $table->string("from");
             $table->string("to");
-            $table->bigInteger("duration");
+            $table->bigInteger("arrival");
             $table->bigInteger("start");
-            $table->foreignId('action')->constrained("actions");
+            $table->integer('action');
+            $table->integer('status');
+            $table->json("troop");
+            $table->json("fleet");
+            $table->integer("metal");
+            $table->integer("crystal");
+            $table->integer("uranium");
+            $table->integer("merchantShips");
         });
         Schema::create('units', function (Blueprint $table) {
             $table->id();
@@ -150,7 +181,7 @@ return new class extends Migration
             $table->integer("attack");
             $table->integer("life");
             $table->bigInteger("metal");
-            $table->bigInteger("deuterium");
+            $table->bigInteger("uranium");
             $table->bigInteger("crystal");
             $table->bigInteger("time");
         });

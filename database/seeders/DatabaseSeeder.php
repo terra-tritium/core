@@ -82,10 +82,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('builds')->insert([
-            "name" => "Deuterium Mining",
+            "name" => "Uranium Mining",
             "code" => 5,
             "image" => "build-05.png",
-            "description" => "Máquina de mineração de deuterium, a cada nível aumenta a capacidade de minerar deuterium, essa máquina exige energia como custo para manter o funcionamento. O deuterium é um recurso nobre usado nas construções, máquinas e naves específicas.",
+            "description" => "Máquina de mineração de uranium, a cada nível aumenta a capacidade de minerar uranium, essa máquina exige energia como custo para manter o funcionamento. O uranium é um recurso nobre usado nas construções, máquinas e naves específicas.",
             "maxLevel" => 52,
             "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
         ]);
@@ -148,7 +148,7 @@ class DatabaseSeeder extends Seeder
             "build" => 1,
             "level" => 1,
             "metal" => 200,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -157,7 +157,7 @@ class DatabaseSeeder extends Seeder
             "build" => 1,
             "level" => 2,
             "metal" => 28000,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -166,7 +166,7 @@ class DatabaseSeeder extends Seeder
             "build" => 2,
             "level" => 1,
             "metal" => 200,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -175,7 +175,7 @@ class DatabaseSeeder extends Seeder
             "build" => 2,
             "level" => 2,
             "metal" => 1000,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -184,7 +184,7 @@ class DatabaseSeeder extends Seeder
             "build" => 3,
             "level" => 1,
             "metal" => 200,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -193,7 +193,7 @@ class DatabaseSeeder extends Seeder
             "build" => 3,
             "level" => 2,
             "metal" => 1000,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -202,7 +202,7 @@ class DatabaseSeeder extends Seeder
             "build" => 4,
             "level" => 1,
             "metal" => 200,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -211,7 +211,7 @@ class DatabaseSeeder extends Seeder
             "build" => 4,
             "level" => 2,
             "metal" => 1000,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -220,7 +220,7 @@ class DatabaseSeeder extends Seeder
             "build" => 5,
             "level" => 1,
             "metal" => 200,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -229,7 +229,7 @@ class DatabaseSeeder extends Seeder
             "build" => 5,
             "level" => 2,
             "metal" => 1000,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -238,7 +238,7 @@ class DatabaseSeeder extends Seeder
             "build" => 6,
             "level" => 1,
             "metal" => 200,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -247,7 +247,7 @@ class DatabaseSeeder extends Seeder
             "build" => 6,
             "level" => 2,
             "metal" => 1000,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -256,7 +256,7 @@ class DatabaseSeeder extends Seeder
             "build" => 7,
             "level" => 1,
             "metal" => 200,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -265,7 +265,7 @@ class DatabaseSeeder extends Seeder
             "build" => 7,
             "level" => 2,
             "metal" => 1000,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -274,7 +274,7 @@ class DatabaseSeeder extends Seeder
             "build" => 8,
             "level" => 1,
             "metal" => 200,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -283,7 +283,7 @@ class DatabaseSeeder extends Seeder
             "build" => 8,
             "level" => 2,
             "metal" => 1000,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -292,7 +292,7 @@ class DatabaseSeeder extends Seeder
             "build" => 9,
             "level" => 1,
             "metal" => 200,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -301,7 +301,7 @@ class DatabaseSeeder extends Seeder
             "build" => 9,
             "level" => 2,
             "metal" => 1000,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -310,7 +310,7 @@ class DatabaseSeeder extends Seeder
             "build" => 10,
             "level" => 1,
             "metal" => 200,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -319,7 +319,7 @@ class DatabaseSeeder extends Seeder
             "build" => 10,
             "level" => 2,
             "metal" => 1000,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -328,7 +328,7 @@ class DatabaseSeeder extends Seeder
             "build" => 11,
             "level" => 1,
             "metal" => 200,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -337,7 +337,7 @@ class DatabaseSeeder extends Seeder
             "build" => 11,
             "level" => 2,
             "metal" => 1000,
-            "deuterium" => 0,
+            "uranium" => 0,
             "crystal" => 0,
             "time" => 2
         ]);
@@ -358,7 +358,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);
@@ -373,7 +373,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);
@@ -388,7 +388,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);
@@ -403,7 +403,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);
@@ -418,7 +418,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);
@@ -433,7 +433,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);
@@ -448,7 +448,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);
@@ -463,7 +463,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);
@@ -478,7 +478,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);
@@ -493,7 +493,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);
@@ -508,7 +508,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);
@@ -523,7 +523,7 @@ class DatabaseSeeder extends Seeder
             'attack' => 5,
             'life' => 100,
             'metal' => 500,
-            'deuterium' => 0,
+            'uranium' => 0,
             'crystal' => 0,
             'time' => 5
         ]);

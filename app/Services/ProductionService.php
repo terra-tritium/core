@@ -61,7 +61,7 @@ class ProductionService
             if (!$this->playerService->enoughBalance($p1, ($unitModel->metal * $unit["quantity"]), 1)){
                 return false;
             }
-            if (!$this->playerService->enoughBalance($p1, ($unitModel->deuterium * $unit["quantity"]), 2)){
+            if (!$this->playerService->enoughBalance($p1, ($unitModel->uranium * $unit["quantity"]), 2)){
                 return false;
             }
             if (!$this->playerService->enoughBalance($p1, ($unitModel->crystal * $unit["quantity"]), 3)){
@@ -74,18 +74,18 @@ class ProductionService
 
   public function spendFunds($address, $units) {
     $metal = 0;
-    $deuterium = 0;
+    $uranium = 0;
     $crystal = 0;
 
     foreach ($units as $key => $unit) {
         $metal += $unit["metal"];
-        $deuterium += $unit["deuterium"];
+        $uranium += $unit["uranium"];
         $crystal += $unit["crystal"];
     }
 
     $p1 = Player::where("address", $address)->firstOrFail();
     $p1 = $this->playerService->removeMetal($p1, $metal);
-    $p1 = $this->playerService->removeDeuterium($p1, $deuterium);
+    $p1 = $this->playerService->removeUranium($p1, $uranium);
     $p1 = $this->playerService->removeCrystal($p1, $crystal);
     $p1->save();
 }
