@@ -50,14 +50,7 @@ return new class extends Migration
             $table->string("image");
             $table->string("description");
         });
-        Schema::create('attackmodes', function (Blueprint $table) {
-            $table->id();
-            $table->integer("code");
-            $table->string("name");
-            $table->string("image");
-            $table->string("description");
-        });
-        Schema::create('defensemodes', function (Blueprint $table) {
+        Schema::create('strategys', function (Blueprint $table) {
             $table->id();
             $table->integer("code");
             $table->string("name");
@@ -71,8 +64,8 @@ return new class extends Migration
             $table->timestamp("since")->useCurrent();
             $table->foreignId('country')->constrained("countrys");
             $table->integer('gameMode');
-            $table->integer('attackMode');
-            $table->integer('defenseMode');
+            $table->integer('attackStrategy');
+            $table->integer('defenderStrategy');
             $table->integer('aliance')->nullable()->unsigned();
             $table->bigInteger("ready")->nullable();
             $table->bigInteger("metal");
@@ -238,6 +231,36 @@ return new class extends Migration
             $table->integer("costBuild");
             $table->integer("protect");
             $table->integer("extraAttack");
+        });
+        Schema::create('battles', function (Blueprint $table) {
+            $table->id();
+            $table->string("attacker");
+            $table->string("defender");
+            $table->string("attackerDemage")->nullable();
+            $table->string("defenderDemage")->nullable();
+            $table->integer("attackerStrategy");
+            $table->integer("defenderStrategy");
+            $table->integer("result")->nullable();
+            $table->bigInteger("start");
+            $table->integer("stages");
+            $table->json('resources')->nullable();;
+            $table->json('attackerUnits');
+            $table->json('defenderUnits');
+        });
+        Schema::create('stages', function (Blueprint $table) {
+            $table->id();
+            $table->integer("number");
+            $table->foreignId('battle')->constrained("battles");
+            $table->string("attackerDemage");
+            $table->string("defenderDemage");
+            $table->integer("attackerStrategy");
+            $table->integer("defenderStrategy");
+            $table->json('attackerUnits');
+            $table->json('defenderUnits');
+            $table->json('attakerKills');
+            $table->json('defenderKills');
+            $table->boolean('attackerRetreated');
+            $table->boolean('defenderRetreated');
         });
     }
 
