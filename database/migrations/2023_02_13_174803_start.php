@@ -50,7 +50,7 @@ return new class extends Migration
             $table->string("image");
             $table->string("description");
         });
-        Schema::create('strategys', function (Blueprint $table) {
+        Schema::create('strategies', function (Blueprint $table) {
             $table->id();
             $table->integer("code");
             $table->string("name");
@@ -261,6 +261,11 @@ return new class extends Migration
             $table->json('defenderKills');
             $table->boolean('attackerRetreated');
             $table->boolean('defenderRetreated');
+        });
+        Schema::create('qnames', function (Blueprint $table) {
+            $table->id();
+            $table->string("quadrant");
+            $table->string("name");
         });
     }
 
