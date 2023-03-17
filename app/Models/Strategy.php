@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AttackMode extends Model
+class Strategy extends Model
 {
     use HasFactory;
-    protected $table = 'attackmodes';
+    protected $table = 'strategys';
     public $timestamps = false;
 }
