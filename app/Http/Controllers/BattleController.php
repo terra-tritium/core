@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\AttackMode;
 use App\Models\DefenseMode;
 use App\Models\Player;
+use App\Models\Battle;
+use App\Models\BattleStage;
 use App\Services\BattleService;
 use Illuminate\Http\Request;
 
@@ -37,8 +39,12 @@ class BattleController extends Controller
         $player->save();
     }
 
+    public function view ($id) {
+        return BattleStage::where('battle', $id)->get();
+    }
+
     public function start() {
-        $attacker = "terraSihduam34a43j4hssz94e";
+        $attack = "terraSihduam34a43j4hssz94e";
         $defender = "terra9d8sksfdccfkkkllssGu9";
         $aUnits = [
             [
@@ -58,7 +64,7 @@ class BattleController extends Controller
         $dStrategy = 5;
 
         return $this->battleService->startNewBattle (
-            $attacker,
+            $attack,
             $defender,
             $aUnits,
             $dUnits,
