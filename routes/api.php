@@ -102,4 +102,5 @@ Route::controller(BattleController::class)->group(function () {
     Route::get('/battle/defensemode/list', 'defenseModeList');
     Route::post('/battle/attackmode/{address}/{option}', 'changeAttackMode');
     Route::post('/battle/defensemode/{address}/{option}', 'changeDefenseMode');
+    Route::get('/battle/start', 'start');
 });

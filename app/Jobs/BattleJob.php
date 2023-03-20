@@ -17,17 +17,17 @@ class BattleJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $battleService;
-    private $battle;
+    private $battleId;
     
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($battleService, $battle)
+    public function __construct($battleService, $battleId)
     {
         $this->battleService = $battleService;
-        $this->battle = $battle;
+        $this->battleId = $battleId;
     }
 
     /**
@@ -37,6 +37,6 @@ class BattleJob implements ShouldQueue
      */
     public function handle()
     {
-        $this->battleService->calculateStage($this->battle);
+        $this->battleService->calculateStage($this->battleId);
     }
 }

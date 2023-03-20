@@ -242,7 +242,7 @@ return new class extends Migration
             $table->integer("defenderStrategy");
             $table->integer("result")->nullable();
             $table->bigInteger("start");
-            $table->integer("stages");
+            $table->integer("stage");
             $table->json('resources')->nullable();;
             $table->json('attackerUnits');
             $table->json('defenderUnits');
@@ -259,8 +259,8 @@ return new class extends Migration
             $table->json('defenderUnits');
             $table->json('attakerKills');
             $table->json('defenderKills');
-            $table->boolean('attackerRetreated');
-            $table->boolean('defenderRetreated');
+            $table->boolean('attackerGaveUp');
+            $table->boolean('defenderGaveUp');
         });
         Schema::create('qnames', function (Blueprint $table) {
             $table->id();
