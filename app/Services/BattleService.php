@@ -4,24 +4,44 @@ namespace App\Services;
 
 use App\Models\Battle;
 use App\Models\BattleSlot;
+use App\Models\BattleStage;
 use App\Jobs\BattleJob;
 
 class BattleService
 {
-    private $sizeFator1 = 1;
-    private $sizeFator2 = 5;
-    private $sizeFator3 = 10;
-    private $droidSlotSize = 50;
-    private $vehicleSlotSize = 20;
-    private $launchersSlotSize = 20;
-    private $specialSlotSize = 5;
-    private $rangeLimit1 = 1000;
-    private $rangeLimit2 = 5000;
-    private $rangeLimit3 = -1;
-    private $attackSlots = [];
-    private $defenderSlots = [];
-    private $attackReserve = [];
-    private $defenderReserve = [];
+    private $sizeFator1;
+    private $sizeFator2;
+    private $sizeFator3;
+    private $droidSlotSize;
+    private $vehicleSlotSize;
+    private $launchersSlotSize;
+    private $specialSlotSize;
+    private $rangeLimit1;
+    private $rangeLimit2;
+    private $rangeLimit3;
+    private $attackSlots;
+    private $defenderSlots;
+    private $attackReserve;
+    private $defenderReserve;
+    private $currentStage;
+
+    public function __construct() {
+        $this->sizeFator1 = 1;
+        $this->sizeFator2 = 5;
+        $this->sizeFator3 = 10;
+        $this->droidSlotSize = 50;
+        $this->vehicleSlotSize = 20;
+        $this->launchersSlotSize = 20;
+        $this->specialSlotSize = 5;
+        $this->rangeLimit1 = 1000;
+        $this->rangeLimit2 = 5000;
+        $this->rangeLimit3 = -1;
+        $this->attackSlots = [];
+        $this->defenderSlots = [];
+        $this->attackReserve = [];
+        $this->defenderReserve = [];
+        $this->currentStage = new BattleStage();
+    }
 
     public function startNewBattle ($attacker, $defender, $aUnits, $dUnits, $aStrategy, $dStrategy) {
         $battle = new Battle();
@@ -40,29 +60,75 @@ class BattleService
 
         $this->loadReverve($battle);
 
-        $battle = $this->calculateStage($battle);
+        $battle = $this->calculateStage($battle->id);
     }
 
-    public function calculateStage($battle) {
+    # Job call
+    public function calculateStage($battleId) {
+
+        $battle = Battle::find($battleId);
+
         $this->fillSlots($battle);
 
         $battle->stage += 1;
         $battle->save();
 
+        $stage = $this->createNewStage($battle);
+
         # Start job for new stage if no end
-        if (! $this->isEnd($battle)) {
+        if (!$this->isEnd()) {
             BattleJob::dispatch(
                 $this,
-                $battle
+                $battle->id
             )->delay(now()->addSeconds(env("TRITIUM_STAGE_SPEED") / 1000 ));
         } else {
-            if ($this->attakerReserve == 0 || $battle->attackerRetreated = true) {
+            if ($this->attakerReserve == 0 || $this->currentStage->attackerGaveUp == true) {
                 $battle->result = 2;
             }
-            if ($this->defenderReserve == 0 || $battle->defenderRetreated = true) {
+            if ($this->defenderReserve == 0 || $this->currentStage->defenderGaveUp == true) {
                 $battle->result = 1;
             }
             $battle->save();
+        }
+    }
+
+    private function createNewStage($battle) {
+
+        $desistiu = rand(0, 1);
+
+        $stage = new BattleStage();
+        $stage->number = $battle->stage;
+        $stage->battle = $battle->id;
+        $stage->attackerDemage = 0;
+        $stage->defenderDemage = 0;
+        $stage->attackerStrategy = $battle->attackerStrategy;
+        $stage->defenderStrategy = $battle->defenderStrategy;
+        $stage->attackerUnits = $battle->attackerUnits;
+        $stage->defenderUnits = $battle->attackerUnits;
+        $stage->attakerKills = 0;
+        $stage->defenderKills = 0;
+        $stage->attackerGaveUp = false;
+        $stage->defenderGaveUp = ($desistiu == 1) ? true : false;
+
+        $stage->save();
+        $this->currentStage = $stage;
+
+        return $stage;
+    }
+
+    private function isEnd() {
+
+        $attackSize = count($this->attackReserve);
+        $defenderSize = count($this->defenderReserve);
+
+        if (
+            $attackSize == 0 || 
+            $defenderSize == 0 || 
+            $this->currentStage->attackerGaveUp == true || 
+            $this->currentStage->defenderGaveUp == true ) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -132,8 +198,6 @@ class BattleService
 
         $this->loadSlots('attack');
         $this->loadSlots('defender');
-
-        dd($this->defenderSlots);
     }
 
     private function loadSlots($side) {
@@ -342,18 +406,6 @@ class BattleService
         ];
         
         return $slotPositions[$strategy];
-    }
-
-    private function isEnd($batle) {
-        if (
-            $battle->attackerUnits == 0 || 
-            $battle->defenderUnits == 0 || 
-            $battle->attackerRetreated = true || 
-            $battle->defenderRetreated = true ) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
 }
