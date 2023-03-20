@@ -326,16 +326,16 @@ class BattleService
                 if ($slot[$i]['pos'] == $position) {
                     switch ($slot[$i]['type']) {
                         case 'D':
-                            $slot[$i]['qtd'] += $this->moveUnits('D', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
+                            $slot[$i] = $this->moveUnits($slot[$i], 'D', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
                             break;
                         case 'V':
-                            $slot[$i]['qtd'] += $this->moveUnits('V', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
+                            $slot[$i] = $this->moveUnits($slot[$i], 'V', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
                             break;
                         case 'L':
-                            $slot[$i]['qtd'] += $this->moveUnits('V', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
+                            $slot[$i] = $this->moveUnits($slot[$i], 'V', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
                             break;
                         case 'E':
-                            $slot[$i]['qtd'] += $this->moveUnits('V', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
+                            $slot[$i] = $this->moveUnits($slot[$i], 'V', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
                             break;
                     }
                 }
@@ -345,9 +345,12 @@ class BattleService
         return $slot;
     }
 
-    private function moveUnits($type, $side, $available) {
+    private function moveUnits($slot, $type, $side, $available) {
 
         $qtdMove = 0;
+        $attackLevel = 0;
+        $defenseLevel = 0;
+        $life = 0;
         $reserve = [];
 
         if ($side == "attack") {
@@ -361,11 +364,13 @@ class BattleService
                 if ($troop->quantity >= $available) {
                     $qtdMove = $available;
                     $troop->quantity -= $available;
-                    return $qtdMove;
                 } else {
                     $qtdMove += $troop->quantity;
                     $troop->quantity = 0;
                 }
+                $attackLevel = $troop->attack;
+                $attackDefense = $troop->defense;
+                $life = $troop->life;
             }
         }
 
@@ -375,7 +380,12 @@ class BattleService
             $this->defenseReserve = $reserve;
         }
 
-        return $qtdMove;
+        $slot['qtd'] = $qtdMove;
+        $slot['attack'] = $attackLevel;
+        $slot['defense'] = $defenseLevel;
+        $slot['life'] = $life;
+
+        return $slot;
     }
 
     private function loadReverve($battle) {
@@ -388,103 +398,103 @@ class BattleService
         $slotPositions = [
             # Cunha
             1 => [
-                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c4', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'v', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c5', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c4', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'v', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c5', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
             ],
             # Delta
             2 => [
-                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c4', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r4c1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r4c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c4', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r4c1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r4c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
             ],
             # Linha
             3 => [
-                ['pos' => 'r1c1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1c4', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1c5', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c4', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c5', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
             ],
             # Sniper
             4 => [
-                ['pos' => 'r1c1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1c4', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c4', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
             ],
             # Coluna
             5 => [
-                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r4c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r5c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r6c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r4c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r5c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r6c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
             ],
             # Diamante
             6 => [
-                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c4', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c5', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c4', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c5', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
             ],
             # Estrela
             7 => [
-                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c4', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r4c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r4c4', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c4', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r4c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r4c4', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
             ],
             # Diagonal
             8 => [
-                ['pos' => 'r1c1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r4c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r4c4', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r5c5', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c3', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r4c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r4c4', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r5c5', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
             ],
             # Coluna Dupla
             9 => [
-                ['pos' => 'r1c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1c4', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c4', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c2', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c4', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c4', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c4', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c2', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c4', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
             ],
             # Flancos
             10 => [
-                ['pos' => 'r1c1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1c5', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r2c5', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r3c5', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
-                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 30, 'defense' => 15, 'life' => 20, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1c5', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'D', 'size' => $dSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r2c5', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'V', 'size' => $vSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r3c5', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'L', 'size' => $lSize, 'qtd' => 0, 'kills' => 0],
+                ['pos' => 'r1e1', 'unit' => 1, 'attack' => 0, 'defense' => 0, 'life' => 0, 'type' => 'S', 'size' => $sSize, 'qtd' => 0, 'kills' => 0],
             ],
         ];
         

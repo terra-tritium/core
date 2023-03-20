@@ -50,14 +50,20 @@ class BattleController extends Controller
             [
                 'unit' => 1,
                 'quantity' => 5000,
-                'type' => 'D'
+                'type' => 'D',
+                'attack' => 5,
+                'defense' => 2,
+                'life' => 20
             ]
         ];
         $dUnits = [
             [
                 'unit' => 1,
                 'quantity' => 1000,
-                'type' => 'D'
+                'type' => 'D',
+                'attack' => 10,
+                'defense' => 3,
+                'life' => 20
             ]
         ];
         $aStrategy = 3;
