@@ -251,7 +251,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 2700,
-            'title' => 'Transcendência tecnologica 1',
+            'title' => 'Avanço tecnologica 1',
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2500",
@@ -260,7 +260,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 2800,
-            'title' => 'Transcendência militar 1',
+            'title' => 'Avanço militar 1',
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2500",
@@ -268,8 +268,8 @@ class ResearchSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => 2900,
-            'title' => 'Transcendência espacial 1',
+            'code' => 2900,  
+            'title' => 'Avanço espacial 1',
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2500",
@@ -287,7 +287,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 3100,
-            'title' => 'Transcendência tecnologica 2',
+            'title' => 'Avanço tecnologica 2',
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2700",
@@ -296,7 +296,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 3200,
-            'title' => 'Transcendência militar 2',
+            'title' => 'Avanço militar 2',
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2800",
@@ -305,7 +305,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 3300,
-            'title' => 'Transcendência espacial 2',
+            'title' => 'Avanço espacial 2',
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "2900",
@@ -323,7 +323,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 3500,
-            'title' => 'Transcendência tecnologica 3',
+            'title' => 'Avanço tecnologica 3',
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "3100",
@@ -332,7 +332,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 3600,
-            'title' => 'Transcendência militar 3',
+            'title' => 'Avanço militar 3',
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "3200",
@@ -341,7 +341,7 @@ class ResearchSeeder extends Seeder
         
         DB::table('researchs')->insert([
             'code' => 3700,
-            'title' => 'Transcendência espacial 3',
+            'title' => 'Avanço espacial 3',
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => "3300",

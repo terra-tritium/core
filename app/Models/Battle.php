@@ -9,4 +9,5 @@ class Battle extends Model
 {
     use HasFactory;
     protected $table = 'battles';
+    public $timestamps = false;
 }
