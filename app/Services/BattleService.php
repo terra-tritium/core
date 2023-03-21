@@ -19,10 +19,6 @@ class BattleService
     private $rangeLimit1;
     private $rangeLimit2;
     private $rangeLimit3;
-    private $attackSlots;
-    private $defenseSlots;
-    private $attackReserve;
-    private $defenseReserve;
     private $currentStage;
 
     public function __construct() {
@@ -36,10 +32,6 @@ class BattleService
         $this->rangeLimit1 = 1000;
         $this->rangeLimit2 = 5000;
         $this->rangeLimit3 = -1;
-        $this->attackSlots = [];
-        $this->defenseSlots = [];
-        $this->attackReserve = [];
-        $this->defenseReserve = [];
         $this->currentStage = new BattleStage();
     }
 
@@ -53,26 +45,29 @@ class BattleService
         $battle->defenseStrategy = $dStrategy;
         $battle->stage = 0;
         $battle->start = time();
+        $battle->attackReserve = json_encode($aUnits);
+        $battle->defenseReserve = json_encode($dUnits);
         $battle->save();
 
+        
         $this->attackReserve = $aUnits;
         $this->defenseReserve = $dUnits;
-
+        
         $this->loadReverve($battle);
-
+        
         $battle = $this->calculateStage($battle->id);
     }
-
+    
     # Job call
     public function calculateStage($battleId) {
-
+        
         $battle = Battle::find($battleId);
-
-        $this->fillSlots($battle);
-
+        
+        $battle = $this->fillSlots($battle);
+        
         $battle->stage += 1;
         $battle->save();
-
+        
         $stage = $this->createNewStage($battle);
 
         # Start job for new stage if no end
@@ -120,38 +115,39 @@ class BattleService
 
     private function resolveConfrontation($battle, $stage) {
 
-        $aSlots = $this->attackSlots;
-        $dSlots = $this->defenseSlots;
-        $stage->attackSlots = json_encode($aSlots);
-        $stage->defenseSlots = json_encode($dSlots);
+        $aSlots = json_decode($battle->attackSlots);
+        $dSlots = json_decode($battle->defenseSlots);
+        $stage->attackSlots = $battle->attackSlots;
+        $stage->defenseSlots = $battle->defenseSlots;
 
+        
         # execute attack
         for ($i=0; $i < count($aSlots); $i++) {
-
-            if ($aSlots[$i]['qtd'] > 0) {
+            
+            if ($aSlots[$i]->qtd > 0) {
 
                 for ($j=0; $j < count($dSlots); $j++) {
                     $demage = 0;
                     $kills = 0;
                     $units = [];
                     
-                    if ($dSlots[$j]['qtd'] > 0) {
+                    if ($dSlots[$j]->qtd > 0) {
 
-                        $demage = (($aSlots[$i]['attack'] * $aSlots[$i]['size']) - ($dSlots[$j]['defense'] * $dSlots[$j]['size']));
+                        $demage = (($aSlots[$i]->attack * $aSlots[$i]->size) - ($dSlots[$j]->defense * $dSlots[$j]->size));
                         if ($demage < 0) { $demage = 0; }
 
-                        $kills = floor($demage / $dSlots[$j]['life']);
+                        $kills = floor($demage / $dSlots[$j]->life);
 
-                        if ($dSlots[$j]['qtd'] - $kills < 0) {
-                            $dSlots[$j]['kills'] += $dSlots[$j]['qtd'];
-                            $dSlots[$j]['qtd'] = 0;
+                        if ($dSlots[$j]->qtd - $kills < 0) {
+                            $dSlots[$j]->kills += $dSlots[$j]->qtd;
+                            $dSlots[$j]->qtd = 0;
                         } else {
-                            $dSlots[$j]['kills'] += $kills;
-                            $dSlots[$j]['qtd'] -= $kills;
+                            $dSlots[$j]->kills += $kills;
+                            $dSlots[$j]->qtd -= $kills;
                         }
 
                         $stage->defenseDemage += $demage;
-                        $stage->defenseKills = $dSlots[$j]['kills'];
+                        $stage->defenseKills = $dSlots[$j]->kills;
                         $stage->defenseSlots = json_encode($dSlots);
                         break;
                     }
@@ -162,30 +158,30 @@ class BattleService
         #execute defense
         for ($i=0; $i < count($dSlots); $i++) {
 
-            if ($dSlots[$i]['qtd'] > 0) {
+            if ($dSlots[$i]->qtd > 0) {
 
                 for ($j=0; $j < count($aSlots); $j++) {
                     $demage = 0;
                     $kills = 0;
                     $units = [];
                     
-                    if ($aSlots[$j]['qtd'] > 0) {
+                    if ($aSlots[$j]->qtd > 0) {
 
-                        $demage = (($dSlots[$i]['attack'] * $dSlots[$i]['size']) - ($aSlots[$j]['defense'] * $aSlots[$j]['size']));
+                        $demage = (($dSlots[$i]->attack * $dSlots[$i]->size) - ($aSlots[$j]->defense * $aSlots[$j]->size));
                         if ($demage < 0) { $demage = 0; }
 
-                        $kills = floor($demage / $aSlots[$j]['life']);
+                        $kills = floor($demage / $aSlots[$j]->life);
 
-                        if ($aSlots[$j]['qtd'] - $kills < 0) {
-                            $aSlots[$j]['kills'] += $aSlots[$j]['qtd'];
-                            $aSlots[$j]['qtd'] = 0;
+                        if ($aSlots[$j]->qtd - $kills < 0) {
+                            $aSlots[$j]->kills += $aSlots[$j]->qtd;
+                            $aSlots[$j]->qtd = 0;
                         } else {
-                            $aSlots[$j]['kills'] += $kills;
-                            $aSlots[$j]['qtd'] -= $kills;
+                            $aSlots[$j]->kills += $kills;
+                            $aSlots[$j]->qtd -= $kills;
                         }
 
                         $stage->attackDemage += $demage;
-                        $stage->attackKills = $aSlots[$j]['kills'];
+                        $stage->attackKills = $aSlots[$j]->kills;
                         $stage->attackSlots = json_encode($aSlots);
                         break;
                     }
@@ -195,6 +191,9 @@ class BattleService
 
         $stage->attackReserve = json_encode($this->attackReserve);
         $stage->defenseReserve = json_encode($this->defenseReserve);
+        $battle->attackSlots = json_encode($this->attackReserve);
+        $battle->defenseSlots = json_encode($this->defenseReserve);
+        $battle->save();
 
         return $stage;
     }
@@ -263,30 +262,32 @@ class BattleService
                 break;
         }
 
-        $this->attackSlots = $this->createSlots(
+        $battle->attackSlots = json_encode($this->createSlots(
             $battle->attackStrategy,
             $this->droidSlotSize,
             $this->vehicleSlotSize,
             $this->launchersSlotSize,
             $this->specialSlotSize
-        );
+        ));
 
-        $this->defenseSlots = $this->createSlots(
+        $battle->defenseSlots = json_encode($this->createSlots(
             $battle->defenseStrategy,
             $this->droidSlotSize,
             $this->vehicleSlotSize,
             $this->launchersSlotSize,
             $this->specialSlotSize
-        );
+        ));
 
-        $this->loadSlots('attack');
-        $this->loadSlots('defense');
+        $battle = $this->loadSlots($battle, 'attack');
+        $battle = $this->loadSlots($battle, 'defense');
+
+        return $battle;
     }
 
-    private function loadSlots($side) {
+    private function loadSlots($battle, $side) {
         $slot = [];
 
-        $slot = ($side == "attack") ? $this->attackSlots : $this->defenseSlots;
+        $slot = ($side == "attack") ? $battle->attackSlots : $battle->defenseSlots;
 
         $slot = $this->selectUnits('r1c1', $slot, $side);
         $slot = $this->selectUnits('r1c2', $slot, $side);
@@ -315,7 +316,9 @@ class BattleService
         $slot = $this->selectUnits('r5c5', $slot, $side);
         $slot = $this->selectUnits('r1e1', $slot, $side);
 
-        $this->{$side.'Slots'} = $slot;
+        $battle->{$side.'Slots'} = $slot;
+        
+        return $battle;
     }
 
     private function selectUnits($position, $slot, $side) {

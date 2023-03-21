@@ -40,6 +40,10 @@ class BattleController extends Controller
     }
 
     public function view ($id) {
+        return Battle::find($id);
+    }
+
+    public function stages ($id) {
         return BattleStage::where('battle', $id)->get();
     }
 

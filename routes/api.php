@@ -102,4 +102,5 @@ Route::controller(BattleController::class)->group(function () {
     Route::post('/battle/defensemode/{address}/{option}', 'changeDefenseMode');
     Route::get('/battle/start', 'start');
     Route::get('/battle/view/{id}', 'view');
+    Route::get('/battle/stages/{id}', 'stages');
 });
