@@ -13,6 +13,7 @@ use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\GameModeController;
 use App\Http\Controllers\TravelController;
 use App\Http\Controllers\BattleController;
+use App\Http\Controllers\QuadrantController;
 //use App\Http\Controllers\AuthController;
 
 use Illuminate\Http\Request;
@@ -105,4 +106,8 @@ Route::controller(BattleController::class)->group(function () {
     Route::get('/battle/start', 'start');
     Route::get('/battle/view/{id}', 'view');
     Route::get('/battle/stages/{id}', 'stages');
+});
+
+Route::controller(QuadrantController::class)->group(function () {
+    Route::get('/quadrant/show/{code}', 'show');
 });
