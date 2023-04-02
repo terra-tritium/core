@@ -1,10 +1,26 @@
 
-#Iniciar os containers
+#Requisitos
 
-    docker-compose build
+    MariaDB 10.7.4
+    Laravel 9
+    PHP 8.1.11
 
-    docker-compose up
+#Iniciar banco de dados local
 
-#Executar comando abaixo na raiz do projeto após iniciar o container
+    create database origin
 
-   docker-compose exec -T app php /var/www/artisan migrate:fresh --seed --force
+#Rodar a migração de dados
+
+   php artisan migrate
+   php artisan db:seed
+
+#Iniciar o servidor backend
+  
+   php artisan serve
+
+#Procedimento para atualizar a base de dados (rodar toda vez que existir alteração de banco)
+  
+   drop database origin
+   create database origin
+   php artisan migrate
+   php artisan db:seed
