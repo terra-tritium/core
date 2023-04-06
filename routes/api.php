@@ -12,7 +12,8 @@ use App\Http\Controllers\GameModeController;
 use App\Http\Controllers\TravelController;
 use App\Http\Controllers\BattleController;
 use App\Http\Controllers\QuadrantController;
-//use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\API\ResetarSenhaController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +40,14 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:sanctum')->group(function () {  
 
 // });
+
+
+Route::controller(AuthController::class)->group(function () {
+    Route::post('/user/login','createToken');
+    Route::get('/user/logout','logout');
+    Route::post('/user/forgot-password','sendLink');
+    Route::post('/user/reset-password','resetPassword');
+});
 
 Route::controller(BuildController::class)->group(function () {
     Route::get('/build/list', 'list');
