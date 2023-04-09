@@ -46,7 +46,7 @@ class PasswordReset extends Notification
         return (new MailMessage)
             ->subject("Redefinir Senha")
             ->line('Você está recebendo este e-mail porque recebemos um pedido de redefinição de senha para sua conta.')
-            ->action('Redefinir Senha',config('api.url_site').'/change-password?token='.$this->token.'&email='.urlencode($notifiable->email))
+            ->action('Redefinir Senha',config('api.url_site').'/reset-password?'.$this->token.'/'.urlencode($notifiable->email))
             ->line('Se você não solicitou uma reinicialização da senha, nenhuma ação adicional será necessária.')
             ->markdown('vendor.notifications.email');
     }
