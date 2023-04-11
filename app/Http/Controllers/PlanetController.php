@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Planet;
+use App\Models\Player;
 use Illuminate\Http\Request;
 
 class PlanetController extends Controller
@@ -53,7 +54,9 @@ class PlanetController extends Controller
         //
     }
 
-    public function list($address) {
-        return Planet::where("address", $address)->get();
+    public function list() {
+        $player = Player::getPlayerLogged();
+
+        return Planet::where('player',$player->id)->get();
     }
 }

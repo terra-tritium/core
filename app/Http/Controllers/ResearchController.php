@@ -21,15 +21,18 @@ class ResearchController extends Controller
         return Research::orderBy('code')->get();
     }
 
-    public function researched($address) {
-        return Researched::where("address", $address)->get();
+    public function researched() {
+        $player = Player::getPlayerLogged();
+        return Researched::where("player", $player->id)->get();
     }
 
-    public function start($address, $code) {
-        return $this->researchService->start($address, $code);
+    public function start($code) {
+        $player = Player::getPlayerLogged();
+        return $this->researchService->start($player->id, $code);
     }
 
-    public function done($address, $code) {
-        return $this->researchService->done($address, $code);
+    public function done($code) {
+        $player = Player::getPlayerLogged();
+        return $this->researchService->done($player->id, $code);
     }
 }

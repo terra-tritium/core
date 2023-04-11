@@ -18,7 +18,7 @@ class TroopJob implements ShouldQueue
 
     private $planet;
     private $units;
-    private $address;
+    private $player;
     private $production;
     
     /**
@@ -26,11 +26,11 @@ class TroopJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($planet, $address, $units, $production, $type)
+    public function __construct($planet, $player, $units, $production, $type)
     {
         $this->planet = $planet;
         $this->units = $units;
-        $this->address = $address;
+        $this->player = $player;
         $this->production = $production;
     }
 
@@ -51,7 +51,7 @@ class TroopJob implements ShouldQueue
                 $troop->quantity += $unit["quantity"];
             } else {
                 $troop = new Troop();
-                $troop->address = $this->address;
+                $troop->player = $this->player;
                 $troop->planet = $this->planet;
                 $troop->unit = $unit["id"];
                 $troop->quantity = $unit["quantity"];

@@ -27,7 +27,7 @@ return new class extends Migration
         });
         Schema::create('planets', function (Blueprint $table) {
             $table->id();
-            $table->string("address");
+            $table->integer('player')->constrained("players");
             $table->string("name");
             $table->string('resource');
             $table->integer("level");
@@ -60,7 +60,8 @@ return new class extends Migration
         Schema::create('players', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->string("address");
+            $table->integer('user')->constrained("users");
+            $table->string("address")->nullable();
             $table->timestamp("since")->useCurrent();
             $table->foreignId('country')->constrained("countrys");
             $table->integer('gameMode');
@@ -98,7 +99,7 @@ return new class extends Migration
         Schema::create('ranking', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->string("address");
+            $table->integer('player')->constrained("players");
             $table->bigInteger("energy");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
@@ -148,7 +149,7 @@ return new class extends Migration
         });
         Schema::create('travels', function (Blueprint $table) {
             $table->id();
-            $table->string("address");
+            $table->integer('player')->constrained("players");
             $table->string("receptor");
             $table->string("from");
             $table->string("to");
@@ -180,21 +181,21 @@ return new class extends Migration
         });
         Schema::create('troop', function (Blueprint $table) {
             $table->id();
-            $table->string("address");
+            $table->integer('player')->constrained("players");
             $table->foreignId('planet')->constrained("planets");
             $table->foreignId('unit')->constrained("units");
             $table->bigInteger("quantity");
         });
         Schema::create('fleet', function (Blueprint $table) {
             $table->id();
-            $table->string("address");
+            $table->integer('player')->constrained("players");
             $table->foreignId('planet')->constrained("planets");
             $table->foreignId('unit')->constrained("units");
             $table->bigInteger("quantity");
         });
         Schema::create('production', function (Blueprint $table) {
             $table->id();
-            $table->string("address");
+            $table->integer('player')->constrained("players");
             $table->foreignId('planet')->constrained("planets");
             $table->json('objects');
             $table->bigInteger("ready");
@@ -202,7 +203,7 @@ return new class extends Migration
         });
         Schema::create('effects', function (Blueprint $table) {
             $table->id();
-            $table->string("address");
+            $table->integer('player')->constrained("players");
             $table->integer("speedProduceUnit");
             $table->integer("speedProduceShip");
             $table->integer("speedBuild");
@@ -226,7 +227,7 @@ return new class extends Migration
         });
         Schema::create('researcheds', function (Blueprint $table) {
             $table->id();
-            $table->string("address");
+            $table->integer('player')->constrained("players");
             $table->integer("code");
             $table->integer("points");
             $table->integer("cost");
