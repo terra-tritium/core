@@ -5,7 +5,6 @@
 /storage/*.key
 /vendor
 .env
-.env.exemple
 .env.backup
 .env.production
 .phpunit.result.cache
@@ -18,7 +17,3 @@ yarn-error.log
 /.idea
 /.vscode
 /storage/*
-.env.example
-composer.json
-composer.lock
-composer2.lock
