@@ -17,9 +17,9 @@ class ProductionService
     $this->playerService = new PlayerService();
   }
 
-  public function add ($address, $planet, $units, $type) {
+  public function add ($player, $planet, $units, $type) {
     $production = new Production();
-    $production->address = $address;
+    $production->player = $player;
     $production->planet = $planet;
     $finalTime = 0;
     $newUnits = [];
@@ -37,7 +37,7 @@ class ProductionService
     if ($type == "troop") {
       TroopJob::dispatch(
         $planet,
-        $address,
+        $player,
         $newUnits,
         $production->id
       )->delay(now()->addSeconds($finalTime * ( env("TRITIUM_PRODUCTION_SPEED") / 1000 ) ));
@@ -46,15 +46,15 @@ class ProductionService
     if ($type == "fleet") {
       FleetJob::dispatch(
         $planet,
-        $address,
+        $player,
         $newUnits,
         $production->id
       )->delay(now()->addSeconds($finalTime * ( env("TRITIUM_PRODUCTION_SPEED") / 1000 ) ));
     }
   }
 
-  public function hasFunds($units, $address) {
-    $p1 = Player::where("address", $address)->firstOrFail();
+  public function hasFunds($units, $player) {
+    $p1 = Player::findOrFail($player);
     foreach ($units as $key => $unit) {
         if (array_key_exists("quantity", $unit)) {
             $unitModel = Unit::find($unit["id"]);
@@ -72,7 +72,7 @@ class ProductionService
     return true;
   }
 
-  public function spendFunds($address, $units) {
+  public function spendFunds($player, $units) {
     $metal = 0;
     $uranium = 0;
     $crystal = 0;
@@ -83,7 +83,7 @@ class ProductionService
         $crystal += $unit["crystal"];
     }
 
-    $p1 = Player::where("address", $address)->firstOrFail();
+    $p1 = Player::findOrFail($player);
     $p1 = $this->playerService->removeMetal($p1, $metal);
     $p1 = $this->playerService->removeUranium($p1, $uranium);
     $p1 = $this->playerService->removeCrystal($p1, $crystal);

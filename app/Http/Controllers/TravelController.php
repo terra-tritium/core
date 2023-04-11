@@ -17,20 +17,24 @@ class TravelController extends Controller
         $this->travelService = $travelService;
     }
 
-    public function list($address) {
-        return Travel::where("address", $address)->orderBy('arrival')->paginate($this->itensPerPage);
+    public function list() {
+        $player = Player::getPlayerLogged();
+        return Travel::where("player", $player->id)->orderBy('arrival')->paginate($this->itensPerPage);
     }
 
-    public function current($address) {
-        return Travel::where([["address", $address], ["status", 1]])->orderBy('arrival')->get();
+    public function current() {
+        $player = Player::getPlayerLogged();
+        return Travel::where([["player", $player->id], ["status", 1]])->orderBy('arrival')->get();
     }
 
-    public function start (Request $request, $address) {
-        $this->travelService->start($address, $request->colect());
+    public function start (Request $request) {
+        $player = Player::getPlayerLogged();
+        $this->travelService->start($player->id, $request->colect());
     }
 
-    public function back ($address, $travel) {
-        $currentTravel = Travel::where([["address", $address], ["id", $travel]])->get();
+    public function back ($travel) {
+        $player = Player::getPlayerLogged();
+        $currentTravel = Travel::where([["player", $player->id], ["id", $travel]])->get();
         if ($currentTravel) {
             $this->travelService->back($travel);
         }

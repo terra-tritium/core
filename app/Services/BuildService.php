@@ -58,7 +58,7 @@ class BuildService
         $building->workers = 0;
 
         $planet = Planet::find($building->planet);
-        $p1 = Player::where("address", $planet->address)->firstOrFail();
+        $p1 = Player::findOrFail($planet->player);
         $build = Build::find($building->build);
 
         $require = Requires::where([
@@ -155,7 +155,7 @@ class BuildService
         $building = Building::find($buildingId);
 
         $planet = Planet::find($building->planet);
-        $player = Player::where("address", $planet->address)->firstOrFail();
+        $player = Player::findOrFail($planet->player);
         $require = Requires::where([["build", $building->build], ["level", $building->level + 1]])->firstOrFail();
 
         $building->ready = (time() * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
@@ -224,7 +224,7 @@ class BuildService
     public function configWorkers ($planetId, $workers, $buildingId) {
 
         $planet = Planet::find($planetId);
-        $p1 = Player::where("address", $planet->address)->firstOrFail();
+        $p1 = Player::findOrFail($planet->player);
         $building = Building::find($buildingId);
         
         if ($workers > $planet->humanoids || $workers < 1) {

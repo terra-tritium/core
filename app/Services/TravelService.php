@@ -8,13 +8,13 @@ use Carbon\Carbon;
 
 class TravelService
 {
-    public function start ($address, $travel) {
+    public function start ($player, $travel) {
 
         $now = Carbon::now()->timestamp * 1000;
         $travelTime = env("TRITIUM_TRAVEL_SPEED") * $this->calcDistance($travel->from, $travel->to);
 
         $newTravel = new Travel();
-        $newTravel->address = $address;
+        $newTravel->player = $player;
         $newTravel->receptor = $travel->receptor;
         $newTravel->from = $travel->from;
         $newTravel->to = $travel->to;

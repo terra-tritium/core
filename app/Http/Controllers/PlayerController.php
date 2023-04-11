@@ -47,9 +47,9 @@ class PlayerController extends Controller
      * @param  \App\Models\Player  $player
      * @return \Illuminate\Http\Response
      */
-    public function show(String $address)
+    public function show()
     {
-        return Player::where("address", $address)->first();
+        return Player::getPlayerLogged();
     }
 
     /**
@@ -87,7 +87,7 @@ class PlayerController extends Controller
         $player->address = $request->input("address");
         $player->country = $request->input("country");
         $player->name = $request->input("name");
-        $player->user_id = $user->id;
+        $player->user = $user->id;
         $this->playerService->register($player);
         
         return response(['messagem' => 'Player created success!','success'=>true],200);

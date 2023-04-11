@@ -192,9 +192,10 @@ class PlayerService
     $planet->region = 1;
     $planet->quadrant = 1;
     $planet->position = 1;
-    $planet->address = $player->address;
+    $planet->player = $player->id;
     $planet->humanoids = 30;
     $planet->status = "pacific";
+    $planet->player = $player->id;
     $planet->save();
   }
 
