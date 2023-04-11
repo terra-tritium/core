@@ -30,7 +30,7 @@ class AuthController extends Controller
 
         if($success)
         {
-            return response(['message' => '','success'=>true, 'player' => $success],200);
+            return response(['message' => '','success'=>true, 'token' => $success['token'],'name' => $success['name'],'planet' => $success['planet']],200);
         }else{
             return response(['message' => 'Invalid Credentials','success'=>false],200);
         }

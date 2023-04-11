@@ -49,11 +49,14 @@ Route::controller(CountryController::class)->group(function () {
 });
 
 Route::controller(PlayerController::class)->group(function () {
-    Route::get('/player/show', 'show');
     Route::post('/player/register', 'register');
 });
 
 Route::middleware('auth:sanctum')->group(function () {  
+    Route::controller(PlayerController::class)->group(function () {
+        Route::get('/player/show', 'show');
+    });
+    
     Route::controller(BuildController::class)->group(function () {
         Route::get('/build/list', 'list');
         Route::get('/build/availables/{planet}', 'availables');
