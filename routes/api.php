@@ -44,6 +44,15 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/user/reset-password','resetPassword');
 });
 
+Route::controller(CountryController::class)->group(function () {
+    Route::get('/country/list', 'list');
+});
+
+Route::controller(PlayerController::class)->group(function () {
+    Route::get('/player/show', 'show');
+    Route::post('/player/register', 'register');
+});
+
 Route::middleware('auth:sanctum')->group(function () {  
     Route::controller(BuildController::class)->group(function () {
         Route::get('/build/list', 'list');
@@ -56,17 +65,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/build/require/{build}/{level}', 'require');
     });
 
-    Route::controller(CountryController::class)->group(function () {
-        Route::get('/country/list', 'list');
-    });
-
     Route::controller(PlanetController::class)->group(function () {
         Route::get('/planet/list', 'list');
-    });
-
-    Route::controller(PlayerController::class)->group(function () {
-        Route::get('/player/show', 'show');
-        Route::post('/player/register', 'register');
     });
 
     Route::controller(UnitController::class)->group(function () {
