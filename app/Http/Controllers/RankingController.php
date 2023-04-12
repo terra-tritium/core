@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ranking;
 use App\Models\Aliance;
+use App\Models\Player;
 use Illuminate\Http\Request;
 
 class RankingController extends Controller
@@ -11,8 +12,8 @@ class RankingController extends Controller
 
     private $itensPerPage = 100;
 
-    public function players($address, $type) {
-
+    public function players($type) {
+        $player = Player::getPlayerLogged();
         switch ($type) {
             case "top":
                 return Ranking::orderBy('score', 'DESC')->take(10)->get();
@@ -31,7 +32,8 @@ class RankingController extends Controller
         }
     }
 
-    public function aliances($address, $type) {
+    public function aliances($type) {
+        $player = Player::getPlayerLogged();
         switch ($type) {
             case "top":
                 return Aliance::orderBy('score', 'DESC')->limit(5);

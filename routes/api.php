@@ -14,7 +14,8 @@ use App\Http\Controllers\GameModeController;
 use App\Http\Controllers\TravelController;
 use App\Http\Controllers\BattleController;
 use App\Http\Controllers\QuadrantController;
-//use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\API\ResetarSenhaController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,76 +39,85 @@ use Illuminate\Support\Facades\Route;
 //     Route::post('/create-token','createToken');
 // });
 
-// Route::middleware('auth:sanctum')->group(function () {  
-
-// });
-
-Route::controller(BuildController::class)->group(function () {
-    Route::get('/build/list', 'list');
-    Route::get('/build/availables/{planet}', 'availables');
-    Route::get('/building/list/{planet}', 'listBildings');
-    Route::post('/build/plant', 'plant');
-    Route::post('/build/up', 'upgrade');
-    Route::post('/build/workers', 'workers');
-    Route::get('/build/requires/{build}', 'requires');
-    Route::get('/build/require/{build}/{level}', 'require');
+Route::controller(AuthController::class)->group(function () {
+    Route::post('/user/login','createToken');
+    Route::get('/user/logout','logout');
+    Route::post('/user/forgot-password','sendLink');
+    Route::post('/user/reset-password','resetPassword');
 });
 
 Route::controller(CountryController::class)->group(function () {
     Route::get('/country/list', 'list');
 });
 
-Route::controller(PlanetController::class)->group(function () {
-    Route::get('/planet/list/{address}', 'list');
-});
-
 Route::controller(PlayerController::class)->group(function () {
-    Route::get('/player/show/{address}', 'show');
     Route::post('/player/register', 'register');
 });
 
-Route::controller(UnitController::class)->group(function () {
-    Route::get('/unit/list', 'list');
-});
+Route::middleware('auth:sanctum')->group(function () {  
+    Route::controller(PlayerController::class)->group(function () {
+        Route::get('/player/show', 'show');
+    });
+    
+    Route::controller(BuildController::class)->group(function () {
+        Route::get('/build/list', 'list');
+        Route::get('/build/availables/{planet}', 'availables');
+        Route::get('/building/list/{planet}', 'listBildings');
+        Route::post('/build/plant', 'plant');
+        Route::post('/build/up', 'upgrade');
+        Route::post('/build/workers', 'workers');
+        Route::get('/build/requires/{build}', 'requires');
+        Route::get('/build/require/{build}/{level}', 'require');
+    });
 
-Route::controller(TroopController::class)->group(function () {
-    Route::post('/troop/production/{address}/{planet}', 'production');
-});
+    Route::controller(PlanetController::class)->group(function () {
+        Route::get('/planet/list', 'list');
+    });
 
-Route::controller(RankingController::class)->group(function () {
-    Route::get('/ranking/players/{address}/{type}', 'players');
-    Route::get('/ranking/aliances/{address}/{type}', 'aliances');
-});
+    Route::controller(UnitController::class)->group(function () {
+        Route::get('/unit/list', 'list');
+    });
 
-Route::controller(ResearchController::class)->group(function () {
-    Route::get('/research/list', 'list');
-    Route::get('/researched/{address}', 'researched');
-    Route::post('/research/start/{address}/{code}', 'start');
-    Route::post('/research/done/{address}/{code}', 'done');
-});
+    Route::controller(TroopController::class)->group(function () {
+        Route::post('/troop/production/{planet}', 'production');
+    });
 
-Route::controller(GameModeController::class)->group(function () {
-    Route::get('/mode/list', 'list');
-    Route::post('/mode/change/{address}/{code}', 'change');
-});
+    Route::controller(RankingController::class)->group(function () {
+        Route::get('/ranking/players/{type}', 'players');
+        Route::get('/ranking/aliances/{type}', 'aliances');
+    });
 
-Route::controller(TravelController::class)->group(function () {
-    Route::get('/travel/list/{address}', 'list');
-    Route::get('/travel/current/{address}', 'current');
-    Route::post('/travel/start/{address}', 'start');
-    Route::post('/travel/back/{address}', 'back');
-});
+    Route::controller(ResearchController::class)->group(function () {
+        Route::get('/research/list', 'list');
+        Route::get('/researched', 'researched');
+        Route::post('/research/start/{code}', 'start');
+        Route::post('/research/done/{code}', 'done');
+    });
 
-Route::controller(BattleController::class)->group(function () {
-    Route::get('/battle/attackmode/list', 'attackModeList');
-    Route::get('/battle/defensemode/list', 'defenseModeList');
-    Route::post('/battle/attackmode/{address}/{option}', 'changeAttackMode');
-    Route::post('/battle/defensemode/{address}/{option}', 'changeDefenseMode');
-    Route::get('/battle/start', 'start');
-    Route::get('/battle/view/{id}', 'view');
-    Route::get('/battle/stages/{id}', 'stages');
-});
+    Route::controller(GameModeController::class)->group(function () {
+        Route::get('/mode/list', 'list');
+        Route::post('/mode/change/{code}', 'change');
+    });
 
-Route::controller(QuadrantController::class)->group(function () {
-    Route::get('/quadrant/show/{code}', 'show');
+    Route::controller(TravelController::class)->group(function () {
+        Route::get('/travel/list', 'list');
+        Route::get('/travel/current', 'current');
+        Route::post('/travel/start', 'start');
+        Route::post('/travel/back', 'back');
+    });
+
+    Route::controller(BattleController::class)->group(function () {
+        Route::get('/battle/attackmode/list', 'attackModeList');
+        Route::get('/battle/defensemode/list', 'defenseModeList');
+        Route::post('/battle/attackmode/{option}', 'changeAttackMode');
+        Route::post('/battle/defensemode/{option}', 'changeDefenseMode');
+        Route::get('/battle/start', 'start');
+        Route::get('/battle/view/{id}', 'view');
+        Route::get('/battle/stages/{id}', 'stages');
+    });
+
+    Route::controller(QuadrantController::class)->group(function () {
+        Route::get('/quadrant/show/{code}', 'show');
+    });
+
 });

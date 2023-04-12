@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
             foreach($players as $p) {
                 $ranking = new Ranking();
                 $ranking->name = $p->name;
-                $ranking->address = $p->address;
+                $ranking->player = $p->player;
                 $ranking->energy = $p->energy;
                 $ranking->score = $p->score;
                 $ranking->buildScore = $p->buildScore;

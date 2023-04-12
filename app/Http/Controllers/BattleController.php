@@ -27,14 +27,16 @@ class BattleController extends Controller
         return DefenseMode::orderBy("code")->get();
     }
 
-    public function changeAttackMode($address, $option) {
-        $player = Player::where("address", $address)->firstOrFail();
+    public function changeAttackMode($option) {
+        $user = auth()->user()->id;
+        $player = Player::where("user", $user)->firstOrFail();
         $player->attackMode = $option;
         $player->save();
     }
 
-    public function changeDefenseMode($address, $option) {
-        $player = Player::where("address", $address)->firstOrFail();
+    public function changeDefenseMode($option) {
+        $user = auth()->user()->id;
+        $player = Player::where("user", $user)->firstOrFail();
         $player->defenseMode = $option;
         $player->save();
     }

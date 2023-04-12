@@ -12,10 +12,10 @@ class TroopService
         $this->productionService = new ProductionService();
     }
 
-    public function production ($address, $planet, $units) {
-        if ($this->productionService->hasFunds($units, $address)) {
-            $this->productionService->add($address, $planet, $units, "troop");
-            $this->productionService->spendFunds($address, $units);
+    public function production ($player, $planet, $units) {
+        if ($this->productionService->hasFunds($units, $player)) {
+            $this->productionService->add($player, $planet, $units, "troop");
+            $this->productionService->spendFunds($player, $units);
         } else {
             return "No suficients Funds";
         }

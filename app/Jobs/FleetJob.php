@@ -18,7 +18,7 @@ class FleetJob implements ShouldQueue
 
     private $planet;
     private $units;
-    private $address;
+    private $player;
     private $production;
     
     /**
@@ -26,11 +26,11 @@ class FleetJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($planet, $address, $units, $production, $type)
+    public function __construct($planet, $player, $units, $production, $type)
     {
         $this->planet = $planet;
         $this->units = $units;
-        $this->address = $address;
+        $this->player = $player;
         $this->production = $production;
     }
 
@@ -51,7 +51,7 @@ class FleetJob implements ShouldQueue
                 $fleet->quantity += $unit["quantity"];
             } else {
                 $fleet = new Fleet();
-                $fleet->address = $this->address;
+                $fleet->player = $this->player;
                 $fleet->planet = $this->planet;
                 $fleet->unit = $unit["id"];
                 $fleet->quantity = $unit["quantity"];

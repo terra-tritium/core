@@ -15,15 +15,16 @@ class GameModeController extends Controller
         return GameMode::orderBy('code')->get();
     }
 
-    public function change($address, $code) {
-        $p1 = Player::where("address", $address)->firstOrFail();
+    public function change($code) {
+        $player = Player::getPlayerLogged();
+        $p1 = Player::where("player", $player->id)->firstOrFail();
         $p1->gameMode($code);
-        $this->applyEffect($address, $code);
+        $this->applyEffect($player->id, $code);
         $p1->save();
     }
 
-    private function applyEffect($address, $code) {
-        $effect = GameMode::where("address", $address)->first();
+    private function applyEffect($player,$code) {
+        $effect = GameMode::where("player", $player)->first();
         
         if (!$effect) {
            $effect = new Effect(); 
