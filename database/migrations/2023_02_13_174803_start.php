@@ -229,9 +229,10 @@ return new class extends Migration
             $table->id();
             $table->integer('player')->constrained("players");
             $table->integer("code");
-            $table->integer("points");
             $table->integer("cost");
+            $table->integer("progress");
             $table->integer("power");
+            $table->bigInteger("start");
             $table->bigInteger("timer");
             $table->integer("status");
         });
