@@ -31,19 +31,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
-// Route::controller(AuthController::class)->group(function () {
-//     Route::post('/create-token','createToken');
-// });
-
 Route::controller(AuthController::class)->group(function () {
     Route::post('/user/login','createToken');
     Route::get('/user/logout','logout');
     Route::post('/user/forgot-password','sendLink');
-    Route::post('/user/reset-password','resetPassword');
+    Route::post('/user/reset-password','resetPassword')->name('password.reset');
 });
 
 Route::controller(CountryController::class)->group(function () {

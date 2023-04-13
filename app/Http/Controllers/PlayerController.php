@@ -77,6 +77,17 @@ class PlayerController extends Controller
 
     public function register(Request $request) {
 
+        $userExist   =  User::where('email',$request->input("email"))->first();
+        $playedExist =  Player::where('name',$request->input("name"))->first();
+
+        if($userExist){
+            return response(['message' => 'There is already a registered user with this E-mail!','success'=>false],200);
+        }
+
+        if($playedExist){
+            return response(['message' => 'There is already a registered user with this Player Name!','success'=>false],200);
+        }
+
         $user = new User();
         $user->email    = $request->input("email");
         $user->name     = $request->input("name");
@@ -90,7 +101,8 @@ class PlayerController extends Controller
         $player->user = $user->id;
         $this->playerService->register($player);
         
-        return response(['messagem' => 'Player created success!','success'=>true],200);
+        return response(['message' => 'Player created success!','success'=>true],200);
 
     }
+
 }
