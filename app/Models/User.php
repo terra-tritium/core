@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\PasswordReset;
+use App\Jobs\QueuedPasswordResetJob;
 
 class User extends Authenticatable
 {
@@ -45,6 +46,6 @@ class User extends Authenticatable
 
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new PasswordReset($token));
+        QueuedPasswordResetJob::dispatch($this,$token);
     }
 }

@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class PasswordReset extends Notification
+class ResetPassword extends Notification
 {
     use Queueable;
 
@@ -45,9 +45,10 @@ class PasswordReset extends Notification
     {
         return (new MailMessage)
             ->subject("Redefinir Senha")
-            ->line('Você está recebendo este e-mail porque recebemos um pedido de redefinição de senha para sua conta.')
-            ->action('Redefinir Senha',config('api.url_site').'/reset-password?'.$this->token.'/'.urlencode($notifiable->email))
-            ->line('Se você não solicitou uma reinicialização da senha, nenhuma ação adicional será necessária.')
+            ->line('You are receiving this email because we received a password reset request for your account.')
+            ->action('Redefinir Senha',config('api.url_site').'/reset-password/'.$this->token.'/'.urlencode($notifiable->email))
+            ->line('This password reset link will expire in 60 minutes.')
+            ->line('If you did not request a password reset, no further action is required.')
             ->markdown('vendor.notifications.email');
     }
 
