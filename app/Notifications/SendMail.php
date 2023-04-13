@@ -13,6 +13,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use App\Jobs\SendMailJob;
+use App\Jobs\QueuedPasswordResetJob;
 
 class SendMail extends Notification implements ShouldQueue
 {
