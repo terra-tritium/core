@@ -9,4 +9,13 @@ class Message extends Model
 {
     use HasFactory;
     protected $table = 'messages';
+    protected $fillable = [
+        'senderId',
+        'recipientId',
+        'content',
+        'createdAt',
+        'updateAt',
+        'status',
+        'read'
+    ];
 }
