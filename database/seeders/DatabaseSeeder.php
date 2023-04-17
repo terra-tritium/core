@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
             RequireSeeder::class,
             ResearchSeeder::class,
             StrategySeeder::class,
-            UnitSeeder::class
+            UnitSeeder::class,
+            MessagesSeeder::class
         ]);
     }
 }

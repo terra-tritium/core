@@ -115,10 +115,15 @@ return new class extends Migration
         });
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->string("text");
-            $table->string("from");
-            $table->string("to");
+            $table->unsignedBigInteger('senderId');
+            $table->unsignedBigInteger('recipientId');
+            $table->string('content',1000);
+            $table->timestamp('createdAt')->useCurrent();
+            $table->timestamp('readAt')->nullable();
+            $table->boolean('status');
             $table->boolean("read");
+            $table->foreign('senderId')->references('id')->on('users');
+            $table->foreign('recipientId')->references('id')->on('users');
         });
         Schema::create('requires', function (Blueprint $table) {
             $table->id();
