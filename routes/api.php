@@ -14,6 +14,7 @@ use App\Http\Controllers\BattleController;
 use App\Http\Controllers\QuadrantController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\API\ResetarSenhaController;
+use App\Http\Controllers\MessegeController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +59,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/build/workers', 'workers');
         Route::get('/build/requires/{build}', 'requires');
         Route::get('/build/require/{build}/{level}', 'require');
+    });
+
+    Route::controller(CountryController::class)->group(function () {
+        Route::get('/country/list', 'list');
     });
 
     Route::controller(PlanetController::class)->group(function () {
@@ -111,3 +116,15 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 });
+/**
+ * Rota Publica, ping
+ */
+Route::get('/ping',function(){
+    return "pong";
+});
+Route::controller(MessegeController::class)->group(function () {
+    Route::get('/messege/all','getAll');
+    Route::get('/messege/all-sender/{id}', 'getAllByUserSender');
+});
+
+
