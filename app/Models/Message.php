@@ -11,28 +11,58 @@ class Message extends Model
 {
     use HasFactory;
     protected $table = 'messages';
+    public $timestamps = false;
+
     protected $fillable = [
         'senderId',
         'recipientId',
         'content',
         'createdAt',
-        'updateAt',
+        'readAt',
         'status',
         'read'
     ];
 
-    public function getAll(){
-        $msgs = DB::table($this->table)->get();
+    public function getAll()
+    {
+        $msgs = DB::table($this->table . ' as m')
+            ->select('us.name as sender', 'ur.name as recipient', 'm.*')
+            ->join('users as us', 'us.id', '=', 'm.senderId')
+            ->join('users as ur', 'ur.id', '=', 'm.recipientId')
+            ->get();
         return $msgs;
     }
 
-    public function getAllByUserSender($senderId){
-        $msg = DB::table($this->table)->where('senderId',$senderId)->get();
+    public function getAllByUserSender($senderId)
+    {
+        $msg = DB::table($this->table . ' as m')
+            ->select('us.name as sender', 'ur.name as recipient', 'm.*')
+            ->join('users as us', 'us.id', '=', 'm.senderId')
+            ->join('users as ur', 'ur.id', '=', 'm.recipientId')
+            ->where('senderId', $senderId)->get();
+        return $msg;
+    }
+
+    /**
+     * 
+     */
+    public function getAllMessegeNotRead($recipientId)
+    {
+        $msg = DB::table($this->table . ' as m')
+            ->select('us.name as sender', 'ur.name as recipient', 'm.*')
+            ->join('users as us', 'us.id', '=', 'm.senderId')
+            ->join('users as ur', 'ur.id', '=', 'm.recipientId')
+            ->where([['recipientId', '=', $recipientId], ['read', '=', false]])->get();
+            return $msg;
+    }
+
+    public function getAllByUserRecipient($recipientId)
+    {
+        $msg = DB::table($this->table . ' as m')
+            ->select('us.name as sender', 'ur.name as recipient', 'm.*')
+            ->join('users as us', 'us.id', '=', 'm.senderId')
+            ->join('users as ur', 'ur.id', '=', 'm.recipientId')->where('recipientId', $recipientId)->get();
         return $msg;
     }
     
-    public function getMsg(){
-        $msg = DB::table($this->table)->where('recipientId','3')->get();
-        return $msg;
-    }
 }
