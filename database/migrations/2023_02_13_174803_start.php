@@ -119,7 +119,7 @@ return new class extends Migration
             $table->unsignedBigInteger('recipientId');
             $table->string('content',1000);
             $table->timestamp('createdAt')->useCurrent();
-            $table->timestamp('updatedAt')->nullable();
+            $table->timestamp('readAt')->nullable();
             $table->boolean('status');
             $table->boolean("read");
             $table->foreign('senderId')->references('id')->on('users');

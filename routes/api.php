@@ -45,11 +45,11 @@ Route::controller(PlayerController::class)->group(function () {
     Route::post('/player/register', 'register');
 });
 
-Route::middleware('auth:sanctum')->group(function () {  
+Route::middleware('auth:sanctum')->group(function () {
     Route::controller(PlayerController::class)->group(function () {
         Route::get('/player/show', 'show');
     });
-    
+
     Route::controller(BuildController::class)->group(function () {
         Route::get('/build/list', 'list');
         Route::get('/build/availables/{planet}', 'availables');
@@ -125,6 +125,10 @@ Route::get('/ping',function(){
 Route::controller(MessegeController::class)->group(function () {
     Route::get('/messege/all','getAll');
     Route::get('/messege/all-sender/{id}', 'getAllByUserSender');
+    Route::get('/messege/all-recipient/{id}', 'getAllByUserRecipient');
+    Route::post('/messege/new','newMessege');
+    Route::post('/messege/read','readMessege');
+    Route::get('/messege/not-read/{id}', 'getAllMessegeNotRead');
 });
 
 
