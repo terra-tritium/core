@@ -61,11 +61,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/build/requires/{build}', 'requires');
         Route::get('/build/require/{build}/{level}', 'require');
     });
-
-    Route::controller(CountryController::class)->group(function () {
-        Route::get('/country/list', 'list');
-    });
-
     Route::controller(PlanetController::class)->group(function () {
         Route::get('/planet/list', 'list');
     });
