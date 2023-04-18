@@ -48,6 +48,7 @@ Route::controller(PlayerController::class)->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::controller(PlayerController::class)->group(function () {
         Route::get('/player/show', 'show');
+        Route::post('/player/new', 'register');
     });
 
     Route::controller(BuildController::class)->group(function () {
