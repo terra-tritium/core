@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Player;
 use App\Models\Research;
 use App\Models\Researched;
 use App\Services\ResearchService;

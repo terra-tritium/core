@@ -85,4 +85,20 @@ class AuthController extends Controller
         return response(['success' => $success  ,'message' => $status ]);
     }
 
+    /**
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @todo remover antes de enviar para produção
+     */
+    public function generateToken()
+    {
+        $user = User::first();
+        if (!$user) {
+            return response(['message' => 'No user found'], 404);
+        }
+
+        $token = $user->createToken('TokenName')->plainTextToken;
+
+        return response(['message' => 'Token generated successfully', 'token' => $token], 200);
+    }
+
 }

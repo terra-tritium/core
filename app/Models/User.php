@@ -48,4 +48,9 @@ class User extends Authenticatable
     {
         QueuedPasswordResetJob::dispatch($this,$token);
     }
+
+    public function player()
+    {
+        return $this->hasOne(Player::class);
+    }
 }

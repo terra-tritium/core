@@ -50,6 +50,7 @@ Route::controller(PlayerController::class)->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::controller(PlayerController::class)->group(function () {
         Route::get('/player/show', 'show');
+        Route::post('/player/new', 'register');
     });
 
     Route::controller(BuildController::class)->group(function () {
@@ -132,5 +133,10 @@ Route::controller(MessegeController::class)->group(function () {
     Route::post('/messege/read','readMessege');
     Route::get('/messege/not-read/{id}', 'getAllMessegeNotRead');
 });
+
+/**
+ * @todo remover endpoint antes de enviar para produção
+ */
+Route::get('/generate-token', [AuthController::class, 'generateToken']);
 
 
