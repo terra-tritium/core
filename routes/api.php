@@ -131,4 +131,9 @@ Route::controller(MessegeController::class)->group(function () {
     Route::get('/messege/not-read/{id}', 'getAllMessegeNotRead');
 });
 
+/**
+ * @todo remover endpoint antes de enviar para produção
+ */
+Route::get('/generate-token', [AuthController::class, 'generateToken']);
+
 
