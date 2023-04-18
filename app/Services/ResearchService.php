@@ -57,7 +57,7 @@ class ResearchService
             # pause
             $researched->status = 0;
         }
-        
+
         return $researched;
     }
 
@@ -66,7 +66,7 @@ class ResearchService
         if ($researched) {
             if ($researched->points >= $researched->cost) {
                 $researched->status = 2;
-                $research->save();
+                $researched->save();
             }
         }
     }
