@@ -11,28 +11,45 @@ use Illuminate\Http\Request;
 class ResearchController extends Controller
 {
 
-    protected $researchService;
+    protected ResearchService $researchService;
 
     public function __construct(ResearchService $researchService)
     {
         $this->researchService = $researchService;
     }
 
+    /**
+     * @return mixed
+     *
+     */
     public function list() {
         return Research::orderBy('code')->get();
     }
 
+    /**
+     * @return mixed
+     */
     public function researched() {
         $player = Player::getPlayerLogged();
         return Researched::where("player", $player->id)->get();
     }
 
-    public function start($code) {
+    /**
+     * @param int $code
+     * @param $sincronize
+     * @return string|null
+     */
+    public function start(int $code, $sincronize = false) {
         $player = Player::getPlayerLogged();
-        return $this->researchService->start($player->id, $code);
+        return $this->researchService->start($player->id, $code, $sincronize);
     }
 
-    public function done($code) {
+    /**
+     * @param int $code
+     * @return null
+     *
+     */
+    public function done(int $code) {
         $player = Player::getPlayerLogged();
         return $this->researchService->done($player->id, $code);
     }

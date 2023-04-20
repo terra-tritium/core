@@ -41,7 +41,7 @@ return new class extends Migration
             $table->id();
             $table->string("name");
             $table->string("code");
-            $table->string("image");           
+            $table->string("image");
         });
         Schema::create('modes', function (Blueprint $table) {
             $table->id();
@@ -239,7 +239,9 @@ return new class extends Migration
             $table->integer("power");
             $table->bigInteger("start");
             $table->bigInteger("timer");
+            $table->bigInteger("points");
             $table->integer("status");
+            $table->bigInteger("finish");
         });
         Schema::create('battles', function (Blueprint $table) {
             $table->id();

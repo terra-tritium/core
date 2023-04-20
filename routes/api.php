@@ -81,7 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(ResearchController::class)->group(function () {
         Route::get('/research/list', 'list');
         Route::get('/researched', 'researched');
-        Route::post('/research/start/{code}', 'start');
+        Route::post('/research/start/{code}/{sincronize?}', 'start');
         Route::post('/research/done/{code}', 'done');
     });
 
