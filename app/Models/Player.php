@@ -13,15 +13,13 @@ class Player extends Model
     protected $table = 'players';
 
     public static function getPlayerLogged(){
-        return Player::where('user', auth()->user()->id)->first();
+        return DB::table('players')->where('user', auth()->user()->id)->first();
     }
 
     public static function getMyPlanets()
     {
-        $planets = DB::table('planets')
-                                    ->join('players','players.id','=','planets.player')
-                                    ->where('players.user',auth()->user()->id)
-                                    ->get();
+        $player = DB::table('players')->where('user', auth()->user()->id)->first();
+        $planets = DB::table('planets')->where('player', $player->id)->get();
 
         return $planets;
     }
