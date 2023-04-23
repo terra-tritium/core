@@ -92,6 +92,10 @@ class MessegeController extends Controller
         $msg = new Message();
         return $msg->getAllByUserRecipient($player->user);
     }
+    public function getCountMessageNotRead(){
+        $naoLidas = $this->getAllMessegeNotRead();
+        return ($naoLidas ? count($naoLidas) : 0);
+    }
     private function messegeForSender($messages)
     {
         $trocas = array();
@@ -118,8 +122,7 @@ class MessegeController extends Controller
         $player = Player::getPlayerLogged();
         $messages = (new Message())->getAllMessegeNotRead($player->user);
         return  $messages;
-        //return $this->messegeForSender($messages);
-        //return $messages;
+       
     }
     public function newMessege(Request $request)
     {
