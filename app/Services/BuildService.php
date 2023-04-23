@@ -8,6 +8,7 @@ use App\Models\Build;
 use App\Models\Building;
 use App\Models\Requires;
 use App\Services\PlayerService;
+use Illuminate\Support\Facades\Auth;
 
 use Carbon\Carbon;
 
@@ -57,8 +58,11 @@ class BuildService
         $building->level = 1;
         $building->workers = 0;
 
+        $user = Auth::user();
+
         $planet = Planet::find($building->planet);
-        $p1 = Player::findOrFail($planet->player);
+        $p1 = Player::where('user', $user->id)->firstOrFail();
+
         $build = Build::find($building->build);
 
         $require = Requires::where([
@@ -67,8 +71,7 @@ class BuildService
         ])->firstOrFail();
 
         $building->ready = (Carbon::now()->timestamp * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
-
-
+        
         // Colonization
         if ($building->build == 1) {
             if ($this->playerService->enoughBalance($p1, $require->metal, 1)) {
@@ -121,7 +124,9 @@ class BuildService
         }
 
         $p1 = $this->playerService->addBuildScore($p1, $this->levelFactor);
-            
+        
+        $building->planet = Planet::where([['player', $p1->id], ['id', $building->planet]])->firstOrFail()->id;
+
         $building->save();
         $p1->save();
         $planet->save();
