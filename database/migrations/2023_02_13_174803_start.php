@@ -81,20 +81,25 @@ return new class extends Migration
             $table->bigInteger("proMetal");
             $table->bigInteger("proUranium");
             $table->bigInteger("proCrystal");
+            # Power multiplier of resources
             $table->integer("pwMetal");
             $table->integer("pwUranium");
             $table->integer("pwCrystal");
             $table->integer("pwEnergy");
+            # Time resources
             $table->bigInteger("timeMetal")->nullable();
             $table->bigInteger("timeUranium")->nullable();
             $table->bigInteger("timeCrystal")->nullable();
             $table->bigInteger("timeEnergy")->nullable();
+            # Spaceships Cargos 
             $table->bigInteger("merchantShips");
+            # Score rankings
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
             $table->bigInteger("attackScore");
             $table->bigInteger("defenseScore");
             $table->bigInteger("militaryScore");
+            $table->bigInteger("researchScore");
         });
         Schema::create('ranking', function (Blueprint $table) {
             $table->id();
