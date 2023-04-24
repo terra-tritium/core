@@ -180,6 +180,7 @@ class PlayerService
     $player->attackScore = 0;
     $player->defenseScore = 0;
     $player->militaryScore = 0;
+    $player->researchScore = 0;
     $player->gameMode = 1;
     $player->attackStrategy = 1;
     $player->defenseStrategy = 1;
