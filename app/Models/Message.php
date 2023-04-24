@@ -36,10 +36,11 @@ class Message extends Model
     public function getAllByUserSender($senderId)
     {
         $msg = DB::table($this->table . ' as m')
-            ->select('us.name as sender', 'ur.name as recipient', 'm.*')
+            ->select('m.senderId', 'us.name as sender')
             ->join('users as us', 'us.id', '=', 'm.senderId')
-            ->join('users as ur', 'ur.id', '=', 'm.recipientId')
-            ->where('senderId', $senderId)->get();
+            ->where('senderId', $senderId)
+            ->groupBy('m.senderId')
+            ->orderBy('m.createdAt')->get();
         return $msg;
     }
 
@@ -53,16 +54,25 @@ class Message extends Model
             ->join('users as us', 'us.id', '=', 'm.senderId')
             ->join('users as ur', 'ur.id', '=', 'm.recipientId')
             ->where([['recipientId', '=', $recipientId], ['read', '=', false]])->get();
-            return $msg;
+        return $msg;
     }
 
     public function getAllByUserRecipient($recipientId)
     {
         $msg = DB::table($this->table . ' as m')
-            ->select('us.name as sender', 'ur.name as recipient', 'm.*')
+            ->select('m.senderId', 'us.name as sender')
             ->join('users as us', 'us.id', '=', 'm.senderId')
-            ->join('users as ur', 'ur.id', '=', 'm.recipientId')->where('recipientId', $recipientId)->get();
+            ->where('recipientId', $recipientId)
+            ->groupBy(['m.senderId', 'us.name'])
+            ->orderBy('us.name')
+            ->get();
         return $msg;
     }
-    
+    public function getAllMessageSenderForRecipent($senderId, $recipientId)
+    {
+        $msgs = DB::table($this->table . ' as m')
+        ->where([['m.recipientId', '=', $recipientId], ['m.senderId', '=', $senderId]])
+        ->orderBy('m.createdAt')->get();
+        return $msgs;
+    }
 }
