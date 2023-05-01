@@ -113,6 +113,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/quadrant/show/{code}', 'show');
     });
 
+    Route::controller(MessegeController::class)->group(function () {
+        Route::get('/messege/all','getAll');
+        Route::get('/messege/all-sender/{id}', 'getAllByUserSender');
+        Route::get('/messege/all-recipient', 'getAllByUserRecipient');
+        Route::post('/messege/new','newMessege');
+        Route::post('/messege/read','readMessege');
+        Route::get('/messege/list', 'list');
+        Route::get('/messege/not-read', 'getAllMessegeNotRead');
+        Route::get('/message/send-for-recipient/{senderid}', 'getAllMessageSenderForRecipent');
+        Route::get('/message/count' ,'getCountMessageNotRead');
+    });
+
 });
 /**
  * Rota Publica, ping
@@ -120,14 +132,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/ping',function(){
     return "pong";
 });
-Route::controller(MessegeController::class)->group(function () {
-    Route::get('/messege/all','getAll');
-    Route::get('/messege/all-sender/{id}', 'getAllByUserSender');
-    Route::get('/messege/all-recipient/{id}', 'getAllByUserRecipient');
-    Route::post('/messege/new','newMessege');
-    Route::post('/messege/read','readMessege');
-    Route::get('/messege/not-read/{id}', 'getAllMessegeNotRead');
-});
+
 
 /**
  * @todo remover endpoint antes de enviar para produção

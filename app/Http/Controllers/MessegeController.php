@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Planet;
 use App\Models\Player;
+
 use Illuminate\Http\Request;
 use App\Models\Message;
 use DateTime;
@@ -80,18 +81,48 @@ class MessegeController extends Controller
 
     public function getAllByUserSender($id)
     {
+        $player = Player::getPlayerLogged();
         $msg = new Message();
-        return $msg->getAllByUserSender($id);
+        return $msg->getAllByUserSender($player->user);
     }
 
-    public function getAllByUserRecipient($id)
+    public function getAllByUserRecipient()
     {
+        $player = Player::getPlayerLogged();
         $msg = new Message();
-        return $msg->getAllByUserRecipient($id);
+        return $msg->getAllByUserRecipient($player->user);
+    }
+    public function getCountMessageNotRead(){
+        $naoLidas = $this->getAllMessegeNotRead();
+        return ($naoLidas ? count($naoLidas) : 0);
+    }
+    private function messegeForSender($messages)
+    {
+        $trocas = array();
+
+        foreach ($messages as $message) {
+            $sender = $message->sender;
+
+            if (!isset($trocas[$sender])) {
+                $trocas[$sender] = array();
+            }
+
+            $trocas[$sender][] = $message;
+        }
+        return $trocas;
     }
 
-    public function getAllMessegeNotRead($id){
-        return (new Message())->getAllMessegeNotRead($id);
+    public function getAllMessageSenderForRecipent($senderid){
+        $player = Player::getPlayerLogged();
+        $messages = (new Message())->getAllMessageSenderForRecipent($senderid, $player->user);
+        return $messages;
+    }
+    public function getAllMessegeNotRead()
+    {
+        $player = Player::getPlayerLogged();
+        $messages = (new Message())->getAllMessegeNotRead($player->user);
+        return  $messages;
+       
     }
     public function newMessege(Request $request)
     {
@@ -108,7 +139,8 @@ class MessegeController extends Controller
         }
         return response(['message' => 'message send success!', 'success' => true], 201);
     }
-    public function readMessege(Request $request){
+    public function readMessege(Request $request)
+    {
         $msg = (new Message())->find($request->input("id"));
         $msg->read = true;
         $msg->readAt = date('Y-m-d H:i:s');
