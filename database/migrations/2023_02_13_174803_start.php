@@ -288,6 +288,8 @@ return new class extends Migration
             $table->id();
             $table->string("quadrant");
             $table->string("name");
+            $table->string("x");
+            $table->string("y");
         });
     }
 

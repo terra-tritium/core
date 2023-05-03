@@ -35,6 +35,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/user/logout','logout');
     Route::post('/user/forgot-password','sendLink');
     Route::post('/user/reset-password','resetPassword')->name('password.reset');
+    Route::post('/gerar','gerar'); // @todo Geracao de posicao dos quadrantes (remover antes de ir para producao)
 });
 
 Route::controller(CountryController::class)->group(function () {
@@ -109,6 +110,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(QuadrantController::class)->group(function () {
         Route::get('/quadrant/show/{code}', 'show');
+        Route::get('/quadrant/map/{region}', 'map');
     });
 
     Route::controller(MessegeController::class)->group(function () {
