@@ -248,8 +248,9 @@ return new class extends Migration
         });
         Schema::create('battles', function (Blueprint $table) {
             $table->id();
-            $table->string("attack");
-            $table->string("defense");
+            $table->foreignId("attack")->constrained("players");
+            $table->foreignId("defense")->constrained("players");
+            $table->foreignId('planet')->constrained("planets");
             $table->string("attackDemage")->nullable();
             $table->string("defenseDemage")->nullable();
             $table->integer("attackStrategy");
