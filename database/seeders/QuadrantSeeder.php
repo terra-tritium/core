@@ -173,7 +173,7 @@ class QuadrantSeeder extends Seeder
         DB::table('qnames')->insert(["x" => "-196", "y" => "-8", "quadrant" => "B054", "name" => "Ataraxia"]);
         DB::table('qnames')->insert(["x" => "-96", "y" => "167", "quadrant" => "B055", "name" => "Atlas"]);
         DB::table('qnames')->insert(["x" => "-157", "y" => "120", "quadrant" => "B056", "name" => "Atria"]);
-        DB::table('qnames')->insert(["x" => "-121", "y" => "-163", "quadrant" => "B057", "name" => "Atropa"]);
+        DB::table('qnames')->insert(["x" => "-119", "y" => "-156", "quadrant" => "B057", "name" => "Atropa"]);
         DB::table('qnames')->insert(["x" => "-120", "y" => "-164", "quadrant" => "B058", "name" => "Atrox"]);
         DB::table('qnames')->insert(["x" => "-190", "y" => "-77", "quadrant" => "B059", "name" => "Aurelia"]);
         DB::table('qnames')->insert(["x" => "-57", "y" => "184", "quadrant" => "B060", "name" => "Auriel"]);
@@ -1330,7 +1330,6 @@ class QuadrantSeeder extends Seeder
         DB::table('qnames')->insert(["x" => "184", "y" => "86", "quadrant" => "M097", "name" => "Tabula Rasa"]);
         DB::table('qnames')->insert(["x" => "190", "y" => "-136", "quadrant" => "M098", "name" => "Tachyon"]);
         DB::table('qnames')->insert(["x" => "151", "y" => "195", "quadrant" => "M099", "name" => "Tachyon II"]);
-
                 
         DB::table('qnames')->insert(["x" => "-12", "y" => "9", "quadrant" => "N000", "name" => "Talaria"]);
         DB::table('qnames')->insert(["x" => "-7", "y" => "34", "quadrant" => "N001", "name" => "Talaria II"]);
