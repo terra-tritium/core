@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Troop;
+use App\Models\Player;
 use App\Services\TroopService;
 use Illuminate\Http\Request;
 

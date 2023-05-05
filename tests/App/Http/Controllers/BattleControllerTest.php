@@ -13,16 +13,20 @@ class BattleControllerTest extends TestCase
     # php artisan test --filter=BattleControllerTest::test_build
     public function test_build()
     {
-        $token = '2|zC4C0XBslpE141CftkJRNPUV7aSFmxenuvveaYa3';
+        $loginData = ['email' => 'nicplayer2@gmail.com', 'password' => '123456'];
+
+        $response = $this->json('POST', 'api/user/login', $loginData, ['Accept' => 'application/json']);
+        
+        $content = json_decode($response->getContent(), true);
+        $token = $content['token'];
 
         $data = [
-            'planetId' => 5,
-            'build' => 1,
-            'slot' => 1
+           
         ];
+
         $response = $this->withHeaders(['Authorization'=>'Bearer '.$token,
                                         'Accept' => 'application/json'])
-                                        ->post('/api/build/plant', $data);
+                                        ->post('/api/troop/production/1', $data);
         $response->dump();   
         $response->assertStatus(200);
     }
