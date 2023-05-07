@@ -127,8 +127,9 @@ class MessegeController extends Controller
     public function newMessege(Request $request)
     {
         try {
+            $player = Player::getPlayerLogged();
             $msg = new Message();
-            $msg->senderId = $request->input("senderId");
+            $msg->senderId = $player->user;
             $msg->recipientId = $request->input("recipientId");
             $msg->content = $request->input("content");
             $msg->status = true;
