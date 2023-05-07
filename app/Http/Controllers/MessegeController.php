@@ -127,8 +127,9 @@ class MessegeController extends Controller
     public function newMessege(Request $request)
     {
         try {
+            $player = Player::getPlayerLogged();
             $msg = new Message();
-            $msg->senderId = $request->input("senderId");
+            $msg->senderId = $player->user;
             $msg->recipientId = $request->input("recipientId");
             $msg->content = $request->input("content");
             $msg->status = true;
@@ -146,5 +147,17 @@ class MessegeController extends Controller
         $msg->readAt = date('Y-m-d H:i:s');
         $msg->save();
         return response(['message' => 'message read!', 'success' => true], 200);
+    }
+
+    public function getSenders(){
+        $player = Player::getPlayerLogged();
+        $messages = (new Message())->getSenders($player->user);
+        return $messages;
+    }
+
+    public function getConversation($senderId){
+        $player = Player::getPlayerLogged();
+        $messages = (new Message())->getConversation($player->user,$senderId);
+        return $messages;
     }
 }

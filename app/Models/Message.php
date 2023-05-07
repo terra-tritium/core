@@ -57,6 +57,7 @@ class Message extends Model
         return $msg;
     }
 
+
     public function getAllByUserRecipient($recipientId)
     {
         $msg = DB::table($this->table . ' as m')
@@ -71,8 +72,42 @@ class Message extends Model
     public function getAllMessageSenderForRecipent($senderId, $recipientId)
     {
         $msgs = DB::table($this->table . ' as m')
-        ->where([['m.recipientId', '=', $recipientId], ['m.senderId', '=', $senderId]])
-        ->orderBy('m.createdAt')->get();
+            ->where([['m.recipientId', '=', $recipientId], ['m.senderId', '=', $senderId]])
+            ->orderBy('m.createdAt')->get();
         return $msgs;
+    }
+
+    /**
+     * Pegar os usuário onde ja tiveram interações
+     */
+    public function getSenders($recipientId)
+    {
+        $messages = DB::table('users')
+            ->join('messages', 'users.id', '=', 'messages.senderId')
+            ->select('users.name', 'users.id as senderId', DB::raw('MAX(messages.createdAt) as createdAt'), DB::raw('MAX(messages.read) as `read`'))
+            ->where('messages.recipientId', $recipientId)
+            ->groupBy('users.id', 'users.name','messages.senderId')
+            ->orderBy('messages.read')
+            ->orderByDesc('createdAt')
+            ->get();
+
+        return $messages;
+    }
+    public function getConversation($recipientId, $senderId)
+    {
+        $messages =  DB::table('messages')
+            ->select('*')
+            ->selectRaw("CASE WHEN senderId = $senderId THEN true WHEN recipientId = $senderId THEN false END AS sender")
+            ->where(function ($query) use ($senderId, $recipientId) {
+                $query->where('senderId', $senderId)
+                    ->where('recipientId', $recipientId);
+            })
+            ->orWhere(function ($query) use ($senderId, $recipientId) {
+                $query->where('senderId', $recipientId)
+                    ->where('recipientId', $senderId);
+            })
+            ->orderBy('createdAt')
+            ->get();
+        return $messages;
     }
 }
