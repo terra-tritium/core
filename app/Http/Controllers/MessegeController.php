@@ -147,4 +147,16 @@ class MessegeController extends Controller
         $msg->save();
         return response(['message' => 'message read!', 'success' => true], 200);
     }
+
+    public function getSenders(){
+        $player = Player::getPlayerLogged();
+        $messages = (new Message())->getSenders($player->user);
+        return $messages;
+    }
+
+    public function getConversation($senderId){
+        $player = Player::getPlayerLogged();
+        $messages = (new Message())->getConversation($player->user,$senderId);
+        return $messages;
+    }
 }

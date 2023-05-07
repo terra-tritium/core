@@ -123,6 +123,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/messege/not-read', 'getAllMessegeNotRead');
         Route::get('/message/send-for-recipient/{senderid}', 'getAllMessageSenderForRecipent');
         Route::get('/message/count' ,'getCountMessageNotRead');
+
+        Route::get('/message/getSenders', 'getSenders');
+        Route::get('/messages/conversation/{senderid}', 'getConversation');
     });
 
 });
