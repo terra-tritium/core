@@ -11,4 +11,62 @@ class QuadrantController extends Controller
     public function show($code) {
         return Quadrant::where("quadrant", $code)->firstOrFail();
     }
+
+    public function map($region) {
+
+        $quadrants = [];
+
+        switch ($region) {
+            case 'A':
+                $quadrants = Quadrant::whereBetween('id', [1, 100])->get();
+                break;
+            case 'B':
+                $quadrants = Quadrant::whereBetween('id', [101, 200])->get();
+                break;
+            case 'C':
+                $quadrants = Quadrant::whereBetween('id', [201, 300])->get();
+                break;
+            case 'D':
+                $quadrants = Quadrant::whereBetween('id', [301, 400])->get();
+                break;
+            case 'E':
+                $quadrants = Quadrant::whereBetween('id', [401, 500])->get();
+                break;
+            case 'F':
+                $quadrants = Quadrant::whereBetween('id', [501, 600])->get();
+                break;
+            case 'G':
+                $quadrants = Quadrant::whereBetween('id', [601, 700])->get();
+                break;
+            case 'H':
+                $quadrants = Quadrant::whereBetween('id', [701, 800])->get();
+                break;
+            case 'I':
+                $quadrants = Quadrant::whereBetween('id', [801, 900])->get();
+                break;
+            case 'J':
+                $quadrants = Quadrant::whereBetween('id', [901, 1000])->get();
+                break;
+            case 'K':
+                $quadrants = Quadrant::whereBetween('id', [1001, 1100])->get();
+                break;
+            case 'L':
+                $quadrants = Quadrant::whereBetween('id', [1101, 1200])->get();
+                break;
+            case 'M':
+                $quadrants = Quadrant::whereBetween('id', [1201, 1300])->get();
+                break;
+            case 'N':
+                $quadrants = Quadrant::whereBetween('id', [1301, 1400])->get();
+                break;
+            case 'O':
+                $quadrants = Quadrant::whereBetween('id', [1401, 1500])->get();
+                break;
+            case 'P':
+                $quadrants = Quadrant::whereBetween('id', [1501, 1600])->get();
+                break;
+        }
+
+        return $quadrants;
+    }
 }
