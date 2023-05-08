@@ -44,6 +44,7 @@ Route::controller(CountryController::class)->group(function () {
 
 Route::controller(PlayerController::class)->group(function () {
     Route::post('/player/register', 'register');
+    Route::get('/player/name/{userid}', 'getNameUser');
 });
 
 Route::middleware('auth:sanctum')->group(function () {
