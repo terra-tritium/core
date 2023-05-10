@@ -130,6 +130,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     });
 
+    Route::controller(RankingController::class)->group(function (){
+        Route::get('/ranking/players', [RankingController::class, 'getPlayerRanking']);
+        Route::get('/ranking/aliances', [RankingController::class, 'getAlianceRanking']);
+    });
+
+
 });
 /**
  * Rota Publica, ping

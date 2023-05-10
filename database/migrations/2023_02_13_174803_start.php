@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('aliances', function (Blueprint $table) {
             $table->id();
+            $table->string("name");
             $table->string("description");
             $table->bigInteger("energy");
             $table->bigInteger("score");
@@ -41,7 +42,7 @@ return new class extends Migration
             $table->id();
             $table->string("name");
             $table->string("code");
-            $table->string("image");           
+            $table->string("image");
         });
         Schema::create('modes', function (Blueprint $table) {
             $table->id();
@@ -91,7 +92,7 @@ return new class extends Migration
             $table->bigInteger("timeUranium")->nullable();
             $table->bigInteger("timeCrystal")->nullable();
             $table->bigInteger("timeEnergy")->nullable();
-            # Spaceships Cargos 
+            # Spaceships Cargos
             $table->bigInteger("merchantShips");
             # Score rankings
             $table->bigInteger("score");
