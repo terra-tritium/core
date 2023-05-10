@@ -106,7 +106,6 @@ class PlayerController extends Controller
     }
 
     public function getNameUser($userId){
-        // $user = new User();
         User::find($userId);
         return User::find($userId)->name;
     }
