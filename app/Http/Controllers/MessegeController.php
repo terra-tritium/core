@@ -142,10 +142,9 @@ class MessegeController extends Controller
     }
     public function readMessege(Request $request)
     {
-        $msg = (new Message())->find($request->input("id"));
-        $msg->read = true;
-        $msg->readAt = date('Y-m-d H:i:s');
-        $msg->save();
+        $player = Player::getPlayerLogged();
+        $msg = new Message();
+        $msg->readMessagesForUser($request->input("id"),$player->user);
         return response(['message' => 'message read!', 'success' => true], 200);
     }
 

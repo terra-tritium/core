@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 
 class Message extends Model
@@ -86,7 +87,7 @@ class Message extends Model
             ->join('messages', 'users.id', '=', 'messages.senderId')
             ->select('users.name', 'users.id as senderId', DB::raw('MAX(messages.createdAt) as createdAt'), DB::raw('MAX(messages.read) as `read`'))
             ->where('messages.recipientId', $recipientId)
-            ->groupBy('users.id', 'users.name','messages.senderId')
+            ->groupBy('users.id', 'users.name', 'messages.senderId')
             ->orderBy('messages.read')
             ->orderByDesc('createdAt')
             ->get();
@@ -109,5 +110,17 @@ class Message extends Model
             ->orderBy('createdAt')
             ->get();
         return $messages;
+    }
+
+    public function readMessagesForUser($senderId, $currentUser)
+    {
+        $readAt = Carbon::now();
+
+        DB::table('messages')
+            ->where([['read', '=', false], ['senderId', '=', $senderId], ['recipientId', '=', $currentUser]])
+            ->update([
+                'read' => true,
+                'readAt' => $readAt
+            ]);
     }
 }
