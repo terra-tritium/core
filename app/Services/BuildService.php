@@ -195,14 +195,8 @@ class BuildService
             foreach($allBuilds as $key => $iBuild) {
                 foreach($buildings as $iBuilding) {
                     if ($iBuilding->build == $iBuild->code) {
-                        $allBuilds->forget($key);
+                        $iBuild->disable = true;
                     }
-                }
-            }
-        } else {
-            foreach($allBuilds as $key => $iBuild) {
-                if ($iBuild->code != 1) {
-                    $allBuilds->forget($key);
                 }
             }
         }
