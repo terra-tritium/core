@@ -50,14 +50,29 @@ class Message extends Model
      */
     public function getAllMessegeNotRead($recipientId)
     {
-        $msg = DB::table($this->table . ' as m')
-            ->select('us.name as sender', 'ur.name as recipient', 'm.*')
-            ->join('users as us', 'us.id', '=', 'm.senderId')
-            ->join('users as ur', 'ur.id', '=', 'm.recipientId')
-            ->where([['recipientId', '=', $recipientId], ['read', '=', false]])->get();
+        $msgs = DB::table('users as u')
+        ->select('u.id','u.name', DB::raw('MAX(m.createdAt) as createdAt'), DB::raw('MAX(m.read) as `read`'))
+        ->join('messages as m', 'u.id', '=', 'm.senderId')
+        ->where('m.recipientId', $recipientId)
+        ->where('m.read', false)
+        ->groupBy('u.id','m.senderId','u.name')
+        ->orderBy('read', 'ASC')
+        ->orderBy('createdAt', 'DESC')
+        ->get();
+        return $msgs;
+    }
+    /**
+     * Recupera a ultima msg não lida enviada por um usuario
+     */
+    public function getLastMessageNotReadBySender($recipientId, $senderId){
+        $msg = DB::table('messages as m')
+        ->where('recipientId', $recipientId)
+        ->where('senderId', $senderId)
+        ->where('read', false)
+        ->orderBy('createdAt', 'desc')
+        ->first();
         return $msg;
     }
-
 
     public function getAllByUserRecipient($recipientId)
     {
