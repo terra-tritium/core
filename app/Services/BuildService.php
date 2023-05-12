@@ -202,6 +202,11 @@ class BuildService
         }
 
         foreach($allBuilds as $temp) {
+
+            if (count($buildings) <= 0 && $temp->code != 1) {
+                $temp->disable = true;
+            }
+
             array_push($availables, $temp);
         }
 
