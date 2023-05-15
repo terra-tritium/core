@@ -88,10 +88,10 @@ class BuildSeeder extends Seeder
         ]);
 
         DB::table('builds')->insert([
-            "name" => "Slipway",
+            "name" => "Spaceship Factory",
             "code" => 10,
-            "image" => "build-10.png",
-            "description" => "Armazena os recursos coletados, quanto maior o nível maior a capacidade de armazenamento, os recursos que não couberem no depósito ficam vulneráveis a roubo de outros jogadores",
+            "image" => "build-13.png",
+            "description" => "Fabrica de construções de naves",
             "maxLevel" => 52,
             "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
         ]);

@@ -122,13 +122,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/messege/all-recipient', 'getAllByUserRecipient');
         Route::post('/messege/read','readMessege');
         Route::get('/messege/list', 'list');
-        Route::get('/messege/not-read', 'getAllMessegeNotRead');
         Route::get('/message/send-for-recipient/{senderid}', 'getAllMessageSenderForRecipent');
         Route::get('/message/count' ,'getCountMessageNotRead');
 
+        Route::get('/messege/not-read', 'getAllMessegeNotRead');
         Route::get('/message/getSenders', 'getSenders');
         Route::get('/messages/conversation/{senderid}', 'getConversation');
         Route::post('/messege/new','newMessege');
+        Route::get('/messege/lastmsg-sender/{senderid}','getLastMessageNotReadBySender');
 
     });
 
