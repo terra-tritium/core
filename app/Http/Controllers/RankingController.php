@@ -6,6 +6,7 @@ use App\Models\Ranking;
 use App\Models\Aliance;
 use App\Models\Player;
 use App\Services\RankingService;
+use App\ValueObjects\RankingCategory;
 use Illuminate\Http\Request;
 
 class RankingController extends Controller
@@ -24,19 +25,19 @@ class RankingController extends Controller
         $player = Player::getPlayerLogged();
         switch ($type) {
             case "top":
-                return Ranking::orderBy('score', 'DESC')->take(10)->get();
+                return Ranking::orderBy(RankingCategory::SCORE, 'DESC')->take(10)->get();
             case "general":
-                return Ranking::orderBy('score', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy(RankingCategory::SCORE, 'DESC')->paginate($this->itensPerPage);
             case "builder":
-                return Ranking::orderBy('buildScore', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy(RankingCategory::BUILD_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "military":
-                return Ranking::orderBy('militaryScore', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy(RankingCategory::MILITARY_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "attack":
-                return Ranking::orderBy('attackScore', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy(RankingCategory::ATTACK_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "defense":
-                return Ranking::orderBy('defenseScore', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy(RankingCategory::DEFENSE_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "energy":
-                return Ranking::orderBy('energy', 'DESC')->paginate($this->itensPerPage);
+                return Ranking::orderBy(RankingCategory::ENERGY, 'DESC')->paginate($this->itensPerPage);
         }
     }
 
@@ -44,19 +45,19 @@ class RankingController extends Controller
         $player = Player::getPlayerLogged();
         switch ($type) {
             case "top":
-                return Aliance::orderBy('score', 'DESC')->limit(5);
+                return Aliance::orderBy(RankingCategory::SCORE, 'DESC')->limit(5);
             case "general":
-                return Aliance::orderBy('score', 'DESC')->paginate($this->itensPerPage);
+                return Aliance::orderBy(RankingCategory::SCORE, 'DESC')->paginate($this->itensPerPage);
             case "builder":
-                return Aliance::orderBy('buildScore', 'DESC')->paginate($this->itensPerPage);
+                return Aliance::orderBy(RankingCategory::BUILD_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "military":
-                return Aliance::orderBy('militaryScore', 'DESC')->paginate($this->itensPerPage);
+                return Aliance::orderBy(RankingCategory::MILITARY_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "attack":
-                return Aliance::orderBy('attackScore', 'DESC')->paginate($this->itensPerPage);
+                return Aliance::orderBy(RankingCategory::ATTACK_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "defense":
-                return Aliance::orderBy('defenseScore', 'DESC')->paginate($this->itensPerPage);
+                return Aliance::orderBy(RankingCategory::DEFENSE_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "energy":
-                return Aliance::orderBy('energy', 'DESC')->paginate($this->itensPerPage);
+                return Aliance::orderBy(RankingCategory::ENERGY, 'DESC')->paginate($this->itensPerPage);
         }
     }
 

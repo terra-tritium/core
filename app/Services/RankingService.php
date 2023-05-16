@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Aliance;
 use App\Models\Player;
 use App\Models\Ranking;
+use App\ValueObjects\RankingCategory;
 
 class RankingService
 {
@@ -18,29 +19,28 @@ class RankingService
         $query = Ranking::query();
 
         if ($name) {
-            $query->where('name', 'LIKE', '%' . $name . '%');
+            $query->whereRaw('name LIKE ?', ['%' . $name . '%']);
         }
 
         if ($orderBy) {
             switch ($orderBy) {
-                case 'score':
-                    $query->orderBy('score', 'desc');
+                case RankingCategory::SCORE:
+                    $query->orderBy(RankingCategory::SCORE, 'desc');
                     break;
-                case 'researchScore':
-                    $query->orderBy('researchScore', 'desc');
+                case RankingCategory::RESEARCH_SCORE:
+                    $query->orderBy(RankingCategory::RESEARCH_SCORE, 'desc');
                     break;
-                case 'attackScore':
-                    $query->orderBy('attackScore', 'desc');
+                case RankingCategory::ATTACK_SCORE:
+                    $query->orderBy(RankingCategory::ATTACK_SCORE, 'desc');
                     break;
-                case 'defenseScore':
-                    $query->orderBy('defenseScore', 'desc');
+                case RankingCategory::DEFENSE_SCORE:
+                    $query->orderBy(RankingCategory::DEFENSE_SCORE, 'desc');
                     break;
-                case 'buildScore':
-                    $query->orderBy('buildScore', 'desc');
+                case RankingCategory::BUILD_SCORE:
+                    $query->orderBy(RankingCategory::BUILD_SCORE, 'desc');
                     break;
                 default:
-                    // Ordenação padrão (pode ser modificada conforme necessidade)
-                    $query->orderBy('score', 'desc');
+                    $query->orderBy(RankingCategory::SCORE, 'desc');
                     break;
             }
         }
@@ -54,30 +54,29 @@ class RankingService
 
         if ($orderBy) {
             switch ($orderBy) {
-                case 'score':
-                    $query->orderBy('score', 'desc');
+                case RankingCategory::SCORE:
+                    $query->orderBy(RankingCategory::SCORE, 'desc');
                     break;
-                case 'buildScore':
-                    $query->orderBy('buildScore', 'desc');
+                case RankingCategory::BUILD_SCORE:
+                    $query->orderBy(RankingCategory::BUILD_SCORE, 'desc');
                     break;
-                case 'labScore':
-                    $query->orderBy('labScore', 'desc');
+                case RankingCategory::LAB_SCORE:
+                    $query->orderBy(RankingCategory::LAB_SCORE, 'desc');
                     break;
-                case 'tradeScore':
-                    $query->orderBy('tradeScore', 'desc');
+                case RankingCategory::TRADE_SCORE:
+                    $query->orderBy(RankingCategory::TRADE_SCORE, 'desc');
                     break;
-                case 'attackScore':
-                    $query->orderBy('attackScore', 'desc');
+                case RankingCategory::ATTACK_SCORE:
+                    $query->orderBy(RankingCategory::ATTACK_SCORE, 'desc');
                     break;
-                case 'defenseScore':
-                    $query->orderBy('defenseScore', 'desc');
+                case RankingCategory::DEFENSE_SCORE:
+                    $query->orderBy(RankingCategory::DEFENSE_SCORE, 'desc');
                     break;
-                case 'warScore':
-                    $query->orderBy('warScore', 'desc');
+                case RankingCategory::WAR_SCORE:
+                    $query->orderBy(RankingCategory::WAR_SCORE, 'desc');
                     break;
                 default:
-                    // Ordenação padrão (pode ser modificada conforme sua necessidade)
-                    $query->orderBy('score', 'desc');
+                    $query->orderBy(RankingCategory::SCORE, 'desc');
                     break;
             }
         }
