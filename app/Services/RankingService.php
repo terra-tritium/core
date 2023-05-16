@@ -9,10 +9,10 @@ use App\ValueObjects\RankingCategory;
 
 class RankingService
 {
-  public function addPoints (Player $player, $points) {
-    $player->score += $points;
-    return $player;
-  }
+    public function addPoints (Player $player, $points) {
+        $player->score += $points;
+        return $player;
+    }
 
     public function getRankings($name = null, $orderBy = null)
     {
