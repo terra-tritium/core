@@ -112,6 +112,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(QuadrantController::class)->group(function () {
         Route::get('/quadrant/show/{code}', 'show');
         Route::get('/quadrant/map/{region}', 'map');
+        Route::get('/quadrant/planets/{quadrant}', 'planets');
     });
 
     Route::controller(MessegeController::class)->group(function () {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quadrant;
+use App\Models\Planet;
 use Illuminate\Http\Request;
 
 class QuadrantController extends Controller
@@ -10,6 +11,10 @@ class QuadrantController extends Controller
 
     public function show($code) {
         return Quadrant::where("quadrant", $code)->firstOrFail();
+    }
+
+    public function planets($quadrant) {
+        return Planet::where("quadrant", $quadrant)->get();
     }
 
     public function map($region) {
