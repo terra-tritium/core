@@ -220,7 +220,7 @@ class PlayerService
     if (!$lastPlanet) {
       return [
         'region' => 'A',
-        'quadrant' => 'A001',
+        'quadrant' => 'A000',
         'position' => 1,
         'resource' => 'crystal',
         'type' => 1
