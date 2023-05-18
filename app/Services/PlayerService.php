@@ -209,4 +209,12 @@ class PlayerService
     $p1->battery += $units;
     return $p1;
   }
+
+  public function iSplayerOwnerPlanet($player, $planet) {
+    $planet = Planet::where(['player' => $player, 'id' => $planet])->first();
+    if ($planet) {
+      return true;
+    }
+    return false;
+  }
 }
