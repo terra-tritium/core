@@ -90,7 +90,7 @@ class BuildSeeder extends Seeder
         DB::table('builds')->insert([
             "name" => "Spaceship Factory",
             "code" => 10,
-            "image" => "build-13.png",
+            "image" => "build-10.png",
             "description" => "Fabrica de construções de naves",
             "maxLevel" => 52,
             "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
@@ -112,6 +112,24 @@ class BuildSeeder extends Seeder
             "description" => "Descricao para military camp.",
             "maxLevel" => 52,
             "effect" => "A cada nível de expanção libera a construção de novas unidades"
+        ]);
+
+        DB::table('builds')->insert([
+            "name" => "Shield",
+            "code" => 13,
+            "image" => "build-13.png",
+            "description" => "Escudo de força, protege o planeta de ataques de outros jogadores, a cada nível aumenta a capacidade de absorção de danos.",   
+            "maxLevel" => 52,
+            "effect" => "A cada nível de expanção libera a construção de novas unidades"
+        ]);
+
+        DB::table('builds')->insert([
+            "name" => "Market",
+            "code" => 14,
+            "image" => "build-14.png",
+            "description" => "Resource trades between players",   
+            "maxLevel" => 52,
+            "effect" => "A cada nível de expanção reduz a taxa de fee e aumenta alcance de trocas"
         ]);
     }
 }
