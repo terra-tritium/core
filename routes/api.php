@@ -65,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::controller(PlanetController::class)->group(function () {
         Route::get('/planet/list', 'list');
+        Route::get('/planet/{quadrant}/{position}', 'find');
     });
 
     Route::controller(UnitController::class)->group(function () {
