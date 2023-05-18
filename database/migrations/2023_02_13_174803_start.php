@@ -106,7 +106,6 @@ return new class extends Migration
             $table->id();
             $table->string("name");
             $table->integer('player')->constrained("players");
-            $table->foreignId('aliance')->constrained("aliances");
             $table->bigInteger("energy");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
