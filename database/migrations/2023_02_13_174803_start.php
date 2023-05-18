@@ -31,11 +31,12 @@ return new class extends Migration
             $table->string("name");
             $table->string('resource');
             $table->integer("level");
-            $table->integer("region");
-            $table->integer("quadrant");
+            $table->string("region");
+            $table->string("quadrant");
             $table->integer("position");
             $table->integer("humanoids");
             $table->string('status');
+            $table->integer('type');
         });
         Schema::create('countrys', function (Blueprint $table) {
             $table->id();

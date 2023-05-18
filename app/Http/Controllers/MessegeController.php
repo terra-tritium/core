@@ -94,7 +94,7 @@ class MessegeController extends Controller
     }
     public function getCountMessageNotRead(){
         $naoLidas = $this->getAllMessegeNotRead();
-        return ($naoLidas ? count($naoLidas) : 0);
+        return $naoLidas;
     }
     private function messegeForSender($messages)
     {
@@ -127,8 +127,9 @@ class MessegeController extends Controller
     public function newMessege(Request $request)
     {
         try {
+            $player = Player::getPlayerLogged();
             $msg = new Message();
-            $msg->senderId = $request->input("senderId");
+            $msg->senderId = $player->user;
             $msg->recipientId = $request->input("recipientId");
             $msg->content = $request->input("content");
             $msg->status = true;
@@ -141,10 +142,27 @@ class MessegeController extends Controller
     }
     public function readMessege(Request $request)
     {
-        $msg = (new Message())->find($request->input("id"));
-        $msg->read = true;
-        $msg->readAt = date('Y-m-d H:i:s');
-        $msg->save();
+        $player = Player::getPlayerLogged();
+        $msg = new Message();
+        $msg->readMessagesForUser($request->input("id"),$player->user);
         return response(['message' => 'message read!', 'success' => true], 200);
+    }
+
+    public function getSenders(){
+        $player = Player::getPlayerLogged();
+        $messages = (new Message())->getSenders($player->user);
+        return $messages;
+    }
+
+    public function getConversation($senderId){
+        $player = Player::getPlayerLogged();
+        $messages = (new Message())->getConversation($player->user,$senderId);
+        return $messages;
+    }
+    public function getLastMessageNotReadBySender($senderid){
+        $message = new Message();
+        $player = Player::getPlayerLogged();
+        $msg = $message->getLastMessageNotReadBySender($player->user,$senderid);
+        return $msg;
     }
 }

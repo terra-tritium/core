@@ -186,13 +186,16 @@ class PlayerService
     $player->defenseStrategy = 1;
     $player->save();
 
+    $newAlocation = $this->startAlocation();
+
     $planet = new Planet();
     $planet->level = 1;
-    $planet->name = "First Planet";
-    $planet->resource = "crystal";
-    $planet->region = 1;
-    $planet->quadrant = 1;
-    $planet->position = 1;
+    $planet->name = "Colony";
+    $planet->resource = $newAlocation['resource'];
+    $planet->region = $newAlocation['region'];
+    $planet->quadrant = $newAlocation['quadrant'];
+    $planet->position = $newAlocation['position'];
+    $planet->type = $newAlocation['type'];
     $planet->player = $player->id;
     $planet->humanoids = 30;
     $planet->status = "pacific";
@@ -216,5 +219,90 @@ class PlayerService
       return true;
     }
     return false;
+  }
+  
+  private function startAlocation() {
+    $coords = [];
+    $lastPlanet = Planet::orderBy('id', 'desc')->first();
+
+    if (!$lastPlanet) {
+      return [
+        'region' => 'A',
+        'quadrant' => 'A000',
+        'position' => 1,
+        'resource' => 'crystal',
+        'type' => 1
+      ];
+    }
+
+    $lastQuadrant = $lastPlanet->quadrant;
+    $lastPosition = $lastPlanet->position;
+    
+    $cont = 0;
+
+    do {
+      $lastPosition += 1;
+      if ($lastPosition <= 15) {
+        $coords['quadrant'] = $lastQuadrant;
+        $coords['position'] = $lastPosition;
+      } else {
+          $coords['quadrant'] = $this->nextQuadrant($lastQuadrant);
+          $coords['position'] = 1;
+      }
+      $cont++;
+    } while ($this->coordInUse($coords) == true && $cont < 1600);
+
+    if ($cont > 1599) {
+      return "end";
+    }
+
+    $coords['region'] = substr($coords['quadrant'], 0, 1);
+
+    if ($coords['position'] % 2 == 0) {
+      $coords['resource'] = "uranium";
+    } else {
+      $coords['resource'] = "crystal";
+    }
+
+    switch ($coords['position']) {
+      case ($coords['position'] > 0 && $coords['position'] <= 4):
+        $coords['type'] = 1;
+        break;
+      case ($coords['position'] >= 5 && $coords['position'] <= 8):
+        $coords['type'] = 2;
+        break;
+      case ($coords['position'] >= 9 && $coords['position'] <= 12):
+        $coords['type'] = 3;
+        break;
+      default:
+        $coords['type'] = 4;
+        break;
+      }
+
+    return $coords;
+  }
+
+  private function nextQuadrant($quadrant) {
+    $nextLetter = substr($quadrant, 0, 1);
+    $nextNumber = substr($quadrant, 2, 2) + 1;
+    if ($nextNumber == 100) {
+      if ($nextLetter == "P") {
+        $nextLetter = "A";
+        $nextNumber = 1;
+      } else {
+        $nextLetter = chr(ord(substr($quadrant, 0, 1)) + 1);
+      }
+    }
+    $next =  $nextLetter . str_pad($nextNumber, 3 , '0' , STR_PAD_LEFT);
+    return $next;
+  }
+
+  private function coordInUse($coords) {
+    $planet = Planet::where('quadrant', $coords['quadrant'])->where('position', $coords['position'])->first();
+    if ($planet) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
