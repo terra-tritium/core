@@ -122,5 +122,14 @@ class BuildSeeder extends Seeder
             "maxLevel" => 52,
             "effect" => "A cada nível de expanção libera a construção de novas unidades"
         ]);
+
+        DB::table('builds')->insert([
+            "name" => "Market",
+            "code" => 14,
+            "image" => "build-14.png",
+            "description" => "Resource trades between players",   
+            "maxLevel" => 52,
+            "effect" => "A cada nível de expanção reduz a taxa de fee e aumenta alcance de trocas"
+        ]);
     }
 }

@@ -50,6 +50,7 @@ Route::controller(PlayerController::class)->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::controller(PlayerController::class)->group(function () {
         Route::get('/player/show', 'show');
+        Route::get('/player/details/{id}', 'getDetails');
         Route::post('/player/new', 'register');
     });
 
@@ -65,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::controller(PlanetController::class)->group(function () {
         Route::get('/planet/list', 'list');
+        Route::get('/planet/{quadrant}/{position}', 'find');
     });
 
     Route::controller(UnitController::class)->group(function () {
@@ -83,7 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(ResearchController::class)->group(function () {
         Route::get('/research/list', 'list');
         Route::get('/researched', 'researched');
-        Route::post('/research/start/{code}', 'start');
+        Route::post('/research/start/{code}/{sincronize?}', 'start');
         Route::post('/research/done/{code}', 'done');
     });
 

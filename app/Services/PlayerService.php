@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Player;
 use App\Models\Planet;
+use App\Models\Aliance;
 use App\Services\RankingService;
 
 class PlayerService
@@ -304,5 +305,21 @@ class PlayerService
     } else {
       return false;
     }
+  }
+
+  public function getDetails($id) {
+    $details = [];
+    $player = Player::where('id', $id)->firstOrFail();
+    $details['name'] = $player->name;
+    $details['since'] = $player->since;
+    $details['country'] = $player->country;
+    $details['score'] = $player->score;
+    if ($player->aliance != null) {
+      $aliance = Aliance::where('id', $player->aliance)->firstOrFail();
+      $details['aliance'] = $aliance->name;
+    } else {
+      $details['aliance'] = "no aliance";
+    }
+    return $details;
   }
 }
