@@ -9,6 +9,15 @@ use Illuminate\Http\Request;
 class PlanetController extends Controller
 {
 
+    public function find ($quadrant, $position) {
+        $planet = Planet::where('quadrant',$quadrant)->where('position',$position)->first();
+
+        if (!$planet) {
+            return "no result";
+        }
+        return $planet;
+    }
+
     /**
      * Store a newly created resource in storage.
      *

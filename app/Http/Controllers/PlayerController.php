@@ -110,4 +110,8 @@ class PlayerController extends Controller
         return User::find($userId)->name;
     }
 
+    public function getDetails($id) {
+        return $this->playerService->getDetails($id);
+    }
+
 }

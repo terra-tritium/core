@@ -9,11 +9,23 @@ use Carbon\Carbon;
 class ResearchService
 {
 
-    public function start ($player, $code) {
+    /**
+     * @param int $player
+     * @param int $code
+     * @return string|void
+     */
+    public function start (int $player, int $code, $sincronize = false) {
 
         $now = Carbon::now()->timestamp;
 
         $researchedStarted = Researched::where([["player", $player], ["status", 1]])->first();
+
+        if ($sincronize) {
+            $researchedSincronize = $this->sincronizeProgress($researchedStarted);
+          //  dd($researchedSincronize);
+            $researchedSincronize->save();
+            return;
+        }
 
         if ($researchedStarted) {
             if (!$this->isElegible($player,  $researchedStarted)) {
@@ -37,17 +49,25 @@ class ResearchService
             $research = Research::where("code", $code)->firstOrFail();
 
             $researched = new Researched();
+
             $researched->player = $player;
             $researched->code = $code;
-            $researched->points = 0;
             $researched->cost = $research->cost;
             $researched->power = 1;
             $researched->timer = $now;
+            $researched->start = $now;
             $researched->status = 1;
+            $researched->progress = 1;
+            $researched->points = 0;
+            $researched->finish = Carbon::now()->addMinutes($researched->cost / $researched->power)->timestamp;
             $researched->save();
         }
     }
 
+    /**
+     * @param $researched
+     * @return mixed
+     */
     public function pause ($researched) {
         $researched = $this->sincronize($researched);
         if ($researched->points >= $researched->cost) {
@@ -61,16 +81,39 @@ class ResearchService
         return $researched;
     }
 
-    public function done ($player, $code) {
+    /**
+     * @param int $player
+     * @param int $code
+     * @return void
+     */
+    public function done (int $player, int $code) {
         $researched = Researched::where([["player", $player], ["code", $code]])->first();
         if ($researched) {
-            if ($researched->points >= $researched->cost) {
+            if ($researched->timer >= $researched->cost) {
                 $researched->status = 2;
                 $researched->save();
             }
         }
     }
 
+    public function sincronizeProgress($researched)
+    {
+        $now = Carbon::now()->timestamp;
+
+        if ($now >= $researched->finish) {
+            $researched->status = 3;
+        } else {
+            $researched->points = floor((($researched->finish - $now) * 1000) / env("TRITIUM_RESEARCH_SPEED"));
+        }
+
+        return $researched;
+
+    }
+
+    /**
+     * @param $researched
+     * @return mixed
+     */
     public function sincronize ($researched) {
         $now = Carbon::now()->timestamp;
         $researched->points = floor((($now - $researched->timer) * 1000) / env("TRITIUM_RESEARCH_SPEED"));
@@ -78,7 +121,12 @@ class ResearchService
         return $researched;
     }
 
-    public function isElegible($player, $researched) {
+    /**
+     * @param int $player
+     * @param $researched
+     * @return bool
+     */
+    public function isElegible(int $player, $researched) {
         $research = Research::where("code", $researched->code)->firstOrFail();
         $dependences[] = explode(",", $research->dependence);
 
