@@ -78,9 +78,10 @@ class ProductionService
     $crystal = 0;
 
     foreach ($units as $key => $unit) {
-        $metal += $unit["metal"];
-        $uranium += $unit["uranium"];
-        $crystal += $unit["crystal"];
+        $unitModel = Unit::find($unit["id"]);
+        $metal += $unitModel->metal;
+        $uranium += $unitModel->uranium;
+        $crystal += $unitModel->crystal;
     }
 
     $p1 = Player::findOrFail($player);
