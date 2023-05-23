@@ -12,10 +12,10 @@ class FleetService
         $this->productionService = new ProductionService();
     }
 
-    public function production ($player, $planet, $units) {
-        if ($this->productionService->hasFunds($units, $player)) {
-            $this->productionService->add($player, $planet, $units, "fleet");
-            $this->productionService->spendFunds($player, $units);
+    public function production ($player, $planet, $unit) {
+        if ($this->productionService->hasFunds($unit, $player)) {
+            $this->productionService->add($player, $planet, $unit, "fleet");
+            $this->productionService->spendFunds($player, $unit);
         } else {
             return "No suficients Funds";
         }
