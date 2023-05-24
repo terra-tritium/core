@@ -23,9 +23,9 @@ class TroopController extends Controller
         return $this->troopService->production($player->id,$planet, $request->collect());
     }
 
-    public function producing(){
+    public function producing(Request $request){
         $player = Player::getPlayerLogged();
-        return $this->troopService->productionTrop($player);
+        return $this->troopService->productionTroop($player,$request->planet);
 
     }
 }
