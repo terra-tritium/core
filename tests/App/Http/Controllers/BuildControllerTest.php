@@ -79,7 +79,7 @@ class BuildControllerTest extends TestCase
 
         $response = $this->withHeaders(['Authorization'=>'Bearer '.$token,
                                         'Accept' => 'application/json'])
-                                        ->get('/api/troop/production');
+                                        ->get('/api/troop/production/2');
         $response->dump();   
         $response->assertStatus(200);
     }
