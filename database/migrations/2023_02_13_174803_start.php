@@ -161,12 +161,11 @@ return new class extends Migration
         Schema::create('travels', function (Blueprint $table) {
             $table->id();
             $table->integer('player')->constrained("players");
-            $table->string("receptor");
+            $table->integer("receptor");
             $table->string("from");
             $table->string("to");
             $table->bigInteger("arrival");
             $table->bigInteger("start");
-            $table->integer('action');
             $table->integer('status');
             $table->json("troop");
             $table->json("fleet");
@@ -174,6 +173,12 @@ return new class extends Migration
             $table->integer("crystal");
             $table->integer("uranium");
             $table->integer("merchantShips");
+            // 1 - Attack
+            // 2 - Defense
+            // 3 - Transport
+            // 4 - Colonize
+            // 5 - Explore
+            $table->integer("action");
         });
         Schema::create('units', function (Blueprint $table) {
             $table->id();
