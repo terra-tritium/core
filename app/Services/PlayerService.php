@@ -34,7 +34,7 @@ class PlayerService
       case 2: 
         return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM") * $activeUraniumMining));
       case 3:
-        return $p1->crystal + ($p1->pwCrysttal * (env("TRITIUM_Crystal") * $activeCrystalMining));
+        return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL") * $activeCrystalMining));
     }
 
     return 0;

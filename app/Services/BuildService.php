@@ -117,7 +117,7 @@ class BuildService
             }
             if ($this->playerService->enoughBalance($p1, $require->crystal, 3)) {
                 $p1 = $this->playerService->removeCrystal($p1, $require->crystal);
-                $p1 = $this->playerService->addBuildScore($p1, $require->mecrystaltal * $this->premiumScoreFator);
+                $p1 = $this->playerService->addBuildScore($p1, $require->crystal * $this->premiumScoreFator);
             } else {
                 return false;
             }
@@ -151,7 +151,7 @@ class BuildService
         $p1 = $this->playerService->removeCrystal($p1, $require->crystal);
         $p1 = $this->playerService->addBuildScore($p1, $require->metal * $this->basicScoreFator);
         $p1 = $this->playerService->addBuildScore($p1, $require->uranium * $this->premiumScoreFator);
-        $p1 = $this->playerService->addBuildScore($p1, $require->mecrystaltal * $this->premiumScoreFator);
+        $p1 = $this->playerService->addBuildScore($p1, $require->crystal * $this->premiumScoreFator);
         return $p1;
     }
 
