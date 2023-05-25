@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Troop;
+use App\Models\Player;
+use App\Models\Production;
 use App\Services\TroopService;
 use Illuminate\Http\Request;
 
@@ -19,5 +21,11 @@ class TroopController extends Controller
     public function production(Request $request, $planet) {
         $player = Player::getPlayerLogged();
         return $this->troopService->production($player->id,$planet, $request->collect());
+    }
+
+    public function producing(Request $request){
+        $player = Player::getPlayerLogged();
+        return $this->troopService->productionTroop($player,$request->planet);
+
     }
 }

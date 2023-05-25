@@ -77,6 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(TroopController::class)->group(function () {
         Route::post('/troop/production/{planet}', 'production');
+        Route::get('/troop/production/{planet?}', 'producing');
     });
 
     Route::controller(RankingController::class)->group(function () {
@@ -108,7 +109,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/battle/defensemode/list', 'defenseModeList');
         Route::post('/battle/attackmode/{option}', 'changeAttackMode');
         Route::post('/battle/defensemode/{option}', 'changeDefenseMode');
-        Route::get('/battle/start', 'start');
+        Route::get('/battle/start/{defense}/{planet}', 'start');
         Route::get('/battle/view/{id}', 'view');
         Route::get('/battle/stages/{id}', 'stages');
     });

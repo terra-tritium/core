@@ -26,7 +26,7 @@ class TroopJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($planet, $player, $units, $production, $type)
+    public function __construct($planet, $player, $units, $production)
     {
         $this->planet = $planet;
         $this->units = $units;
