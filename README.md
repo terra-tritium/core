@@ -1,33 +1,39 @@
 
 # Terra Tritium Server Core
 
-## Requisitos
+## Requirements
 
     MariaDB 10.7.4
     Laravel 9
     PHP 8.1.11
 
-## Iniciar banco de dados local
+## Start local database
 
     create database origin
 
-## Rodar a migração de dados
+## Run data migrations
 
     php artisan migrate
     php artisan db:seed
 
-## Iniciar o servidor backend
+## Start server service
   
     php artisan serve
 
-## Procedimento para atualizar a base de dados (rodar toda vez que existir alteração de banco)
+### Listen schedule and queue
+```
+php artisan schedule:work
+php artisan queue:work
+```
+
+## Procedure to update the database (run every time there is a database change)
   
     drop database origin
     create database origin
     php artisan migrate
     php artisan db:seed
 
-## Acesso a caixa de e-mail para teste
+## Test email service
 
     Site: https://mailtrap.io/
     Login: ronielvb@hotmail.com
