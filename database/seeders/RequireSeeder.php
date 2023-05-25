@@ -241,6 +241,51 @@ class RequireSeeder extends Seeder
         ]);
 
         DB::table('requires')->insert([
+            "build" => 6,
+            "level" => 1,
+            "metal" => 100,
+            "uranium" => 0,
+            "crystal" => 0,
+            "time" => 2
+        ]);
+
+        DB::table('requires')->insert([
+            "build" => 6,
+            "level" => 2,
+            "metal" => 100,
+            "uranium" => 0,
+            "crystal" => 0,
+            "time" => 2
+        ]);
+
+        DB::table('requires')->insert([
+            "build" => 6,
+            "level" => 3,
+            "metal" => 100,
+            "uranium" => 0,
+            "crystal" => 0,
+            "time" => 2
+        ]);
+
+        DB::table('requires')->insert([
+            "build" => 6,
+            "level" => 4,
+            "metal" => 100,
+            "uranium" => 0,
+            "crystal" => 0,
+            "time" => 2
+        ]);
+
+        DB::table('requires')->insert([
+            "build" => 6,
+            "level" => 5,
+            "metal" => 100,
+            "uranium" => 0,
+            "crystal" => 0,
+            "time" => 2
+        ]);
+
+        DB::table('requires')->insert([
             "build" => 7,
             "level" => 1,
             "metal" => 100,
