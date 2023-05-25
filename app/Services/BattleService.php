@@ -20,6 +20,9 @@ class BattleService
     private $rangeLimit2;
     private $rangeLimit3;
     private $currentStage;
+    private $attackReserve;
+    private $defenseReserve;
+        
 
     public function __construct() {
         $this->sizeFator1 = 1;
