@@ -64,8 +64,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/build/requires/{build}', 'requires');
         Route::get('/build/require/{build}/{level}', 'require');
     });
+
+    // Route::controller(FactoryController::class)->group(function () {
+    //     Route::post('/factory/workers/{qtd}', 'plant');
+    // });
+
     Route::controller(PlanetController::class)->group(function () {
         Route::get('/planet/list', 'list');
+        Route::get('/planet/show/{id}', 'show');
         Route::get('/planet/{quadrant}/{position}', 'find');
     });
 

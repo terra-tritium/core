@@ -198,7 +198,10 @@ class PlayerService
     $planet->position = $newAlocation['position'];
     $planet->type = $newAlocation['type'];
     $planet->player = $player->id;
-    $planet->humanoids = 30;
+    $planet->workers = 30;
+    $planet->workersOnMetal = 0;
+    $planet->workersOnUranium = 0;
+    $planet->workersOnCrystal = 0;
     $planet->status = "pacific";
     $planet->player = $player->id;
     $planet->save();

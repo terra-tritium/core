@@ -34,7 +34,10 @@ return new class extends Migration
             $table->string("region");
             $table->string("quadrant");
             $table->integer("position");
-            $table->integer("humanoids");
+            $table->integer("workers");
+            $table->integer("workersOnMetal");
+            $table->integer("workersOnUranium");
+            $table->integer("workersOnCrystal");
             $table->string('status');
             $table->integer('type');
         });
