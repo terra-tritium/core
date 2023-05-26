@@ -62,13 +62,9 @@ class BuildService
 
         $planet = Planet::find($building->planet);
         $p1 = Player::where('user', $user->id)->firstOrFail();
-
         $build = Build::find($building->build);
 
-        $require = Requires::where([
-            ["build", "=", $building->build],
-            ["level", "=", 1]
-        ])->firstOrFail();
+        $require = $this->calcResourceRequire($building->build, 1);
 
         $building->ready = (Carbon::now()->timestamp * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
         
@@ -161,7 +157,7 @@ class BuildService
 
         $planet = Planet::find($building->planet);
         $player = Player::findOrFail($planet->player);
-        $require = Requires::where([["build", $building->build], ["level", $building->level + 1]])->firstOrFail();
+        $require = $this->calcResourceRequire($building->build, $building->level + 1);
 
         $building->ready = (time() * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
 
@@ -217,14 +213,6 @@ class BuildService
         return Building::where("planet", $planet)->get();
     }
 
-    public function requires($build) {
-        return Requires::where("build", $build)->get();
-    }
-
-    public function require($build, $level) {
-        return Requires::where([["build", $build],["level", $level]])->firstOrFail();
-    }
-
     public function configWorkers ($planetId, $workers, $buildingId) {
 
         $planet = Planet::find($planetId);
@@ -263,5 +251,53 @@ class BuildService
             $building->save();        
             $p1->save();
         }
+    }
+
+    public function calcResourceRequire($build, $level) {
+        $build = Build::find($build);
+        $require = new Requires();
+        $metalReq = 0;
+        $uraniumReq = 0;
+        $crystalReq = 0;
+
+        # Metal
+        if ($level == $build->metalLevel) {
+            $metalReq = $build->metalStart;
+        }
+        if ($level > $build->metalLevel) {
+            $metalReq = $build->metalStart;
+            for ($i = 1; $i <= (($level - $build->metalLevel) -1); $i++) {
+                $metalReq += $metalReq * ($build->coefficient / 100);
+            }
+        }
+
+        # Uranium
+        if ($level == $build->uraniumLevel) {
+            $uraniumReq = $build->uraniumStart;
+        }
+        if ($level > $build->uraniumLevel) {
+            $metalReq = $build->metalStart;
+            for ($i = 1; $i <= (($level - $build->uraniumLevel) -1); $i++) {
+                $uraniumReq += $uraniumReq * ($build->coefficient / 100);
+            }
+        }
+
+        # Crystal
+        if ($level == $build->uraniumLevel) {
+            $uraniumReq = $build->uraniumStart;
+        }
+        if ($level > $build->uraniumLevel) {
+            $metalReq = $build->metalStart;
+            for ($i = 1; $i <= (($level - $build->uraniumLevel) -1); $i++) {
+                $uraniumReq += $uraniumReq * ($build->coefficient / 100);
+            }
+        }
+
+        $require->metal = $metalReq;
+        $require->uranium = $uraniumReq;
+        $require->crystal = $crystalReq;
+        $require->time = ($metalReq + $uraniumReq + $crystalReq) / 100;
+
+        return $require;
     }
 }

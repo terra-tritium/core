@@ -131,23 +131,23 @@ return new class extends Migration
             $table->foreign('senderId')->references('id')->on('users');
             $table->foreign('recipientId')->references('id')->on('users');
         });
-        Schema::create('requires', function (Blueprint $table) {
-            $table->id();
-            $table->integer('build');
-            $table->integer("level");
-            $table->bigInteger("metal");
-            $table->bigInteger("uranium");
-            $table->bigInteger("crystal");
-            $table->bigInteger("time");
-        });
         Schema::create('builds', function (Blueprint $table) {
             $table->id();
             $table->string("name");
             $table->integer("code");
             $table->string("image");
             $table->text("description");
-            $table->integer("maxLevel");
             $table->string("effect");
+            // initial cost
+            $table->integer("metalStart");
+            $table->integer("uraniumStart");
+            $table->integer("crystalStart");
+            // initial level
+            $table->integer("metalLevel");
+            $table->integer("uraniumLevel");
+            $table->integer("crystalLevel");
+            // coefficient of growth 0% - 100%
+            $table->integer("coefficient");
         });
         Schema::create('buildings', function (Blueprint $table) {
             $table->id();
