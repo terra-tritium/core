@@ -88,6 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/researched', 'researched');
         Route::post('/research/start/{code}/{sincronize?}', 'start');
         Route::post('/research/done/{code}', 'done');
+        Route::get('/research/status/{code}', 'getStatus');
     });
 
     Route::controller(GameModeController::class)->group(function () {
