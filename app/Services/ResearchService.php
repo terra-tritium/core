@@ -96,6 +96,20 @@ class ResearchService
         }
     }
 
+    /**
+     * @param $player
+     * @param $code
+     * @return mixed
+     */
+    public function status($player, $code) {
+        $researched = Researched::where([["player", $player], ["code", $code]])->first();
+        return $researched->status;
+    }
+
+    /**
+     * @param $researched
+     * @return mixed
+     */
     public function sincronizeProgress($researched)
     {
         $now = Carbon::now()->timestamp;
