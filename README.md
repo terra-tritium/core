@@ -45,3 +45,70 @@ php artisan queue:work
 
     Url do site para o link dos templates de email
     ENV_URL_SITE=http://localhost:3000
+
+## SWAGGER
+
+    1- Adicionar Notation no metodo da controller
+    Ex :            
+         * @OA\Get (
+         *      path="/api/country/list",
+         *      summary="List of countries",
+         *      tags={"Contries"},
+         *      description="List of countries",
+         * @OA\Parameter(
+         *          id="id",
+         *          description="country id",
+         *          required=true,
+         *          in="path",
+         *          @OA\Schema(
+         *              type="integer"
+         *          )
+         *      ),
+         * @OA\Response(response="200", description="Sucesso")
+         * )
+         */
+
+        [tags é o agrupador dos endpoints]
+
+    # Se for um endpoint protegido pelo middleware é necessario adicionar as informaçoes de security na annotation
+    
+    Ex:
+     * @OA\Get (
+     *     path="/api/player/show",
+     *     tags={"Players"},
+     *     summary="List Players",
+     *     security={
+     *         {"bearerAuth": {}}
+     *     },
+     *     @OA\Response(response="200", description="Resposta bem-sucedida")
+     * )
+     *  @OA\SecurityScheme(
+     *     type="http",
+     *     scheme="bearer",
+     *     securityScheme="bearerAuth"
+     * )
+
+    Siga as etapas abaixo para adicionar o token de autenticação no Swagger UI:
+    
+     - Abra o Swagger UI no navegador, geralmente acessível por meio de /api/documentation .
+    
+     - Procure pelo botão "Authorize" no canto superior direito da página. Clique nele para abrir um campo de texto para inserir o token.
+    
+     - Insira o token no campo de texto (Pode ser adiquirido no endpoint generate-token).
+        - Resposta do Endpoint :
+                {
+                    "message": "Token generated successfully",
+                    "token": "4|T0VrwehkynvhxhzNrBbXrxk8crOuk5wnEZb9hZbY"
+                }
+    
+     - Clique no botão "Authorize" para salvar o token.
+
+     - Agora é só consultar o endpoint que deseja
+    
+    
+    2- Após escrever a annotation, rodar o comando para gerar a doc no swagger
+        - php artisan l5-swagger:generate
+
+    3- Acessar o Swagger local
+        http://localhost:8000/api/documentation
+
