@@ -68,10 +68,10 @@ class TravelService
             $newTravel->uranium = 0;
         }
         # Merchant Ships
-        if (isset($travel->merchantShips)) {
-            $newTravel->merchantShips = $travel->merchantShips;
+        if (isset($travel->transportShips)) {
+            $newTravel->transportShips = $travel->transportShips;
         } else {
-            $newTravel->merchantShips = 0;
+            $newTravel->transportShips = 0;
         }
 
         $newTravel->save();

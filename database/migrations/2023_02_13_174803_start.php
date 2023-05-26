@@ -40,6 +40,30 @@ return new class extends Migration
             $table->integer("workersOnCrystal");
             $table->string('status');
             $table->integer('type');
+            $table->bigInteger("metal");
+            $table->bigInteger("uranium");
+            $table->bigInteger("crystal");
+            $table->bigInteger("energy");
+            $table->bigInteger("battery");
+            $table->bigInteger("extraBattery");
+            $table->bigInteger("capMetal");
+            $table->bigInteger("capUranium");
+            $table->bigInteger("capCrystal");
+            $table->bigInteger("proMetal");
+            $table->bigInteger("proUranium");
+            $table->bigInteger("proCrystal");
+            # Power multiplier of resources
+            $table->integer("pwMetal");
+            $table->integer("pwUranium");
+            $table->integer("pwCrystal");
+            $table->integer("pwEnergy");
+            # Time resources
+            $table->bigInteger("timeMetal")->nullable();
+            $table->bigInteger("timeUranium")->nullable();
+            $table->bigInteger("timeCrystal")->nullable();
+            $table->bigInteger("timeEnergy")->nullable();
+            # Spaceships Transport 
+            $table->bigInteger("transportShips");
         });
         Schema::create('countrys', function (Blueprint $table) {
             $table->id();
@@ -73,30 +97,6 @@ return new class extends Migration
             $table->integer('defenseStrategy');
             $table->integer('aliance')->nullable()->unsigned();
             $table->bigInteger("ready")->nullable();
-            $table->bigInteger("metal");
-            $table->bigInteger("uranium");
-            $table->bigInteger("crystal");
-            $table->bigInteger("energy");
-            $table->bigInteger("battery");
-            $table->bigInteger("extraBattery");
-            $table->bigInteger("capMetal");
-            $table->bigInteger("capUranium");
-            $table->bigInteger("capCrystal");
-            $table->bigInteger("proMetal");
-            $table->bigInteger("proUranium");
-            $table->bigInteger("proCrystal");
-            # Power multiplier of resources
-            $table->integer("pwMetal");
-            $table->integer("pwUranium");
-            $table->integer("pwCrystal");
-            $table->integer("pwEnergy");
-            # Time resources
-            $table->bigInteger("timeMetal")->nullable();
-            $table->bigInteger("timeUranium")->nullable();
-            $table->bigInteger("timeCrystal")->nullable();
-            $table->bigInteger("timeEnergy")->nullable();
-            # Spaceships Cargos 
-            $table->bigInteger("merchantShips");
             # Score rankings
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
@@ -175,7 +175,7 @@ return new class extends Migration
             $table->integer("metal");
             $table->integer("crystal");
             $table->integer("uranium");
-            $table->integer("merchantShips");
+            $table->integer("transportShips");
             // 1 - Attack
             // 2 - Defense
             // 3 - Transport

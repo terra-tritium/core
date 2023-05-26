@@ -5,177 +5,17 @@ namespace App\Services;
 use App\Models\Player;
 use App\Models\Planet;
 use App\Models\Aliance;
-use App\Services\RankingService;
+use App\Services\PlanetService;
 
 class PlayerService
 {
-
-  protected $timeNow;
-  protected $rankingService;
+  protected $planetService;
 
   public function __construct () {
-    $this->timeNow = time() * 1000;
-    $this->rankingService = new RankingService();
-  }
-
-  public function currentBalance($p1, $type) {
-
-    $msInHour = 3600000;
-    $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $msInHour;
-    $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $msInHour;
-    $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $msInHour;
-    $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $msInHour;
-
-    switch ($type) {
-      case 0: 
-        return $p1->energy + ($p1->pwEnergy * (env("TRITIUM_ENERGY") * $activeEnergyMining));
-      case 1: 
-        return $p1->metal + ($p1->pwMetal * (env("TRITIUM_METAL") * $activeMetalMining));
-      case 2: 
-        return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM") * $activeUraniumMining));
-      case 3:
-        return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL") * $activeCrystalMining));
-    }
-
-    return 0;
-  }
-
-  public function enoughBalance($p1, $units, $type) {
-    if ($units == 0){
-      return true;
-    }
-    switch ($type) {
-      case 0:
-        if ($this->currentBalance($p1, 0) >= $units) {
-          return true;
-        }
-        break;
-      case 1:
-        if ($this->currentBalance($p1, 1) >= $units) {
-          return true;
-        }
-        break;
-      case 2:
-        if ($this->currentBalance($p1, 2) >= $units) {
-          return true;
-        }
-        break;
-      case 3:
-        if ($this->currentBalance($p1, 3) >= $units) {
-          return true;
-        }
-        break;
-    }
-
-    return false;
-  }
-
-  public function startMining($player, $resource) {
-
-    switch ($resource) {
-      case 0:
-        $player->timeEnergy = $this->timeNow;
-        $player->pwEnergy = 1;
-        break;
-
-      case 1:
-        $player->timeMetal = $this->timeNow;
-        $player->pwMetal = 0;
-        break;
-    
-      case 2:
-        $player->timeUranium = $this->timeNow;
-        $player->pwUranium = 0;
-        break;
-
-      case 3:
-        $player->timeCrystal = $this->timeNow;
-        $player->pwCrystal = 0;
-        break;
-    }
-
-    return $player;
-  }
-
-  public function addEnergy($p1, $units) {
-    $p1->energy += $units;
-    return $p1;
-  }
-
-  public function removeEnergy($p1, $units) {
-    $p1->energy -= $units;
-    return $p1;
-  }
-
-  public function addMetal($p1, $units) {
-    $p1->metal = $this->currentBalance($p1, 1);
-    $p1->timeMetal = $this->timeNow;
-    $p1->metal += $units;
-    return $p1;
-  }
-
-  public function removeMetal($p1, $units) {
-    if ($this->currentBalance($p1, 1) > $units) {
-      $p1->metal = $this->currentBalance($p1, 1);
-      $p1->timeMetal = $this->timeNow;
-      $p1->metal -= $units;
-      $p1 = $this->rankingService->addPoints($p1, $units / 100);
-    }
-    return $p1;
-  }
-
-  public function addUranium($p1, $units) {
-    $p1->uranium = $this->currentBalance($p1, 2);
-    $p1->timeUranium = $this->timeNow;
-    $p1->uranium += $units;
-    return $p1;
-  }
-
-  public function removeUranium($p1, $units) {
-    if ($this->currentBalance($p1, 2) > $units) {
-      $p1->uranium = $this->currentBalance($p1, 2);
-      $p1->timeUranium = $this->timeNow;
-      $p1->uranium -= $units;
-      $p1 = $this->rankingService->addPoints($p1, $units / 20);
-    }
-    return $p1;
-  }
-
-  public function addCrystal($p1, $units) {
-    $p1->uranium = $this->currentBalance($p1, 2);
-    $p1->timeUranium = $this->timeNow;
-    $p1->uranium += $units;
-    return $p1;
-  }
-
-  public function removeCrystal($p1, $units) {
-    if ($this->currentBalance($p1, 2) > $units) {
-      $p1->crystal = $this->currentBalance($p1, 2);
-      $p1->timeCrystal = $this->timeNow;
-      $p1->crystal -= $units;
-      $p1 = $this->rankingService->addPoints($p1, $units / 20);
-    }
-    return $p1;
+    $this->planetService = new PlanetService();
   }
 
   public function register(Player $player) {
-    $player->metal = 1500;
-    $player->uranium = 0;
-    $player->crystal = 0;
-    $player->energy = 100;
-    $player->battery = 10000;
-    $player->extraBattery = 0;
-    $player->capMetal = 10000;
-    $player->capUranium = 10000;
-    $player->capCrystal = 10000;
-    $player->proMetal = 1000;
-    $player->proUranium = 1000;
-    $player->proCrystal = 1000;
-    $player->pwMetal = 0;
-    $player->pwUranium = 0;
-    $player->pwCrystal = 0;
-    $player->pwEnergy = 0;
-    $player->merchantShips = 0;
     $player->score = 0;
     $player->buildScore = 0;
     $player->attackScore = 0;
@@ -204,25 +44,24 @@ class PlayerService
     $planet->workersOnCrystal = 0;
     $planet->status = "pacific";
     $planet->player = $player->id;
+    $planet->metal = 1500;
+    $planet->uranium = 0;
+    $planet->crystal = 0;
+    $planet->energy = 100;
+    $planet->battery = 10000;
+    $planet->extraBattery = 0;
+    $planet->capMetal = 10000;
+    $planet->capUranium = 10000;
+    $planet->capCrystal = 10000;
+    $planet->proMetal = 1000;
+    $planet->proUranium = 1000;
+    $planet->proCrystal = 1000;
+    $planet->pwMetal = 0;
+    $planet->pwUranium = 0;
+    $planet->pwCrystal = 0;
+    $planet->pwEnergy = 0;
+    $planet->transportShips = 0;
     $planet->save();
-  }
-
-  public function addBuildScore ($p1, $units) {
-    $p1->buildScore += $units;
-    return $p1;
-  }
-
-  public function incrementBattery($p1, $units) {
-    $p1->battery += $units;
-    return $p1;
-  }
-
-  public function iSplayerOwnerPlanet($player, $planet) {
-    $planet = Planet::where(['player' => $player, 'id' => $planet])->first();
-    if ($planet) {
-      return true;
-    }
-    return false;
   }
   
   private function startAlocation() {
