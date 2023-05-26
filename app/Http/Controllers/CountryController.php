@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Country;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Tag(name="Contries")
+ */
 class CountryController extends Controller
 {
     /**
@@ -62,6 +65,16 @@ class CountryController extends Controller
         //
     }
 
+    /**
+     * @return mixed
+     * @OA\Get (
+     *      path="/api/country/list",
+     *      summary="List of countries",
+     *      tags={"Contries"},
+     *      description="List of countries",
+     * @OA\Response(response="200", description="Sucesso")
+     * )
+     */
     public function list() {
         return Country::orderBy('name')->get();
     }

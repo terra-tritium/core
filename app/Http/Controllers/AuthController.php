@@ -27,19 +27,19 @@ class AuthController extends Controller
         $dy = $coord1['y'] - $coord2['y'];
         return sqrt($dx * $dx + $dy * $dy);
         }
-        
+
         $coords = array();
-        
+
         while(count($coords) < 100) {
         $x = rand(-200, 200);
         $y = rand(-200, 200);
         $coord = array('x' => $x, 'y' => $y);
-        
+
         if(!in_array($coord, $coords)) {
             array_push($coords, $coord);
         }
         }
-        
+
         usort($coords, function($a, $b) use($coords) {
         $dist1 = 0;
         $dist2 = 0;
@@ -51,7 +51,7 @@ class AuthController extends Controller
         });
 
         $cont = 1500;
-        
+
         foreach($coords as $coord) {
             $cont++;
             $quadrant = Quadrant::find($cont);
@@ -127,6 +127,15 @@ class AuthController extends Controller
     /**
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      * @todo remover antes de enviar para produção
+     *
+     * @OA\Get (
+     *      path="/api/generate-token",
+     *      summary="Generate Token",
+     *      tags={"Auth"},
+     *      description="Generate token to access other endpoints",
+     * @OA\Response(response="200", description="Sucesso")
+     * )
+     *
      */
     public function generateToken()
     {
