@@ -29,15 +29,9 @@ class PlanetController extends Controller
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Planet  $planet
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Planet $planet)
+    public function show($id)
     {
-        //
+        return Planet::find($id);
     }
 
     /**

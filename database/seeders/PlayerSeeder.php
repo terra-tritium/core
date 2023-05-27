@@ -21,11 +21,7 @@ class PlayerSeeder extends Seeder
         $users->each(function ($user) {
             Player::factory()->create([
                 'user' => $user->id,
-                'name' => $user->name,
-                'energy' => rand(100, 500),
-                'metal' => rand(100, 500),
-                'uranium' => rand(100, 500),
-                'crystal' => rand(100, 500),
+                'name' => $user->name
             ]);
         });
     }

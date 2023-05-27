@@ -44,5 +44,11 @@ class CountrySeeder extends Seeder
             "code" => "FRA",
             "image" => "Vazio"
         ]);
+
+        DB::table('countrys')->insert([
+            "name" => "Japan",
+            "code" => "JAP",
+            "image" => "Vazio"
+        ]);
     }
 }
