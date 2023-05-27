@@ -156,7 +156,7 @@ class BuildService
 
         $building->ready = (time() * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
 
-        if ($this->suficientFunds($player, $require)) {
+        if ($this->suficientFunds($planet, $require)) {
             $player = $this->spendResources($player, $require);
         } else {
             return false;
@@ -164,7 +164,7 @@ class BuildService
 
         // Battery House
         if ($building->build == 11) {
-            $player = $this->planetService->incrementBattery($p1, $this->initialBattery * $building->level);
+            $player = $this->planetService->incrementBattery($planet, $this->initialBattery * $building->level);
         }
 
         $building->level += 1;
@@ -260,7 +260,7 @@ class BuildService
         }
         if ($level > $build->metalLevel) {
             $metalReq = $build->metalStart;
-            for ($i = 1; $i <= (($level - $build->metalLevel) -1); $i++) {
+            for ($i = 1; $i <= ($level - $build->metalLevel); $i++) {
                 $metalReq += $metalReq * ($build->coefficient / 100);
             }
         }
@@ -271,7 +271,7 @@ class BuildService
         }
         if ($level > $build->uraniumLevel) {
             $metalReq = $build->metalStart;
-            for ($i = 1; $i <= (($level - $build->uraniumLevel) -1); $i++) {
+            for ($i = 1; $i <= (($level - $build->uraniumLevel)); $i++) {
                 $uraniumReq += $uraniumReq * ($build->coefficient / 100);
             }
         }
@@ -282,7 +282,7 @@ class BuildService
         }
         if ($level > $build->uraniumLevel) {
             $metalReq = $build->metalStart;
-            for ($i = 1; $i <= (($level - $build->uraniumLevel) -1); $i++) {
+            for ($i = 1; $i <= (($level - $build->uraniumLevel)); $i++) {
                 $uraniumReq += $uraniumReq * ($build->coefficient / 100);
             }
         }
