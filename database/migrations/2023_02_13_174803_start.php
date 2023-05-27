@@ -52,6 +52,7 @@ return new class extends Migration
             $table->bigInteger("proMetal");
             $table->bigInteger("proUranium");
             $table->bigInteger("proCrystal");
+            $table->bigInteger("ready")->nullable();
             # Power multiplier of resources
             $table->integer("pwMetal");
             $table->integer("pwUranium");

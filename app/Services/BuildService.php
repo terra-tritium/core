@@ -8,7 +8,6 @@ use App\Models\Build;
 use App\Models\Building;
 use App\Models\Requires;
 use App\Services\PlanetService;
-use Illuminate\Support\Facades\Auth;
 
 use Carbon\Carbon;
 
@@ -58,10 +57,7 @@ class BuildService
         $building->level = 1;
         $building->workers = 0;
 
-        $user = Auth::user();
-
-        $planet = Planet::find($building->planet);
-        $p1 = Player::where('user', $user->id)->firstOrFail();
+        $p1 = Planet::find($building->planet); 
         $build = Build::find($building->build);
 
         $require = $this->calcResourceRequire($building->build, 1);
@@ -125,7 +121,6 @@ class BuildService
 
         $building->save();
         $p1->save();
-        $planet->save();
     }
 
     public function suficientFunds($p1, $require) {
@@ -216,40 +211,39 @@ class BuildService
     public function configWorkers ($planetId, $workers, $buildingId) {
 
         $planet = Planet::find($planetId);
-        $p1 = Player::findOrFail($planet->player);
         $building = Building::find($buildingId);
         
-        if ($workers > $planet->humanoids || $workers < 1) {
+        if ($workers > $planet->workers || $workers < 1) {
             return "Humanoids insuficients or workers invalid";
         } else {
         
             switch ($building->build) {
                 // Metal
                 case 4 : 
-                    $p1->metal = $this->planetService->currentBalance($p1, 1);
-                    $p1->timeMetal = time() * 1000;
-                    $p1->pwMetal = $workers;
+                    $planet->metal = $this->planetService->currentBalance($planet, 1);
+                    $planet->timeMetal = time() * 1000;
+                    $planet->pwMetal = $workers;
                     break;
 
                 // Uranium
                 case 5 : 
-                    $p1->uranium = $this->planetService->currentBalance($p1, 2);
-                    $p1->timeUranium = time() * 1000;
-                    $p1->pwUranium = $workers;
+                    $planet->uranium = $this->planetService->currentBalance($planet, 2);
+                    $planet->timeUranium = time() * 1000;
+                    $planet->pwUranium = $workers;
                     break;
 
                 // Crystal
                 case 6 : 
-                    $p1->crystal = $this->planetService->currentBalance($p1, 3);
-                    $p1->timeCrystal = time() * 1000;
-                    $p1->pwCrystal = $workers;
+                    $planet->crystal = $this->planetService->currentBalance($planet, 3);
+                    $planet->timeCrystal = time() * 1000;
+                    $planet->pwCrystal = $workers;
                     break;
             }
 
             $building->workers = $workers;
     
             $building->save();        
-            $p1->save();
+            $planet->save();
         }
     }
 
