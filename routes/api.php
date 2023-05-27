@@ -103,8 +103,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(BattleController::class)->group(function () {
-        Route::get('/battle/attackmode/list', 'attackModeList');
-        Route::get('/battle/defensemode/list', 'defenseModeList');
+        // Route::get('/battle/attackmode/list', 'attackModeList');
+        // Route::get('/battle/defensemode/list', 'defenseModeList');
         Route::post('/battle/attackmode/{option}', 'changeAttackMode');
         Route::post('/battle/defensemode/{option}', 'changeDefenseMode');
         Route::get('/battle/start/{defense}/{planet}', 'start');

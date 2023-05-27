@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AttackMode;
-use App\Models\DefenseMode;
+//use App\Models\AttackMode;
+//use App\Models\DefenseMode;
 use App\Models\Player;
 use App\Models\Battle;
 use App\Models\BattleStage;
@@ -21,13 +21,13 @@ class BattleController extends Controller
         $this->playerService = $playerService;
     }
 
-    public function attackModeList() {
-        return AttackMode::orderBy("code")->get();
-    }
+    // public function attackModeList() {
+    //     return AttackMode::orderBy("code")->get();
+    // }
 
-    public function defenseModeList() {
-        return DefenseMode::orderBy("code")->get();
-    }
+    // public function defenseModeList() {
+    //     return DefenseMode::orderBy("code")->get();
+    // }
 
     public function changeAttackMode($option) {
         $user = auth()->user()->id;
@@ -51,11 +51,13 @@ class BattleController extends Controller
         return BattleStage::where('battle', $id)->get();
     }
 
-    public function start($defender,$planet) {
-        $attack = Player::getPlayerLogged();
-        $playerOwnerPlatet = $this->playerService->iSplayerOwnerPlanet($defender,$planet);
+    public function start($defense,$planet) {
+        $playerOwnerPlatet = $this->playerService->iSplayerOwnerPlanet($defense,$planet);
 
         if($playerOwnerPlatet){
+            $attack  = Player::getPlayerLogged();
+            $defense = Player::find($defense);
+
             $aUnits = [
                 [
                     'unit' => 1,
@@ -76,12 +78,13 @@ class BattleController extends Controller
                     'life' => 20
                 ]
             ];
-            $aStrategy = 3;
-            $dStrategy = 5;
+            
+            $aStrategy = $attack->attackStrategy;
+            $dStrategy = $attack->defenseStrategy;
 
             return $this->battleService->startNewBattle (
-                $attack,
-                $defender,
+                $attack->id,
+                $defense->id,
                 $aUnits,
                 $dUnits,
                 $aStrategy,

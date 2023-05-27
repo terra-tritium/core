@@ -110,7 +110,7 @@ class ProductionService
 
         $unitModel->ready =  $production->ready;
         $unitModel->planet =  $production->planet;
-        $unitModel->quantity =  $production->quantity;
+        $unitModel->quantity =  $unit->quantity;
 
         $units[] =  $unitModel ;
       }
