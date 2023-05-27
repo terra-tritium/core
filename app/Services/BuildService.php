@@ -211,45 +211,6 @@ class BuildService
         return Building::where("planet", $planet)->get();
     }
 
-    public function configWorkers ($planetId, $workers, $buildingId) {
-
-        $planet = Planet::find($planetId);
-        $building = Building::find($buildingId);
-        
-        if ($workers > $planet->workers || $workers < 1) {
-            return "Humanoids insuficients or workers invalid";
-        } else {
-        
-            switch ($building->build) {
-                // Metal
-                case 4 : 
-                    $planet->metal = $this->planetService->currentBalance($planet, 1);
-                    $planet->timeMetal = time() * 1000;
-                    $planet->pwMetal = $workers;
-                    break;
-
-                // Uranium
-                case 5 : 
-                    $planet->uranium = $this->planetService->currentBalance($planet, 2);
-                    $planet->timeUranium = time() * 1000;
-                    $planet->pwUranium = $workers;
-                    break;
-
-                // Crystal
-                case 6 : 
-                    $planet->crystal = $this->planetService->currentBalance($planet, 3);
-                    $planet->timeCrystal = time() * 1000;
-                    $planet->pwCrystal = $workers;
-                    break;
-            }
-
-            $building->workers = $workers;
-    
-            $building->save();        
-            $planet->save();
-        }
-    }
-
     public function calcResourceRequire($build, $level) {
         $build = Build::find($build);
         $require = new Requires();

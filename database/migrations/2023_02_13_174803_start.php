@@ -35,6 +35,7 @@ return new class extends Migration
             $table->string("quadrant");
             $table->integer("position");
             $table->integer("workers");
+            $table->integer("workersWaiting");
             $table->integer("workersOnMetal");
             $table->integer("workersOnUranium");
             $table->integer("workersOnCrystal");

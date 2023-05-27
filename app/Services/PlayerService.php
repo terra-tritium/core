@@ -39,6 +39,7 @@ class PlayerService
     $planet->type = $newAlocation['type'];
     $planet->player = $player->id;
     $planet->workers = 30;
+    $planet->workersWaiting = 30;
     $planet->workersOnMetal = 0;
     $planet->workersOnUranium = 0;
     $planet->workersOnCrystal = 0;
