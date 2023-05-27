@@ -7,15 +7,15 @@ use App\Models\Player;
 use App\Models\Unit;
 use App\Jobs\TroopJob;
 use App\Jobs\FleetJob;
-use App\Services\PlayerService;
+use App\Services\PlanetService;
 
 class ProductionService
 {
 
-  private $playerService;
+  private $planetService;
 
   public function __construct() {
-    $this->playerService = new PlayerService();
+    $this->planetService = new PlanetService();
   }
 
   public function add ($player, $planet, $unit, $type) {
@@ -62,13 +62,13 @@ class ProductionService
 
     if (isset($unit["quantity"])) {
       $p1 = Player::findOrFail($player);
-      if (!$this->playerService->enoughBalance($p1, ($unitModel->metal * $unit["quantity"]), 1)){
+      if (!$this->planetService->enoughBalance($p1, ($unitModel->metal * $unit["quantity"]), 1)){
             return false;
         }
-        if (!$this->playerService->enoughBalance($p1, ($unitModel->uranium * $unit["quantity"]), 2)){
+        if (!$this->planetService->enoughBalance($p1, ($unitModel->uranium * $unit["quantity"]), 2)){
             return false;
         }
-        if (!$this->playerService->enoughBalance($p1, ($unitModel->crystal * $unit["quantity"]), 3)){
+        if (!$this->planetService->enoughBalance($p1, ($unitModel->crystal * $unit["quantity"]), 3)){
             return false;
         }
     }
@@ -86,9 +86,9 @@ class ProductionService
     $crystal += $unitModel->crystal;
 
     $p1 = Player::findOrFail($player);
-    $p1 = $this->playerService->removeMetal($p1, $metal);
-    $p1 = $this->playerService->removeUranium($p1, $uranium);
-    $p1 = $this->playerService->removeCrystal($p1, $crystal);
+    $p1 = $this->planetService->removeMetal($p1, $metal);
+    $p1 = $this->planetService->removeUranium($p1, $uranium);
+    $p1 = $this->planetService->removeCrystal($p1, $crystal);
     $p1->save();
   }
 

@@ -53,4 +53,14 @@ class ResearchController extends Controller
         $player = Player::getPlayerLogged();
         return $this->researchService->done($player->id, $code);
     }
+
+    /**
+     * @param int $code
+     * @return mixed
+     */
+    public function getStatus(int $code)
+    {
+        $player = Player::getPlayerLogged();
+        return $this->researchService->status($player->id, $code);
+    }
 }

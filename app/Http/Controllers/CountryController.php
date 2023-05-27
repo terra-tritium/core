@@ -62,6 +62,16 @@ class CountryController extends Controller
         //
     }
 
+    /**
+     * @return mixed
+     * @OA\Get (
+     *      path="/api/country/list",
+     *      summary="List of countries",
+     *      tags={"Contries"},
+     *      description="List of countries",
+     * @OA\Response(response="200", description="Sucesso")
+     * )
+     */
     public function list() {
         return Country::orderBy('name')->get();
     }

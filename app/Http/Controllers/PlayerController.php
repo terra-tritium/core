@@ -46,6 +46,22 @@ class PlayerController extends Controller
      *
      * @param  \App\Models\Player  $player
      * @return \Illuminate\Http\Response
+     *
+     * @OA\Get (
+     *     path="/api/player/show",
+     *     tags={"Players"},
+     *     summary="List Players",
+     *     security={
+     *         {"bearerAuth": {}}
+     *     },
+     *     @OA\Response(response="200", description="Resposta bem-sucedida")
+     * )
+     *  @OA\SecurityScheme(
+     *     type="http",
+     *     scheme="bearer",
+     *     securityScheme="bearerAuth"
+     * )
+     *
      */
     public function show()
     {
@@ -93,14 +109,14 @@ class PlayerController extends Controller
         $user->name     = $request->input("name");
         $user->password = bcrypt($request->input("password"));
         $user->save();
-        
+
         $player = new Player();
         $player->address = $request->input("address");
         $player->country = $request->input("country");
         $player->name = $request->input("name");
         $player->user = $user->id;
         $this->playerService->register($player);
-        
+
         return response(['message' => 'Player created success!','success'=>true],200);
 
     }

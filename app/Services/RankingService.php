@@ -6,8 +6,10 @@ use App\Models\Player;
 
 class RankingService
 {
-  public function addPoints (Player $player, $points) {
+  public function addPoints ($points) {
+    $user = auth()->user()->id;
+    $player = Player::where("user", $user)->firstOrFail();
     $player->score += $points;
-    return $player;
+    $player->save();
   }
 }

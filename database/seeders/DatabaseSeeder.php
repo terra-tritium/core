@@ -19,12 +19,11 @@ class DatabaseSeeder extends Seeder
             CountrySeeder::class,
             ModeSeeder::class,
             QuadrantSeeder::class,
-            RequireSeeder::class,
             ResearchSeeder::class,
             StrategySeeder::class,
             UnitSeeder::class,
             MessagesSeeder::class,
-            PlayerSeeder::class
+            // PlayerSeeder::class
         ]);
     }
 }
