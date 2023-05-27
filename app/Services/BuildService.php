@@ -136,20 +136,22 @@ class BuildService
         return true;
     }
 
-    public function spendResources($p1, $require) {
-        $p1 = $this->planetService->removeMetal($p1, $require->metal);
-        $p1 = $this->planetService->removeUranium($p1, $require->uranium);
-        $p1 = $this->planetService->removeCrystal($p1, $require->crystal);
-        $p1 = $this->planetService->addBuildScore($p1, $require->metal * $this->basicScoreFator);
-        $p1 = $this->planetService->addBuildScore($p1, $require->uranium * $this->premiumScoreFator);
-        $p1 = $this->planetService->addBuildScore($p1, $require->crystal * $this->premiumScoreFator);
-        return $p1;
+    public function spendResources(Planet $planet, $require) {
+        $planet = $this->planetService->removeMetal($planet, $require->metal);
+        $planet = $this->planetService->removeUranium($planet, $require->uranium);
+        $planet = $this->planetService->removeCrystal($planet, $require->crystal);
+        $planet->save();
+    }
+
+    public function updateScore(Player $player, $require) {
+        $player = $this->planetService->addBuildScore($player, $require->metal * $this->basicScoreFator);
+        $player = $this->planetService->addBuildScore($player, $require->uranium * $this->premiumScoreFator);
+        $player = $this->planetService->addBuildScore($player, $require->crystal * $this->premiumScoreFator);
+        $player->save();
     }
 
     public function upgrade($buildingId) {
-
         $building = Building::find($buildingId);
-
         $planet = Planet::find($building->planet);
         $player = Player::findOrFail($planet->player);
         $require = $this->calcResourceRequire($building->build, $building->level + 1);
@@ -157,7 +159,8 @@ class BuildService
         $building->ready = (time() * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
 
         if ($this->suficientFunds($planet, $require)) {
-            $player = $this->spendResources($player, $require);
+            $this->spendResources($planet, $require);
+            $this->updateScore($player, $require);
         } else {
             return false;
         }
