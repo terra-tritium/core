@@ -117,7 +117,8 @@ class BuildService
 
         $p1 = $this->planetService->addBuildScore($p1, $this->levelFactor);
         
-        $building->planet = Planet::where([['player', $p1->id], ['id', $building->planet]])->firstOrFail()->id;
+        $player = Player::getPlayerLogged();
+        $building->planet = Planet::where([['player', $player->id], ['id', $building->planet]])->firstOrFail()->id;
 
         $building->save();
         $p1->save();
