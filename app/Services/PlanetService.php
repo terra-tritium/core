@@ -11,7 +11,7 @@ class PlanetService
   protected $rankingService;
 
   public function __construct () {
-    $this->timeNow = time() * 1000;
+    $this->timeNow = time();
     $this->rankingService = new RankingService();
   }
 

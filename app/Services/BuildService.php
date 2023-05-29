@@ -155,7 +155,7 @@ class BuildService
         $player = Player::findOrFail($planet->player);
         $require = $this->calcResourceRequire($building->build, $building->level + 1);
 
-        $building->ready = (time() * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
+        $building->ready = time() + ($require->time * env("TRITIUM_BUILD_SPEED"));
 
         if ($this->suficientFunds($planet, $require)) {
             $this->spendResources($planet, $require);

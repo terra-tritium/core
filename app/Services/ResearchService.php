@@ -115,7 +115,7 @@ class ResearchService
         if ($now >= $researched->finish) {
             $researched->status = 3;
         } else {
-            $researched->points = floor((($researched->finish - $now) * 1000) / env("TRITIUM_RESEARCH_SPEED"));
+            $researched->points = floor(($researched->finish - $now) / env("TRITIUM_RESEARCH_SPEED"));
         }
 
         return $researched;
@@ -128,7 +128,7 @@ class ResearchService
      */
     public function sincronize ($researched) {
         $now = time();
-        $researched->points = floor((($now - $researched->timer) * 1000) / env("TRITIUM_RESEARCH_SPEED"));
+        $researched->points = floor(($now - $researched->timer) / env("TRITIUM_RESEARCH_SPEED"));
         $researched->timer = $now;
         return $researched;
     }
