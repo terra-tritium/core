@@ -155,11 +155,6 @@ class PlanetService
     return $p1;
   }
 
-  public function addBuildScore ($p1, $units) {
-    $p1->buildScore += $units;
-    return $p1;
-  }
-
   public function incrementBattery($p1, $units) {
     $p1->battery += $units;
     return $p1;
