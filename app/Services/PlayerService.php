@@ -164,4 +164,12 @@ class PlayerService
     }
     return $details;
   }
+
+  public function iSplayerOwnerPlanet($player, $planet) {
+    $planet = Planet::where(['player' => $player, 'id' => $planet])->first();
+    if ($planet) {
+      return true;
+    }
+    return false;
+  }
 }
