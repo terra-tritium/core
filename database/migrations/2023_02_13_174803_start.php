@@ -72,6 +72,7 @@ return new class extends Migration
             $table->bigInteger("timeUranium")->nullable();
             $table->bigInteger("timeCrystal")->nullable();
             $table->bigInteger("timeEnergy")->nullable();
+            $table->bigInteger("timeWorker")->nullable();
             # Spaceships Transport 
             $table->bigInteger("transportShips");
         });

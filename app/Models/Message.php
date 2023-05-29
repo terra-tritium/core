@@ -5,8 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-
 
 class Message extends Model
 {
@@ -129,13 +127,11 @@ class Message extends Model
 
     public function readMessagesForUser($senderId, $currentUser)
     {
-        $readAt = Carbon::now();
-
         DB::table('messages')
             ->where([['read', '=', false], ['senderId', '=', $senderId], ['recipientId', '=', $currentUser]])
             ->update([
                 'read' => true,
-                'readAt' => $readAt
+                'readAt' => time()
             ]);
     }
 }

@@ -26,6 +26,11 @@ class RobotFactoryService
     $planet->useEnergyByFactory = $qtd;
     $planet->timeEnergyByFactory = time();
     $planet->pwWorker = $qtd / 100;
+
+    $planet = $this->sincronizeWorkers($planet);
+
+    $planet->timeWorker = time();
+
     $planet->save();
     return $planet->useEnergyByFactory;
   }
@@ -46,5 +51,19 @@ class RobotFactoryService
       $planet->energy = 0;
     }
     return $planet;
+  }
+
+  public function sincronizeWorkers(Planet $planet) {
+      if ($planet->timeWorker == null) {
+        return $planet;
+      }
+      $now = time();
+      $time = $planet->timeWorker;
+      $diff = $now - $time;
+      // convert to hours
+      $diff = $diff / 3600;
+      $newWorkeropulation = $diff * $planet->pwWorker;
+      $planet->workers += $newWorkeropulation;
+      return $planet;
   }
 }

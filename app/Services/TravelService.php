@@ -6,7 +6,6 @@ use App\Models\Travel;
 use App\Jobs\TravelJob;
 use App\Models\Position;
 use App\Models\Planet;
-use Carbon\Carbon;
 
 class TravelService
 {
@@ -26,7 +25,7 @@ class TravelService
             return "Impossible travel";
         }
 
-        $now = Carbon::now()->timestamp * 1000;
+        $now = time();
         $travelTime = env("TRITIUM_TRAVEL_SPEED") * $this->calcDistance($travel->from, $travel->to);
         $newTravel->from = $travel->from;
         $newTravel->to = $travel->to;
@@ -80,7 +79,7 @@ class TravelService
     }
 
     public function back ($travel) {
-        $now = Carbon::now()->timestamp * 1000;
+        $now = time();
         $travelTime = $now - $currentTravel->start;
 
         $currentTravel = Travel::find($travel);
