@@ -8,12 +8,12 @@ use App\Models\Player;
 
 class RobotFactoryService
 {
-  public function setEnergy($planet, $qtd) {
+  public function setEnergy($planetId, $qtd) {
 
     $user = auth()->user()->id;
     $player = Player::where("user", $user)->firstOrFail();
 
-    $planet = Planet::where("id", $planet)->where("player", $player->id)->firstOrFail();
+    $planet = Planet::where("id", $planetId)->where("player", $player->id)->firstOrFail();
     $robotFactoryBuild = Building::where("planet", $planet->id)->where("build", 3)->firstOrFail();
 
     $maxEnergy = $robotFactoryBuild->level * 100;
@@ -35,7 +35,6 @@ class RobotFactoryService
     if ($planet->timeEnergyByFactory == null) {
       return $planet;
     }
-
     $now = time();
     $time = $planet->timeEnergyByFactory;
     $diff = $now - $time;
@@ -43,7 +42,7 @@ class RobotFactoryService
     $diff = $diff / 3600;
     $energyUsed = $diff * $planet->useEnergyByFactory;
     $planet->energy -= $energyUsed;
-    if ($planet < 0) {
+    if ($planet->energy < 0) {
       $planet->energy = 0;
     }
     return $planet;
