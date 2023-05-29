@@ -39,9 +39,11 @@ class PlayerService
     $planet->type = $newAlocation['type'];
     $planet->player = $player->id;
     $planet->workers = 30;
+    $planet->workersWaiting = 30;
     $planet->workersOnMetal = 0;
     $planet->workersOnUranium = 0;
     $planet->workersOnCrystal = 0;
+    $planet->useEnergyByFactory = 0;
     $planet->status = "pacific";
     $planet->player = $player->id;
     $planet->metal = 1500;
@@ -60,6 +62,7 @@ class PlayerService
     $planet->pwUranium = 0;
     $planet->pwCrystal = 0;
     $planet->pwEnergy = 0;
+    $planet->pwWorker = 0;
     $planet->transportShips = 0;
     $planet->save();
   }

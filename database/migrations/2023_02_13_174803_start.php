@@ -31,15 +31,19 @@ return new class extends Migration
             $table->string("name");
             $table->string('resource');
             $table->integer("level");
+            $table->string('status');
+            $table->integer('type');
+            # Position
             $table->string("region");
             $table->string("quadrant");
             $table->integer("position");
+            # Workers
             $table->integer("workers");
+            $table->integer("workersWaiting");
             $table->integer("workersOnMetal");
             $table->integer("workersOnUranium");
             $table->integer("workersOnCrystal");
-            $table->string('status');
-            $table->integer('type');
+            # Resources
             $table->bigInteger("metal");
             $table->bigInteger("uranium");
             $table->bigInteger("crystal");
@@ -58,7 +62,12 @@ return new class extends Migration
             $table->integer("pwUranium");
             $table->integer("pwCrystal");
             $table->integer("pwEnergy");
-            # Time resources
+            $table->integer("pwWorker");
+            # Using resources
+            $table->integer("useEnergyByFactory");
+            # Consumes times start
+            $table->integer("timeEnergyByFactory")->nullable();
+            # Accumulation time start resources
             $table->bigInteger("timeMetal")->nullable();
             $table->bigInteger("timeUranium")->nullable();
             $table->bigInteger("timeCrystal")->nullable();
