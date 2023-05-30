@@ -15,6 +15,11 @@ class PlayerService
     $this->planetService = new PlanetService();
   }
 
+  public function addBuildScore (Player $player, $units) {
+    $player->buildScore += $units;
+    return $player;
+  }
+
   public function register(Player $player) {
     $player->score = 0;
     $player->buildScore = 0;
