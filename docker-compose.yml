@@ -48,7 +48,7 @@ services:
     command: composer install
     working_dir: /var/www/html
     volumes:
-      - ./dotquest_api:/var/www/html
+      - ./:/var/www/html
     networks: 
       - tritiumnet
 

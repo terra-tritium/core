@@ -80,7 +80,7 @@ class BattleController extends Controller
             ];
             
             $aStrategy = $attack->attackStrategy;
-            $dStrategy = $attack->defenseStrategy;
+            $dStrategy = $defense->defenseStrategy;
 
             return $this->battleService->startNewBattle (
                 $attack->id,

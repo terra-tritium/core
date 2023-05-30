@@ -13,8 +13,8 @@ class BuildControllerTest extends TestCase
     # php artisan test --filter=BuildControllerTest::test_create_player
     public function test_create_player(){ 
 
-        $createPlayer = [  'email' => 'nicplayer@gmail.com', 
-                            'name' => 'nicplayer',
+        $createPlayer = [  'email' => 'nicplayer2@gmail.com', 
+                            'name' => 'nicplayer2',
                             'country'=> 2,
                             'password' => '123456',
                             'address'];
@@ -58,11 +58,11 @@ class BuildControllerTest extends TestCase
         $content = json_decode($response->getContent(), true);
         $token = $content['token'];
 
-        $data = ['id'=> 2, 'quantity' => 1 ];
+        $data = ['id'=> 2, 'quantity' => 3 ];
         
         $response = $this->withHeaders(['Authorization'=>'Bearer '.$token,
                                         'Accept' => 'application/json'])
-                                        ->post('/api/troop/production/2', $data);
+                                        ->post('/api/troop/production/1', $data);
         $response->dump();   
         $response->assertStatus(200);
     }
