@@ -91,7 +91,7 @@ class BuildSeeder extends Seeder
         ]);
 
         DB::table('builds')->insert([
-            "name" => "Cristal Mining",
+            "name" => "Crystal Mining",
             "code" => 6,
             "image" => "build-06.png",
             "description" => "Máquina de mineração de cristal, a cada nível aumenta a capacidade de minerar cristal, essa máquina exige energia como custo para manter o funcionamento. O cristal é usado para o desenvolvimento da tecnologia espacial e máquinas de guerra especiais.",
