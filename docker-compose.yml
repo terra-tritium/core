@@ -51,6 +51,20 @@ services:
       - ./:/var/www/html
     networks: 
       - tritiumnet
+  queue:
+    image: php:8-apache
+    command: php artisan queue:work  
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - app
+  schedule:
+    image: php:8-apache
+    command: php artisan schedule:work  
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - app
 
 networks:
   tritiumnet:

@@ -40,10 +40,12 @@ class BattleControllerTest extends TestCase
         
         $content = json_decode($response->getContent(), true);
         $token = $content['token'];
+        $defense = 2 ;
+        $planet_defense  = 2 ;
 
         $response = $this->withHeaders(['Authorization'=>'Bearer '.$token,
                                         'Accept' => 'application/json'])
-                                        ->get('/api/battle/start/5/1');
+                                        ->get("/api/battle/start/{$defense}/{$planet_defense}");
         $response->dump();   
         $response->assertStatus(200);
     }

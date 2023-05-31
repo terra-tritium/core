@@ -55,6 +55,7 @@ class BattleController extends Controller
         $playerOwnerPlatet = $this->playerService->iSplayerOwnerPlanet($defense,$planet);
 
         if($playerOwnerPlatet){
+
             $attack  = Player::getPlayerLogged();
             $defense = Player::find($defense);
 
@@ -68,6 +69,7 @@ class BattleController extends Controller
                     'life' => 20
                 ]
             ];
+            
             $dUnits = [
                 [
                     'unit' => 1,
@@ -88,7 +90,8 @@ class BattleController extends Controller
                 $aUnits,
                 $dUnits,
                 $aStrategy,
-                $dStrategy
+                $dStrategy,
+                $planet
             );
         }
         else{
