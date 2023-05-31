@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class Requires extends Model
+class Requires
 {
-    use HasFactory;
-    protected $table = 'requires';
-    public $timestamps = false;
+    public $time;
+    public $metal;
+    public $uranium;
+    public $crystal;
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Travel;
 use App\Services\TravelService;
 use Illuminate\Http\Request;
+use App\Models\Player;
 
 class TravelController extends Controller
 {
@@ -29,7 +30,7 @@ class TravelController extends Controller
 
     public function start (Request $request) {
         $player = Player::getPlayerLogged();
-        $this->travelService->start($player->id, $request->colect());
+        return $this->travelService->start($player->id, $request);
     }
 
     public function back ($travel) {

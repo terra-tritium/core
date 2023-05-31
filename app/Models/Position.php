@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Models;
+
+class Position
+{
+   public $region;
+   public $quadrant;
+   public $position;
+}

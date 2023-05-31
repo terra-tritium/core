@@ -15,6 +15,7 @@ use App\Http\Controllers\QuadrantController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\API\ResetarSenhaController;
 use App\Http\Controllers\MessegeController;
+use App\Http\Controllers\FactoryController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +51,7 @@ Route::controller(PlayerController::class)->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::controller(PlayerController::class)->group(function () {
         Route::get('/player/show', 'show');
+        Route::get('/player/details/{id}', 'getDetails');
         Route::post('/player/new', 'register');
     });
 
@@ -63,8 +65,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/build/requires/{build}', 'requires');
         Route::get('/build/require/{build}/{level}', 'require');
     });
+
+    Route::controller(FactoryController::class)->group(function () {
+        Route::post('/factory/energy/{planet}/{qtd}', 'energy');
+    });
+
     Route::controller(PlanetController::class)->group(function () {
         Route::get('/planet/list', 'list');
+        Route::get('/planet/show/{id}', 'show');
+        Route::get('/planet/{quadrant}/{position}', 'find');
     });
 
     Route::controller(UnitController::class)->group(function () {
@@ -73,6 +82,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(TroopController::class)->group(function () {
         Route::post('/troop/production/{planet}', 'production');
+        Route::get('/troop/production/{planet?}', 'producing');
     });
 
     Route::controller(RankingController::class)->group(function () {
@@ -83,8 +93,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(ResearchController::class)->group(function () {
         Route::get('/research/list', 'list');
         Route::get('/researched', 'researched');
-        Route::post('/research/start/{code}', 'start');
+        Route::post('/research/start/{code}/{sincronize?}', 'start');
         Route::post('/research/done/{code}', 'done');
+        Route::get('/research/status/{code}', 'getStatus');
     });
 
     Route::controller(GameModeController::class)->group(function () {
@@ -104,7 +115,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/battle/defensemode/list', 'defenseModeList');
         Route::post('/battle/attackmode/{option}', 'changeAttackMode');
         Route::post('/battle/defensemode/{option}', 'changeDefenseMode');
-        Route::get('/battle/start', 'start');
+        Route::get('/battle/start/{defense}/{planet}', 'start');
         Route::get('/battle/view/{id}', 'view');
         Route::get('/battle/stages/{id}', 'stages');
     });
@@ -112,6 +123,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(QuadrantController::class)->group(function () {
         Route::get('/quadrant/show/{code}', 'show');
         Route::get('/quadrant/map/{region}', 'map');
+        Route::get('/quadrant/planets/{quadrant}', 'planets');
     });
 
     Route::controller(MessegeController::class)->group(function () {
@@ -120,13 +132,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/messege/all-recipient', 'getAllByUserRecipient');
         Route::post('/messege/read','readMessege');
         Route::get('/messege/list', 'list');
-        Route::get('/messege/not-read', 'getAllMessegeNotRead');
         Route::get('/message/send-for-recipient/{senderid}', 'getAllMessageSenderForRecipent');
         Route::get('/message/count' ,'getCountMessageNotRead');
 
+        Route::get('/messege/not-read', 'getAllMessegeNotRead');
         Route::get('/message/getSenders', 'getSenders');
         Route::get('/messages/conversation/{senderid}', 'getConversation');
         Route::post('/messege/new','newMessege');
+        Route::get('/messege/lastmsg-sender/{senderid}','getLastMessageNotReadBySender');
 
     });
 

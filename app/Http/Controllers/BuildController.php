@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Build;
 use App\Models\Building;
 use App\Services\BuildService;
+use App\Services\WorkerService;
 
 use Illuminate\Http\Request;
 
@@ -12,9 +13,11 @@ class BuildController extends Controller
 {
 
     protected $buildService;
+    protected $workerService;
 
-    public function __construct(BuildService $buildService) {
+    public function __construct(BuildService $buildService, WorkerService $workerService) {
         $this->buildService = $buildService;
+        $this->workerService = $workerService;
     }
 
     public function list()
@@ -53,7 +56,7 @@ class BuildController extends Controller
     }
 
     public function workers (Request $request) {
-        return $this->buildService->configWorkers (
+        return $this->workerService->configWorkers (
             $request->input("planetId"),
             $request->input("workers"),
             $request->input("buildingId")

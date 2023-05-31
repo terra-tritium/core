@@ -32,11 +32,50 @@ return new class extends Migration
             $table->string("name");
             $table->string('resource');
             $table->integer("level");
-            $table->integer("region");
-            $table->integer("quadrant");
-            $table->integer("position");
-            $table->integer("humanoids");
             $table->string('status');
+            $table->integer('type');
+            # Position
+            $table->string("region");
+            $table->string("quadrant");
+            $table->integer("position");
+            # Workers
+            $table->integer("workers");
+            $table->integer("workersWaiting");
+            $table->integer("workersOnMetal");
+            $table->integer("workersOnUranium");
+            $table->integer("workersOnCrystal");
+            # Resources
+            $table->bigInteger("metal");
+            $table->bigInteger("uranium");
+            $table->bigInteger("crystal");
+            $table->bigInteger("energy");
+            $table->bigInteger("battery");
+            $table->bigInteger("extraBattery");
+            $table->bigInteger("capMetal");
+            $table->bigInteger("capUranium");
+            $table->bigInteger("capCrystal");
+            $table->bigInteger("proMetal");
+            $table->bigInteger("proUranium");
+            $table->bigInteger("proCrystal");
+            $table->bigInteger("ready")->nullable();
+            # Power multiplier of resources
+            $table->integer("pwMetal");
+            $table->integer("pwUranium");
+            $table->integer("pwCrystal");
+            $table->integer("pwEnergy");
+            $table->integer("pwWorker");
+            # Using resources
+            $table->integer("useEnergyByFactory");
+            # Consumes times start
+            $table->integer("timeEnergyByFactory")->nullable();
+            # Accumulation time start resources
+            $table->bigInteger("timeMetal")->nullable();
+            $table->bigInteger("timeUranium")->nullable();
+            $table->bigInteger("timeCrystal")->nullable();
+            $table->bigInteger("timeEnergy")->nullable();
+            $table->bigInteger("timeWorker")->nullable();
+            # Spaceships Transport 
+            $table->bigInteger("transportShips");
         });
         Schema::create('countrys', function (Blueprint $table) {
             $table->id();
@@ -70,30 +109,6 @@ return new class extends Migration
             $table->integer('defenseStrategy');
             $table->integer('aliance')->nullable()->unsigned();
             $table->bigInteger("ready")->nullable();
-            $table->bigInteger("metal");
-            $table->bigInteger("uranium");
-            $table->bigInteger("crystal");
-            $table->bigInteger("energy");
-            $table->bigInteger("battery");
-            $table->bigInteger("extraBattery");
-            $table->bigInteger("capMetal");
-            $table->bigInteger("capUranium");
-            $table->bigInteger("capCrystal");
-            $table->bigInteger("proMetal");
-            $table->bigInteger("proUranium");
-            $table->bigInteger("proCrystal");
-            # Power multiplier of resources
-            $table->integer("pwMetal");
-            $table->integer("pwUranium");
-            $table->integer("pwCrystal");
-            $table->integer("pwEnergy");
-            # Time resources
-            $table->bigInteger("timeMetal")->nullable();
-            $table->bigInteger("timeUranium")->nullable();
-            $table->bigInteger("timeCrystal")->nullable();
-            $table->bigInteger("timeEnergy")->nullable();
-            # Spaceships Cargos
-            $table->bigInteger("merchantShips");
             # Score rankings
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
@@ -131,23 +146,23 @@ return new class extends Migration
             $table->foreign('senderId')->references('id')->on('users');
             $table->foreign('recipientId')->references('id')->on('users');
         });
-        Schema::create('requires', function (Blueprint $table) {
-            $table->id();
-            $table->integer('build');
-            $table->integer("level");
-            $table->bigInteger("metal");
-            $table->bigInteger("uranium");
-            $table->bigInteger("crystal");
-            $table->bigInteger("time");
-        });
         Schema::create('builds', function (Blueprint $table) {
             $table->id();
             $table->string("name");
             $table->integer("code");
             $table->string("image");
             $table->text("description");
-            $table->integer("maxLevel");
             $table->string("effect");
+            // initial cost
+            $table->integer("metalStart");
+            $table->integer("uraniumStart");
+            $table->integer("crystalStart");
+            // initial level
+            $table->integer("metalLevel");
+            $table->integer("uraniumLevel");
+            $table->integer("crystalLevel");
+            // coefficient of growth 0% - 100%
+            $table->integer("coefficient");
         });
         Schema::create('buildings', function (Blueprint $table) {
             $table->id();
@@ -161,19 +176,24 @@ return new class extends Migration
         Schema::create('travels', function (Blueprint $table) {
             $table->id();
             $table->integer('player')->constrained("players");
-            $table->string("receptor");
+            $table->integer("receptor");
             $table->string("from");
             $table->string("to");
             $table->bigInteger("arrival");
             $table->bigInteger("start");
-            $table->integer('action');
             $table->integer('status');
             $table->json("troop");
             $table->json("fleet");
             $table->integer("metal");
             $table->integer("crystal");
             $table->integer("uranium");
-            $table->integer("merchantShips");
+            $table->integer("transportShips");
+            // 1 - Attack
+            // 2 - Defense
+            // 3 - Transport
+            // 4 - Colonize
+            // 5 - Explore
+            $table->integer("action");
         });
         Schema::create('units', function (Blueprint $table) {
             $table->id();
@@ -245,12 +265,15 @@ return new class extends Migration
             $table->integer("power");
             $table->bigInteger("start");
             $table->bigInteger("timer");
+            $table->bigInteger("points");
             $table->integer("status");
+            $table->bigInteger("finish");
         });
         Schema::create('battles', function (Blueprint $table) {
             $table->id();
-            $table->string("attack");
-            $table->string("defense");
+            $table->foreignId("attack")->constrained("players");
+            $table->foreignId("defense")->constrained("players");
+            $table->foreignId('planet')->constrained("planets");
             $table->string("attackDemage")->nullable();
             $table->string("defenseDemage")->nullable();
             $table->integer("attackStrategy");

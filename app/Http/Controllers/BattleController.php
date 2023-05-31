@@ -8,15 +8,17 @@ use App\Models\Player;
 use App\Models\Battle;
 use App\Models\BattleStage;
 use App\Services\BattleService;
+use App\Services\PlayerService;
 use Illuminate\Http\Request;
 
 class BattleController extends Controller
 {
-
     protected $battleService;
+    protected $playerService;
 
-    public function __construct(BattleService $battleService) {
+    public function __construct(BattleService $battleService, PlayerService $playerService) {
         $this->battleService = $battleService;
+        $this->playerService = $playerService;
     }
 
     public function attackModeList() {
@@ -49,39 +51,47 @@ class BattleController extends Controller
         return BattleStage::where('battle', $id)->get();
     }
 
-    public function start() {
-        $attack = "terraSihduam34a43j4hssz94e";
-        $defender = "terra9d8sksfdccfkkkllssGu9";
-        $aUnits = [
-            [
-                'unit' => 1,
-                'quantity' => 5000,
-                'type' => 'D',
-                'attack' => 5,
-                'defense' => 2,
-                'life' => 20
-            ]
-        ];
-        $dUnits = [
-            [
-                'unit' => 1,
-                'quantity' => 1000,
-                'type' => 'D',
-                'attack' => 10,
-                'defense' => 3,
-                'life' => 20
-            ]
-        ];
-        $aStrategy = 3;
-        $dStrategy = 5;
+    public function start($defender,$planet) {
+        $attack = Player::getPlayerLogged();
+        $playerOwnerPlatet = $this->playerService->iSplayerOwnerPlanet($defender,$planet);
 
-        return $this->battleService->startNewBattle (
-            $attack,
-            $defender,
-            $aUnits,
-            $dUnits,
-            $aStrategy,
-            $dStrategy
-        );
+        if($playerOwnerPlatet){
+            $aUnits = [
+                [
+                    'unit' => 1,
+                    'quantity' => 5000,
+                    'type' => 'D',
+                    'attack' => 5,
+                    'defense' => 2,
+                    'life' => 20
+                ]
+            ];
+            $dUnits = [
+                [
+                    'unit' => 1,
+                    'quantity' => 1000,
+                    'type' => 'D',
+                    'attack' => 10,
+                    'defense' => 3,
+                    'life' => 20
+                ]
+            ];
+            $aStrategy = 3;
+            $dStrategy = 5;
+
+            return $this->battleService->startNewBattle (
+                $attack,
+                $defender,
+                $aUnits,
+                $dUnits,
+                $aStrategy,
+                $dStrategy
+            );
+        }
+        else{
+            return response()->json([
+                'message' => 'The player is not the owner of the planet'
+            ], 403);
+        }
     }
 }

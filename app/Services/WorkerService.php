@@ -1,0 +1,83 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Planet;
+use App\Models\Building;
+use App\Services\PlanetService;
+
+class WorkerService
+{
+  private $planetService;
+
+  public function __construct() {
+    $this->planetService = new PlanetService();
+  }
+
+  public function configWorkers ($planetId, $workers, $buildingId) {
+    $planet = Planet::find($planetId);
+    $building = Building::find($buildingId);
+
+    switch ($building->build) {
+      // Metal
+      case 4 :
+          $planet->workersOnMetal = 0;
+          break;
+      // Uranium
+      case 5 : 
+          $planet->workersOnUranium = 0;
+          break;
+
+      // Crystal
+      case 6 : 
+          $planet->workersOnCrystal = 0;
+          break;
+    }
+
+    if ($this->waitingWorkers($planet) < $workers) {
+      return "Insuficients waiting workers";
+    }
+    
+    if ($workers < 1) {
+      return "Invalid workers";
+    } else {    
+        switch ($building->build) {
+            // Metal
+            case 4 :
+                $planet->metal = $this->planetService->currentBalance($planet, 1);
+                $planet->timeMetal = time();
+                $planet->pwMetal = $workers;
+                $planet->workersOnMetal = $workers;
+                $planet->workersWaiting = $this->waitingWorkers($planet);
+                break;
+
+            // Uranium
+            case 5 : 
+                $planet->uranium = $this->planetService->currentBalance($planet, 2);
+                $planet->timeUranium = time();
+                $planet->pwUranium = $workers;
+                $planet->workersOnUranium = $workers;
+                $planet->workersWaiting = $this->waitingWorkers($planet);
+                break;
+
+            // Crystal
+            case 6 : 
+                $planet->crystal = $this->planetService->currentBalance($planet, 3);
+                $planet->timeCrystal = time();
+                $planet->pwCrystal = $workers;
+                $planet->workersOnCrystal = $workers;
+                $planet->workersWaiting = $this->waitingWorkers($planet);
+                break;
+        }
+
+        $building->workers = $workers;
+
+        $building->save();   
+        $planet->save();
+    }
+  }
+
+  private function waitingWorkers(Planet $planet) {
+    return $planet->workers - ($planet->workersOnMetal + $planet->workersOnUranium + $planet->workersOnCrystal);
+  }
+}

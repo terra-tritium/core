@@ -20,8 +20,14 @@ class BuildSeeder extends Seeder
             "code" => 1,
             "image" => "build-01.png",
             "description" => "O módulo de colonização é um sonho flutuante, uma casa voadora que leva a humanidade para além de seus limites. É um navio da esperança, carregando uma carga valiosa de vida humana e recursos para a próxima fronteira do universo. É uma mistura de engenharia e arte, projetada para sobreviver em ambientes hostis e fornecer conforto e segurança para aqueles que o habitam.",
-            "maxLevel" => 52,
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
+            "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 2,
+            "crystalLevel" => 3,
+            "coefficient" => 50
         ]);
 
         DB::table('builds')->insert([
@@ -29,8 +35,14 @@ class BuildSeeder extends Seeder
             "code" => 2,
             "image" => "build-02.png",
             "description" => "O núcleo possui baterias e coletores, a bateria armazena energia, quanto mais núcleos maior poder de armazenagem da bateria. Os coletores são responsáveis por coletar energia e armazenar nas baterias.",
-            "maxLevel" => 52,
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
+            "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
         ]);
 
         DB::table('builds')->insert([
@@ -38,8 +50,14 @@ class BuildSeeder extends Seeder
             "code" => 3,
             "image" => "build-03.png",
             "description" => "A fábrica de robôs humanoides é uma sinfonia de tecnologia e criatividade, onde a inteligência artificial e a engenharia se unem para criar máquinas surpreendentes que imitam a forma humana. É uma obra de arte mecânica, onde a ciência e a arte se complementam para produzir robôs humanoides capazes de realizar tarefas complexas e interagir com o mundo ao nosso redor. É a visão de um futuro onde a tecnologia e a humanidade trabalham juntas para melhorar a vida e a sociedade.",
-            "maxLevel" => 52,
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
+            "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
         ]);
 
         DB::table('builds')->insert([
@@ -47,8 +65,14 @@ class BuildSeeder extends Seeder
             "code" => 4,
             "image" => "build-04.png",
             "description" => "Máquina de mineração de metal, a cada nível aumenta a capacidade de minerar metal, essa máquina exige energia como custo para manter o funcionamento. O metal é um recurso básico para construção de edifícios, máquinas e naves",
-            "maxLevel" => 52,
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
+            "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
         ]);
 
         DB::table('builds')->insert([
@@ -56,17 +80,29 @@ class BuildSeeder extends Seeder
             "code" => 5,
             "image" => "build-05.png",
             "description" => "Máquina de mineração de uranium, a cada nível aumenta a capacidade de minerar uranium, essa máquina exige energia como custo para manter o funcionamento. O uranium é um recurso nobre usado nas construções, máquinas e naves específicas.",
-            "maxLevel" => 52,
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
+            "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
         ]);
 
         DB::table('builds')->insert([
-            "name" => "Cristal Mining",
+            "name" => "Crystal Mining",
             "code" => 6,
             "image" => "build-06.png",
             "description" => "Máquina de mineração de cristal, a cada nível aumenta a capacidade de minerar cristal, essa máquina exige energia como custo para manter o funcionamento. O cristal é usado para o desenvolvimento da tecnologia espacial e máquinas de guerra especiais.",
-            "maxLevel" => 52,
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
+            "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
         ]);
 
         DB::table('builds')->insert([
@@ -74,8 +110,14 @@ class BuildSeeder extends Seeder
             "code" => 8,
             "image" => "build-08.png",
             "description" => "Edifício de pesquisa tecnológica, requer energia para funcionamento. Acumula pontos de pesquisa, os pontos de pesquisa são utilizados para descoberta e liberação de novas tecnologias. Cada tecnologia descoberta traz algum recurso ou vantagem especial no jogo.",
-            "maxLevel" => 52,
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
+            "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
         ]);
 
         DB::table('builds')->insert([
@@ -83,17 +125,29 @@ class BuildSeeder extends Seeder
             "code" => 9,
             "image" => "build-09.png",
             "description" => "Armazena os recursos coletados, quanto maior o nível maior a capacidade de armazenamento, os recursos que não couberem no depósito ficam vulneráveis a roubo de outros jogadores",
-            "maxLevel" => 52,
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
+            "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
         ]);
 
         DB::table('builds')->insert([
-            "name" => "Slipway",
+            "name" => "Spaceship Factory",
             "code" => 10,
             "image" => "build-10.png",
-            "description" => "Armazena os recursos coletados, quanto maior o nível maior a capacidade de armazenamento, os recursos que não couberem no depósito ficam vulneráveis a roubo de outros jogadores",
-            "maxLevel" => 52,
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
+            "description" => "Fabrica de construções de naves",
+            "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
         ]);
 
         DB::table('builds')->insert([
@@ -101,8 +155,14 @@ class BuildSeeder extends Seeder
             "code" => 11,
             "image" => "build-11.png",
             "description" => "Descricao para casa de baterias.",
-            "maxLevel" => 52,
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta"
+            "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
         ]);
 
         DB::table('builds')->insert([
@@ -110,8 +170,44 @@ class BuildSeeder extends Seeder
             "code" => 12,
             "image" => "build-12.png",
             "description" => "Descricao para military camp.",
-            "maxLevel" => 52,
-            "effect" => "A cada nível de expanção libera a construção de novas unidades"
+            "effect" => "A cada nível de expanção libera a construção de novas unidades",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
+        ]);
+
+        DB::table('builds')->insert([
+            "name" => "Shield",
+            "code" => 13,
+            "image" => "build-13.png",
+            "description" => "Escudo de força, protege o planeta de ataques de outros jogadores, a cada nível aumenta a capacidade de absorção de danos.",   
+            "effect" => "A cada nível de expanção libera a construção de novas unidades",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
+        ]);
+
+        DB::table('builds')->insert([
+            "name" => "Market",
+            "code" => 14,
+            "image" => "build-14.png",
+            "description" => "Resource trades between players",   
+            "effect" => "A cada nível de expanção reduz a taxa de fee e aumenta alcance de trocas",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
         ]);
     }
 }

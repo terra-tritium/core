@@ -7,13 +7,12 @@ use App\Models\Player;
 use App\Models\Build;
 use App\Models\Building;
 use App\Models\Requires;
+use App\Services\PlanetService;
 use App\Services\PlayerService;
-use Illuminate\Support\Facades\Auth;
-
-use Carbon\Carbon;
 
 class BuildService
 {
+    private $planetService;
     private $playerService;
 
     private $basicScoreFator = 0.01;
@@ -23,6 +22,7 @@ class BuildService
 
     public function __construct() {
         $this->playerService = new PlayerService();
+        $this->planetService = new PlanetService();
     }
 
     private function starNewMining($p1, $building, $resourceMining, $resourceSpend, $require) {
@@ -31,16 +31,16 @@ class BuildService
 
         switch ($resourceSpend) {
             case 1:
-                $hasBalance = $this->playerService->enoughBalance($p1, $require, $resourceSpend);
-                if ($hasBalance) { $p1 = $this->playerService->removeMetal($p1, $require); }
+                $hasBalance = $this->planetService->enoughBalance($p1, $require, $resourceSpend);
+                if ($hasBalance) { $p1 = $this->planetService->removeMetal($p1, $require); }
                 break;
             case 2:
-                $hasBalance = $this->playerService->enoughBalance($p1, $require, $resourceSpend);
-                if ($hasBalance) { $p1 = $this->playerService->removeUranium($p1, $require); }
+                $hasBalance = $this->planetService->enoughBalance($p1, $require, $resourceSpend);
+                if ($hasBalance) { $p1 = $this->planetService->removeUranium($p1, $require); }
                 break;
             case 3:
-                $hasBalance = $this->playerService->enoughBalance($p1, $require, $resourceSpend);
-                if ($hasBalance) { $p1 = $this->playerService->removeCrystal($p1, $require); }
+                $hasBalance = $this->planetService->enoughBalance($p1, $require, $resourceSpend);
+                if ($hasBalance) { $p1 = $this->planetService->removeCrystal($p1, $require); }
                 break;
         
             default:
@@ -48,8 +48,8 @@ class BuildService
         }
 
         if ($hasBalance) {
-            $player = $this->playerService->startMining($p1, $resourceMining);
-            $player->save();
+            $planet = $this->planetService->startMining($p1, $resourceMining);
+            $planet->save();
         }
     }
 
@@ -58,24 +58,20 @@ class BuildService
         $building->level = 1;
         $building->workers = 0;
 
-        $user = Auth::user();
-
-        $planet = Planet::find($building->planet);
-        $p1 = Player::where('user', $user->id)->firstOrFail();
-
+        $p1 = Planet::find($building->planet); 
         $build = Build::find($building->build);
+        $playerLogged = Player::getPlayerLogged();
+        $player = Player::findOrFail($playerLogged->id);
 
-        $require = Requires::where([
-            ["build", "=", $building->build],
-            ["level", "=", 1]
-        ])->firstOrFail();
 
-        $building->ready = (Carbon::now()->timestamp * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
+        $require = $this->calcResourceRequire($building->build, 1);
+
+        $building->ready = time() + ($require->time * env("TRITIUM_BUILD_SPEED"));
         
         // Colonization
         if ($building->build == 1) {
-            if ($this->playerService->enoughBalance($p1, $require->metal, 1)) {
-                $p1 = $this->playerService->removeMetal($p1, $require->metal);
+            if ($this->planetService->enoughBalance($p1, $require->metal, 1)) {
+                $p1 = $this->planetService->removeMetal($p1, $require->metal);
                 $p1->save();
             } else {
                 return false;
@@ -103,77 +99,80 @@ class BuildService
         }
 
         if ($building->build == 3 || $building->code > 6) {
-            if ($this->playerService->enoughBalance($p1, $require->metal, 1)) {
-                $p1 = $this->playerService->removeMetal($p1, $require->metal);
-                $p1 = $this->playerService->addBuildScore($p1, $require->metal * $this->basicScoreFator);
+            if ($this->planetService->enoughBalance($p1, $require->metal, 1)) {
+                $p1 = $this->planetService->removeMetal($p1, $require->metal);
+                $player = $this->playerService->addBuildScore($player, $require->metal * $this->basicScoreFator);
             } else {
                 return false;
             }
-            if ($this->playerService->enoughBalance($p1, $require->uranium, 2)) {
-                $p1 = $this->playerService->removeUranium($p1, $require->uranium);
-                $p1 = $this->playerService->addBuildScore($p1, $require->uranium * $this->premiumScoreFator);
+            if ($this->planetService->enoughBalance($p1, $require->uranium, 2)) {
+                $p1 = $this->planetService->removeUranium($p1, $require->uranium);
+                $player = $this->playerService->addBuildScore($player, $require->uranium * $this->premiumScoreFator);
             } else {
                 return false;
             }
-            if ($this->playerService->enoughBalance($p1, $require->crystal, 3)) {
-                $p1 = $this->playerService->removeCrystal($p1, $require->crystal);
-                $p1 = $this->playerService->addBuildScore($p1, $require->mecrystaltal * $this->premiumScoreFator);
+            if ($this->planetService->enoughBalance($p1, $require->crystal, 3)) {
+                $p1 = $this->planetService->removeCrystal($p1, $require->crystal);
+                $player = $this->playerService->addBuildScore($player, $require->crystal * $this->premiumScoreFator);
             } else {
                 return false;
             }
         }
 
-        $p1 = $this->playerService->addBuildScore($p1, $this->levelFactor);
+        $player = $this->playerService->addBuildScore($player, $this->levelFactor);
         
-        $building->planet = Planet::where([['player', $p1->id], ['id', $building->planet]])->firstOrFail()->id;
+        $building->planet = Planet::where([['player', $player->id], ['id', $building->planet]])->firstOrFail()->id;
 
         $building->save();
         $p1->save();
-        $planet->save();
+        $player->save();
     }
 
     public function suficientFunds($p1, $require) {
-        if (!$this->playerService->enoughBalance($p1, $require->metal, 1)) {
+        if (!$this->planetService->enoughBalance($p1, $require->metal, 1)) {
             return false;
         }
-        if (!$this->playerService->enoughBalance($p1, $require->uranium, 2)) {
+        if (!$this->planetService->enoughBalance($p1, $require->uranium, 2)) {
             return false;
         }
-        if (!$this->playerService->enoughBalance($p1, $require->crystal, 3)) {
+        if (!$this->planetService->enoughBalance($p1, $require->crystal, 3)) {
             return false;
         }
         return true;
     }
 
-    public function spendResources($p1, $require) {
-        $p1 = $this->playerService->removeMetal($p1, $require->metal);
-        $p1 = $this->playerService->removeUranium($p1, $require->uranium);
-        $p1 = $this->playerService->removeCrystal($p1, $require->crystal);
-        $p1 = $this->playerService->addBuildScore($p1, $require->metal * $this->basicScoreFator);
-        $p1 = $this->playerService->addBuildScore($p1, $require->uranium * $this->premiumScoreFator);
-        $p1 = $this->playerService->addBuildScore($p1, $require->mecrystaltal * $this->premiumScoreFator);
-        return $p1;
+    public function spendResources(Planet $planet, $require) {
+        $planet = $this->planetService->removeMetal($planet, $require->metal);
+        $planet = $this->planetService->removeUranium($planet, $require->uranium);
+        $planet = $this->planetService->removeCrystal($planet, $require->crystal);
+        $planet->save();
+    }
+
+    public function updateScore(Player $player, $require) {
+        $player = $this->playerService->addBuildScore($player, $require->metal * $this->basicScoreFator);
+        $player = $this->playerService->addBuildScore($player, $require->uranium * $this->premiumScoreFator);
+        $player = $this->playerService->addBuildScore($player, $require->crystal * $this->premiumScoreFator);
+        $player->save();
     }
 
     public function upgrade($buildingId) {
-
         $building = Building::find($buildingId);
-
         $planet = Planet::find($building->planet);
         $player = Player::findOrFail($planet->player);
-        $require = Requires::where([["build", $building->build], ["level", $building->level + 1]])->firstOrFail();
+        $require = $this->calcResourceRequire($building->build, $building->level + 1);
 
-        $building->ready = (time() * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
+        $building->ready = time() + ($require->time * env("TRITIUM_BUILD_SPEED"));
 
-        if ($this->suficientFunds($player, $require)) {
-            $player = $this->spendResources($player, $require);
+        if ($this->suficientFunds($planet, $require)) {
+            $this->spendResources($planet, $require);
+            $this->updateScore($player, $require);
         } else {
             return false;
         }
 
         // Battery House
         if ($building->build == 11) {
-            $player = $this->playerService->incrementBattery($p1, $this->initialBattery * $building->level);
+            $player = $this->planetService->incrementBattery($planet, $this->initialBattery * $building->level);
         }
 
         $building->level += 1;
@@ -195,19 +194,18 @@ class BuildService
             foreach($allBuilds as $key => $iBuild) {
                 foreach($buildings as $iBuilding) {
                     if ($iBuilding->build == $iBuild->code) {
-                        $allBuilds->forget($key);
+                        $iBuild->disable = true;
                     }
-                }
-            }
-        } else {
-            foreach($allBuilds as $key => $iBuild) {
-                if ($iBuild->code != 1) {
-                    $allBuilds->forget($key);
                 }
             }
         }
 
         foreach($allBuilds as $temp) {
+
+            if (count($buildings) <= 0 && $temp->code != 1) {
+                $temp->disable = true;
+            }
+
             array_push($availables, $temp);
         }
 
@@ -218,51 +216,51 @@ class BuildService
         return Building::where("planet", $planet)->get();
     }
 
-    public function requires($build) {
-        return Requires::where("build", $build)->get();
-    }
+    public function calcResourceRequire($build, $level) {
+        $build = Build::find($build);
+        $require = new Requires();
+        $metalReq = 0;
+        $uraniumReq = 0;
+        $crystalReq = 0;
 
-    public function require($build, $level) {
-        return Requires::where([["build", $build],["level", $level]])->firstOrFail();
-    }
-
-    public function configWorkers ($planetId, $workers, $buildingId) {
-
-        $planet = Planet::find($planetId);
-        $p1 = Player::findOrFail($planet->player);
-        $building = Building::find($buildingId);
-        
-        if ($workers > $planet->humanoids || $workers < 1) {
-            return "Humanoids insuficients or workers invalid";
-        } else {
-        
-            switch ($building->build) {
-                // Metal
-                case 4 : 
-                    $p1->metal = $this->playerService->currentBalance($p1, 1);
-                    $p1->timeMetal = time() * 1000;
-                    $p1->pwMetal = $workers;
-                    break;
-
-                // Uranium
-                case 5 : 
-                    $p1->uranium = $this->playerService->currentBalance($p1, 2);
-                    $p1->timeUranium = time() * 1000;
-                    $p1->pwUranium = $workers;
-                    break;
-
-                // Crystal
-                case 6 : 
-                    $p1->crystal = $this->playerService->currentBalance($p1, 3);
-                    $p1->timeCrystal = time() * 1000;
-                    $p1->pwCrystal = $workers;
-                    break;
-            }
-
-            $building->workers = $workers;
-    
-            $building->save();        
-            $p1->save();
+        # Metal
+        if ($level == $build->metalLevel) {
+            $metalReq = $build->metalStart;
         }
+        if ($level > $build->metalLevel) {
+            $metalReq = $build->metalStart;
+            for ($i = 1; $i <= ($level - $build->metalLevel); $i++) {
+                $metalReq += $metalReq * ($build->coefficient / 100);
+            }
+        }
+
+        # Uranium
+        if ($level == $build->uraniumLevel) {
+            $uraniumReq = $build->uraniumStart;
+        }
+        if ($level > $build->uraniumLevel) {
+            $metalReq = $build->metalStart;
+            for ($i = 1; $i <= (($level - $build->uraniumLevel)); $i++) {
+                $uraniumReq += $uraniumReq * ($build->coefficient / 100);
+            }
+        }
+
+        # Crystal
+        if ($level == $build->uraniumLevel) {
+            $uraniumReq = $build->uraniumStart;
+        }
+        if ($level > $build->uraniumLevel) {
+            $metalReq = $build->metalStart;
+            for ($i = 1; $i <= (($level - $build->uraniumLevel)); $i++) {
+                $uraniumReq += $uraniumReq * ($build->coefficient / 100);
+            }
+        }
+
+        $require->metal = $metalReq;
+        $require->uranium = $uraniumReq;
+        $require->crystal = $crystalReq;
+        $require->time = ($metalReq + $uraniumReq + $crystalReq) / 100;
+
+        return $require;
     }
 }

@@ -94,7 +94,7 @@ class MessegeController extends Controller
     }
     public function getCountMessageNotRead(){
         $naoLidas = $this->getAllMessegeNotRead();
-        return ($naoLidas ? count($naoLidas) : 0);
+        return $naoLidas;
     }
     private function messegeForSender($messages)
     {
@@ -142,10 +142,9 @@ class MessegeController extends Controller
     }
     public function readMessege(Request $request)
     {
-        $msg = (new Message())->find($request->input("id"));
-        $msg->read = true;
-        $msg->readAt = date('Y-m-d H:i:s');
-        $msg->save();
+        $player = Player::getPlayerLogged();
+        $msg = new Message();
+        $msg->readMessagesForUser($request->input("id"),$player->user);
         return response(['message' => 'message read!', 'success' => true], 200);
     }
 
@@ -159,5 +158,11 @@ class MessegeController extends Controller
         $player = Player::getPlayerLogged();
         $messages = (new Message())->getConversation($player->user,$senderId);
         return $messages;
+    }
+    public function getLastMessageNotReadBySender($senderid){
+        $message = new Message();
+        $player = Player::getPlayerLogged();
+        $msg = $message->getLastMessageNotReadBySender($player->user,$senderid);
+        return $msg;
     }
 }

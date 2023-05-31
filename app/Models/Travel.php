@@ -9,4 +9,5 @@ class Travel extends Model
 {
     use HasFactory;
     protected $table = 'travels';
+    public $timestamps = false;
 }
