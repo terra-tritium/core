@@ -11,7 +11,7 @@ class PlanetService
   protected $rankingService;
 
   public function __construct () {
-    $this->timeNow = time() * 1000;
+    $this->timeNow = time();
     $this->rankingService = new RankingService();
   }
 
@@ -152,11 +152,6 @@ class PlanetService
       $p1->crystal -= $units;
       $this->rankingService->addPoints($units / 20);
     }
-    return $p1;
-  }
-
-  public function addBuildScore ($p1, $units) {
-    $p1->buildScore += $units;
     return $p1;
   }
 

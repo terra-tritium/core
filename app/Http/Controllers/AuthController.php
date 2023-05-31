@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use App\Notifications\SendMail;
 use App\Notifications\Message;
 use App\Models\Quadrant;

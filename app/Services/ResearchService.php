@@ -16,8 +16,6 @@ class ResearchService
      */
     public function start (int $player, int $code, $sincronize = false) {
 
-        $now = Carbon::now()->timestamp;
-
         $researchedStarted = Researched::where([["player", $player], ["status", 1]])->first();
 
         if ($sincronize) {
@@ -41,7 +39,7 @@ class ResearchService
             if ($researched->status == 0) {
                 # start
                 $researched->status = 1;
-                $researched->timer = $now;
+                $researched->timer = time();
                 $researched->save();
             }
         } else {
@@ -54,8 +52,8 @@ class ResearchService
             $researched->code = $code;
             $researched->cost = $research->cost;
             $researched->power = 1;
-            $researched->timer = $now;
-            $researched->start = $now;
+            $researched->timer = time();
+            $researched->start = time();
             $researched->status = 1;
             $researched->progress = 1;
             $researched->points = 0;
@@ -112,12 +110,12 @@ class ResearchService
      */
     public function sincronizeProgress($researched)
     {
-        $now = Carbon::now()->timestamp;
+        $now = time();
 
         if ($now >= $researched->finish) {
             $researched->status = 3;
         } else {
-            $researched->points = floor((($researched->finish - $now) * 1000) / env("TRITIUM_RESEARCH_SPEED"));
+            $researched->points = floor(($researched->finish - $now) / env("TRITIUM_RESEARCH_SPEED"));
         }
 
         return $researched;
@@ -129,8 +127,8 @@ class ResearchService
      * @return mixed
      */
     public function sincronize ($researched) {
-        $now = Carbon::now()->timestamp;
-        $researched->points = floor((($now - $researched->timer) * 1000) / env("TRITIUM_RESEARCH_SPEED"));
+        $now = time();
+        $researched->points = floor(($now - $researched->timer) / env("TRITIUM_RESEARCH_SPEED"));
         $researched->timer = $now;
         return $researched;
     }

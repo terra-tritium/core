@@ -8,7 +8,6 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class ResetPassword extends Notification
 {
@@ -73,7 +72,7 @@ class ResetPassword extends Notification
             DB::table('password_resets')->insert([
                 'email' => $email,
                 'token' => $token,
-                'created_at' => Carbon::now()
+                'created_at' => time()
             ]);
 
             return $token;

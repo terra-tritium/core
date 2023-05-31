@@ -8,12 +8,12 @@ use App\Models\Build;
 use App\Models\Building;
 use App\Models\Requires;
 use App\Services\PlanetService;
-
-use Carbon\Carbon;
+use App\Services\PlayerService;
 
 class BuildService
 {
     private $planetService;
+    private $playerService;
 
     private $basicScoreFator = 0.01;
     private $premiumScoreFator = 0.03;
@@ -21,6 +21,7 @@ class BuildService
     private $initialBattery = 10000;
 
     public function __construct() {
+        $this->playerService = new PlayerService();
         $this->planetService = new PlanetService();
     }
 
@@ -47,8 +48,8 @@ class BuildService
         }
 
         if ($hasBalance) {
-            $player = $this->planetService->startMining($p1, $resourceMining);
-            $player->save();
+            $planet = $this->planetService->startMining($p1, $resourceMining);
+            $planet->save();
         }
     }
 
@@ -59,10 +60,13 @@ class BuildService
 
         $p1 = Planet::find($building->planet); 
         $build = Build::find($building->build);
+        $playerLogged = Player::getPlayerLogged();
+        $player = Player::findOrFail($playerLogged->id);
+
 
         $require = $this->calcResourceRequire($building->build, 1);
 
-        $building->ready = (Carbon::now()->timestamp * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
+        $building->ready = time() + ($require->time * env("TRITIUM_BUILD_SPEED"));
         
         // Colonization
         if ($building->build == 1) {
@@ -97,30 +101,31 @@ class BuildService
         if ($building->build == 3 || $building->code > 6) {
             if ($this->planetService->enoughBalance($p1, $require->metal, 1)) {
                 $p1 = $this->planetService->removeMetal($p1, $require->metal);
-                $p1 = $this->planetService->addBuildScore($p1, $require->metal * $this->basicScoreFator);
+                $player = $this->playerService->addBuildScore($player, $require->metal * $this->basicScoreFator);
             } else {
                 return false;
             }
             if ($this->planetService->enoughBalance($p1, $require->uranium, 2)) {
                 $p1 = $this->planetService->removeUranium($p1, $require->uranium);
-                $p1 = $this->planetService->addBuildScore($p1, $require->uranium * $this->premiumScoreFator);
+                $player = $this->playerService->addBuildScore($player, $require->uranium * $this->premiumScoreFator);
             } else {
                 return false;
             }
             if ($this->planetService->enoughBalance($p1, $require->crystal, 3)) {
                 $p1 = $this->planetService->removeCrystal($p1, $require->crystal);
-                $p1 = $this->planetService->addBuildScore($p1, $require->crystal * $this->premiumScoreFator);
+                $player = $this->playerService->addBuildScore($player, $require->crystal * $this->premiumScoreFator);
             } else {
                 return false;
             }
         }
 
-        $p1 = $this->planetService->addBuildScore($p1, $this->levelFactor);
+        $player = $this->playerService->addBuildScore($player, $this->levelFactor);
         
-        $building->planet = Planet::where([['player', $p1->id], ['id', $building->planet]])->firstOrFail()->id;
+        $building->planet = Planet::where([['player', $player->id], ['id', $building->planet]])->firstOrFail()->id;
 
         $building->save();
         $p1->save();
+        $player->save();
     }
 
     public function suficientFunds($p1, $require) {
@@ -144,9 +149,9 @@ class BuildService
     }
 
     public function updateScore(Player $player, $require) {
-        $player = $this->planetService->addBuildScore($player, $require->metal * $this->basicScoreFator);
-        $player = $this->planetService->addBuildScore($player, $require->uranium * $this->premiumScoreFator);
-        $player = $this->planetService->addBuildScore($player, $require->crystal * $this->premiumScoreFator);
+        $player = $this->playerService->addBuildScore($player, $require->metal * $this->basicScoreFator);
+        $player = $this->playerService->addBuildScore($player, $require->uranium * $this->premiumScoreFator);
+        $player = $this->playerService->addBuildScore($player, $require->crystal * $this->premiumScoreFator);
         $player->save();
     }
 
@@ -156,7 +161,7 @@ class BuildService
         $player = Player::findOrFail($planet->player);
         $require = $this->calcResourceRequire($building->build, $building->level + 1);
 
-        $building->ready = (time() * 1000) + ($require->time * env("TRITIUM_BUILD_SPEED"));
+        $building->ready = time() + ($require->time * env("TRITIUM_BUILD_SPEED"));
 
         if ($this->suficientFunds($planet, $require)) {
             $this->spendResources($planet, $require);
@@ -172,7 +177,7 @@ class BuildService
 
         $building->level += 1;
 
-        $player = $this->planetService->addBuildScore($player, $building->level * $this->levelFactor);
+        $player = $this->playerService->addBuildScore($player, $building->level * $this->levelFactor);
 
         $player->save();
         $building->save();

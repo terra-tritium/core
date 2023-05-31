@@ -15,6 +15,11 @@ class PlayerService
     $this->planetService = new PlanetService();
   }
 
+  public function addBuildScore (Player $player, $units) {
+    $player->buildScore += $units;
+    return $player;
+  }
+
   public function register(Player $player) {
     $player->score = 0;
     $player->buildScore = 0;
@@ -43,6 +48,7 @@ class PlayerService
     $planet->workersOnMetal = 0;
     $planet->workersOnUranium = 0;
     $planet->workersOnCrystal = 0;
+    $planet->useEnergyByFactory = 0;
     $planet->status = "pacific";
     $planet->player = $player->id;
     $planet->metal = 1500;
@@ -61,6 +67,7 @@ class PlayerService
     $planet->pwUranium = 0;
     $planet->pwCrystal = 0;
     $planet->pwEnergy = 0;
+    $planet->pwWorker = 0;
     $planet->transportShips = 0;
     $planet->save();
   }

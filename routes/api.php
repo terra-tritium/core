@@ -17,6 +17,7 @@ use App\Http\Controllers\QuadrantController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\API\ResetarSenhaController;
 use App\Http\Controllers\MessegeController;
+use App\Http\Controllers\FactoryController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -67,9 +68,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/build/require/{build}/{level}', 'require');
     });
 
-    // Route::controller(FactoryController::class)->group(function () {
-    //     Route::post('/factory/workers/{qtd}', 'plant');
-    // });
+    Route::controller(FactoryController::class)->group(function () {
+        Route::post('/factory/energy/{planet}/{qtd}', 'energy');
+    });
 
     Route::controller(PlanetController::class)->group(function () {
         Route::get('/planet/list', 'list');
@@ -143,6 +144,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/messege/lastmsg-sender/{senderid}','getLastMessageNotReadBySender');
 
     });
+
+    Route::controller(RankingController::class)->group(function (){
+        Route::get('/ranking/players', [RankingController::class, 'getPlayerRanking']);
+        Route::get('/ranking/aliances', [RankingController::class, 'getAlianceRanking']);
+    });
+
 
 });
 /**
