@@ -314,7 +314,69 @@ return new class extends Migration
             $table->string("x");
             $table->string("y");
         });
+
+        /**
+         *INICIO DAS TABELAS REFERENTE AO MERCADO 
+         */
+        Schema::create('market', function (Blueprint $table) {
+            $table->id();
+            $table->string("quadrant");
+            $table->boolean('status')->default(true);
+            $table->string("name");
+            $table->timestamp('createdAt')->useCurrent();
+            $table->timestamp('updatedAt')->nullable();
+        });
+        Schema::create('resource', function (Blueprint $table) {
+            $table->id();
+            $table->string("nameResource");
+            $table->boolean('status')->default(true);
+            $table->timestamp('createdAt')->useCurrent();
+            $table->timestamp('updatedAt')->nullable();
+        });
+        Schema::create('trading', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('idPlanetCreator');
+            $table->unsignedBigInteger('idResource');
+            $table->unsignedBigInteger('idMarket');
+            $table->char('type',1);//
+            $table->unsignedBigInteger('quantity');//
+            $table->double('price',8,3);//
+            $table->boolean('status')->default(true);
+            $table->timestamp('createdAt')->useCurrent();
+            $table->timestamp('updatedAt')->nullable();
+
+            $table->foreign('idPlanetCreator')->references('id')->on('planets');
+            $table->foreign('idResource')->references('id')->on('Resource');
+            $table->foreign('idMarket')->references('id')->on('market');
+
+            $table->unsignedInteger('quantity')->default(0)->change();
+
+        });
+        Schema::create('trading_finished', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('idPlanetSale')->nullable();
+            $table->unsignedBigInteger('idPlanetPurch')->nullable();
+            $table->unsignedBigInteger('quantity');//
+            $table->double('price',8,3);//
+            $table->double('distance',11,3);//
+            $table->unsignedBigInteger('deliveryTime');//
+            $table->unsignedBigInteger('idTrading');
+            $table->boolean('status')->default(true);
+            $table->timestamp('finishedAt')->useCurrent();
+
+            $table->foreign('idPlanetSale')->references('id')->on('planets');
+            $table->foreign('idPlanetPurch')->references('id')->on('planets');
+            $table->foreign('idTrading')->references('id')->on('trading');
+
+            $table->unsignedInteger('quantity')->default(0)->change();
+            $table->unsignedInteger('deliveryTime')->default(0)->change();
+
+        });
+        /**
+         *FIM DAS TABELAS REFERENTE AO MERCADO 
+         */
     }
+  
 
     /**
      * Reverse the migrations.
