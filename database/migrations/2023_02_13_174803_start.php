@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('aliances', function (Blueprint $table) {
             $table->id();
+            $table->string("name");
             $table->string("description");
             $table->bigInteger("energy");
             $table->bigInteger("score");
