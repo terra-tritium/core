@@ -43,7 +43,20 @@ class PlanetController extends Controller
      */
     public function update(Request $request, Planet $planet)
     {
-        //
+        $player = Player::getPlayerLogged();
+
+        if ($planet->player !== $player->id) {
+            return response()->json(['message' => "You aren't the owner of this planet"], 403);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $planet->name = $request->input('name');
+        $planet->save();
+
+        return response()->json(['message' => 'Planet name successfully updated']);
     }
 
     /**
