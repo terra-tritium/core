@@ -10,4 +10,20 @@ class Ranking extends Model
     use HasFactory;
     protected $table = 'ranking';
     public $timestamps = false;
+
+    protected $fillable = [
+        'name',
+        'player',
+        'energy',
+        'score',
+        'buildScore',
+        'attackScore',
+        'defenseScore',
+        'militaryScore',
+    ];
+
+    public function player()
+    {
+        return $this->belongsTo(Player::class, 'player');
+    }
 }
