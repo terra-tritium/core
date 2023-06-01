@@ -16,12 +16,13 @@ class PlanetService
   }
 
   public function currentBalance($p1, $type) {
-
-    $msInHour = 3600000;
-    $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $msInHour;
-    $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $msInHour;
-    $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $msInHour;
-    $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $msInHour;
+    # secounds in hour
+    $sInHour = 3600;
+    
+    $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $sInHour;
+    $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $sInHour;
+    $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $sInHour;
+    $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $sInHour;
 
     switch ($type) {
       case 0: 
