@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AliancesController;
 use App\Http\Controllers\BuildController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\PlanetController;
@@ -134,6 +135,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/messege/new','newMessege');
         Route::get('/messege/lastmsg-sender/{senderid}','getLastMessageNotReadBySender');
 
+    });
+
+    Route::controller(AliancesController::class)->group(function () {
+        Route::post('/aliances/create',  'create');
+        Route::put('/aliances/edit/{id}', 'update');
+        Route::get('/aliances/list',  'index');
+        Route::delete('/aliances/delete/{id}',  'destroy');
+        Route::put('/aliances/update-avatar/{id}',  'updateAvatar');
     });
 
 });

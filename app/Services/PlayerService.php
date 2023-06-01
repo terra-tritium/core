@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Player;
 use App\Models\Planet;
-use App\Models\Aliance;
+use App\Models\AlianceRanking;
 use App\Services\RankingService;
 
 class PlayerService
@@ -27,11 +27,11 @@ class PlayerService
     $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $msInHour;
 
     switch ($type) {
-      case 0: 
+      case 0:
         return $p1->energy + ($p1->pwEnergy * (env("TRITIUM_ENERGY") * $activeEnergyMining));
-      case 1: 
+      case 1:
         return $p1->metal + ($p1->pwMetal * (env("TRITIUM_METAL") * $activeMetalMining));
-      case 2: 
+      case 2:
         return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM") * $activeUraniumMining));
       case 3:
         return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL") * $activeCrystalMining));
@@ -82,7 +82,7 @@ class PlayerService
         $player->timeMetal = $this->timeNow;
         $player->pwMetal = 0;
         break;
-    
+
       case 2:
         $player->timeUranium = $this->timeNow;
         $player->pwUranium = 0;
@@ -221,7 +221,7 @@ class PlayerService
     }
     return false;
   }
-  
+
   private function startAlocation() {
     $coords = [];
     $lastPlanet = Planet::orderBy('id', 'desc')->first();
@@ -238,7 +238,7 @@ class PlayerService
 
     $lastQuadrant = $lastPlanet->quadrant;
     $lastPosition = $lastPlanet->position;
-    
+
     $cont = 0;
 
     do {
@@ -315,7 +315,7 @@ class PlayerService
     $details['country'] = $player->country;
     $details['score'] = $player->score;
     if ($player->aliance != null) {
-      $aliance = Aliance::where('id', $player->aliance)->firstOrFail();
+      $aliance = AlianceRanking::where('id', $player->aliance)->firstOrFail();
       $details['aliance'] = $aliance->name;
     } else {
       $details['aliance'] = "no aliance";

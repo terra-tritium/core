@@ -15,6 +15,20 @@ return new class extends Migration
     {
         Schema::create('aliances', function (Blueprint $table) {
             $table->id();
+            $table->string("description")->nullable();
+            $table->string("name");
+            $table->string('avatar')->nullable();
+            $table->bigInteger("energy")->default(0);
+            $table->bigInteger("score")->default(0);
+            $table->bigInteger("buildScore")->default(0);
+            $table->bigInteger("labScore")->default(0);
+            $table->bigInteger("tradeScore")->default(0);
+            $table->bigInteger("attackScore")->default(0);
+            $table->bigInteger("defenseScore")->default(0);
+            $table->bigInteger("warScore")->default(0);
+        });
+        Schema::create('aliancesRanking', function (Blueprint $table) {
+            $table->id();
             $table->string("description");
             $table->bigInteger("energy");
             $table->bigInteger("score");
@@ -92,7 +106,7 @@ return new class extends Migration
             $table->bigInteger("timeUranium")->nullable();
             $table->bigInteger("timeCrystal")->nullable();
             $table->bigInteger("timeEnergy")->nullable();
-            # Spaceships Cargos 
+            # Spaceships Cargos
             $table->bigInteger("merchantShips");
             # Score rankings
             $table->bigInteger("score");
