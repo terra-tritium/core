@@ -13,6 +13,7 @@ class Market extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'region',
         'quadrant',
         'status',
         'name',

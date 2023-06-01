@@ -321,6 +321,7 @@ return new class extends Migration
          */
         Schema::create('market', function (Blueprint $table) {
             $table->id();
+            $table->char("region",1);
             $table->string("quadrant");
             $table->boolean('status')->default(true);
             $table->string("name");
