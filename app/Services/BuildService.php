@@ -239,20 +239,20 @@ class BuildService
             $uraniumReq = $build->uraniumStart;
         }
         if ($level > $build->uraniumLevel) {
-            $metalReq = $build->metalStart;
+            $uraniumReq = $build->uraniumStart;
             for ($i = 1; $i <= (($level - $build->uraniumLevel)); $i++) {
                 $uraniumReq += $uraniumReq * ($build->coefficient / 100);
             }
         }
 
         # Crystal
-        if ($level == $build->uraniumLevel) {
-            $uraniumReq = $build->uraniumStart;
+        if ($level == $build->crystalLevel) {
+            $crystalReq = $build->crystalStart;
         }
         if ($level > $build->uraniumLevel) {
-            $metalReq = $build->metalStart;
-            for ($i = 1; $i <= (($level - $build->uraniumLevel)); $i++) {
-                $uraniumReq += $uraniumReq * ($build->coefficient / 100);
+            $crystalReq = $build->crystalStart;
+            for ($i = 1; $i <= (($level - $build->crystalLevel)); $i++) {
+                $crystalReq += $crystalReq * ($build->coefficient / 100);
             }
         }
 
