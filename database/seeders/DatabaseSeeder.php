@@ -23,7 +23,9 @@ class DatabaseSeeder extends Seeder
             StrategySeeder::class,
             UnitSeeder::class,
             MessagesSeeder::class,
-            // PlayerSeeder::class
+            ResourcesSeeder::class,
+            MarketSeeder::class,
+            PlayerSeeder::class
         ]);
     }
 }
