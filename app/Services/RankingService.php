@@ -9,9 +9,11 @@ use App\ValueObjects\RankingCategory;
 
 class RankingService
 {
-    public function addPoints (Player $player, $points) {
+    public function addPoints ($points) {
+        $logged = Player::getPlayerLogged();
+        $player = Player::find($logged->id);
         $player->score += $points;
-        return $player;
+        $player->save();
     }
 
     public function getRankings($name = null, $orderBy = null)

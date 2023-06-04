@@ -74,6 +74,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/planet/list', 'list');
         Route::get('/planet/show/{id}', 'show');
         Route::get('/planet/{quadrant}/{position}', 'find');
+        Route::put('/planet/edit/{planet}', 'update');
+
     });
 
     Route::controller(UnitController::class)->group(function () {
