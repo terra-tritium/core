@@ -292,7 +292,7 @@ class TravelService
     public function starBattleTravel($travel)
     {
         $travelModel = Travel::find($travel);
-
+        
         $planet  = Planet::find($travelModel->receptor);
 
         $defense  = Player::find($planet->player);
@@ -306,4 +306,5 @@ class TravelService
 
         $this->battleService->startNewBattle($attack->id,  $defense->id, $aUnits, $dUnits, $aStrategy, $dStrategy,$dPlanet);
     }
+
 }
