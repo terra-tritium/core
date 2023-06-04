@@ -16,15 +16,16 @@ class TravelJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $travel;
-    
+    private $travelService;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($travel)
+    public function __construct($travel,$travelService)
     {
         $this->travel = $travel;
+        $this->travelService = $travelService ;
     }
 
     /**
@@ -38,6 +39,7 @@ class TravelJob implements ShouldQueue
         if ($currentTravel) {
             $currentTravel->status = 2;
             $currentTravel->save();
+            $this->travelService->starBattleTravel($this->travel);
         }
     }
 }

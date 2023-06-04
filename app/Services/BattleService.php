@@ -22,6 +22,7 @@ class BattleService
     private $currentStage;
     private $attackReserve;
     private $defenseReserve;
+    private $travelService;
         
 
     public function __construct() {

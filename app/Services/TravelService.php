@@ -7,9 +7,18 @@ use App\Jobs\TravelJob;
 use App\Models\Position;
 use App\Models\Planet;
 use App\Models\Troop;
+use App\Models\Unit;
+use App\Models\Player;
 
 class TravelService
 {
+    private  $battleService;
+
+    public function __construct(BattleService $battleService) {
+        $this->battleService = $battleService;
+        
+    }
+
     public function start ($player, $travel) {
 
         $travel = json_decode($travel);
@@ -86,7 +95,7 @@ class TravelService
 
         $this->removeTroop($player,$planetFrom,$travel->troop);
 
-        TravelJob::dispatch($newTravel->id)->delay(now()->addSeconds($travelTime / 1000));
+        TravelJob::dispatch($newTravel->id, $this)->delay(now()->addSeconds($travelTime / 1000));
 
     }
 
@@ -212,5 +221,89 @@ class TravelService
             $troopm->dispatch = ($troop->quantity + $troopm->dispatch);
             $troopm->save();       
         }
+    }
+
+    public function getTroopAttack($travel){
+
+        $travel = Travel::find($travel);
+        $troops = json_decode($travel->troop);
+        $units = [];
+
+        foreach($troops as $key => $troop){
+
+            $unit = Unit::find($troop->unit);
+            $type = $this->getTypeUnit($unit->type);
+            $units [] = [
+                            'unit'=> $troop->unit,
+                            'quantity'=> $troop->quantity,
+                            'type'=> $type,
+                            'attack'=> $unit->attack,
+                            'defense'=> $unit->defense ,
+                            'life'=> $unit->life
+                        ];
+        }
+
+        return $units;
+    }
+
+    public function getTroopDefense($travel){
+        $travel = Travel::find($travel);
+
+        $troops = Troop::where('planet',$travel->receptor)->get();    
+        $units = [];
+
+        foreach($troops as $key => $troop){
+            $unit = Unit::find($troop->unit);
+            $type = $this->getTypeUnit($unit->type);
+
+            $units [] = [
+                            'unit'=> $troop->unit,
+                            'quantity'=> $troop->quantity,
+                            'type'=> $type,
+                            'attack'=> $unit->attack,
+                            'defense'=> $unit->defense ,
+                            'life'=> $unit->life
+                        ];
+        }
+
+        return $units;
+    }
+
+    public function getTypeUnit($typeUnit){
+        $type = '';
+        switch($typeUnit){
+            case 'droid':
+                $type = 'D';
+                break;
+            case 'especial':
+                $type = 'S';
+                break;
+            case 'vehicle':
+                $type = 'V';
+                break;
+            case 'launcher':
+                $type = 'L';
+                break;
+        }
+
+        return $type;
+    }
+
+    public function starBattleTravel($travel)
+    {
+        $travelModel = Travel::find($travel);
+
+        $planet  = Planet::find($travelModel->receptor);
+
+        $defense  = Player::find($planet->player);
+        $attack  = Player::find($travelModel->player);
+
+        $aUnits = $this->getTroopAttack($travel);
+        $dUnits = $this->getTroopDefense($travel);
+        $aStrategy = $attack->attackStrategy;
+        $dStrategy = $defense->defenseStrategy;
+        $dPlanet = $travelModel->receptor;
+
+        $this->battleService->startNewBattle($attack->id,  $defense->id, $aUnits, $dUnits, $aStrategy, $dStrategy,$dPlanet);
     }
 }

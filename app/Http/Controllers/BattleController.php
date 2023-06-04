@@ -9,16 +9,19 @@ use App\Models\Battle;
 use App\Models\BattleStage;
 use App\Services\BattleService;
 use App\Services\PlayerService;
+use App\Services\TravelService;
 use Illuminate\Http\Request;
 
 class BattleController extends Controller
 {
     protected $battleService;
     protected $playerService;
+    protected $travelService;
 
-    public function __construct(BattleService $battleService, PlayerService $playerService) {
+    public function __construct(BattleService $battleService, PlayerService $playerService, TravelService $travelService) {
         $this->battleService = $battleService;
         $this->playerService = $playerService;
+        $this->travelService = $travelService; 
     }
 
     // public function attackModeList() {
@@ -51,35 +54,16 @@ class BattleController extends Controller
         return BattleStage::where('battle', $id)->get();
     }
 
-    public function start($defense,$planet) {
+    public function start($defense,$planet,$travel) {
         $playerOwnerPlatet = $this->playerService->iSplayerOwnerPlanet($defense,$planet);
 
         if($playerOwnerPlatet){
-
+            
             $attack  = Player::getPlayerLogged();
             $defense = Player::find($defense);
 
-            $aUnits = [
-                [
-                    'unit' => 1,
-                    'quantity' => 5000,
-                    'type' => 'D',
-                    'attack' => 5,
-                    'defense' => 2,
-                    'life' => 20
-                ]
-            ];
-            
-            $dUnits = [
-                [
-                    'unit' => 1,
-                    'quantity' => 1000,
-                    'type' => 'D',
-                    'attack' => 10,
-                    'defense' => 3,
-                    'life' => 20
-                ]
-            ];
+            $aUnits  = $this->travelService->getTroopAttack($travel);
+            $dUnits  = $this->travelService->getTroopDefense($travel);
             
             $aStrategy = $attack->attackStrategy;
             $dStrategy = $defense->defenseStrategy;

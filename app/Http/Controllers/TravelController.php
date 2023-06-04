@@ -29,6 +29,7 @@ class TravelController extends Controller
     }
 
     public function start (Request $request) {
+
         $player = Player::getPlayerLogged();
         return $this->travelService->start($player->id, $request->collect());
     }
