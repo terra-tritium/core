@@ -64,7 +64,7 @@ class BuildService
         $player = Player::findOrFail($playerLogged->id);
 
         # Yet have a building in construction on this planet
-        if ($p1->ready < time()) {
+        if ($p1->ready != null && $p1->ready < time()) {
             return false;
         }
 
@@ -167,7 +167,7 @@ class BuildService
         $require = $this->calcResourceRequire($building->build, $building->level + 1);
 
         # Yet have a building in construction on this planet
-        if ($planet->ready < time()) {
+        if ($planet->ready != null && $planet->ready < time()) {
             return false;
         }
 
