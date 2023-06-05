@@ -63,10 +63,15 @@ class BuildService
         $playerLogged = Player::getPlayerLogged();
         $player = Player::findOrFail($playerLogged->id);
 
+        # Yet have a building in construction on this planet
+        if ($p1->ready < time()) {
+            return false;
+        }
 
         $require = $this->calcResourceRequire($building->build, 1);
 
         $building->ready = time() + ($require->time * env("TRITIUM_BUILD_SPEED"));
+        $p1->ready = $building->ready;
         
         // Colonization
         if ($building->build == 1) {
@@ -161,7 +166,13 @@ class BuildService
         $player = Player::findOrFail($planet->player);
         $require = $this->calcResourceRequire($building->build, $building->level + 1);
 
+        # Yet have a building in construction on this planet
+        if ($planet->ready < time()) {
+            return false;
+        }
+
         $building->ready = time() + ($require->time * env("TRITIUM_BUILD_SPEED"));
+        $planet->ready = $building->ready;
 
         if ($this->suficientFunds($planet, $require)) {
             $this->spendResources($planet, $require);
@@ -179,6 +190,7 @@ class BuildService
 
         $player = $this->playerService->addBuildScore($player, $building->level * $this->levelFactor);
 
+        $planet->save();
         $player->save();
         $building->save();
     }
@@ -239,20 +251,20 @@ class BuildService
             $uraniumReq = $build->uraniumStart;
         }
         if ($level > $build->uraniumLevel) {
-            $metalReq = $build->metalStart;
+            $uraniumReq = $build->uraniumStart;
             for ($i = 1; $i <= (($level - $build->uraniumLevel)); $i++) {
                 $uraniumReq += $uraniumReq * ($build->coefficient / 100);
             }
         }
 
         # Crystal
-        if ($level == $build->uraniumLevel) {
-            $uraniumReq = $build->uraniumStart;
+        if ($level == $build->crystalLevel) {
+            $crystalReq = $build->crystalStart;
         }
         if ($level > $build->uraniumLevel) {
-            $metalReq = $build->metalStart;
-            for ($i = 1; $i <= (($level - $build->uraniumLevel)); $i++) {
-                $uraniumReq += $uraniumReq * ($build->coefficient / 100);
+            $crystalReq = $build->crystalStart;
+            for ($i = 1; $i <= (($level - $build->crystalLevel)); $i++) {
+                $crystalReq += $crystalReq * ($build->coefficient / 100);
             }
         }
 
