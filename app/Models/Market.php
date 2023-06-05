@@ -14,7 +14,6 @@ class Market extends Model
 
     protected $fillable = [
         'region',
-        'quadrant',
         'status',
         'name',
         'createdAt',

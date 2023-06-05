@@ -13,7 +13,7 @@ class Trading extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'idResource',
+        'resource',
         'idPlanetCreator',
         'idMarket',
         'type',
