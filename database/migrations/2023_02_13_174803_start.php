@@ -322,24 +322,25 @@ return new class extends Migration
         Schema::create('market', function (Blueprint $table) {
             $table->id();
             $table->char("region",1);
-            $table->string("quadrant");
+            // $table->string("quadrant");
             $table->boolean('status')->default(true);
             $table->string("name");
             $table->timestamp('createdAt')->useCurrent();
             $table->timestamp('updatedAt')->nullable();
         });
-        Schema::create('resource', function (Blueprint $table) {
-            $table->id();
-            $table->string("nameResource");
-            $table->boolean('status')->default(true);
-            $table->timestamp('createdAt')->useCurrent();
-            $table->timestamp('updatedAt')->nullable();
-        });
+        // Schema::create('resource', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string("nameResource");
+        //     $table->boolean('status')->default(true);
+        //     $table->timestamp('createdAt')->useCurrent();
+        //     $table->timestamp('updatedAt')->nullable();
+        // });
         Schema::create('trading', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('idPlanetCreator');
-            $table->unsignedBigInteger('idResource');
+            // $table->unsignedBigInteger('idResource');
             $table->unsignedBigInteger('idMarket');
+            $table->string('resource',20);
             $table->char('type',1);//
             $table->unsignedBigInteger('quantity');//
             $table->double('price',8,3);//
@@ -348,7 +349,7 @@ return new class extends Migration
             $table->timestamp('updatedAt')->nullable();
 
             $table->foreign('idPlanetCreator')->references('id')->on('planets');
-            $table->foreign('idResource')->references('id')->on('Resource');
+            // $table->foreign('idResource')->references('id')->on('Resource');
             $table->foreign('idMarket')->references('id')->on('market');
 
             $table->unsignedInteger('quantity')->default(0)->change();

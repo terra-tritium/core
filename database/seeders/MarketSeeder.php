@@ -17,9 +17,8 @@ class MarketSeeder extends Seeder
     {
         $letter = 'A';
         for ($i = 1; $i <= 16; $i++) {
-            $quadrant = $letter . '000';
-            $name = 'market ' . $quadrant;
-            DB::table('market')->insert(['region'=>$letter,'quadrant' => $quadrant, 'name' => $name]);        
+            $name = 'market ' . $letter;
+            DB::table('market')->insert(['region'=>$letter, 'name' => $name]);        
             $letter++;
         }
     }
