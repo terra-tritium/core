@@ -112,3 +112,22 @@ php artisan queue:work
     3- Acessar o Swagger local
         http://localhost:8000/api/documentation
 
+## DOCKER CONTAINER
+
+    1 - Baixar e construir as imagens
+
+        docker-compose build 
+        
+    2 - Iniciar os containers em modo background
+
+        docker-composer up -d
+
+    3 - Listar os container em execução
+
+        docker ps 
+
+    4 - Acessar o container para executar comandos com php
+
+        docker-composer exec -it app bash
+    
+    Tem uma imagem para instalar as dependências
