@@ -53,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/player/show', 'show');
         Route::get('/player/details/{id}', 'getDetails');
         Route::post('/player/new', 'register');
+        Route::post('/player/list-name/{id}', 'getNameUser');
     });
 
     Route::controller(BuildController::class)->group(function () {
@@ -75,7 +76,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/planet/show/{id}', 'show');
         Route::get('/planet/{quadrant}/{position}', 'find');
         Route::put('/planet/edit/{planet}', 'update');
-
     });
 
     Route::controller(UnitController::class)->group(function () {
