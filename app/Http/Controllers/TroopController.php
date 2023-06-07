@@ -8,6 +8,7 @@ use App\Models\Production;
 use App\Services\TroopService;
 use Illuminate\Http\Request;
 use App\Services\PlayerService;
+use Illuminate\Support\Facades\Log;
 
 class TroopController extends Controller
 {
@@ -29,7 +30,7 @@ class TroopController extends Controller
      *
      * @OA\Post (
      *     path="/api/troop/production/{planet}",
-     *     tags={"Produce/Troop"},
+     *     tags={"Troop"},
      *     summary="Produce Troops",
      *     security={
      *         {"bearerAuthTroopP": {}}
@@ -68,10 +69,17 @@ class TroopController extends Controller
     public function production(Request $request, $planet) {
         $player = Player::getPlayerLogged();
 
-        if($this->playerService->iSplayerOwnerPlanet($player->id,$planet)){
-            return $this->troopService->production($player->id,$planet, $request->collect());
-        }else{
-            return ['You are not that smart.'];
+        try {
+            $player = Player::getPlayerLogged();
+
+            if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
+                return $this->troopService->production($player->id, $planet, $request->all());
+            } else {
+                return response()->json(['message' => 'You are not authorized to perform this action.'], 403);
+            }
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'An error occurred during troop production.'], 500);
         }
     }
 
@@ -83,7 +91,7 @@ class TroopController extends Controller
      *
      * @OA\Get (
      *     path="/api/troop/production/{planet?}",
-     *     tags={"Producing/Troop"},
+     *     tags={"Troop"},
      *     summary="List Troops in Producions",
      *     security={
      *         {"bearerAuthTroop": {}}
@@ -99,10 +107,18 @@ class TroopController extends Controller
      */
 
     public function producing(Request $request){
-        $player = Player::getPlayerLogged();
-        
-        if($this->playerService->iSplayerOwnerPlanet($player->id,$request->planet)){
-            return $this->troopService->productionTroop($player,$request->planet);
+        try {
+            $player = Player::getPlayerLogged();
+            $planet = $request->input('planet');
+
+            if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
+                return $this->troopService->productionTroop($player, $planet);
+            } else {
+                return response()->json(['message' => 'You are not authorized to perform this action.'], 403);
+            }
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'An error occurred during troop production.'], 500);
         }
     }
 }

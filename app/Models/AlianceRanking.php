@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Aliance extends Model
+class AlianceRanking extends Model
 {
     use HasFactory;
     protected $table = 'aliances';
@@ -14,6 +14,13 @@ class Aliance extends Model
     protected $fillable = [
         'name',
         'description',
-        'avatar'
+        'energy',
+        'score',
+        'buildScore',
+        'labScore',
+        'tradeScore',
+        'attackScore',
+        'defenseScore',
+        'warScore',
     ];
 }
