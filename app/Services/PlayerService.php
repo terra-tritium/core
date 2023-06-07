@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Player;
 use App\Models\Planet;
-use App\Models\Aliance;
+use App\Models\AlianceRanking;
 use App\Services\PlanetService;
 
 class PlayerService
@@ -71,7 +71,7 @@ class PlayerService
     $planet->transportShips = 0;
     $planet->save();
   }
-  
+
   private function startAlocation() {
     $coords = [];
     $lastPlanet = Planet::orderBy('id', 'desc')->first();
@@ -88,7 +88,7 @@ class PlayerService
 
     $lastQuadrant = $lastPlanet->quadrant;
     $lastPosition = $lastPlanet->position;
-    
+
     $cont = 0;
 
     do {
@@ -165,7 +165,7 @@ class PlayerService
     $details['country'] = $player->country;
     $details['score'] = $player->score;
     if ($player->aliance != null) {
-      $aliance = Aliance::where('id', $player->aliance)->firstOrFail();
+      $aliance = AlianceRanking::where('id', $player->aliance)->firstOrFail();
       $details['aliance'] = $aliance->name;
     } else {
       $details['aliance'] = "no aliance";

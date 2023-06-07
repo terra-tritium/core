@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Aliance;
+use App\Models\AlianceRanking;
 use App\Models\Player;
 use App\Models\Ranking;
 use App\ValueObjects\RankingCategory;
@@ -52,7 +52,7 @@ class RankingService
 
     public function getAlianceRankings($orderBy = null, $filter = null)
     {
-        $query = Aliance::query();
+        $query = AlianceRanking::query();
 
         if ($orderBy) {
             switch ($orderBy) {
