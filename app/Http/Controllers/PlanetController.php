@@ -76,12 +76,21 @@ class PlanetController extends Controller
      * @return string
      */
     public function find ($quadrant, $position) {
-        $planet = Planet::where('quadrant',$quadrant)->where('position',$position)->first();
+        try {
+            if (empty($quadrantParam) || empty($positionParam)) {
+                return response()->json(['error' => 'Invalid quadrant or position'], 400);
+            }
 
-        if (!$planet) {
-            return "no result";
+            $planet = Planet::where('quadrant', $quadrantParam)->where('position', $positionParam)->first();
+
+            if (!$planet) {
+                return response()->json(['error' => 'Planet not found'], 404);
+            }
+
+            return $planet;
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred'], 500);
         }
-        return $planet;
     }
 
     /**
@@ -127,7 +136,13 @@ class PlanetController extends Controller
      */
     public function show($id)
     {
-        return Planet::find($id);
+        try {
+            $planet = Planet::findOrFail($id);
+
+            return response()->json($planet, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred'], 500);
+        }
     }
 
     /**
@@ -227,7 +242,12 @@ class PlanetController extends Controller
      */
     public function list() {
         $player = Player::getPlayerLogged();
+        if (!$player) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
-        return Planet::where('player',$player->id)->get();
+        $planets = Planet::where('player', $player->id)->get();
+
+        return response()->json($planets, 200);
     }
 }
