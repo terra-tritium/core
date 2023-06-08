@@ -86,6 +86,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(TroopController::class)->group(function () {
         Route::post('/troop/production/{planet}', 'production');
         Route::get('/troop/production/{planet?}', 'producing');
+        Route::get('/troop/{planet}', 'list');
     });
 
     Route::controller(RankingController::class)->group(function () {

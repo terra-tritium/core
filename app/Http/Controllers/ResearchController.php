@@ -47,11 +47,12 @@ class ResearchController extends Controller
     public function list() {
         try {
             $researchList = Research::orderBy('code')->get();
-            return response()->json(['data' => $researchList], 200);
+            return response()->json($researchList, 200);
         } catch (Exception $exception) {
             Log::error($exception);
             return response()->json(['message' => 'Error retrieving research list'], 500);
-        }    }
+        }
+    }
 
     /**
      * @OA\Get(

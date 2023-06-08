@@ -40,7 +40,7 @@ class TravelJob implements ShouldQueue
             $currentTravel->status = 2;
             $currentTravel->save();
             
-            if($currentTravel->action ==  1){//Action attack = 1
+            if($currentTravel->action ===  1){//Action attack = 1
                 $this->travelService->starBattleTravel($this->travel);
             }
         }
