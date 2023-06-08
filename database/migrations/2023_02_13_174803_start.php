@@ -230,7 +230,6 @@ return new class extends Migration
             $table->foreignId('planet')->constrained("planets");
             $table->foreignId('unit')->constrained("units");
             $table->bigInteger("quantity");
-            $table->bigInteger("dispatch")->default(0);
         });
         Schema::create('fleet', function (Blueprint $table) {
             $table->id();

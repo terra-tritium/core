@@ -121,4 +121,42 @@ class TroopController extends Controller
             return response()->json(['message' => 'An error occurred during troop production.'], 500);
         }
     }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Troop  $player
+     * @return \Illuminate\Http\Response
+     *
+     * @OA\Get (
+     *     path="/api/troop/{planet}",
+     *     tags={"Troop"},
+     *     summary="List Troops of planet",
+     *     security={
+     *         {"bearerAuthTroopList": {}}
+     *     },
+     *     @OA\Response(response="200", description="Resposta bem-sucedida")
+     * )
+     *  @OA\SecurityScheme(
+     *     type="http",
+     *     scheme="bearer",
+     *     securityScheme="bearerAuthTroopList"
+     * )
+     *
+     */
+
+    public function list($planet){
+        try {
+            $player = Player::getPlayerLogged();
+
+            if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
+                return $this->troopService->troops($player->id, $planet);
+            } else {
+                return response()->json(['message' => 'You are not authorized to perform this action.'], 403);
+            }
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'An error occurred during troop production.'], 500);
+        }
+    }
 }

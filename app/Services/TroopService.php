@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Services\ProductionService;
 use App\Models\Troop;
+use App\Models\Unit;
 
 class TroopService
 {
@@ -26,5 +27,9 @@ class TroopService
         return $this->productionService->productionPlayer($player,$planet);
     }
 
+    public function troops($player,$planet){
+        $troops = Troop::where(['player' => $player, 'planet' => $planet])->get();
+        return $troops;
+    }
     
 }

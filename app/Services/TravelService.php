@@ -190,7 +190,7 @@ class TravelService
         foreach($troops as $key => $troop)
         {
             $troopModel = Troop::where(['unit' => $troop->unit,'player' => $player,'planet' => $planet])->first();
-            if($troop->quantity <= ($troopModel->quantity - $troopModel->dispatch))
+            if($troop->quantity <= $troopModel->quantity)
             {
                 return true;
             }
@@ -216,9 +216,9 @@ class TravelService
 
     public function removeTroop($player,$planet,$troops){ 
         foreach($troops as $key => $troop)
-        {
+        {  
             $troopm = Troop::where(['unit' => $troop->unit,'player' => $player,'planet' => $planet])->first();
-            $troopm->dispatch = ($troop->quantity + $troopm->dispatch);
+            $troopm->quantity = ($troopm->quantity -  $troop->quantity);
             $troopm->save();       
         }
     }
