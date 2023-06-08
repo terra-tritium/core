@@ -25,7 +25,8 @@ class DatabaseSeeder extends Seeder
             MessagesSeeder::class,
             // ResourcesSeeder::class,
             MarketSeeder::class,
-            PlayerSeeder::class
+            PlayerSeeder::class,
+            TradingSeeder::class
         ]);
     }
 }

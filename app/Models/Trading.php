@@ -19,6 +19,7 @@ class Trading extends Model
         'type',
         'price',
         'quantity',
+        'total',
         'createdAt',
         'updatedAt',
     ];
