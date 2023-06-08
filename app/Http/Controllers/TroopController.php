@@ -156,7 +156,7 @@ class TroopController extends Controller
             }
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'An error occurred during troop production.'], 500);
+            return response()->json(['message' => 'An error occurred during list troops.'], 500);
         }
     }
 }
