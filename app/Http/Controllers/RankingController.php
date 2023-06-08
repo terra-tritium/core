@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ranking;
-use App\Models\Aliance;
+use App\Models\AlianceRanking;
 use App\Models\Player;
 use App\Services\RankingService;
 use App\ValueObjects\RankingCategory;
@@ -45,19 +45,19 @@ class RankingController extends Controller
         $player = Player::getPlayerLogged();
         switch ($type) {
             case "top":
-                return Aliance::orderBy(RankingCategory::SCORE, 'DESC')->limit(5);
+                return AlianceRanking::orderBy(RankingCategory::SCORE, 'DESC')->limit(5);
             case "general":
-                return Aliance::orderBy(RankingCategory::SCORE, 'DESC')->paginate($this->itensPerPage);
+                return AlianceRanking::orderBy(RankingCategory::SCORE, 'DESC')->paginate($this->itensPerPage);
             case "builder":
-                return Aliance::orderBy(RankingCategory::BUILD_SCORE, 'DESC')->paginate($this->itensPerPage);
+                return AlianceRanking::orderBy(RankingCategory::BUILD_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "military":
-                return Aliance::orderBy(RankingCategory::MILITARY_SCORE, 'DESC')->paginate($this->itensPerPage);
+                return AlianceRanking::orderBy(RankingCategory::MILITARY_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "attack":
-                return Aliance::orderBy(RankingCategory::ATTACK_SCORE, 'DESC')->paginate($this->itensPerPage);
+                return AlianceRanking::orderBy(RankingCategory::ATTACK_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "defense":
-                return Aliance::orderBy(RankingCategory::DEFENSE_SCORE, 'DESC')->paginate($this->itensPerPage);
+                return AlianceRanking::orderBy(RankingCategory::DEFENSE_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "energy":
-                return Aliance::orderBy(RankingCategory::ENERGY, 'DESC')->paginate($this->itensPerPage);
+                return AlianceRanking::orderBy(RankingCategory::ENERGY, 'DESC')->paginate($this->itensPerPage);
         }
     }
 

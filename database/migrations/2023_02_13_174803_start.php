@@ -15,7 +15,21 @@ return new class extends Migration
     {
         Schema::create('aliances', function (Blueprint $table) {
             $table->id();
+            $table->string("description")->nullable();
             $table->string("name");
+            $table->string('avatar')->nullable();
+            $table->bigInteger("energy")->default(0);
+            $table->bigInteger("score")->default(0);
+            $table->bigInteger("buildScore")->default(0);
+            $table->bigInteger("labScore")->default(0);
+            $table->bigInteger("tradeScore")->default(0);
+            $table->bigInteger("attackScore")->default(0);
+            $table->bigInteger("defenseScore")->default(0);
+            $table->bigInteger("warScore")->default(0);
+        });
+
+        Schema::create('aliancesRanking', function (Blueprint $table) {
+            $table->id();
             $table->string("description");
             $table->bigInteger("energy");
             $table->bigInteger("score");
@@ -74,7 +88,7 @@ return new class extends Migration
             $table->bigInteger("timeCrystal")->nullable();
             $table->bigInteger("timeEnergy")->nullable();
             $table->bigInteger("timeWorker")->nullable();
-            # Spaceships Transport 
+            # Spaceships Transport
             $table->bigInteger("transportShips");
         });
         Schema::create('countrys', function (Blueprint $table) {
@@ -216,6 +230,7 @@ return new class extends Migration
             $table->foreignId('planet')->constrained("planets");
             $table->foreignId('unit')->constrained("units");
             $table->bigInteger("quantity");
+            $table->bigInteger("dispatch")->default(0);
         });
         Schema::create('fleet', function (Blueprint $table) {
             $table->id();
@@ -317,7 +332,7 @@ return new class extends Migration
         });
 
         /**
-         *INICIO DAS TABELAS REFERENTE AO MERCADO 
+         *INICIO DAS TABELAS REFERENTE AO MERCADO
          */
         Schema::create('market', function (Blueprint $table) {
             $table->id();
@@ -377,10 +392,10 @@ return new class extends Migration
 
         });
         /**
-         *FIM DAS TABELAS REFERENTE AO MERCADO 
+         *FIM DAS TABELAS REFERENTE AO MERCADO
          */
     }
-  
+
 
     /**
      * Reverse the migrations.

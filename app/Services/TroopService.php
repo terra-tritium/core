@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Services\ProductionService;
+use App\Models\Troop;
 
 class TroopService
 {
@@ -13,9 +14,9 @@ class TroopService
     }
 
     public function production ($player, $planet, $unit) {
-        if ($this->productionService->hasFunds($unit, $player)) {
+        if ($this->productionService->hasFunds($unit, $planet)) {
             $this->productionService->add($player, $planet, $unit, "troop");
-            $this->productionService->spendFunds($player, $unit);
+            $this->productionService->spendFunds($planet, $unit);
         } else {
             return "No suficients Funds";
         }
@@ -24,4 +25,6 @@ class TroopService
     public function productionTroop($player,$planet){
         return $this->productionService->productionPlayer($player,$planet);
     }
+
+    
 }
