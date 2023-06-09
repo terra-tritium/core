@@ -358,6 +358,7 @@ return new class extends Migration
             $table->char('type',1);//
             $table->unsignedBigInteger('quantity');//
             $table->double('price',8,3);//
+            $table->double('total',10,3);//
             $table->boolean('status')->default(true);
             $table->timestamp('createdAt')->useCurrent();
             $table->timestamp('updatedAt')->nullable();

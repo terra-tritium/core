@@ -17,7 +17,7 @@ use App\Http\Controllers\API\ResetarSenhaController;
 use App\Http\Controllers\MessegeController;
 use App\Http\Controllers\FactoryController;
 use App\Http\Controllers\AliancesController;
-
+use App\Http\Controllers\TradingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -158,6 +158,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/aliances/list',  'index');
         Route::delete('/aliances/delete/{id}',  'destroy');
         Route::put('/aliances/update-avatar/{id}',  'updateAvatar');
+    });
+
+    Route::controller(TradingController::class)->group(function (){
+        Route::get('/trading/{type}', 'getAllTradingByMarketResource');
     });
 
 
