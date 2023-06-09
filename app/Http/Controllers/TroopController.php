@@ -109,8 +109,7 @@ class TroopController extends Controller
     public function producing(Request $request){
         try {
             $player = Player::getPlayerLogged();
-            $planet = $request->input('planet');
-
+            $planet = $request->planet;
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
                 return $this->troopService->productionTroop($player, $planet);
             } else {
