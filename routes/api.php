@@ -161,7 +161,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(TradingController::class)->group(function (){
-        Route::get('/trading/{type}', 'getAllTradingByMarketResource');
+        Route::get('/trading/{resource}/{type}/{orderby?}/{column?}', 'getAllTradingByMarketResource');
     });
 
 

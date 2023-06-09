@@ -24,7 +24,9 @@ class Trading extends Model
         'updatedAt',
     ];
 
-    public function getDadosTradingByResourceAndMarket($type, $region){
+    public function getDadosTradingByResourceAndMarket($resource, $region,$type,$orderby,$column){
+        $orderByDirection = $orderby == 'A' ? 'asc' : 'desc';
+        $columnOrder = $column ? 't.createdAt' : 't.' . $column;
         $trading = DB::table($this->table . ' as t')->select("t.*","p.name")
                 ->join('market as m', 'm.id', '=', 't.idMarket')
                 ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')
@@ -32,7 +34,9 @@ class Trading extends Model
                  ->where('m.status', true)
                  ->where('t.status', true)
                 ->where('m.region', '=', $region)
-                ->where('t.resource','=', $type)
+                ->where('t.resource','=', $resource)
+                ->where('t.type', '=',$type)
+                ->orderBy($columnOrder, $orderByDirection)
                 ->get();
          return $trading;       
     }
