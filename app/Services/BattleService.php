@@ -108,7 +108,8 @@ class BattleService
         $stage->attackKills = json_encode("{}");
         $stage->defenseKills = json_encode("{}");
         $stage->attackGaveUp = false;
-        $stage->defenseGaveUp = ($desistiu == 1) ? true : false;
+        $stage->defenseGaveUp = false;
+        #$stage->defenseGaveUp = ($desistiu == 1) ? true : false;
 
         $stage = $this->resolveConfrontation($battle, $stage);
 

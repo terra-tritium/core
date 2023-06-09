@@ -109,8 +109,7 @@ class TroopController extends Controller
     public function producing(Request $request){
         try {
             $player = Player::getPlayerLogged();
-            $planet = $request->input('planet');
-
+            $planet = $request->planet;
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
                 return $this->troopService->productionTroop($player, $planet);
             } else {
@@ -156,7 +155,7 @@ class TroopController extends Controller
             }
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'An error occurred during troop production.'], 500);
+            return response()->json(['message' => 'An error occurred during list troops.'], 500);
         }
     }
 }
