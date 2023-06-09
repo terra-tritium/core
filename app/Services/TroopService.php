@@ -28,7 +28,7 @@ class TroopService
     }
 
     public function troops($player,$planet){
-        $troops = Troop::where(['player' => $player, 'planet' => $planet])->get();
+        $troops = Troop::with('unit')->where(['player' => $player, 'planet' => $planet])->get();
         return $troops;
     }
     
