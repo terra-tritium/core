@@ -63,16 +63,23 @@ class TradingController extends Controller
         return Planet::where('player', $player->id)->get();
     }
 
-    private function getPlanetUserLogged(){
+    private function getPlanetUserLogged()
+    {
         $player = Player::getPlayerLogged();
         return Planet::where('player', $player->id)->get();
     }
-    public function getAllTradingByMarketResource($resource, $type,$orderby = 'A',$column = ''){
+    public function getAllTradingByMarketResource($resource, $type, $orderby = 'A', $column = '')
+    {
         $planeta = $this->getPlanetUserLogged();
         $trading = new Trading();
-        $trads = $trading->getDadosTradingByResourceAndMarket($resource, $planeta[0]->region,$type, $orderby,$column);
+        $trads = $trading->getDadosTradingByResourceAndMarket($resource, $planeta[0]->region, $type, $orderby, $column);
         return $trads;
     }
-
-  
+    public function getMyResources()
+    {
+        $planeta = $this->getPlanetUserLogged();
+        $trading = new Trading();
+        $resources = $trading->getMyResources($planeta[0]->player);
+        return $resources;
+    }
 }
