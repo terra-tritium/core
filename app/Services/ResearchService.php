@@ -13,7 +13,6 @@ class ResearchService
     }
 
     public function laboratoryConfig ($player, $planet, $power) {
-        $this->planetSincronize($planet);
         $this->playerSincronize($player);
         $planet->pwResearch = $power;
         $planet->save();
@@ -44,8 +43,6 @@ class ResearchService
         foreach ($planets as $planet) {
             $p = $this->planetSincronize($planet);
             $points += $p->researchPoints;
-            $p->researchPoints = 0;
-            $p->save();
         }
         $player->researchPoints += $points;
         $player->save();

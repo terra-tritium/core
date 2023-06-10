@@ -92,7 +92,7 @@ class ResearchController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/research/laboratory/config",
+     *     path="/api/research/laboratory/config",
      *     tags={"Research"},
      *     summary="Config power of laboratory and synchronize researched points",
      *     @OA\Parameter(
