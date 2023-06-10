@@ -72,6 +72,10 @@ return new class extends Migration
             $table->bigInteger("proUranium");
             $table->bigInteger("proCrystal");
             $table->bigInteger("ready")->nullable();
+            # Laboratory
+            $table->bigInteger("researchPoints");
+            $table->integer("pwResearch");
+            $table->bigInteger("timeResearch")->nullable();
             # Power multiplier of resources
             $table->integer("pwMetal");
             $table->integer("pwUranium");
@@ -123,6 +127,7 @@ return new class extends Migration
             $table->integer('defenseStrategy');
             $table->integer('aliance')->nullable()->unsigned();
             $table->bigInteger("ready")->nullable();
+            $table->bigInteger("researchPoints");
             # Score rankings
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
@@ -265,7 +270,7 @@ return new class extends Migration
             $table->string("title");
             $table->text("description");
             $table->integer("cost");
-            $table->string("dependence");
+            $table->integer("dependence");
             $table->integer("category");
             $table->string("effectDescription");
             $table->json('effects');
@@ -274,14 +279,6 @@ return new class extends Migration
             $table->id();
             $table->integer('player')->constrained("players");
             $table->integer("code");
-            $table->integer("cost");
-            $table->integer("progress");
-            $table->integer("power");
-            $table->bigInteger("start");
-            $table->bigInteger("timer");
-            $table->bigInteger("points");
-            $table->integer("status");
-            $table->bigInteger("finish");
         });
         Schema::create('battles', function (Blueprint $table) {
             $table->id();

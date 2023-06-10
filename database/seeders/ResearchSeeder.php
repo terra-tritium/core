@@ -21,7 +21,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Economia de Energia',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "0",
+            'dependence' => 0,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -34,7 +34,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Extração de minerio nobre',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "100",
+            'dependence' => 100,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -47,7 +47,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Defesa',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "200",
+            'dependence' => 200,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -60,7 +60,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Mecanica espacial',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "300",
+            'dependence' => 0,
             'category' => 1,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -73,7 +73,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Explorador',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "300",
+            'dependence' => 0,
             'category' => 3,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -86,7 +86,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Robotica',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "400",
+            'dependence' => 400,
             'category' => 1,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -99,7 +99,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Comercio',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "500",
+            'dependence' => 500,
             'category' => 3,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -112,7 +112,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Nanotecnologia',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "600",
+            'dependence' => 600,
             'category' => 1,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -125,7 +125,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Expansão',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "300,600,700",
+            'dependence' => 300,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -138,7 +138,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Tritium',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "500",
+            'dependence' => 500,
             'category' => 3,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -151,7 +151,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Bateria',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "800",
+            'dependence' => 800,
             'category' => 1,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -164,7 +164,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Diplomacia',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "900",
+            'dependence' => 900,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -177,7 +177,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Plasma',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "1100",
+            'dependence' => 1100,
             'category' => 1,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -190,7 +190,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Centro de Armazenamento',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "1100,1200",
+            'dependence' => 1100,
             'category' => 3,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -203,7 +203,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Gravidade',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "1300,1400",
+            'dependence' => 1300,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -216,7 +216,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Reflexo de Lux',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "1500",
+            'dependence' => 1400,
             'category' => 3,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -229,7 +229,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Reflexo de Lux',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "1500",
+            'dependence' => 1500,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -242,7 +242,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Hipervelocidade',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "1700",
+            'dependence' => 1300,
             'category' => 1,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -255,7 +255,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Fabrica',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "1700",
+            'dependence' => 1700,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -268,7 +268,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Governo',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "1900",
+            'dependence' => 1900,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -281,7 +281,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Localizador',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "1800,1900",
+            'dependence' => 1600,
             'category' => 3,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -294,7 +294,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Fonte de energia',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "1900",
+            'dependence' => 2000,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -307,7 +307,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Destroyer',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "2200",
+            'dependence' => 1800,
             'category' => 1,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -320,7 +320,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Black trade',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "2200",
+            'dependence' => 2200,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -333,7 +333,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Tecnologia Alien',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "2300",
+            'dependence' => 2300,
             'category' => 1,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -346,7 +346,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Filtro de tritium',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "2200,2300",
+            'dependence' => 2100,
             'category' => 3,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -359,7 +359,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Avanço tecnologica 1',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "2500",
+            'dependence' => 2400,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -372,7 +372,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Avanço militar 1',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "2500",
+            'dependence' => 2500,
             'category' => 1,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -385,7 +385,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Avanço espacial 1',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "2500",
+            'dependence' => 2600,
             'category' => 3,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -398,7 +398,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Tritium power mining 1',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "2700,2800,2900",
+            'dependence' => 2700,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -411,7 +411,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Avanço tecnologica 2',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "2700",
+            'dependence' => 3000,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -424,7 +424,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Avanço militar 2',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "2800",
+            'dependence' => 2800,
             'category' => 1,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -437,7 +437,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Avanço espacial 2',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "2900",
+            'dependence' => 2900,
             'category' => 3,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -450,7 +450,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Tritium power mining 2',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "3100,3200,3300",
+            'dependence' => 3100,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -463,7 +463,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Avanço tecnologica 3',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "3100",
+            'dependence' => 3400,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -476,7 +476,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Avanço militar 3',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "3200",
+            'dependence' => 3200,
             'category' => 1,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -489,7 +489,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Avanço espacial 3',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "3300",
+            'dependence' => 3300,
             'category' => 3,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
@@ -502,7 +502,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Tritium power mining 3',
             'description' => 'Descrição',
             'cost' => 100,
-            'dependence' => "3500,3600,3700",
+            'dependence' => 3500,
             'category' => 2,
             'effectDescription' => 'Aumenta a velocidade de viagem em 1',
             'effects' => json_encode([
