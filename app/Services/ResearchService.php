@@ -24,8 +24,12 @@ class ResearchService
         $researched = new Researched();
         $researched->player = $player->id;
         $researched->code = $research->code;
-        $researched->save();
         $player->researchPoints -= $research->cost;
+        
+        # Don't have enough balance
+        if ($player->researchPoints < 0) { return false; }
+
+        $researched->save();
         $player->save();
         return $researched;
     }
