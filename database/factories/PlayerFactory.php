@@ -30,6 +30,7 @@ class PlayerFactory extends Factory
             'defenseScore' => $this->faker->numberBetween(1, 1000),
             'militaryScore' => $this->faker->numberBetween(1, 1000),
             'researchScore' => $this->faker->numberBetween(1, 1000),
+            'researchPoints' => 0,
         ];
     }
 

@@ -97,9 +97,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(ResearchController::class)->group(function () {
         Route::get('/research/list', 'list');
         Route::get('/researched', 'researched');
-        Route::post('/research/start/{code}/{sincronize?}', 'start');
-        Route::post('/research/done/{code}', 'done');
-        Route::get('/research/status/{code}', 'getStatus');
+        Route::post('/research/laboratory/config/{planet}/{power}', 'laboratoryConfig');
+        Route::post('/research/buy/{code}', 'buyResearch');
     });
 
     Route::controller(GameModeController::class)->group(function () {

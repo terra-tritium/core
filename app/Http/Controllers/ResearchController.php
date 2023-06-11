@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Player;
 use App\Models\Research;
 use App\Models\Researched;
+use App\Models\Planet;
 use App\Services\ResearchService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -90,112 +91,23 @@ class ResearchController extends Controller
     }
 
     /**
-     *  @OA\Post(
-     *     path="/research/start/{code}/{sincronize?}",
+     * @OA\Post(
+     *     path="/api/research/laboratory/config",
      *     tags={"Research"},
-     *     summary="Start a research",
+     *     summary="Config power of laboratory and synchronize researched points",
      *     @OA\Parameter(
-     *         name="code",
+     *         name="planet",
      *         in="path",
+     *         description="Planet ID",
      *         required=true,
-     *         description="Code of the research",
-     *         @OA\Schema(type="integer")
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
      *     ),
      *     @OA\Parameter(
-     *         name="sincronize",
+     *         name="power",
      *         in="path",
-     *         required=false,
-     *         description="Flag to indicate whether to synchronize the research",
-     *         @OA\Schema(type="boolean", default=false)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Research started successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Research started successfully")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Error starting research",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Error starting research")
-     *         )
-     *     )
-     * )
-     *
-     * @param int $code
-     * @param $sincronize
-     * @return string|null
-     */
-    public function start(int $code, $sincronize = false) {
-        try {
-            $player = Player::getPlayerLogged();
-            $this->researchService->start($player->id, $code, $sincronize);
-            return response()->json(['message' => 'Research started successfully'], 200);
-        } catch (\Exception $exception) {
-            Log::error($exception);
-            return response()->json(['message' => 'Error starting research'], 500);
-        }
-    }
-
-    /**
-     *
-     * * @OA\Post(
-     *     path="/research/done/{code}",
-     *     tags={"Research"},
-     *     summary="Mark research as done",
-     *     @OA\Parameter(
-     *         name="code",
-     *         in="path",
-     *         required=true,
-     *         description="Code of the research",
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Research marked as done successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Research marked as done successfully")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Error marking research as done",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Error marking research as done")
-     *         )
-     *     )
-     * )
-     *
-     * @param int $code
-     * @return null
-     *
-     */
-    public function done(int $code) {
-        try {
-            $player = Player::getPlayerLogged();
-            $this->researchService->done($player->id, $code);
-
-            return response()->json(['message' => 'Research completed successfully'], 200);
-        } catch (\InvalidArgumentException $exception) {
-            return response()->json(['message' => 'Invalid research code'], 400);
-        } catch (\Exception $exception) {
-            Log::error($exception);
-            return response()->json(['message' => 'Error completing research'], 500);
-        }
-    }
-
-    /**
-     * @OA\Get(
-     *     path="/research/status/{code}",
-     *     tags={"Research"},
-     *     summary="Get research status",
-     *     description="Retrieve the status of a research for the logged-in player.",
-     *     @OA\Parameter(
-     *         name="code",
-     *         in="path",
-     *         description="Research code",
+     *         description="Power of laboratory",
      *         required=true,
      *         @OA\Schema(
      *             type="integer"
@@ -203,60 +115,73 @@ class ResearchController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="status",
-     *                 type="string",
-     *                 description="Research status"
-     *             ),
-     *             @OA\Property(
-     *                 property="progress",
-     *                 type="integer",
-     *                 description="Research progress percentage"
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Invalid research code",
-     *         @OA\JsonContent(
-     *             @OA\Property(
-     *                 property="message",
-     *                 type="string",
-     *                 description="Error message"
-     *             )
-     *         )
+     *         description="Successful operation"
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Internal server error",
+     *         description="Error researching item",
      *         @OA\JsonContent(
-     *             @OA\Property(
-     *                 property="message",
-     *                 type="string",
-     *                 description="Error message"
-     *             )
+     *             @OA\Property(property="message", type="string", example="Error researching item")
      *         )
      *     )
      * )
      *
-     * @param int $code
+     * @param Request $request
      * @return mixed
      */
-    public function getStatus(int $code)
-    {
+    public function laboratoryConfig($planet, $power) {
         try {
-            $player = Player::getPlayerLogged();
-            $status = $this->researchService->status($player->id, $code);
-
-            return response()->json($status, 200);
-        } catch (\InvalidArgumentException $exception) {
-            return response()->json(['message' => 'Invalid research code'], 400);
+            $playerLogged = Player::getPlayerLogged();
+            $player = Player::find($playerLogged->id);
+            $planetData = Planet::find($planet);
+            $result = $this->researchService->laboratoryConfig($player, $planetData, $power);
+            return response()->json($result, 200);
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error retrieving research status'], 500);
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
+    }
+    
+    /**
+     * @OA\Post(
+     *     path="/research/buy/{code}",
+     *     tags={"Research"},
+     *     summary="Buy research",
+     *     @OA\Parameter(
+     *         name="code",
+     *         in="path",
+     *         description="Research code",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error buying research",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Error buying research")
+     *         )
+     *     )
+     * )
+     *
+     * @param $code
+     * @return mixed
+     */
+    public function buyResearch($code) {
+        try {
+            $playerLogged = Player::getPlayerLogged();
+            $player = Player::find($playerLogged->id);
+            $research = Research::where('code', $code)->first();
+            $result = $this->researchService->buyResearch($player, $research);
+            return response()->json($result, 200);
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'Internal server error'], 500);
         }
     }
 }

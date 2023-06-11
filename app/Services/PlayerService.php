@@ -30,6 +30,7 @@ class PlayerService
     $player->gameMode = 1;
     $player->attackStrategy = 1;
     $player->defenseStrategy = 1;
+    $player->researchPoints = 0;
     $player->save();
 
     $newAlocation = $this->startAlocation();
@@ -69,6 +70,8 @@ class PlayerService
     $planet->pwEnergy = 0;
     $planet->pwWorker = 0;
     $planet->transportShips = 0;
+    $planet->researchPoints = 0;
+    $planet->pwResearch = 0;
     $planet->save();
   }
 
@@ -179,5 +182,11 @@ class PlayerService
       return true;
     }
     return false;
+  }
+
+  public function getPlanets() {
+    $playerLogged = Player::getPlayerLogged();
+    $planets = Planet::where('player', $playerLogged->id)->get();
+    return $planets;
   }
 }
