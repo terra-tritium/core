@@ -174,7 +174,8 @@ class ResearchController extends Controller
      */
     public function buyResearch($code) {
         try {
-            $player = Player::getPlayerLogged();
+            $playerLogged = Player::getPlayerLogged();
+            $player = Player::find($playerLogged->id);
             $research = Research::where('code', $code)->first();
             $result = $this->researchService->buyResearch($player, $research);
             return response()->json($result, 200);
