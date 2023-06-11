@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Market;
 use App\Models\Planet;
 use App\Models\Player;
 use App\Models\Trading;
@@ -63,17 +64,52 @@ class TradingController extends Controller
         return Planet::where('player', $player->id)->get();
     }
 
-    private function getPlanetUserLogged(){
+    private function getPlanetUserLogged()
+    {
         $player = Player::getPlayerLogged();
         return Planet::where('player', $player->id)->get();
     }
-    public function getAllTradingByMarketResource($type){
+    public function getAllTradingByMarketResource($resource, $type, $orderby = 'A', $column = '')
+    {
         $planeta = $this->getPlanetUserLogged();
-        $data = ['tipo' => $type, 'region' => $planeta[0]->region];
         $trading = new Trading();
-        $trads = $trading->getDadosTradingByResourceAndMarket($type, $planeta[0]->region);
+        $trads = $trading->getDadosTradingByResourceAndMarket($resource, $planeta[0]->region, $type, $orderby, $column);
         return $trads;
     }
+    public function getMyResources()
+    {
+        $planeta = $this->getPlanetUserLogged();
+        $trading = new Trading();
+        $resources = $trading->getMyResources($planeta[0]->player);
+        return $resources;
+    }
+    public function tradingNewSale(Request $request)
+    {
+        $planeta = $this->getPlanetUserLogged();
+        $trading = new Trading();
+        $resources = $trading->getMyResources($planeta[0]->player)  ?? [];
+        $resourceKey = strtolower($request->resource);
+        if (property_exists($resources, $resourceKey)) {
+            if ($resources->{$resourceKey} <= $request->quantity) {
+                return ['msg' => 'tentando vender mais do que tem'];
+            } else {
+                $newTrading = new Trading();
+                $newTrading->resource = $request->resource;
+                $newTrading->type = 'S';
+                $newTrading->price = $request->unitityPrice;
+                $newTrading->quantity = $request->quantity;
+                $newTrading->total = $request->quantity * $request->unitityPrice;
+                $newTrading->status = true;
+                $newTrading->idPlanetCreator = $planeta[0]->id; //pega o id do planeta que ta logado
+                $newTrading->idMarket = Market::where('region','A')->first()['id'] ?? 'A'; //pega a região do planeta que ta logado
+                $newTrading->save();
+                return ["quantidadeDisponivel" => $resources->{$resourceKey}, "a venda" => $request->quantity, 'dados'=>$newTrading];
+            }
+        } else {
+            return "não existe a chave informada, verificar!";
+        }
 
-  
+        // $crys = "crystal1";
+        // return  property_exists($resources,$resourceKey) ? "existe" : "não existe";
+    }
 }
