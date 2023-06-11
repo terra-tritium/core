@@ -45,7 +45,7 @@ class Trading extends Model
     {
         $resources = DB::table('planets as p')
             ->select('p.resource', 'p.region', 'p.uranium', 'p.crystal', 'p.metal', 'p.transportShips')
-            ->where('p.player', $player)->get();
+            ->where('p.player', $player)->first();
             return $resources;
     }
     /*
