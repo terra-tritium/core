@@ -38,6 +38,7 @@ class RobotFactoryService
 
     $planet->energy -= $cost;
     $planet->workers += $qtd;
+    $planet->workersWaiting += $qtd;
 
     $planet->save();
   }
