@@ -69,7 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(FactoryController::class)->group(function () {
-        Route::post('/factory/energy/{planet}/{qtd}', 'energy');
+        Route::post('/factory/humanoid/create/{planet}/{qtd}', 'createHumanoid');
     });
 
     Route::controller(PlanetController::class)->group(function () {

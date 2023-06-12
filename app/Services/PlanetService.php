@@ -15,6 +15,13 @@ class PlanetService
     $this->rankingService = new RankingService();
   }
 
+  public function syncronizeEnergy(Planet $planet) {
+    $currentBalance = $this->currentBalance($planet, 0);
+    $planet->energy = $currentBalance;
+    $planet->timeEnergy = $this->timeNow;
+    $planet->save();
+  }
+
   public function currentBalance($p1, $type) {
     # secounds in hour
     $sInHour = 3600;
