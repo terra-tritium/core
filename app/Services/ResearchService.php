@@ -4,12 +4,15 @@ namespace App\Services;
 
 use App\Models\Researched;
 use App\Models\Research;
+use App\Models\Building;
 use App\Services\PlayerService;
+use App\Services\WorkerService;
 
 class ResearchService
 {
     public function __construct () {
         $this->playerService = new PlayerService();
+        $this->workerService = new WorkerService();
     }
 
     public function laboratoryConfig ($player, $planet, $power) {
@@ -23,8 +26,10 @@ class ResearchService
 
         $this->playerSincronize($player);
         $planet->pwResearch = $power;
-        $planet->workersOnLaboratory = $power;
+        $planet->workersOnLaboratory = (int) $power;
         $planet->save();
+
+        $this->workerService->syncronizeEnergy($planet, Building::where('build', 7)->first()->level);
         
         return $planet;
     }
