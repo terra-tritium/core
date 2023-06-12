@@ -33,7 +33,7 @@ class PlanetService
 
     switch ($type) {
       case 0: 
-        return $p1->energy + ($p1->pwEnergy * (env("TRITIUM_ENERGY") * $activeEnergyMining));
+        return $p1->energy + ($p1->workersWaiting * (env("TRITIUM_ENERGY") * $activeEnergyMining));
       case 1: 
         return $p1->metal + ($p1->pwMetal * (env("TRITIUM_METAL") * $activeMetalMining));
       case 2: 

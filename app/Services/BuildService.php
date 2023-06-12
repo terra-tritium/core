@@ -124,6 +124,11 @@ class BuildService
             }
         }
 
+        // Energy
+        if ($building->build == 7) {
+            $p1->pwEnergy = 1;
+        }
+
         $player = $this->playerService->addBuildScore($player, $this->levelFactor);
         
         $building->planet = Planet::where([['player', $player->id], ['id', $building->planet]])->firstOrFail()->id;
@@ -187,6 +192,11 @@ class BuildService
         }
 
         $building->level += 1;
+
+        // Energy
+        if ($building->build == 7) {
+            $planet->pwEnergy = $building->level;
+        }
 
         $player = $this->playerService->addBuildScore($player, $building->level * $this->levelFactor);
 
