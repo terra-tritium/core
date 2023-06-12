@@ -49,6 +49,7 @@ class PlayerService
     $planet->workersOnMetal = 0;
     $planet->workersOnUranium = 0;
     $planet->workersOnCrystal = 0;
+    $planet->workersOnLaboratory = 0;
     $planet->useEnergyByFactory = 0;
     $planet->status = "pacific";
     $planet->player = $player->id;

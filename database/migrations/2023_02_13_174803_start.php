@@ -58,6 +58,7 @@ return new class extends Migration
             $table->integer("workersOnMetal");
             $table->integer("workersOnUranium");
             $table->integer("workersOnCrystal");
+            $table->integer("workersOnLaboratory");
             # Resources
             $table->bigInteger("metal");
             $table->bigInteger("uranium");

@@ -13,9 +13,19 @@ class ResearchService
     }
 
     public function laboratoryConfig ($player, $planet, $power) {
+
+        $planet->workersWaiting = $planet->workers - ($planet->workersOnMetal + $planet->workersOnUranium + $planet->workersOnCrystal + $power);
+
+        # Don't have enough workers
+        if ($planet->workersWaiting < 0) {
+            return false;
+        }
+
         $this->playerSincronize($player);
         $planet->pwResearch = $power;
+        $planet->workersOnLaboratory = $power;
         $planet->save();
+        
         return $planet;
     }
 

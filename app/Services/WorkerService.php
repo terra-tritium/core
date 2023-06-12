@@ -27,7 +27,6 @@ class WorkerService
       case 5 : 
           $planet->workersOnUranium = 0;
           break;
-
       // Crystal
       case 6 : 
           $planet->workersOnCrystal = 0;
@@ -78,6 +77,6 @@ class WorkerService
   }
 
   private function waitingWorkers(Planet $planet) {
-    return $planet->workers - ($planet->workersOnMetal + $planet->workersOnUranium + $planet->workersOnCrystal);
+    return $planet->workers - ($planet->workersOnMetal + $planet->workersOnUranium + $planet->workersOnCrystal + $planet->workersOnLaboratory);
   }
 }
