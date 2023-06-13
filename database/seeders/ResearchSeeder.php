@@ -18,7 +18,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 100,
-            'title' => 'Economia de Energia',
+            'title' => 'Energy Saving',
             'description' => 'Descrição',
             'cost' => 100,
             'dependence' => 0,

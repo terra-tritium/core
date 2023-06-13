@@ -107,7 +107,7 @@ class BuildSeeder extends Seeder
 
         DB::table('builds')->insert([
             "name" => "Laboratory",
-            "code" => 8,
+            "code" => 7,
             "image" => "build-08.png",
             "description" => "Edifício de pesquisa tecnológica, requer energia para funcionamento. Acumula pontos de pesquisa, os pontos de pesquisa são utilizados para descoberta e liberação de novas tecnologias. Cada tecnologia descoberta traz algum recurso ou vantagem especial no jogo.",
             "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
@@ -122,7 +122,7 @@ class BuildSeeder extends Seeder
 
         DB::table('builds')->insert([
             "name" => "Warehouse",
-            "code" => 9,
+            "code" => 8,
             "image" => "build-09.png",
             "description" => "Armazena os recursos coletados, quanto maior o nível maior a capacidade de armazenamento, os recursos que não couberem no depósito ficam vulneráveis a roubo de outros jogadores",
             "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
@@ -137,7 +137,7 @@ class BuildSeeder extends Seeder
 
         DB::table('builds')->insert([
             "name" => "Spaceship Factory",
-            "code" => 10,
+            "code" => 9,
             "image" => "build-10.png",
             "description" => "Fabrica de construções de naves",
             "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
@@ -152,7 +152,7 @@ class BuildSeeder extends Seeder
 
         DB::table('builds')->insert([
             "name" => "Batery House",
-            "code" => 11,
+            "code" => 10,
             "image" => "build-11.png",
             "description" => "Descricao para casa de baterias.",
             "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
@@ -167,7 +167,7 @@ class BuildSeeder extends Seeder
 
         DB::table('builds')->insert([
             "name" => "Military Camp",
-            "code" => 12,
+            "code" => 11,
             "image" => "build-12.png",
             "description" => "Descricao para military camp.",
             "effect" => "A cada nível de expanção libera a construção de novas unidades",
@@ -182,7 +182,7 @@ class BuildSeeder extends Seeder
 
         DB::table('builds')->insert([
             "name" => "Shield",
-            "code" => 13,
+            "code" => 12,
             "image" => "build-13.png",
             "description" => "Escudo de força, protege o planeta de ataques de outros jogadores, a cada nível aumenta a capacidade de absorção de danos.",   
             "effect" => "A cada nível de expanção libera a construção de novas unidades",
@@ -197,7 +197,7 @@ class BuildSeeder extends Seeder
 
         DB::table('builds')->insert([
             "name" => "Market",
-            "code" => 14,
+            "code" => 13,
             "image" => "build-14.png",
             "description" => "Resource trades between players",   
             "effect" => "A cada nível de expanção reduz a taxa de fee e aumenta alcance de trocas",

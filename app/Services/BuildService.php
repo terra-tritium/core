@@ -124,7 +124,7 @@ class BuildService
             }
         }
 
-        // Energy
+        // Laboratory
         if ($building->build == 7) {
             $p1->pwEnergy = 1;
         }
@@ -186,16 +186,23 @@ class BuildService
             return false;
         }
 
+        $building->level += 1;
+
         // Battery House
         if ($building->build == 11) {
             $player = $this->planetService->incrementBattery($planet, $this->initialBattery * $building->level);
         }
 
-        $building->level += 1;
-
         // Energy
         if ($building->build == 7) {
             $planet->pwEnergy = $building->level;
+        }
+
+        // Warehouse
+        if ($building->build == 8) {
+            $planet->capMetal = $building->level * 10000;
+            $planet->capUranium = $building->level * 10000;
+            $planet->capCrystal = $building->level * 10000;
         }
 
         $player = $this->playerService->addBuildScore($player, $building->level * $this->levelFactor);
