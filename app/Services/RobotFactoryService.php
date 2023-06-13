@@ -5,14 +5,14 @@ namespace App\Services;
 use App\Models\Building;
 use App\Models\Planet;
 use App\Models\Player;
-use App\Services\PlanetService;
+use App\Services\WorkerService;
 
 class RobotFactoryService
 {
 
-  public function __construct(PlanetService $planetService)
+  public function __construct(WorkerService $workerService)
   {
-    $this->planetService = $planetService;
+    $this->workerService = $workerService;
   }
 
   /**
@@ -27,7 +27,7 @@ class RobotFactoryService
     $player = Player::where("user", $user)->firstOrFail();
     $planet = Planet::where("id", $planetId)->where("player", $player->id)->firstOrFail();
 
-    $this->planetService->syncronizeEnergy($planet);
+    $this->workerService->syncronizeEnergy($planet, Building::where('build', 7)->first()->level);
 
     $cost = $qtd * env('TRITIUM_HUMANOID_PRICE');
 
