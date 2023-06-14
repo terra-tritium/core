@@ -32,137 +32,136 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::controller(AuthController::class)->group(function () {
-    Route::post('/user/login','createToken');
-    Route::get('/user/logout','logout');
-    Route::post('/user/forgot-password','sendLink');
-    Route::post('/user/reset-password','resetPassword')->name('password.reset');
-    Route::post('/gerar','gerar'); // @todo Geracao de posicao dos quadrantes (remover antes de ir para producao)
+Route::prefix('user')->group(function () {
+    Route::post('/login', [AuthController::class, 'createToken']);
+    Route::get('/logout', [AuthController::class, 'logout']);
+    Route::post('/forgot-password', [AuthController::class, 'sendLink']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
+});
+Route::post('/gerar',[AuthController::class, 'gerar']); // @todo Geracao de posicao dos quadrantes (remover antes de ir para producao)
+
+Route::group(['prefix' => 'country'], function () {
+    Route::get('/list', [CountryController::class, 'list']);
 });
 
-Route::controller(CountryController::class)->group(function () {
-    Route::get('/country/list', 'list');
-});
-
-Route::controller(PlayerController::class)->group(function () {
-    Route::post('/player/register', 'register');
-    Route::get('/player/name/{userid}', 'getNameUser');
+Route::group(['prefix' => 'player'], function () {
+    Route::post('/register', [PlayerController::class, 'register']);
+    Route::get('/name/{userid}', [PlayerController::class, 'getNameUser']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::controller(PlayerController::class)->group(function () {
-        Route::get('/player/show', 'show');
-        Route::get('/player/details/{id}', 'getDetails');
-        Route::post('/player/new', 'register');
-        Route::post('/player/list-name/{id}', 'getNameUser');
+    Route::group(['prefix' => 'player'], function () {
+        Route::get('/show', [PlayerController::class, 'show']);
+        Route::get('/details/{id}', [PlayerController::class, 'getDetails']);
+        Route::post('/new', [PlayerController::class, 'register']);
+        Route::post('/list-name/{id}', [PlayerController::class, 'getNameUser']);
     });
 
-    Route::controller(BuildController::class)->group(function () {
-        Route::get('/build/list', 'list');
-        Route::get('/build/availables/{planet}', 'availables');
-        Route::get('/building/list/{planet}', 'listBildings');
-        Route::post('/build/plant', 'plant');
-        Route::post('/build/up', 'upgrade');
-        Route::post('/build/workers', 'workers');
-        Route::get('/build/requires/{build}', 'requires');
-        Route::get('/build/require/{build}/{level}', 'require');
+    Route::group(['prefix' => 'build'], function () {
+        Route::get('/list', [BuildController::class, 'list']);
+        Route::get('/availables/{planet}', [BuildController::class, 'availables']);
+        Route::post('/plant', [BuildController::class, 'plant']);
+        Route::post('/up', [BuildController::class, 'upgrade']);
+        Route::post('/workers', [BuildController::class, 'workers']);
+        Route::get('/requires/{build}', [BuildController::class, 'requires']);
+        Route::get('/require/{build}/{level}', [BuildController::class, 'require']);
     });
 
-    Route::controller(FactoryController::class)->group(function () {
-        Route::post('/factory/humanoid/create/{planet}/{qtd}', 'createHumanoid');
+    Route::get('/building/list/{planet}', [BuildController::class, 'listBildings']);
+
+    Route::group(['prefix' => 'factory'], function () {
+        Route::post('/humanoid/create/{planet}/{qtd}', [FactoryController::class, 'createHumanoid']);
     });
 
-    Route::controller(PlanetController::class)->group(function () {
-        Route::get('/planet/list', 'list');
-        Route::get('/planet/show/{id}', 'show');
-        Route::get('/planet/{quadrant}/{position}', 'find');
-        Route::put('/planet/edit/{planet}', 'update');
+    Route::prefix('planet')->group(function () {
+        Route::get('/list', [PlanetController::class, 'list']);
+        Route::get('/show/{id}', [PlanetController::class, 'show']);
+        Route::get('/{quadrant}/{position}', [PlanetController::class, 'find']);
+        Route::put('/edit/{planet}', [PlanetController::class, 'update']);
     });
 
-    Route::controller(UnitController::class)->group(function () {
-        Route::get('/unit/list', 'list');
+    Route::prefix('unit')->group(function () {
+        Route::get('/list', [UnitController::class, 'list']);
     });
 
-    Route::controller(TroopController::class)->group(function () {
-        Route::post('/troop/production/{planet}', 'production');
-        Route::get('/troop/production/{planet?}', 'producing');
-        Route::get('/troop/{planet}', 'list');
+    Route::prefix('troop')->group(function () {
+        Route::post('/production/{planet}', [TroopController::class, 'production']);
+        Route::get('/production/{planet?}', [TroopController::class, 'producing']);
+        Route::get('/{planet}', [TroopController::class, 'list']);
     });
 
-    Route::controller(RankingController::class)->group(function () {
-        Route::get('/ranking/players/{type}', 'players');
-        Route::get('/ranking/aliances/{type}', 'aliances');
+    Route::prefix('ranking')->group(function () {
+        Route::get('/players/{type}', [RankingController::class, 'players']);
+        Route::get('/aliances/{type}', [RankingController::class, 'aliances']);
     });
 
-    Route::controller(ResearchController::class)->group(function () {
-        Route::get('/research/list', 'list');
-        Route::get('/researched', 'researched');
-        Route::post('/research/laboratory/config/{planet}/{power}', 'laboratoryConfig');
-        Route::post('/research/buy/{code}', 'buyResearch');
+    Route::prefix('research')->group(function () {
+        Route::get('/list', [ResearchController::class, 'list']);
+        Route::post('/laboratory/config/{planet}/{power}', [ResearchController::class, 'laboratoryConfig']);
+        Route::post('/buy/{code}', [ResearchController::class, 'buyResearch']);
     });
 
-    Route::controller(GameModeController::class)->group(function () {
-        Route::get('/mode/list', 'list');
-        Route::post('/mode/change/{code}', 'change');
+    Route::get('/researched', [ResearchController::class, 'researched']);
+
+    Route::prefix('mode')->group(function () {
+        Route::get('/list', [GameModeController::class, 'list']);
+        Route::post('/change/{code}', [GameModeController::class, 'change']);
     });
 
-    Route::controller(TravelController::class)->group(function () {
-        Route::get('/travel/list', 'list');
-        Route::get('/travel/current', 'current');
-        Route::post('/travel/start', 'start');
-        Route::post('/travel/back', 'back');
+    Route::prefix('travel')->group(function () {
+        Route::get('/list', [TravelController::class, 'list']);
+        Route::get('/current', [TravelController::class, 'current']);
+        Route::post('/start', [TravelController::class, 'start']);
+        Route::post('/back', [TravelController::class, 'back']);
     });
 
-    Route::controller(BattleController::class)->group(function () {
-        // Route::get('/battle/attackmode/list', 'attackModeList');
-        // Route::get('/battle/defensemode/list', 'defenseModeList');
-        Route::post('/battle/attackmode/{option}', 'changeAttackMode');
-        Route::post('/battle/defensemode/{option}', 'changeDefenseMode');
-        Route::get('/battle/start/{defense}/{planet}', 'start');
-        Route::get('/battle/view/{id}', 'view');
-        Route::get('/battle/stages/{id}', 'stages');
+    Route::prefix('battle')->group(function () {
+        Route::post('/attackmode/{option}', [BattleController::class, 'changeAttackMode']);
+        Route::post('/defensemode/{option}', [BattleController::class, 'changeDefenseMode']);
+        Route::get('/start/{defense}/{planet}', [BattleController::class, 'start']);
+        Route::get('/view/{id}', [BattleController::class, 'view']);
+        Route::get('/stages/{id}', [BattleController::class, 'stages']);
     });
 
-    Route::controller(QuadrantController::class)->group(function () {
-        Route::get('/quadrant/show/{code}', 'show');
-        Route::get('/quadrant/map/{region}', 'map');
-        Route::get('/quadrant/planets/{quadrant}', 'planets');
+    Route::prefix('quadrant')->group(function () {
+        Route::get('/show/{code}', [QuadrantController::class, 'show']);
+        Route::get('/map/{region}', [QuadrantController::class, 'map']);
+        Route::get('/planets/{quadrant}', [QuadrantController::class, 'planets']);
     });
 
-    Route::controller(MessegeController::class)->group(function () {
-        Route::get('/messege/all','getAll');
-        Route::get('/messege/all-sender/{id}', 'getAllByUserSender');
-        Route::get('/messege/all-recipient', 'getAllByUserRecipient');
-        Route::post('/messege/read','readMessege');
-        Route::get('/messege/list', 'list');
-        Route::get('/message/send-for-recipient/{senderid}', 'getAllMessageSenderForRecipent');
-        Route::get('/message/count' ,'getCountMessageNotRead');
+    Route::prefix('message')->group(function () {
+        Route::get('/all', [MessegeController::class, 'getAll']);
+        Route::get('/all-sender/{id}', [MessegeController::class, 'getAllByUserSender']);
+        Route::get('/all-recipient', [MessegeController::class, 'getAllByUserRecipient']);
+        Route::post('/read', [MessegeController::class, 'readMessege']);
+        Route::get('/list', [MessegeController::class, 'list']);
+        Route::get('/send-for-recipient/{senderid}', [MessegeController::class, 'getAllMessageSenderForRecipent']);
+        Route::get('/count', [MessegeController::class, 'getCountMessageNotRead']);
 
-        Route::get('/messege/not-read', 'getAllMessegeNotRead');
-        Route::get('/message/getSenders', 'getSenders');
-        Route::get('/messages/conversation/{senderid}', 'getConversation');
-        Route::post('/messege/new','newMessege');
-        Route::get('/messege/lastmsg-sender/{senderid}','getLastMessageNotReadBySender');
-
+        Route::get('/not-read', [MessegeController::class, 'getAllMessegeNotRead']);
+        Route::get('/getSenders', [MessegeController::class, 'getSenders']);
+        Route::get('/conversation/{senderid}', [MessegeController::class, 'getConversation']);
+        Route::post('/new', [MessegeController::class, 'newMessege']);
+        Route::get('/lastmsg-sender/{senderid}', [MessegeController::class, 'getLastMessageNotReadBySender']);
     });
 
-    Route::controller(RankingController::class)->group(function (){
-        Route::get('/ranking/players', [RankingController::class, 'getPlayerRanking']);
-        Route::get('/ranking/aliances', [RankingController::class, 'getAlianceRanking']);
+    Route::prefix('ranking')->group(function () {
+        Route::get('/players', [RankingController::class, 'getPlayerRanking']);
+        Route::get('/aliances', [RankingController::class, 'getAlianceRanking']);
     });
 
-    Route::controller(AliancesController::class)->group(function () {
-        Route::post('/aliances/create',  'create');
-        Route::put('/aliances/edit/{id}', 'update');
-        Route::get('/aliances/list',  'index');
-        Route::delete('/aliances/delete/{id}',  'destroy');
-        Route::put('/aliances/update-avatar/{id}',  'updateAvatar');
+    Route::prefix('alliances')->group(function () {
+        Route::post('/create', [AliancesController::class, 'create']);
+        Route::put('/edit/{id}', [AliancesController::class, 'update']);
+        Route::get('/list', [AliancesController::class, 'index']);
+        Route::delete('/delete/{id}', [AliancesController::class, 'destroy']);
+        Route::put('/update-avatar/{id}', [AliancesController::class, 'updateAvatar']);
     });
 
-    Route::controller(TradingController::class)->group(function (){
-        Route::get('/trading/{resource}/{type}/{orderby?}/{column?}', 'getAllTradingByMarketResource');
-        Route::get('/trading/myresources', 'getMyResources');
-        Route::post('/trading/new-sale','tradingNewSale');
+    Route::prefix('trading')->group(function () {
+        Route::get('/{resource}/{type}/{orderby?}/{column?}', [TradingController::class, 'getAllTradingByMarketResource']);
+        Route::get('/myresources', [TradingController::class, 'getMyResources']);
+        Route::post('/new-sale', [TradingController::class, 'tradingNewSale']);
     });
 
 
