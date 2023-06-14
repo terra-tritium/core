@@ -14,7 +14,7 @@ use App\Http\Controllers\BattleController;
 use App\Http\Controllers\QuadrantController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\API\ResetarSenhaController;
-use App\Http\Controllers\MessegeController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\FactoryController;
 use App\Http\Controllers\AliancesController;
 use App\Http\Controllers\TradingController;
@@ -130,19 +130,19 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('message')->group(function () {
-        Route::get('/all', [MessegeController::class, 'getAll']);
-        Route::get('/all-sender/{id}', [MessegeController::class, 'getAllByUserSender']);
-        Route::get('/all-recipient', [MessegeController::class, 'getAllByUserRecipient']);
-        Route::post('/read', [MessegeController::class, 'readMessege']);
-        Route::get('/list', [MessegeController::class, 'list']);
-        Route::get('/send-for-recipient/{senderid}', [MessegeController::class, 'getAllMessageSenderForRecipent']);
-        Route::get('/count', [MessegeController::class, 'getCountMessageNotRead']);
+        Route::get('/all', [MessageController::class, 'getAll']);
+        Route::get('/all-sender/{id}', [MessageController::class, 'getAllByUserSender']);
+        Route::get('/all-recipient', [MessageController::class, 'getAllByUserRecipient']);
+        Route::post('/read', [MessageController::class, 'readMessage']);
+        Route::get('/list', [MessageController::class, 'list']);
+        Route::get('/send-for-recipient/{senderid}', [MessageController::class, 'getAllMessageSenderForRecipent']);
+        Route::get('/count', [MessageController::class, 'getCountMessageNotRead']);
 
-        Route::get('/not-read', [MessegeController::class, 'getAllMessegeNotRead']);
-        Route::get('/getSenders', [MessegeController::class, 'getSenders']);
-        Route::get('/conversation/{senderid}', [MessegeController::class, 'getConversation']);
-        Route::post('/new', [MessegeController::class, 'newMessege']);
-        Route::get('/lastmsg-sender/{senderid}', [MessegeController::class, 'getLastMessageNotReadBySender']);
+        Route::get('/not-read', [MessageController::class, 'getAllMessageNotRead']);
+        Route::get('/getSenders', [MessageController::class, 'getSenders']);
+        Route::get('/conversation/{senderid}', [MessageController::class, 'getConversation']);
+        Route::post('/new', [MessageController::class, 'newMessage']);
+        Route::get('/lastmsg-sender/{senderid}', [MessageController::class, 'getLastMessageNotReadBySender']);
     });
 
     Route::prefix('ranking')->group(function () {

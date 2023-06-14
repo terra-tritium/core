@@ -58,7 +58,7 @@ class Message extends Model
     /**
      *
      */
-    public function getAllMessegeNotRead($recipientId)
+    public function getAllMessageNotRead($recipientId)
     {
         $msgs = DB::table('users as u')
         ->select('u.id','u.name', DB::raw('MAX(m.createdAt) as createdAt'), DB::raw('MAX(m.read) as `read`'))

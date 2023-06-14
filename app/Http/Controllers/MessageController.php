@@ -12,7 +12,7 @@ use DateTime;
 use Exception;
 use Illuminate\Http\Response;
 
-class MessegeController extends Controller
+class MessageController extends Controller
 {
 
     public function __construct()
@@ -153,10 +153,10 @@ class MessegeController extends Controller
         return $msg->getAllByUserRecipient($player->user);
     }
     public function getCountMessageNotRead(){
-        $naoLidas = $this->getAllMessegeNotRead();
+        $naoLidas = $this->getAllMessageNotRead();
         return $naoLidas;
     }
-    private function messegeForSender($messages)
+    private function messageForSender($messages)
     {
         $trocas = array();
 
@@ -177,14 +177,14 @@ class MessegeController extends Controller
         $messages = app(Message::class)->getAllMessageSenderForRecipient($senderid, $player->user);
         return $messages;
     }
-    public function getAllMessegeNotRead()
+    public function getAllMessageNotRead()
     {
         $player = Player::getPlayerLogged();
         $messages = app(Message::class)->getAllMessageNotRead($player->user);
         return  $messages;
 
     }
-    public function newMessege(Request $request)
+    public function newMessage(Request $request)
     {
         try {
             $player = Player::getPlayerLogged();
@@ -200,7 +200,7 @@ class MessegeController extends Controller
         }
         return response(['message' => 'message send success!', 'success' => true], Response::HTTP_CREATED);
     }
-    public function readMessege(Request $request)
+    public function readMessage(Request $request)
     {
         $player = Player::getPlayerLogged();
         $msg = app(Message::class);
