@@ -241,7 +241,7 @@ class BuildService
         return $availables;
     }
 
-    public function listBildings ($planet) {
+    public function listBuildings ($planet) {
         return Building::where("planet", $planet)->get();
     }
 

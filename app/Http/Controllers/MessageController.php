@@ -15,16 +15,6 @@ use Illuminate\Http\Response;
 class MessageController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->player = Player::getPlayerLogged();
-
-        if (!$this->player) {
-            throw new AuthenticationException('Unauthenticated player.', Response::HTTP_UNAUTHORIZED);
-        }
-    }
-
-
     /**
      * Store a newly created resource in storage.
      *
