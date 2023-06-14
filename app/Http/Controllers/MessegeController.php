@@ -5,13 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\Planet;
 use App\Models\Player;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use App\Models\Message;
 use DateTime;
 use Exception;
+use Illuminate\Http\Response;
 
 class MessegeController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->player = Player::getPlayerLogged();
+
+        if (!$this->player) {
+            throw new AuthenticationException('Unauthenticated player.', Response::HTTP_UNAUTHORIZED);
+        }
+    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -58,38 +70,86 @@ class MessegeController extends Controller
         //
     }
 
+    /**
+     *
+     * * @OA\Get(
+     *     path="/list",
+     *     summary="Obter lista de planetas do jogador",
+     *     operationId="getPlanetList",
+     *     tags={"Planetas"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de planetas",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Planet")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Não autorizado"
+     *     )
+     * )
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function list()
     {
         $player = Player::getPlayerLogged();
 
-        return Planet::where('player', $player->id)->get();
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $planets = Planet::where('player', $player->id)->get();
+
+        return response()->json($planets);
     }
 
     public function ping()
     {
-        $msg = new Message();
+        $msg = app(Message::class);
         $dados = $msg->getMsg();
         return $dados;
     }
 
-
+    /**
+     * @OA\Get(
+     *     path="/messages",
+     *     summary="Obter todas as mensagens",
+     *     operationId="getAllMessages",
+     *     tags={"Mensagens"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de mensagens",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Message")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno do servidor"
+     *     )
+     * )
+     * @return mixed
+     */
     public function getAll()
     {
-        $msg = new Message();
+        $msg = app(Message::class);
         return $msg->getAll();
     }
 
     public function getAllByUserSender($id)
     {
         $player = Player::getPlayerLogged();
-        $msg = new Message();
+        $msg = app(Message::class);
         return $msg->getAllByUserSender($player->user);
     }
 
     public function getAllByUserRecipient()
     {
         $player = Player::getPlayerLogged();
-        $msg = new Message();
+        $msg = app(Message::class);
         return $msg->getAllByUserRecipient($player->user);
     }
     public function getCountMessageNotRead(){
@@ -114,21 +174,21 @@ class MessegeController extends Controller
 
     public function getAllMessageSenderForRecipent($senderid){
         $player = Player::getPlayerLogged();
-        $messages = (new Message())->getAllMessageSenderForRecipent($senderid, $player->user);
+        $messages = app(Message::class)->getAllMessageSenderForRecipient($senderid, $player->user);
         return $messages;
     }
     public function getAllMessegeNotRead()
     {
         $player = Player::getPlayerLogged();
-        $messages = (new Message())->getAllMessegeNotRead($player->user);
+        $messages = app(Message::class)->getAllMessageNotRead($player->user);
         return  $messages;
-       
+
     }
     public function newMessege(Request $request)
     {
         try {
             $player = Player::getPlayerLogged();
-            $msg = new Message();
+            $msg = app(Message::class);
             $msg->senderId = $player->user;
             $msg->recipientId = $request->input("recipientId");
             $msg->content = $request->input("content");
@@ -136,31 +196,31 @@ class MessegeController extends Controller
             $msg->read = false;
             $msg->save();
         } catch (Exception $e) {
-            return response(["msg" => "error " . $e->getMessage()], 500);
+            return response(["msg" => "error " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return response(['message' => 'message send success!', 'success' => true], 201);
+        return response(['message' => 'message send success!', 'success' => true], Response::HTTP_CREATED);
     }
     public function readMessege(Request $request)
     {
         $player = Player::getPlayerLogged();
-        $msg = new Message();
+        $msg = app(Message::class);
         $msg->readMessagesForUser($request->input("id"),$player->user);
-        return response(['message' => 'message read!', 'success' => true], 200);
+        return response(['message' => 'message read!', 'success' => true], Response::HTTP_OK);
     }
 
     public function getSenders(){
         $player = Player::getPlayerLogged();
-        $messages = (new Message())->getSenders($player->user);
+        $messages = app(Message::class)->getSenders($player->user);
         return $messages;
     }
 
     public function getConversation($senderId){
         $player = Player::getPlayerLogged();
-        $messages = (new Message())->getConversation($player->user,$senderId);
+        $messages = app(Message::class)->getConversation($player->user, $senderId);
         return $messages;
     }
     public function getLastMessageNotReadBySender($senderid){
-        $message = new Message();
+        $message = app(Message::class);
         $player = Player::getPlayerLogged();
         $msg = $message->getLastMessageNotReadBySender($player->user,$senderid);
         return $msg;

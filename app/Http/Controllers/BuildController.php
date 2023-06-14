@@ -9,6 +9,7 @@ use App\Services\WorkerService;
 
 use http\Exception\InvalidArgumentException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
 class BuildController extends Controller
@@ -53,8 +54,14 @@ class BuildController extends Controller
      */
     public function list()
     {
-        return Build::orderBy('code')->get();
-    }
+        try {
+            $builds = Build::orderBy('code')->get();
+
+            return response()->json($builds, Response::HTTP_OK);
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }    }
 
     /**
      *
@@ -77,6 +84,28 @@ class BuildController extends Controller
      *             @OA\Items(ref="#/components/schemas/Build")
      *         )
      *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Unauthorized"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Internal server error"
+     *             )
+     *         )
+     *     )
      * )
      *
      * @param $planet
@@ -84,8 +113,14 @@ class BuildController extends Controller
      */
     public function availables($planet)
     {
-        return $this->buildService->listAvailableBuilds($planet);
-    }
+        try {
+            $builds = $this->buildService->listAvailableBuilds($planet);
+
+            return response()->json($builds, Response::HTTP_OK);
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }    }
 
     /**
      *
@@ -108,14 +143,31 @@ class BuildController extends Controller
      *             @OA\Items(ref="#/components/schemas/Building")
      *         )
      *     ),
+     *    @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Internal server error"
+     *             )
+     *         )
+     *     )
      * )
      *
      * @param $planet
      * @return mixed
      */
     public function listBildings($planet) {
-        return $this->buildService->listBildings($planet);
-    }
+        try {
+            $buildings = $this->buildService->listBuildings($planet);
+
+            return response()->json($buildings, Response::HTTP_OK);
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }    }
 
     /**
      *
@@ -134,6 +186,14 @@ class BuildController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Building planted successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
      *     )
      * )
      *
@@ -141,12 +201,18 @@ class BuildController extends Controller
      * @return void
      */
     public function plant(Request $request) {
-        $building = new Building();
-        $building->build = $request->input("build");
-        $building->planet = $request->input("planet");
-        $building->slot = $request->input("slot");
+        try {
+            $building = app(Building::class);
+            $building->build = $request->input("build");
+            $building->planet = $request->input("planet");
+            $building->slot = $request->input("slot");
 
-        $this->buildService->plant($building);
+            $this->buildService->plant($building);
+
+            return response()->json(['message' => 'Building planted successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -183,12 +249,13 @@ class BuildController extends Controller
 
         try {
             $this->buildService->upgrade($buildingId);
-            return response()->json(['message' => 'Building upgrade successful'], 200);
+            return response()->json(['message' => 'Building upgrade successful'], Response::HTTP_OK);
         } catch (InvalidArgumentException $exception) {
-            return response()->json(['message' => 'Invalid building ID'], 400);
+            return response()->json(['message' => 'Invalid building ID'], Response::HTTP_BAD_REQUEST);
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error upgrading building'], 500);
+            return response()->json(['message' => 'Error upgrading building'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -199,12 +266,13 @@ class BuildController extends Controller
     public function requires($build) {
         try {
             $requiredResources = $this->buildService->requires($build);
-            return response()->json(['data' => $requiredResources], 200);
+            return response()->json(['data' => $requiredResources], Response::HTTP_OK);
         } catch (InvalidArgumentException $exception) {
-            return response()->json(['message' => 'Invalid building type'], 400);
+            return response()->json(['message' => 'Invalid building type'], Response::HTTP_BAD_REQUEST);
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error getting required resources'], 500);
+            return response()->json(['message' => 'Error getting required resources'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -216,10 +284,11 @@ class BuildController extends Controller
     public function require($build, $level) {
         try {
             $result = $this->buildService->require($build, $level);
-            return response()->json($result, 200);
+            return response()->json($result, Response::HTTP_OK);
         } catch (\Throwable $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error: Failed to retrieve requirements'], 500);
+            return response()->json(['message' => 'Error: Failed to retrieve requirements'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -264,11 +333,12 @@ class BuildController extends Controller
 
             $this->workerService->configWorkers($planetId, $workers, $buildingId);
 
-            return response()->json(['message' => 'Workers configured successfully'], 200);
+            return response()->json(['message' => 'Workers configured successfully'], Response::HTTP_OK);
         } catch (Throwable $exception) {
             Log::error($exception);
 
-            return response()->json(['message' => 'Error configuring workers'], 500);
+            return response()->json(['message' => 'Error configuring workers'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

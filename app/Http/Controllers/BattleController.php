@@ -11,6 +11,7 @@ use App\Services\BattleService;
 use App\Services\PlayerService;
 use App\Services\TravelService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class BattleController extends Controller
 {
@@ -21,7 +22,7 @@ class BattleController extends Controller
     public function __construct(BattleService $battleService, PlayerService $playerService, TravelService $travelService) {
         $this->battleService = $battleService;
         $this->playerService = $playerService;
-        $this->travelService = $travelService; 
+        $this->travelService = $travelService;
     }
 
     // public function attackModeList() {
@@ -58,13 +59,13 @@ class BattleController extends Controller
         $playerOwnerPlatet = $this->playerService->iSplayerOwnerPlanet($defense,$planet);
 
         if($playerOwnerPlatet){
-            
+
             $attack  = Player::getPlayerLogged();
             $defense = Player::find($defense);
 
             $aUnits  = $this->travelService->getTroopAttack($travel);
             $dUnits  = $this->travelService->getTroopDefense($travel);
-            
+
             $aStrategy = $attack->attackStrategy;
             $dStrategy = $defense->defenseStrategy;
 
@@ -81,7 +82,7 @@ class BattleController extends Controller
         else{
             return response()->json([
                 'message' => 'The player is not the owner of the planet'
-            ], 403);
+            ], Response::HTTP_FORBIDDEN);
         }
     }
 }

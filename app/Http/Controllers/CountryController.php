@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CountryController extends Controller
 {
@@ -73,6 +74,11 @@ class CountryController extends Controller
      * )
      */
     public function list() {
-        return Country::orderBy('name')->get();
+        try {
+            return Country::orderBy('name')->get();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Ocorreu um erro ao buscar a lista de países.'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
