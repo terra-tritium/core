@@ -31,14 +31,14 @@ class UpdateRankingCommand extends Command
     public function handle()
     {
         try {
-            DB::table('rankingPlayer')->truncate();
+            DB::table('ranking')->truncate();
 
             $players = DB::table('players')
-                ->select('id', 'name', 'score', 'buildScore', 'attackScore', 'defenseScore', 'militaryScore', 'researchScore')
+                ->select('id', 'name', 'score', 'buildScore', 'attackScore', 'defenseScore', 'militaryScore', 'researchScore', 'aliance')
                 ->get();
 
             foreach ($players as $player) {
-                DB::table('rankingPlayer')->insert([
+                DB::table('ranking')->insert([
                     'name' => $player->name,
                     'player' => $player->id,
                     'energy' => $this->calculateTotalEnergy($player->id),
@@ -48,6 +48,7 @@ class UpdateRankingCommand extends Command
                     'defenseScore' => $player->defenseScore,
                     'militaryScore' => $player->militaryScore,
                     'researchScore' => $player->researchScore,
+                    'aliance' => $player->aliance,
                 ]);
             }
         } catch (\Exception $exception) {

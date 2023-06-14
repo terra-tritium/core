@@ -141,13 +141,14 @@ return new class extends Migration
             $table->id();
             $table->string("name");
             $table->integer('player')->constrained("players");
-            $table->integer('aliance')->constrained("aliances");
+            $table->integer('aliance')->nullable()->unsigned();
             $table->bigInteger("energy");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
             $table->bigInteger("attackScore");
             $table->bigInteger("defenseScore");
             $table->bigInteger("militaryScore");
+            $table->bigInteger("researchScore");
         });
         Schema::create('logbook', function (Blueprint $table) {
             $table->id();
