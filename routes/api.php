@@ -60,13 +60,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'build'], function () {
         Route::get('/list', [BuildController::class, 'list']);
         Route::get('/availables/{planet}', [BuildController::class, 'availables']);
-        Route::get('/building/list/{planet}', [BuildController::class, 'listBildings']);
         Route::post('/plant', [BuildController::class, 'plant']);
         Route::post('/up', [BuildController::class, 'upgrade']);
         Route::post('/workers', [BuildController::class, 'workers']);
         Route::get('/requires/{build}', [BuildController::class, 'requires']);
         Route::get('/require/{build}/{level}', [BuildController::class, 'require']);
     });
+
+    Route::get('/building/list/{planet}', [BuildController::class, 'listBildings']);
 
     Route::group(['prefix' => 'factory'], function () {
         Route::post('/humanoid/create/{planet}/{qtd}', [FactoryController::class, 'createHumanoid']);
@@ -96,10 +97,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('research')->group(function () {
         Route::get('/list', [ResearchController::class, 'list']);
-        //  Route::get('/researched', [ResearchController::class, 'researched']);
         Route::post('/laboratory/config/{planet}/{power}', [ResearchController::class, 'laboratoryConfig']);
         Route::post('/buy/{code}', [ResearchController::class, 'buyResearch']);
     });
+
+    Route::get('/researched', [ResearchController::class, 'researched']);
 
     Route::prefix('mode')->group(function () {
         Route::get('/list', [GameModeController::class, 'list']);
