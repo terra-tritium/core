@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('aliances', function (Blueprint $table) {
-            $table->id();
+            $table->id()->index();
             $table->string("description")->nullable();
             $table->string("name");
             $table->string('avatar')->nullable();
@@ -28,9 +28,9 @@ return new class extends Migration
             $table->bigInteger("warScore")->default(0);
         });
 
-        Schema::create('aliancesRanking', function (Blueprint $table) {
+        Schema::create('aliances_ranking', function (Blueprint $table) {
             $table->id();
-            $table->string("description");
+            $table->integer('aliance')->constrained("aliances");
             $table->bigInteger("energy");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");

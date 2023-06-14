@@ -20,6 +20,7 @@ class Kernel extends ConsoleKernel
     {
 
         $schedule->command('rankings:update')->everyThirtyMinutes();
+        $schedule->command('energy:update')->everyThirtyMinutes();
 
 
         # Ranking
