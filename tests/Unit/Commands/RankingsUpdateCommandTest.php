@@ -10,7 +10,7 @@ use App\Models\RankingPlayer;
 
 class RankingsUpdateCommandTest extends TestCase
 {
-    use RefreshDatabase;
+    //use RefreshDatabase;
 
     public function testHandle()
     {
