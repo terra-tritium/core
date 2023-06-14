@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Planet;
 use App\Models\Player;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 /**
  *
@@ -78,18 +79,18 @@ class PlanetController extends Controller
     public function find ($quadrant, $position) {
         try {
             if (empty($quadrantParam) || empty($positionParam)) {
-                return response()->json(['error' => 'Invalid quadrant or position'], 400);
+                return response()->json(['error' => 'Invalid quadrant or position'], Response::HTTP_BAD_REQUEST);
             }
 
             $planet = Planet::where('quadrant', $quadrantParam)->where('position', $positionParam)->first();
 
             if (!$planet) {
-                return response()->json(['error' => 'Planet not found'], 404);
+                return response()->json(['error' => 'Planet not found'], Response::HTTP_NOT_FOUND);
             }
 
             return $planet;
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred'], 500);
+            return response()->json(['error' => 'An error occurred'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -139,9 +140,9 @@ class PlanetController extends Controller
         try {
             $planet = Planet::findOrFail($id);
 
-            return response()->json($planet, 200);
+            return response()->json($planet, Response::HTTP_OK);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred'], 500);
+            return response()->json(['error' => 'An error occurred'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -197,7 +198,8 @@ class PlanetController extends Controller
         $player = Player::getPlayerLogged();
 
         if ($planet->player !== $player->id) {
-            return response()->json(['message' => "You aren't the owner of this planet"], 403);
+            return response()->json(['message' => "You aren't the owner of this planet"],
+                Response::HTTP_FORBIDDEN);
         }
 
         $request->validate([
@@ -207,7 +209,7 @@ class PlanetController extends Controller
         $planet->name = $request->input('name');
         $planet->save();
 
-        return response()->json(['message' => 'Planet name successfully updated']);
+        return response()->json(['message' => 'Planet name successfully updated'], Response::HTTP_OK);
     }
 
     /**
@@ -243,11 +245,11 @@ class PlanetController extends Controller
     public function list() {
         $player = Player::getPlayerLogged();
         if (!$player) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }
 
         $planets = Planet::where('player', $player->id)->get();
 
-        return response()->json($planets, 200);
+        return response()->json($planets, Response::HTTP_OK);
     }
 }

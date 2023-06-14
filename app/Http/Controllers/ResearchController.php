@@ -10,6 +10,7 @@ use App\Services\ResearchService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
 class ResearchController extends Controller
@@ -48,10 +49,11 @@ class ResearchController extends Controller
     public function list() {
         try {
             $researchList = Research::orderBy('code')->get();
-            return response()->json($researchList, 200);
+            return response()->json($researchList, Response::HTTP_OK);
         } catch (Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error retrieving research list'], 500);
+            return response()->json(['message' => 'Error retrieving research list'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -83,10 +85,10 @@ class ResearchController extends Controller
         try {
             $player = Player::getPlayerLogged();
             $researchedItems = Researched::where('player', $player->id)->get();
-            return response()->json($researchedItems, 200);
+            return response()->json($researchedItems, Response::HTTP_OK);
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Internal server error'], 500);
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -135,13 +137,13 @@ class ResearchController extends Controller
             $player = Player::find($playerLogged->id);
             $planetData = Planet::find($planet);
             $result = $this->researchService->laboratoryConfig($player, $planetData, $power);
-            return response()->json($result, 200);
+            return response()->json($result, Response::HTTP_OK);
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Internal server error'], 500);
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     /**
      * @OA\Post(
      *     path="/research/buy/{code}",
@@ -178,10 +180,10 @@ class ResearchController extends Controller
             $player = Player::find($playerLogged->id);
             $research = Research::where('code', $code)->first();
             $result = $this->researchService->buyResearch($player, $research);
-            return response()->json($result, 200);
+            return response()->json($result, Response::HTTP_OK);
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Internal server error'], 500);
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

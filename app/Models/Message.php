@@ -6,6 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @OA\Schema(
+ *     schema="Message",
+ *     required={"id", "content", "sender", "recipient"},
+ *     @OA\Property(property="id", type="integer", format="int64", description="ID da mensagem"),
+ *     @OA\Property(property="content", type="string", description="Conteúdo da mensagem"),
+ *     @OA\Property(property="sender", type="integer", format="int64", description="ID do remetente"),
+ *     @OA\Property(property="recipient", type="integer", format="int64", description="ID do destinatário"),
+ *     @OA\Property(property="created_at", type="string", format="date-time", description="Data e hora de criação da mensagem"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", description="Data e hora de atualização da mensagem")
+ * )
+ */
 class Message extends Model
 {
     use HasFactory;
@@ -44,7 +56,7 @@ class Message extends Model
     }
 
     /**
-     * 
+     *
      */
     public function getAllMessegeNotRead($recipientId)
     {
