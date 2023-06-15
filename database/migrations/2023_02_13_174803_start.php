@@ -41,8 +41,8 @@ return new class extends Migration
             $table->bigInteger("warScore");
         });
         Schema::create('planets', function (Blueprint $table) {
-            $table->id();
-            $table->integer('player')->constrained("players");
+            $table->id()->index();
+            $table->integer('player')->constrained("players")->index();
             $table->string("name");
             $table->string('resource');
             $table->integer("level");
@@ -117,9 +117,9 @@ return new class extends Migration
             $table->string("description");
         });
         Schema::create('players', function (Blueprint $table) {
-            $table->id();
+            $table->id()->index();
             $table->string("name");
-            $table->integer('user')->constrained("users");
+            $table->integer('user')->constrained("users")->index();
             $table->string("address")->nullable();
             $table->timestamp("since")->useCurrent();
             $table->foreignId('country')->constrained("countrys");
