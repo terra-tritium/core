@@ -181,11 +181,13 @@ class PlayerController extends Controller
         $playedExist =  Player::where('name',$request->input("name"))->first();
 
         if($userExist){
-            return response(['message' => 'There is already a registered user with this E-mail!','success'=>false],200);
+            return response(['message' => 'There is already a registered user with this E-mail!','success'=>false],
+                Response::HTTP_OK);
         }
 
         if($playedExist){
-            return response(['message' => 'There is already a registered user with this Player Name!','success'=>false],200);
+            return response(['message' => 'There is already a registered user with this Player Name!','success'=>false],
+                Response::HTTP_OK);
         }
 
         $user = new User();
@@ -201,7 +203,7 @@ class PlayerController extends Controller
         $player->user = $user->id;
         $this->playerService->register($player);
 
-        return response(['message' => 'Player created success!','success'=>true],200);
+        return response(['message' => 'Player created success!','success'=>true],Response::HTTP_OK);
 
     }
 
@@ -246,7 +248,8 @@ class PlayerController extends Controller
         $user = User::find($userId);
 
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'User not found'],
+                Response::HTTP_NOT_FOUND);
         }
 
         return response()->json(['name' => $user->name]);
@@ -287,7 +290,7 @@ class PlayerController extends Controller
             $playerDetails = $this->playerService->getDetails($id);
             return response()->json($playerDetails);
         } catch (ModelNotFoundException $exception) {
-            return response()->json(['message' => 'Player not found'], 404);
+            return response()->json(['message' => 'Player not found'], Response::HTTP_NOT_FOUND);
         }
     }
 

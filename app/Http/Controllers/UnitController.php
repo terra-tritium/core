@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
 class UnitController extends Controller
@@ -39,7 +40,8 @@ class UnitController extends Controller
             return Unit::orderBy('name')->get();
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error retrieving units'], 500);
+            return response()->json(['message' => 'Error retrieving units'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

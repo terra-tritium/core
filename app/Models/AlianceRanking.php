@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AlianceRanking extends Model
 {
     use HasFactory;
-    protected $table = 'aliances';
+    protected $table = 'aliances_ranking';
     public $timestamps = false;
 
     protected $fillable = [

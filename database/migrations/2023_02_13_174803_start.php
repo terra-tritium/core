@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('aliances', function (Blueprint $table) {
-            $table->id();
+            $table->id()->index();
             $table->string("description")->nullable();
             $table->string("name");
             $table->string('avatar')->nullable();
@@ -28,9 +28,9 @@ return new class extends Migration
             $table->bigInteger("warScore")->default(0);
         });
 
-        Schema::create('aliancesRanking', function (Blueprint $table) {
+        Schema::create('aliances_ranking', function (Blueprint $table) {
             $table->id();
-            $table->string("description");
+            $table->integer('aliance')->constrained("aliances");
             $table->bigInteger("energy");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
@@ -41,8 +41,8 @@ return new class extends Migration
             $table->bigInteger("warScore");
         });
         Schema::create('planets', function (Blueprint $table) {
-            $table->id();
-            $table->integer('player')->constrained("players");
+            $table->id()->index();
+            $table->integer('player')->constrained("players")->index();
             $table->string("name");
             $table->string('resource');
             $table->integer("level");
@@ -58,6 +58,7 @@ return new class extends Migration
             $table->integer("workersOnMetal");
             $table->integer("workersOnUranium");
             $table->integer("workersOnCrystal");
+            $table->integer("workersOnLaboratory");
             # Resources
             $table->bigInteger("metal");
             $table->bigInteger("uranium");
@@ -116,9 +117,9 @@ return new class extends Migration
             $table->string("description");
         });
         Schema::create('players', function (Blueprint $table) {
-            $table->id();
+            $table->id()->index();
             $table->string("name");
-            $table->integer('user')->constrained("users");
+            $table->integer('user')->constrained("users")->index();
             $table->string("address")->nullable();
             $table->timestamp("since")->useCurrent();
             $table->foreignId('country')->constrained("countrys");
@@ -140,12 +141,14 @@ return new class extends Migration
             $table->id();
             $table->string("name");
             $table->integer('player')->constrained("players");
+            $table->integer('aliance')->nullable()->unsigned();
             $table->bigInteger("energy");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
             $table->bigInteger("attackScore");
             $table->bigInteger("defenseScore");
             $table->bigInteger("militaryScore");
+            $table->bigInteger("researchScore");
         });
         Schema::create('logbook', function (Blueprint $table) {
             $table->id();

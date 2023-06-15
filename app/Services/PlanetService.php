@@ -15,6 +15,13 @@ class PlanetService
     $this->rankingService = new RankingService();
   }
 
+  public function syncronizeEnergy(Planet $planet) {
+    $currentBalance = $this->currentBalance($planet, 0);
+    $planet->energy = $currentBalance;
+    $planet->timeEnergy = $this->timeNow;
+    $planet->save();
+  }
+
   public function currentBalance($p1, $type) {
     # secounds in hour
     $sInHour = 3600;
@@ -26,7 +33,7 @@ class PlanetService
 
     switch ($type) {
       case 0: 
-        return $p1->energy + ($p1->pwEnergy * (env("TRITIUM_ENERGY") * $activeEnergyMining));
+        return $p1->energy + ($p1->workersWaiting * (env("TRITIUM_ENERGY") * $activeEnergyMining));
       case 1: 
         return $p1->metal + ($p1->pwMetal * (env("TRITIUM_METAL") * $activeMetalMining));
       case 2: 

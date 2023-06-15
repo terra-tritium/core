@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Services\RobotFactoryService;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
 class FactoryController extends Controller
@@ -18,40 +19,54 @@ class FactoryController extends Controller
 
     /**
      *
-     * @OA\Post(
-     *     path="/factory/energy/{planet}/{qtd}",
+     * * @OA\Post(
+     *     path="/factory/humanoid/create/{planet}/{qtd}",
+     *     summary="Create humanoid in the factory",
      *     tags={"Factory"},
-     *     summary="Set energy for a planet in the factory",
+     *     description="Create a specified quantity of humanoid in the factory.",
      *     @OA\Parameter(
      *         name="planet",
      *         in="path",
+     *         description="The planet identifier.",
      *         required=true,
-     *         description="Planet name or ID",
-     *         @OA\Schema(type="string")
+     *         @OA\Schema(
+     *             type="string"
+     *         )
      *     ),
      *     @OA\Parameter(
      *         name="qtd",
      *         in="path",
+     *         description="The quantity of humanoids to create.",
      *         required=true,
-     *         description="Energy quantity",
-     *         @OA\Schema(type="integer")
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int32"
+     *         )
      *     ),
      *     @OA\Response(
-     *         response=200,
-     *         description="Energy set successfully",
+     *         response="200",
+     *         description="Success",
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="qtd", type="integer", example=100)
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="string",
+     *                 example="success"
+     *             ),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="qtd",
+     *                     type="integer",
+     *                     format="int32",
+     *                     example="10"
+     *                 )
      *             )
      *         )
      *     ),
      *     @OA\Response(
-     *         response=500,
-     *         description="Error setting energy",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Error setting energy")
-     *         )
+     *         response="500",
+     *         description="Error on create humanoid"
      *     )
      * )
      *
@@ -59,10 +74,10 @@ class FactoryController extends Controller
      * @param $qtd
      * @return \Illuminate\Http\JsonResponse
      */
-    public function energy($planet, $qtd)
+    public function createHumanoid($planet, $qtd)
     {
         try {
-            $resp = $this->robotFactoryService->setEnergy($planet, $qtd);
+            $resp = $this->robotFactoryService->createHumanoid($planet, $qtd);
 
             return response()->json([
                 'status' => 'success',
@@ -72,7 +87,8 @@ class FactoryController extends Controller
             ]);
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error setting energy'], 500);
+            return response()->json(['message' => 'Error on create humanoid'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

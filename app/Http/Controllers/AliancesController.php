@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Aliances;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -56,11 +57,12 @@ class AliancesController extends Controller
         try {
             $aliances = Aliances::all();
 
-            return response()->json($aliances, 200);
+            return response()->json($aliances, Response::HTTP_OK);
         } catch (Throwable $exception) {
             Log::error($exception);
 
-            return response()->json(['message' => 'Error finding alliances'], 500);
+            return response()->json(['message' => 'Error finding alliances'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -115,11 +117,12 @@ class AliancesController extends Controller
 
             $aliances->save();
 
-            return response()->json($aliances, 201);
+            return response()->json($aliances, Response::HTTP_OK);
 
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error : failed to create alliances'], 500);
+            return response()->json(['message' => 'Error : failed to create alliances'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -184,10 +187,11 @@ class AliancesController extends Controller
 
             $aliances->save();
 
-            return response()->json($aliances, 200);
+            return response()->json($aliances, Response::HTTP_OK);
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error : failed to update alliances'], 500);
+            return response()->json(['message' => 'Error : failed to update alliances'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -229,10 +233,11 @@ class AliancesController extends Controller
             $aliances = Aliances::findOrFail($id);
             $aliances->delete();
 
-            return response()->json(['message' => 'Alliances deleted successfully'], 200);
+            return response()->json(['message' => 'Alliances deleted successfully'], Response::HTTP_OK);
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error deleting Alliances'], 500);
+            return response()->json(['message' => 'Error deleting Alliances'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -248,10 +253,11 @@ class AliancesController extends Controller
 
             $aliances->save();
 
-            return response()->json($aliances, 200);
+            return response()->json($aliances, Response::HTTP_OK);
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error: failed to update avatar'], 500);
+            return response()->json(['message' => 'Error: failed to update avatar'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

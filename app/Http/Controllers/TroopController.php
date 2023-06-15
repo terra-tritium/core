@@ -8,6 +8,7 @@ use App\Models\Production;
 use App\Services\TroopService;
 use Illuminate\Http\Request;
 use App\Services\PlayerService;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
 class TroopController extends Controller
@@ -75,11 +76,13 @@ class TroopController extends Controller
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
                 return $this->troopService->production($player->id, $planet, $request->all());
             } else {
-                return response()->json(['message' => 'You are not authorized to perform this action.'], 403);
+                return response()->json(['message' => 'You are not authorized to perform this action.'],
+                    Response::HTTP_FORBIDDEN);
             }
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'An error occurred during troop production.'], 500);
+            return response()->json(['message' => 'An error occurred during troop production.'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -113,11 +116,13 @@ class TroopController extends Controller
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
                 return $this->troopService->productionTroop($player, $planet);
             } else {
-                return response()->json(['message' => 'You are not authorized to perform this action.'], 403);
+                return response()->json(['message' => 'You are not authorized to perform this action.'],
+                    Response::HTTP_FORBIDDEN);
             }
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'An error occurred during troop production.'], 500);
+            return response()->json(['message' => 'An error occurred during troop production.'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -151,11 +156,13 @@ class TroopController extends Controller
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
                 return $this->troopService->troops($player->id, $planet);
             } else {
-                return response()->json(['message' => 'You are not authorized to perform this action.'], 403);
+                return response()->json(['message' => 'You are not authorized to perform this action.'],
+                    Response::HTTP_FORBIDDEN);
             }
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'An error occurred during list troops.'], 500);
+            return response()->json(['message' => 'An error occurred during list troops.'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

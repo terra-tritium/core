@@ -25,7 +25,7 @@ class RankingController extends Controller
         $player = Player::getPlayerLogged();
         switch ($type) {
             case "top":
-                return Ranking::orderBy(RankingCategory::SCORE, 'DESC')->take(10)->get();
+                return Ranking::orderBy(RankingCategory::SCORE, 'DESC')->take(4)->get();
             case "general":
                 return Ranking::orderBy(RankingCategory::SCORE, 'DESC')->paginate($this->itensPerPage);
             case "builder":

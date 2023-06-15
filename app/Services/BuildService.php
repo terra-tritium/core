@@ -124,6 +124,11 @@ class BuildService
             }
         }
 
+        // Laboratory
+        if ($building->build == 7) {
+            $p1->pwEnergy = 1;
+        }
+
         $player = $this->playerService->addBuildScore($player, $this->levelFactor);
         
         $building->planet = Planet::where([['player', $player->id], ['id', $building->planet]])->firstOrFail()->id;
@@ -181,12 +186,24 @@ class BuildService
             return false;
         }
 
+        $building->level += 1;
+
         // Battery House
         if ($building->build == 11) {
             $player = $this->planetService->incrementBattery($planet, $this->initialBattery * $building->level);
         }
 
-        $building->level += 1;
+        // Energy
+        if ($building->build == 7) {
+            $planet->pwEnergy = $building->level;
+        }
+
+        // Warehouse
+        if ($building->build == 8) {
+            $planet->capMetal = $building->level * 10000;
+            $planet->capUranium = $building->level * 10000;
+            $planet->capCrystal = $building->level * 10000;
+        }
 
         $player = $this->playerService->addBuildScore($player, $building->level * $this->levelFactor);
 
@@ -224,7 +241,7 @@ class BuildService
         return $availables;
     }
 
-    public function listBildings ($planet) {
+    public function listBuildings ($planet) {
         return Building::where("planet", $planet)->get();
     }
 
