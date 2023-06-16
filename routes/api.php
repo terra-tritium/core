@@ -162,6 +162,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{resource}/{type}/{orderby?}/{column?}', [TradingController::class, 'getAllTradingByMarketResource']);
         Route::get('/myresources', [TradingController::class, 'getMyResources']);
         Route::post('/new-sale', [TradingController::class, 'tradingNewSale']);
+        Route::get('/history', [TradingController::class, 'getAllOrdersPlayer']);
+        Route::patch('/cancel/{id}', [TradingController::class, 'cancelOrder']);
     });
 
 
