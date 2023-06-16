@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Player;
 use App\Models\Planet;
-use App\Models\Aliance;
+use App\Models\AlianceRanking;
 use App\Services\PlanetService;
 
 class PlayerService
@@ -30,6 +30,7 @@ class PlayerService
     $player->gameMode = 1;
     $player->attackStrategy = 1;
     $player->defenseStrategy = 1;
+    $player->researchPoints = 0;
     $player->save();
 
     $newAlocation = $this->startAlocation();
@@ -48,6 +49,7 @@ class PlayerService
     $planet->workersOnMetal = 0;
     $planet->workersOnUranium = 0;
     $planet->workersOnCrystal = 0;
+    $planet->workersOnLaboratory = 0;
     $planet->useEnergyByFactory = 0;
     $planet->status = "pacific";
     $planet->player = $player->id;
@@ -69,9 +71,11 @@ class PlayerService
     $planet->pwEnergy = 0;
     $planet->pwWorker = 0;
     $planet->transportShips = 0;
+    $planet->researchPoints = 0;
+    $planet->pwResearch = 0;
     $planet->save();
   }
-  
+
   private function startAlocation() {
     $coords = [];
     $lastPlanet = Planet::orderBy('id', 'desc')->first();
@@ -88,7 +92,7 @@ class PlayerService
 
     $lastQuadrant = $lastPlanet->quadrant;
     $lastPosition = $lastPlanet->position;
-    
+
     $cont = 0;
 
     do {
@@ -165,11 +169,25 @@ class PlayerService
     $details['country'] = $player->country;
     $details['score'] = $player->score;
     if ($player->aliance != null) {
-      $aliance = Aliance::where('id', $player->aliance)->firstOrFail();
+      $aliance = AlianceRanking::where('id', $player->aliance)->firstOrFail();
       $details['aliance'] = $aliance->name;
     } else {
       $details['aliance'] = "no aliance";
     }
     return $details;
+  }
+
+  public function iSplayerOwnerPlanet($player, $planet) {
+    $planet = Planet::where(['player' => $player, 'id' => $planet])->first();
+    if ($planet) {
+      return true;
+    }
+    return false;
+  }
+
+  public function getPlanets() {
+    $playerLogged = Player::getPlayerLogged();
+    $planets = Planet::where('player', $playerLogged->id)->get();
+    return $planets;
   }
 }

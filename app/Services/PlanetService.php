@@ -15,17 +15,25 @@ class PlanetService
     $this->rankingService = new RankingService();
   }
 
-  public function currentBalance($p1, $type) {
+  public function syncronizeEnergy(Planet $planet) {
+    $currentBalance = $this->currentBalance($planet, 0);
+    $planet->energy = $currentBalance;
+    $planet->timeEnergy = $this->timeNow;
+    $planet->save();
+  }
 
-    $msInHour = 3600000;
-    $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $msInHour;
-    $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $msInHour;
-    $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $msInHour;
-    $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $msInHour;
+  public function currentBalance($p1, $type) {
+    # secounds in hour
+    $sInHour = 3600;
+    
+    $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $sInHour;
+    $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $sInHour;
+    $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $sInHour;
+    $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $sInHour;
 
     switch ($type) {
       case 0: 
-        return $p1->energy + ($p1->pwEnergy * (env("TRITIUM_ENERGY") * $activeEnergyMining));
+        return $p1->energy + ($p1->workersWaiting * (env("TRITIUM_ENERGY") * $activeEnergyMining));
       case 1: 
         return $p1->metal + ($p1->pwMetal * (env("TRITIUM_METAL") * $activeMetalMining));
       case 2: 
@@ -159,12 +167,5 @@ class PlanetService
     $p1->battery += $units;
     return $p1;
   }
-
-  public function iSplayerOwnerPlanet($player, $planet) {
-    $planet = Planet::where(['player' => $player, 'id' => $planet])->first();
-    if ($planet) {
-      return true;
-    }
-    return false;
-  }
+ 
 }

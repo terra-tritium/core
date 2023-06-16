@@ -6,7 +6,43 @@ use App\Models\Player;
 use App\Models\User;
 use App\Services\PlayerService;
 use App\Services\UserService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+
+/**
+ * @OA\Schema(
+ *         schema="RegisterPlayerRequest",
+ *         @OA\Property(
+ *             property="email",
+ *             type="string",
+ *             example="example@example.com"
+ *         ),
+ *         @OA\Property(
+ *             property="name",
+ *             type="string",
+ *             example="John Doe"
+ *         ),
+ *         @OA\Property(
+ *             property="password",
+ *             type="string",
+ *             example="password"
+ *         ),
+ *         @OA\Property(
+ *             property="address",
+ *             type="string",
+ *             example="123 Street"
+ *         ),
+ *         @OA\Property(
+ *             property="country",
+ *             type="string",
+ *             example="USA"
+ *         )
+ *     )
+ *
+ *
+ * )
+ */
 
 class PlayerController extends Controller
 {
@@ -91,17 +127,67 @@ class PlayerController extends Controller
         //
     }
 
+    /**
+     *
+     * @OA\Post(
+     *     path="/player/new",
+     *     operationId="registerPlayer",
+     *     tags={"Players"},
+     *     summary="Register a new player",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/RegisterPlayerRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Player created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Player created success!"
+     *             ),
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean",
+     *                 example=true
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="User or player already exists",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="There is already a registered user with this E-mail!"
+     *             ),
+     *             @OA\Property(
+     *                 property="success",
+     *                 type="boolean",
+     *                 example=false
+     *             )
+     *         )
+     *     )
+     * )
+     *
+     * @param Request $request
+     * @return Response
+     */
     public function register(Request $request) {
 
         $userExist   =  User::where('email',$request->input("email"))->first();
         $playedExist =  Player::where('name',$request->input("name"))->first();
 
         if($userExist){
-            return response(['message' => 'There is already a registered user with this E-mail!','success'=>false],200);
+            return response(['message' => 'There is already a registered user with this E-mail!','success'=>false],
+                Response::HTTP_OK);
         }
 
         if($playedExist){
-            return response(['message' => 'There is already a registered user with this Player Name!','success'=>false],200);
+            return response(['message' => 'There is already a registered user with this Player Name!','success'=>false],
+                Response::HTTP_OK);
         }
 
         $user = new User();
@@ -117,17 +203,95 @@ class PlayerController extends Controller
         $player->user = $user->id;
         $this->playerService->register($player);
 
-        return response(['message' => 'Player created success!','success'=>true],200);
+        return response(['message' => 'Player created success!','success'=>true],Response::HTTP_OK);
 
     }
 
-    public function getNameUser($userId){
-        User::find($userId);
-        return User::find($userId)->name;
+    /**
+     *
+     *  @OA\Post(
+     *     path="/player/list-name/{id}",
+     *     operationId="getPlayerName",
+     *     tags={"Players"},
+     *     summary="Get user name by ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="User ID",
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="name",
+     *                 type="string",
+     *                 example="John Doe"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
+     *     )
+     * )
+     *
+     * @param $userId
+     * @return mixed
+     */
+    public function getNameUser($userId) {
+        $user = User::find($userId);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'],
+                Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json(['name' => $user->name]);
     }
 
+    /**
+     *
+     * @OA\Get(
+     *     path="/player/details/{id}",
+     *     operationId="getPlayerDetails",
+     *     tags={"Players"},
+     *     summary="Get player details by ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Player ID",
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Player not found"
+     *     )
+     * )
+     *
+     * @param $id
+     * @return array
+     */
     public function getDetails($id) {
-        return $this->playerService->getDetails($id);
+        try {
+            $playerDetails = $this->playerService->getDetails($id);
+            return response()->json($playerDetails);
+        } catch (ModelNotFoundException $exception) {
+            return response()->json(['message' => 'Player not found'], Response::HTTP_NOT_FOUND);
+        }
     }
 
 }

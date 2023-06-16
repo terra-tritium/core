@@ -20,6 +20,10 @@ class BattleService
     private $rangeLimit2;
     private $rangeLimit3;
     private $currentStage;
+    private $attackReserve;
+    private $defenseReserve;
+    private $travelService;
+        
 
     public function __construct() {
         $this->sizeFator1 = 1;
@@ -35,7 +39,7 @@ class BattleService
         $this->currentStage = new BattleStage();
     }
 
-    public function startNewBattle ($attack, $defense, $aUnits, $dUnits, $aStrategy, $dStrategy) {
+    public function startNewBattle ($attack, $defense, $aUnits, $dUnits, $aStrategy, $dStrategy,$dPlanet) {
         $battle = new Battle();
         $battle->attack = $attack;
         $battle->defense = $defense;
@@ -47,6 +51,7 @@ class BattleService
         $battle->start = time();
         $battle->attackReserve = json_encode($aUnits);
         $battle->defenseReserve = json_encode($dUnits);
+        $battle->planet = $dPlanet;
         $battle->save();
 
         
@@ -100,10 +105,11 @@ class BattleService
         $stage->defenseStrategy = $battle->defenseStrategy;
         $stage->attackUnits = $battle->attackUnits;
         $stage->defenseUnits = $battle->defenseUnits;
-        $stage->attackKills = 0;
-        $stage->defenseKills = 0;
+        $stage->attackKills = json_encode("{}");
+        $stage->defenseKills = json_encode("{}");
         $stage->attackGaveUp = false;
-        $stage->defenseGaveUp = ($desistiu == 1) ? true : false;
+        $stage->defenseGaveUp = false;
+        #$stage->defenseGaveUp = ($desistiu == 1) ? true : false;
 
         $stage = $this->resolveConfrontation($battle, $stage);
 
@@ -503,5 +509,5 @@ class BattleService
         
         return $slotPositions[$strategy];
     }
-
+ 
 }

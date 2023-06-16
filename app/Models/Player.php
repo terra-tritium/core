@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class Player extends Model
 {
@@ -12,12 +13,16 @@ class Player extends Model
     public $timestamps = false;
     protected $table = 'players';
 
-    public static function getPlayerLogged(){
+    public static function getPlayerLogged() {
+        if (!Auth::check()) { return false; }
+        
         return DB::table('players')->where('user', auth()->user()->id)->first();
     }
 
     public static function getMyPlanets()
     {
+        if (!Auth::check()) { return false; }
+
         $player = DB::table('players')->where('user', auth()->user()->id)->first();
         $planets = DB::table('planets')->where('player', $player->id)->get();
 

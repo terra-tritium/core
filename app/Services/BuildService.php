@@ -63,10 +63,15 @@ class BuildService
         $playerLogged = Player::getPlayerLogged();
         $player = Player::findOrFail($playerLogged->id);
 
+        # Yet have a building in construction on this planet
+        if ($p1->ready != null && $p1->ready > time()) {
+            return false;
+        }
 
         $require = $this->calcResourceRequire($building->build, 1);
 
         $building->ready = time() + ($require->time * env("TRITIUM_BUILD_SPEED"));
+        $p1->ready = $building->ready;
         
         // Colonization
         if ($building->build == 1) {
@@ -119,6 +124,11 @@ class BuildService
             }
         }
 
+        // Laboratory
+        if ($building->build == 7) {
+            $p1->pwEnergy = 1;
+        }
+
         $player = $this->playerService->addBuildScore($player, $this->levelFactor);
         
         $building->planet = Planet::where([['player', $player->id], ['id', $building->planet]])->firstOrFail()->id;
@@ -161,7 +171,13 @@ class BuildService
         $player = Player::findOrFail($planet->player);
         $require = $this->calcResourceRequire($building->build, $building->level + 1);
 
+        # Yet have a building in construction on this planet
+        if ($planet->ready != null && $planet->ready > time()) {
+            return false;
+        }
+
         $building->ready = time() + ($require->time * env("TRITIUM_BUILD_SPEED"));
+        $planet->ready = $building->ready;
 
         if ($this->suficientFunds($planet, $require)) {
             $this->spendResources($planet, $require);
@@ -170,15 +186,28 @@ class BuildService
             return false;
         }
 
+        $building->level += 1;
+
         // Battery House
         if ($building->build == 11) {
             $player = $this->planetService->incrementBattery($planet, $this->initialBattery * $building->level);
         }
 
-        $building->level += 1;
+        // Energy
+        if ($building->build == 7) {
+            $planet->pwEnergy = $building->level;
+        }
+
+        // Warehouse
+        if ($building->build == 8) {
+            $planet->capMetal = $building->level * 10000;
+            $planet->capUranium = $building->level * 10000;
+            $planet->capCrystal = $building->level * 10000;
+        }
 
         $player = $this->playerService->addBuildScore($player, $building->level * $this->levelFactor);
 
+        $planet->save();
         $player->save();
         $building->save();
     }
@@ -212,7 +241,7 @@ class BuildService
         return $availables;
     }
 
-    public function listBildings ($planet) {
+    public function listBuildings ($planet) {
         return Building::where("planet", $planet)->get();
     }
 
@@ -239,20 +268,20 @@ class BuildService
             $uraniumReq = $build->uraniumStart;
         }
         if ($level > $build->uraniumLevel) {
-            $metalReq = $build->metalStart;
+            $uraniumReq = $build->uraniumStart;
             for ($i = 1; $i <= (($level - $build->uraniumLevel)); $i++) {
                 $uraniumReq += $uraniumReq * ($build->coefficient / 100);
             }
         }
 
         # Crystal
-        if ($level == $build->uraniumLevel) {
-            $uraniumReq = $build->uraniumStart;
+        if ($level == $build->crystalLevel) {
+            $crystalReq = $build->crystalStart;
         }
         if ($level > $build->uraniumLevel) {
-            $metalReq = $build->metalStart;
-            for ($i = 1; $i <= (($level - $build->uraniumLevel)); $i++) {
-                $uraniumReq += $uraniumReq * ($build->coefficient / 100);
+            $crystalReq = $build->crystalStart;
+            for ($i = 1; $i <= (($level - $build->crystalLevel)); $i++) {
+                $crystalReq += $crystalReq * ($build->coefficient / 100);
             }
         }
 

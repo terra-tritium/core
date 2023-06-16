@@ -7,6 +7,7 @@ use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -68,9 +69,15 @@ class AuthController extends Controller
 
         if($success)
         {
-            return response(['message' => '','success'=>true, 'token' => $success['token'],'name' => $success['name'],'planet' => $success['planet']],200);
+            return response([
+                'message' => '',
+                'success'=>true,
+                'token' => $success['token'],
+                'name' => $success['name'],
+                'planet' => $success['planet']],
+                Response::HTTP_OK);
         }else{
-            return response(['message' => 'Invalid Credentials','success'=>false],200);
+            return response(['message' => 'Invalid Credentials','success'=>false],Response::HTTP_OK);
         }
 
     }
@@ -140,12 +147,12 @@ class AuthController extends Controller
     {
         $user = User::first();
         if (!$user) {
-            return response(['message' => 'No user found'], 404);
+            return response(['message' => 'No user found'], Response::HTTP_NOT_FOUND);
         }
 
         $token = $user->createToken('TokenName')->plainTextToken;
 
-        return response(['message' => 'Token generated successfully', 'token' => $token], 200);
+        return response(['message' => 'Token generated successfully', 'token' => $token], Response::HTTP_OK);
     }
 
 }

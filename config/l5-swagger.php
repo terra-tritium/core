@@ -2,6 +2,8 @@
 
 return [
     'default' => 'default',
+    'swagger' => '2.0.0',
+    "openapi" => "3.0.0",
     'documentations' => [
         'default' => [
             'api' => [
@@ -297,5 +299,7 @@ return [
         'constants' => [
             'L5_SWAGGER_CONST_HOST' => env('L5_SWAGGER_CONST_HOST', 'http://my-default-host.com'),
         ],
+
     ],
+
 ];

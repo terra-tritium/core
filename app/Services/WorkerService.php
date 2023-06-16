@@ -27,7 +27,6 @@ class WorkerService
       case 5 : 
           $planet->workersOnUranium = 0;
           break;
-
       // Crystal
       case 6 : 
           $planet->workersOnCrystal = 0;
@@ -49,6 +48,7 @@ class WorkerService
                 $planet->pwMetal = $workers;
                 $planet->workersOnMetal = $workers;
                 $planet->workersWaiting = $this->waitingWorkers($planet);
+                $this->syncronizeEnergy($planet, $building->level);
                 break;
 
             // Uranium
@@ -58,6 +58,7 @@ class WorkerService
                 $planet->pwUranium = $workers;
                 $planet->workersOnUranium = $workers;
                 $planet->workersWaiting = $this->waitingWorkers($planet);
+                $this->syncronizeEnergy($planet, $building->level);
                 break;
 
             // Crystal
@@ -67,17 +68,31 @@ class WorkerService
                 $planet->pwCrystal = $workers;
                 $planet->workersOnCrystal = $workers;
                 $planet->workersWaiting = $this->waitingWorkers($planet);
+                $this->syncronizeEnergy($planet, $building->level);
                 break;
         }
 
         $building->workers = $workers;
 
-        $building->save();   
+        $building->save(); 
         $planet->save();
     }
   }
 
   private function waitingWorkers(Planet $planet) {
-    return $planet->workers - ($planet->workersOnMetal + $planet->workersOnUranium + $planet->workersOnCrystal);
+    return $planet->workers - ($planet->workersOnMetal + $planet->workersOnUranium + $planet->workersOnCrystal + $planet->workersOnLaboratory);
+  }
+
+  public function syncronizeEnergy(Planet $planet, $level) {
+    $fator = 0;
+    $padronizedLevel = $level * 10;
+    if ($padronizedLevel < $planet->workersWaiting) {
+      $fator = $padronizedLevel;
+    } else {
+      $fator = $planet->workersWaiting;
+    }
+    $planet->energy += ((time() - $planet->timeEnergy) / 360) * env('TRITIUM_ENERGY') * $fator;
+    $planet->timeEnergy = time();
+    $planet->save();
   }
 }

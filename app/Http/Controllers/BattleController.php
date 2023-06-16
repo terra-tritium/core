@@ -2,32 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AttackMode;
-use App\Models\DefenseMode;
+//use App\Models\AttackMode;
+//use App\Models\DefenseMode;
 use App\Models\Player;
 use App\Models\Battle;
 use App\Models\BattleStage;
 use App\Services\BattleService;
 use App\Services\PlayerService;
+use App\Services\TravelService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class BattleController extends Controller
 {
     protected $battleService;
     protected $playerService;
+    protected $travelService;
 
-    public function __construct(BattleService $battleService, PlayerService $playerService) {
+    public function __construct(BattleService $battleService, PlayerService $playerService, TravelService $travelService) {
         $this->battleService = $battleService;
         $this->playerService = $playerService;
+        $this->travelService = $travelService;
     }
 
-    public function attackModeList() {
-        return AttackMode::orderBy("code")->get();
-    }
+    // public function attackModeList() {
+    //     return AttackMode::orderBy("code")->get();
+    // }
 
-    public function defenseModeList() {
-        return DefenseMode::orderBy("code")->get();
-    }
+    // public function defenseModeList() {
+    //     return DefenseMode::orderBy("code")->get();
+    // }
 
     public function changeAttackMode($option) {
         $user = auth()->user()->id;
@@ -51,47 +55,34 @@ class BattleController extends Controller
         return BattleStage::where('battle', $id)->get();
     }
 
-    public function start($defender,$planet) {
-        $attack = Player::getPlayerLogged();
-        $playerOwnerPlatet = $this->playerService->iSplayerOwnerPlanet($defender,$planet);
+    public function start($defense,$planet,$travel) {
+        $playerOwnerPlatet = $this->playerService->iSplayerOwnerPlanet($defense,$planet);
 
         if($playerOwnerPlatet){
-            $aUnits = [
-                [
-                    'unit' => 1,
-                    'quantity' => 5000,
-                    'type' => 'D',
-                    'attack' => 5,
-                    'defense' => 2,
-                    'life' => 20
-                ]
-            ];
-            $dUnits = [
-                [
-                    'unit' => 1,
-                    'quantity' => 1000,
-                    'type' => 'D',
-                    'attack' => 10,
-                    'defense' => 3,
-                    'life' => 20
-                ]
-            ];
-            $aStrategy = 3;
-            $dStrategy = 5;
+
+            $attack  = Player::getPlayerLogged();
+            $defense = Player::find($defense);
+
+            $aUnits  = $this->travelService->getTroopAttack($travel);
+            $dUnits  = $this->travelService->getTroopDefense($travel);
+
+            $aStrategy = $attack->attackStrategy;
+            $dStrategy = $defense->defenseStrategy;
 
             return $this->battleService->startNewBattle (
-                $attack,
-                $defender,
+                $attack->id,
+                $defense->id,
                 $aUnits,
                 $dUnits,
                 $aStrategy,
-                $dStrategy
+                $dStrategy,
+                $planet
             );
         }
         else{
             return response()->json([
                 'message' => 'The player is not the owner of the planet'
-            ], 403);
+            ], Response::HTTP_FORBIDDEN);
         }
     }
 }

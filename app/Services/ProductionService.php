@@ -7,6 +7,7 @@ use App\Models\Player;
 use App\Models\Unit;
 use App\Jobs\TroopJob;
 use App\Jobs\FleetJob;
+use App\Models\Planet;
 use App\Services\PlanetService;
 
 class ProductionService
@@ -26,10 +27,10 @@ class ProductionService
       $production->planet = $planet;
       $finalTime = 0;
   
-      $finalTime = $unitModel->time;
+      $finalTime = time() + ($unitModel->time *  $unit['quantity'] * env("TRITIUM_PRODUCTION_SPEED") );
       $newUnit[] = $unit;
       
-      $production->ready = time() + $finalTime;
+      $production->ready = $finalTime;
       $production->objects = json_encode($newUnit);
       $production->executed = false;
       $production->save();
@@ -40,7 +41,7 @@ class ProductionService
           $player,
           $newUnit,
           $production->id
-        )->delay(now()->addSeconds($finalTime * ( env("TRITIUM_PRODUCTION_SPEED") / 1000 ) ));
+        )->delay(now()->addSeconds($finalTime));
       }
   
       if ($type == "fleet") {
@@ -49,7 +50,7 @@ class ProductionService
           $player,
           $newUnit,
           $production->id
-        )->delay(now()->addSeconds($finalTime * ( env("TRITIUM_PRODUCTION_SPEED") / 1000 ) ));
+        )->delay(now()->addSeconds($finalTime));
       }
     }else{
       return false;
@@ -57,11 +58,11 @@ class ProductionService
     
   }
 
-  public function hasFunds($unit, $player) {
+  public function hasFunds($unit, $planet) {
     $unitModel = Unit::findOrFail($unit["id"]);
 
     if (isset($unit["quantity"])) {
-      $p1 = Player::findOrFail($player);
+      $p1 = Planet::findOrFail($planet);
       if (!$this->planetService->enoughBalance($p1, ($unitModel->metal * $unit["quantity"]), 1)){
             return false;
         }
@@ -75,7 +76,7 @@ class ProductionService
     return true;
   }
 
-  public function spendFunds($player, $unit) {
+  public function spendFunds($planet, $unit) {
     $metal = 0;
     $uranium = 0;
     $crystal = 0;
@@ -85,7 +86,7 @@ class ProductionService
     $uranium += $unitModel->uranium;
     $crystal += $unitModel->crystal;
 
-    $p1 = Player::findOrFail($player);
+    $p1 = Planet::findOrFail($planet);
     $p1 = $this->planetService->removeMetal($p1, $metal);
     $p1 = $this->planetService->removeUranium($p1, $uranium);
     $p1 = $this->planetService->removeCrystal($p1, $crystal);
@@ -110,7 +111,7 @@ class ProductionService
 
         $unitModel->ready =  $production->ready;
         $unitModel->planet =  $production->planet;
-        $unitModel->quantity =  $production->quantity;
+        $unitModel->quantity =  $unit->quantity;
 
         $units[] =  $unitModel ;
       }

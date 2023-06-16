@@ -4,16 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
-class Aliance extends Model
+class Market extends Model
 {
     use HasFactory;
-    protected $table = 'aliances';
+    protected $table = 'market';
     public $timestamps = false;
 
     protected $fillable = [
+        'region',
+        'status',
         'name',
-        'description',
-        'avatar'
+        'createdAt',
+        'updatedAt',
     ];
+
+    
 }

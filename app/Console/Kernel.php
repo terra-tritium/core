@@ -18,6 +18,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+
+        $schedule->command('rankings:update')->everyThirtyMinutes();
+        $schedule->command('energy:update')->everyThirtyMinutes();
+        $schedule->command('aliances-rankings:update')->everyThirtyMinutes();
+
         # Ranking
         $schedule->call(function () {
 
