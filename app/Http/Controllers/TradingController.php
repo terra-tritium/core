@@ -6,7 +6,10 @@ use App\Models\Market;
 use App\Models\Planet;
 use App\Models\Player;
 use App\Models\Trading;
+use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+
 use Exception;
 
 class TradingController extends Controller
@@ -80,36 +83,66 @@ class TradingController extends Controller
     {
         $planeta = $this->getPlanetUserLogged();
         $trading = new Trading();
-        $resources = $trading->getMyResources($planeta[0]->player);
+        $resources = $trading->getResourceAvailable($planeta[0]->player);
         return $resources;
+        // return $resources;
     }
     public function tradingNewSale(Request $request)
     {
         $planeta = $this->getPlanetUserLogged();
         $trading = new Trading();
-        $resources = $trading->getMyResources($planeta[0]->player)  ?? [];
+        $resources = $trading->getResourceAvailable($planeta[0]->player)  ?? [];
         $resourceKey = strtolower($request->resource);
         if (property_exists($resources, $resourceKey)) {
             if ($resources->{$resourceKey} <= $request->quantity) {
-                return ['msg' => 'tentando vender mais do que tem'];
+                return response()->json(['error' => 'Trying to sell a quantity of resource higher than available'], Response::HTTP_BAD_REQUEST);
             } else {
-                $newTrading = new Trading();
-                $newTrading->resource = $request->resource;
-                $newTrading->type = 'S';
-                $newTrading->price = $request->unitityPrice;
-                $newTrading->quantity = $request->quantity;
-                $newTrading->total = $request->quantity * $request->unitityPrice;
-                $newTrading->status = true;
-                $newTrading->idPlanetCreator = $planeta[0]->id; //pega o id do planeta que ta logado
-                $newTrading->idMarket = Market::where('region','A')->first()['id'] ?? 'A'; //pega a região do planeta que ta logado
-                $newTrading->save();
-                return ["quantidadeDisponivel" => $resources->{$resourceKey}, "a venda" => $request->quantity, 'dados'=>$newTrading];
+                try {
+                    $newTrading = new Trading();
+                    $newTrading->resource = $request->resource;
+                    $newTrading->type = 'S';
+                    $newTrading->price = $request->unitityPrice;
+                    $newTrading->quantity = $request->quantity;
+                    $newTrading->total = $request->quantity * $request->unitityPrice;
+                    $newTrading->status = true;
+                    $newTrading->idPlanetCreator = $planeta[0]->id; //pega o id do planeta que ta logado
+                    $newTrading->idMarket = Market::where('region', 'A')->first()['id'] ?? 'A'; //pega a região do planeta que ta logado
+                    $newTrading->save();
+                    return response(['message' => 'New order successfully registered!', 'success' => true, 'new' => $newTrading], Response::HTTP_OK);
+                } catch (Exception $e) {
+                    return response(["msg" => "error " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
             }
         } else {
-            return "não existe a chave informada, verificar!";
+            return response(['message' => 'Não existe a chave informada', 'success' => false], Response::HTTP_NOT_FOUND);
         }
+    }
 
-        // $crys = "crystal1";
-        // return  property_exists($resources,$resourceKey) ? "existe" : "não existe";
+    public function getAllOrdersPlayer()
+    {
+        $planeta = $this->getPlanetUserLogged();
+        $trading = new Trading();
+        $orders = $trading->getAllOrderPlayer($planeta[0]->player) ?? [];
+        return $orders;
+    }
+    public function cancelOrder($id)
+    {
+        try {
+            $trading = Trading::find($id);
+            if (!$trading) {
+                return response(['message' => 'Trading não encontrado', 'success' => false], Response::HTTP_NOT_FOUND);
+            }
+            $planeta = $this->getPlanetUserLogged();
+            //verifica se o status pode ser alterado e quem ta alterando a ordem é quem criou
+            if ($trading->status != 1 || $trading->idPlanetCreator != $planeta[0]->player) {
+                return response(['message' => 'Status não pode ser alterado ou não é o criador', 'success' => false], Response::HTTP_BAD_REQUEST);
+            }
+            $trading->status = 0;
+            $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
+            $trading->save();
+            return response(['message' => 'New order successfully registered!', 'success' => true, 'new' => $trading], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response(["message" => "error " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
