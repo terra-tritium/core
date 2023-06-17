@@ -87,6 +87,7 @@ class TradingController extends Controller
         return $resources;
         // return $resources;
     }
+
     public function tradingNewSale(Request $request)
     {
         $planeta = $this->getPlanetUserLogged();
@@ -97,32 +98,42 @@ class TradingController extends Controller
             if ($resources->{$resourceKey} <= $request->quantity) {
                 return response()->json(['error' => 'Trying to sell a quantity of resource higher than available'], Response::HTTP_BAD_REQUEST);
             } else {
-                try {
-                    $newTrading = new Trading();
-                    $newTrading->resource = $request->resource;
-                    $newTrading->type = 'S';
-                    $newTrading->price = $request->unitityPrice;
-                    $newTrading->quantity = $request->quantity;
-                    $newTrading->total = $request->quantity * $request->unitityPrice;
-                    $newTrading->status = true;
-                    $newTrading->idPlanetCreator = $planeta[0]->id; //pega o id do planeta que ta logado
-                    $newTrading->idMarket = Market::where('region', 'A')->first()['id'] ?? 'A'; //pega a região do planeta que ta logado
-                    $newTrading->save();
-                    return response(['message' => 'New order successfully registered!', 'success' => true, 'new' => $newTrading], Response::HTTP_OK);
-                } catch (Exception $e) {
-                    return response(["msg" => "error " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+                $success = $this->createTrading($request, $planeta[0]->id);
+                if ($success) {
+                    return response(['message' => 'New order successfully registered!', 'success' => true], Response::HTTP_OK);
+                } else {
+                    return response(["msg" => "error "], Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
             }
         } else {
             return response(['message' => 'Não existe a chave informada', 'success' => false], Response::HTTP_NOT_FOUND);
         }
     }
-
-    public function getAllOrdersPlayer()
+    private function createTrading($request, $idCreator)
     {
+        try {
+            $newTrading = new Trading();
+            $newTrading->resource = $request->resource;
+            $newTrading->type = $request->type;
+            $newTrading->price = $request->unitityPrice;
+            $newTrading->quantity = $request->quantity;
+            $newTrading->total = $request->quantity * $request->unitityPrice;
+            $newTrading->status = true;
+            $newTrading->idPlanetCreator = $idCreator; //pega o id do planeta que ta logado
+            $newTrading->idMarket = Market::where('region', 'A')->first()['id'] ?? 'A'; //pega a região do planeta que ta logado
+            $newTrading->save();
+            return true;
+        } catch (Exception $e) {
+            //gerar o log
+            return false;
+        }
+    }
+    public function getAllOrdersPlayer($id = 'Metal')
+    {
+        // return $recurso;
         $planeta = $this->getPlanetUserLogged();
         $trading = new Trading();
-        $orders = $trading->getAllOrderPlayer($planeta[0]->player) ?? [];
+        $orders = $trading->getAllOrderPlayer($planeta[0]->player, $id) ?? [];
         return $orders;
     }
     public function cancelOrder($id)
@@ -140,7 +151,25 @@ class TradingController extends Controller
             $trading->status = 0;
             $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
             $trading->save();
-            return response(['message' => 'New order successfully registered!', 'success' => true, 'new' => $trading], Response::HTTP_OK);
+            return response(['message' => 'New order sale successfully registered!', 'success' => true, 'new' => $trading], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response(["message" => "error " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    public function tradingNewPurchase(Request $request)
+    {
+        try {
+            if ($request->quantity <= 0 || $request->unitityPrice <= 0) {
+                return response(['message' => 'Quantidade e preço unitário devem ser superiores a 0', 'success' => false], Response::HTTP_BAD_REQUEST);
+            }
+            $planeta = $this->getPlanetUserLogged();
+            $success = $this->createTrading($request, $planeta[0]->id);
+            if ($success) {
+                return response(['message' => 'New order purch successfully registered!', 'success' => true], Response::HTTP_OK);
+            } else {
+                return response(["msg" => "error "], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+            return $request;
         } catch (Exception $e) {
             return response(["message" => "error " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

@@ -67,7 +67,7 @@ class Trading extends Model
             ->first();
         return $resources;
     }
-    public function getAllOrderPlayer($player)
+    public function getAllOrderPlayer($player, $resource)
     {
         $orders = DB::table($this->table . ' as t')
             ->select(
@@ -86,6 +86,7 @@ class Trading extends Model
             )
             ->leftJoin('trading_finished as tf', 'tf.idTrading', '=', 't.id')
             ->where('t.idPlanetCreator', $player)
+            ->where('t.resource', $resource)
             ->orderBy('t.createdAt', 'DESC')
             ->get();
         return $orders;
