@@ -47,8 +47,8 @@ class ResearchSeeder extends Seeder
             'title' => 'Energy Force Field',
             'description' => 'A force field is like a protective cloak, a web of luminous lines that wrap around an object, creating an energy shield that envelops and safeguards. It is a spectacular phenomenon of physics, a spectacle of light and color, maintaining balance and stability in the universe.',
             'cost' => 100,
-            'dependence' => 200,
-            'category' => 2,
+            'dependence' => 0,
+            'category' => 1,
             'effectDescription' => 'Enables the construction of a Force Shield for the defense of the planet against external attacks',
             'effects' => json_encode([
                 'speedTravel' => 1,
@@ -60,7 +60,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Space Mechanics',
             'description' => 'Space Mechanics is a symphony of technology and design, where science and imagination come together to create astonishing machines that travel and explore the cosmos. It is the realization of human ambition to reach the limits of the universe and discover new forms of life and culture. With its futuristic vision and technological elegance, space mechanics resonates like flying operas, taking humanity to unimaginable places.',
             'cost' => 100,
-            'dependence' => 0,
+            'dependence' => 300,
             'category' => 1,
             'effectDescription' => 'Enables the construction of the Spaceship Factory',
             'effects' => json_encode([
