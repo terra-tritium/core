@@ -83,7 +83,7 @@ class BuildService
             }
         }
 
-        // Power Core
+        // Energy Collector
         if ($building->build == 2) {
             $this->starNewMining($p1, $building, 0, 1, $require->metal);
         }

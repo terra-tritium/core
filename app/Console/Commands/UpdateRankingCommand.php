@@ -35,11 +35,16 @@ class UpdateRankingCommand extends Command
 
             $players = DB::table('players')
                 ->select('id', 'name', 'score', 'buildScore', 'attackScore', 'defenseScore', 'militaryScore', 'researchScore', 'aliance')
+                ->orderBy('score', 'desc')
                 ->get();
 
+            $count = 0;
+
             foreach ($players as $player) {
+                $count++;
                 DB::table('ranking')->insert([
                     'name' => $player->name,
+                    'position' => $count,
                     'player' => $player->id,
                     'energy' => $this->calculateTotalEnergy($player->id),
                     'score' => $player->score,

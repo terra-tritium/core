@@ -84,6 +84,10 @@ class WorkerService
   }
 
   public function syncronizeEnergy(Planet $planet, $level) {
+
+    if ($planet->timeEnergy == null) { return false; }
+    if ($planet->timeEnergy == 0) { return false; }
+    
     $fator = 0;
     $padronizedLevel = $level * 10;
     if ($padronizedLevel < $planet->workersWaiting) {
