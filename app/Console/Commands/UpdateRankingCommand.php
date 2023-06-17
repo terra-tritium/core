@@ -35,6 +35,7 @@ class UpdateRankingCommand extends Command
 
             $players = DB::table('players')
                 ->select('id', 'name', 'score', 'buildScore', 'attackScore', 'defenseScore', 'militaryScore', 'researchScore', 'aliance')
+                ->orderBy('score', 'desc')
                 ->get();
 
             $count = 0;
