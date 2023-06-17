@@ -83,11 +83,6 @@ class BuildService
             }
         }
 
-        // Power Core
-        if ($building->build == 2) {
-            $this->starNewMining($p1, $building, 0, 1, $require->metal);
-        }
-
         // Metal Mining
         if ($building->build == 4) {
             $this->starNewMining($p1, $building, 1, 1, $require->metal);
