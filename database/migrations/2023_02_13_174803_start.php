@@ -139,6 +139,7 @@ return new class extends Migration
         });
         Schema::create('ranking', function (Blueprint $table) {
             $table->id();
+            $table->integer("position");
             $table->string("name");
             $table->integer('player')->constrained("players");
             $table->integer('aliance')->nullable()->unsigned();
