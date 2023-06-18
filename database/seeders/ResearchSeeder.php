@@ -47,11 +47,12 @@ class ResearchSeeder extends Seeder
             'title' => 'Energy Force Field',
             'description' => 'A force field is like a protective cloak, a web of luminous lines that wrap around an object, creating an energy shield that envelops and safeguards. It is a spectacular phenomenon of physics, a spectacle of light and color, maintaining balance and stability in the universe.',
             'cost' => 100,
-            'dependence' => 200,
-            'category' => 2,
-            'effectDescription' => 'Enables the construction of a Force Shield for the defense of the planet against external attacks',
+            'dependence' => 0,
+            'category' => 1,
+            'effectDescription' => 'Enables the construction of a Force Shield and the Defense Tower to protect the planet against external attacks',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'enableForceShield' => true,
+                'enableDefenseTower' => true
             ]),
         ]);
 
@@ -60,9 +61,9 @@ class ResearchSeeder extends Seeder
             'title' => 'Space Mechanics',
             'description' => 'Space Mechanics is a symphony of technology and design, where science and imagination come together to create astonishing machines that travel and explore the cosmos. It is the realization of human ambition to reach the limits of the universe and discover new forms of life and culture. With its futuristic vision and technological elegance, space mechanics resonates like flying operas, taking humanity to unimaginable places.',
             'cost' => 100,
-            'dependence' => 0,
+            'dependence' => 300,
             'category' => 1,
-            'effectDescription' => 'Enables the construction of the Spaceship Factory',
+            'effectDescription' => 'Enables the construction of the Shipyard',
             'effects' => json_encode([
                 'speedTravel' => 1,
             ]),
@@ -122,7 +123,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 900,
-            'title' => 'Expension',
+            'title' => 'Expansion',
             'description' => 'Expansion, an unstoppable call beyond familiar frontiers, awakens the audacity of explorers and visionaries, unveiling new horizons and challenging the limits of human imagination. Like an unrelenting flame, expansion ignites the soul of humanity, propelling us to seek new territories, resources, and possibilities, venturing into the unknown and writing bold chapters in the history of evolution.',
             'cost' => 100,
             'dependence' => 300,
@@ -203,7 +204,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Storage Center',
             'description' => 'The Storage Center, an imposing and secure fortress, guards the precious secrets and vital resources of humanity, protecting the legacy of the past and the aspirations of the future. Like a pulsating heart of operation, the Storage Center is the epicenter where technology and security converge, housing vast quantities of strategic supplies to face the challenges that await beyond its doors.',
             'cost' => 100,
-            'dependence' => 1100,
+            'dependence' => 1000,
             'category' => 3,
             'effectDescription' => 'Enables the construction of the Warehouse',
             'effects' => json_encode([
