@@ -2,16 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Market;
 use App\Models\Planet;
 use App\Models\Player;
 use App\Models\Trading;
 use App\Services\TradingService;
-use DateTime;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
-use Exception;
 
 class TradingController extends Controller
 {
@@ -103,4 +99,8 @@ class TradingController extends Controller
     {
         return $this->tradingService->cancelOrder($id);
     }
+    public function getTradingProcess($id){
+        return $this->tradingService->getTradingProcess($id);
+    }
+
 }

@@ -165,6 +165,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/new-purch',[TradingController::class, 'tradingNewPurchase']);
         Route::get('/my-history/{id}', [TradingController::class, 'getAllOrdersPlayer']);
         Route::patch('/cancel/{id}', [TradingController::class, 'cancelOrder']);
+        Route::get('/trading-process/{id}',[TradingController::class, 'getTradingProcess']);
     });
 
 

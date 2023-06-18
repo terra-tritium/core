@@ -124,4 +124,14 @@ class TradingService
         }
         return response(['message' => 'Trading não encontrado', 'success' => false], Response::HTTP_NOT_FOUND);
     }
+    public function getTradingProcess($id)
+    {
+        if ($id) {
+            $this->trading = Trading::where('id', $id)
+                ->where('status', 1)
+                ->first();
+            return $this->trading;
+        }
+        return response(['message' => 'Trading nao encontrada', 'success' => false], Response::HTTP_NOT_FOUND);
+    }
 }
