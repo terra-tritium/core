@@ -209,5 +209,20 @@ class BuildSeeder extends Seeder
             "crystalLevel" => 20,
             "coefficient" => 50
         ]);
+
+        DB::table('builds')->insert([
+            "name" => "Diplomacy",
+            "code" => 15,
+            "image" => "build-14.png",
+            "description" => "Resource trades between players",   
+            "effect" => "A cada nível de expanção reduz a taxa de fee e aumenta alcance de trocas",
+            "metalStart" => 100,
+            "uraniumStart" => 50,
+            "crystalStart" => 50,
+            "metalLevel" => 1,
+            "uraniumLevel" => 10,
+            "crystalLevel" => 20,
+            "coefficient" => 50
+        ]);
     }
 }
