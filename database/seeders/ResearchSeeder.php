@@ -49,9 +49,10 @@ class ResearchSeeder extends Seeder
             'cost' => 100,
             'dependence' => 0,
             'category' => 1,
-            'effectDescription' => 'Enables the construction of a Force Shield for the defense of the planet against external attacks',
+            'effectDescription' => 'Enables the construction of a Force Shield and the Defense Tower to protect the planet against external attacks',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'enableForceShield' => true,
+                'enableDefenseTower' => true
             ]),
         ]);
 
@@ -62,7 +63,7 @@ class ResearchSeeder extends Seeder
             'cost' => 100,
             'dependence' => 300,
             'category' => 1,
-            'effectDescription' => 'Enables the construction of the Spaceship Factory',
+            'effectDescription' => 'Enables the construction of the Shipyard',
             'effects' => json_encode([
                 'speedTravel' => 1,
             ]),
@@ -122,7 +123,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 900,
-            'title' => 'Expension',
+            'title' => 'Expansion',
             'description' => 'Expansion, an unstoppable call beyond familiar frontiers, awakens the audacity of explorers and visionaries, unveiling new horizons and challenging the limits of human imagination. Like an unrelenting flame, expansion ignites the soul of humanity, propelling us to seek new territories, resources, and possibilities, venturing into the unknown and writing bold chapters in the history of evolution.',
             'cost' => 100,
             'dependence' => 300,
@@ -203,7 +204,7 @@ class ResearchSeeder extends Seeder
             'title' => 'Storage Center',
             'description' => 'The Storage Center, an imposing and secure fortress, guards the precious secrets and vital resources of humanity, protecting the legacy of the past and the aspirations of the future. Like a pulsating heart of operation, the Storage Center is the epicenter where technology and security converge, housing vast quantities of strategic supplies to face the challenges that await beyond its doors.',
             'cost' => 100,
-            'dependence' => 1100,
+            'dependence' => 1000,
             'category' => 3,
             'effectDescription' => 'Enables the construction of the Warehouse',
             'effects' => json_encode([
