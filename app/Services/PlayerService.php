@@ -56,7 +56,7 @@ class PlayerService
     $planet->metal = 1500;
     $planet->uranium = 0;
     $planet->crystal = 0;
-    $planet->energy = 100;
+    $planet->energy = 1;
     $planet->battery = 10000;
     $planet->extraBattery = 0;
     $planet->capMetal = 10000;
