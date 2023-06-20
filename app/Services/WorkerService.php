@@ -48,7 +48,7 @@ class WorkerService
                 $planet->pwMetal = $workers;
                 $planet->workersOnMetal = $workers;
                 $planet->workersWaiting = $this->waitingWorkers($planet);
-                $this->syncronizeEnergy($planet, $building->level);
+                $this->syncronizeEnergy($planet);
                 break;
 
             // Uranium
@@ -58,7 +58,7 @@ class WorkerService
                 $planet->pwUranium = $workers;
                 $planet->workersOnUranium = $workers;
                 $planet->workersWaiting = $this->waitingWorkers($planet);
-                $this->syncronizeEnergy($planet, $building->level);
+                $this->syncronizeEnergy($planet);
                 break;
 
             // Crystal
@@ -68,7 +68,7 @@ class WorkerService
                 $planet->pwCrystal = $workers;
                 $planet->workersOnCrystal = $workers;
                 $planet->workersWaiting = $this->waitingWorkers($planet);
-                $this->syncronizeEnergy($planet, $building->level);
+                $this->syncronizeEnergy($planet);
                 break;
         }
 
@@ -83,10 +83,12 @@ class WorkerService
     return $planet->workers - ($planet->workersOnMetal + $planet->workersOnUranium + $planet->workersOnCrystal + $planet->workersOnLaboratory);
   }
 
-  public function syncronizeEnergy(Planet $planet, $level) {
+  public function syncronizeEnergy(Planet $planet) {
 
     if ($planet->timeEnergy == null) { return false; }
     if ($planet->timeEnergy == 0) { return false; }
+
+    $level = Building::where('build', 2)->first()->level;
     
     $fator = 0;
     $padronizedLevel = $level * 10;

@@ -29,7 +29,7 @@ class ResearchService
         $planet->workersOnLaboratory = (int) $power;
         $planet->save();
 
-        $this->workerService->syncronizeEnergy($planet, Building::where('build', 7)->first()->level);
+        $this->workerService->syncronizeEnergy($planet);
         
         return $planet;
     }
