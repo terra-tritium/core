@@ -110,7 +110,8 @@ class Message extends Model
     {
         $messages = DB::table('users')
             ->join('messages', 'users.id', '=', 'messages.senderId')
-            ->select('users.name', 'users.id as senderId', DB::raw('MAX(messages.createdAt) as createdAt'), DB::raw('MAX(messages.read) as `read`'))
+            ->select('users.name', 'users.id as senderId', DB::raw('MAX(messages.createdAt) as createdAt'),
+                DB::raw('MAX(messages.read) as `read`'))
             ->where('messages.recipientId', $recipientId)
             ->groupBy('users.id', 'users.name', 'messages.senderId')
             ->orderBy('messages.read')
@@ -123,7 +124,8 @@ class Message extends Model
     {
         $messages =  DB::table('messages')
             ->select('*')
-            ->selectRaw("CASE WHEN senderId = $senderId THEN true WHEN recipientId = $senderId THEN false END AS sender")
+            ->selectRaw("CASE WHEN senderId = ? THEN true WHEN recipientId = ? THEN false END AS sender",
+                [$senderId, $senderId])
             ->where(function ($query) use ($senderId, $recipientId) {
                 $query->where('senderId', $senderId)
                     ->where('recipientId', $recipientId);
