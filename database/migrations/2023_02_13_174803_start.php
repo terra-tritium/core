@@ -75,14 +75,13 @@ return new class extends Migration
             $table->bigInteger("ready")->nullable();
             # Laboratory
             $table->bigInteger("researchPoints");
-            $table->integer("pwResearch");
-            $table->bigInteger("timeResearch")->nullable();
             # Power multiplier of resources
             $table->integer("pwMetal");
             $table->integer("pwUranium");
             $table->integer("pwCrystal");
             $table->integer("pwEnergy");
             $table->integer("pwWorker");
+            $table->integer("pwResearch");
             # Using resources
             $table->integer("useEnergyByFactory");
             # Consumes times start
@@ -93,6 +92,7 @@ return new class extends Migration
             $table->bigInteger("timeCrystal")->nullable();
             $table->bigInteger("timeEnergy")->nullable();
             $table->bigInteger("timeWorker")->nullable();
+            $table->bigInteger("timeResearch")->nullable();
             # Spaceships Transport
             $table->bigInteger("transportShips");
         });

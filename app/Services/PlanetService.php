@@ -30,6 +30,7 @@ class PlanetService
     $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $sInHour;
     $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $sInHour;
     $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $sInHour;
+    $activeLaboratory = ($this->timeNow - $p1->timeResearch) / $sInHour;
 
     switch ($type) {
       case 0: 
@@ -40,6 +41,8 @@ class PlanetService
         return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM") * $activeUraniumMining));
       case 3:
         return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL") * $activeCrystalMining));
+      case 4:
+        return $p1->researchPoints + ($p1->pwResearch * (env("TRITIUM_RESEARCH_SPEED") * $activeLaboratory));
     }
 
     return 0;

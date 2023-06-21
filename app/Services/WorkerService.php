@@ -31,6 +31,10 @@ class WorkerService
       case 6 : 
           $planet->workersOnCrystal = 0;
           break;
+      // Laboratory
+      case 7 : 
+        $planet->workersOnLaboratory = 0;
+        break;
     }
 
     if ($this->waitingWorkers($planet) < $workers) {
@@ -70,6 +74,16 @@ class WorkerService
                 $planet->workersWaiting = $this->waitingWorkers($planet);
                 $this->syncronizeEnergy($planet);
                 break;
+
+            // Laboratory
+            case 7 : 
+              $planet->researchPoints = $this->planetService->currentBalance($planet, 4);
+              $planet->timeResearch = time();
+              $planet->pwResearch = $workers;
+              $planet->workersOnLaboratory = $workers;
+              $planet->workersWaiting = $this->waitingWorkers($planet);
+              $this->syncronizeEnergy($planet);
+              break;
         }
 
         $building->workers = $workers;

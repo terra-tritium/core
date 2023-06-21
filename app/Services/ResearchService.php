@@ -30,6 +30,7 @@ class ResearchService
         $planet->save();
 
         $this->workerService->syncronizeEnergy($planet);
+        $this->updateBuildPower($planet->id, $power);
         
         return $planet;
     }
@@ -65,5 +66,11 @@ class ResearchService
         }
         $player->researchPoints += $points;
         $player->save();
+    }
+
+    public function updateBuildPower($planet, $power) {
+        $building = Building::where([['planet', $planet], ['build', 7]])->firstOrFail();
+        $building->workers = $power;
+        $building->save();
     }
 }
