@@ -137,7 +137,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 1000,
-            'title' => 'Future of War 1 star',
+            'title' => 'Future 1 star',
             'description' => 'The "Future of War" is a dark and challenging horizon where technology and strategy intertwine in a scenario of increasingly sophisticated and devastating conflicts. In this context, advanced weapons such as autonomous drones, anti-missile defense systems, and military artificial intelligence shape the battlefield, redefining the tactics and challenges faced by armed forces. As the boundaries between the physical and digital blur, the military future is permeated by cyber attacks, electronic warfare, and information manipulation, increasing the complexity of conflicts and the ethical dilemmas associated with them. In this uncertain future, the pursuit of security and peace becomes a constant struggle against emerging threats and a call for the development of effective defense and diplomatic strategies',
             'cost' => 51200,
             'dependence' => 900,
@@ -150,7 +150,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 1100,
-            'title' => 'Future of War 2 stars',
+            'title' => 'Future 2 stars',
             'description' => 'The "Future of War" is a dark and challenging horizon where technology and strategy intertwine in a scenario of increasingly sophisticated and devastating conflicts. In this context, advanced weapons such as autonomous drones, anti-missile defense systems, and military artificial intelligence shape the battlefield, redefining the tactics and challenges faced by armed forces. As the boundaries between the physical and digital blur, the military future is permeated by cyber attacks, electronic warfare, and information manipulation, increasing the complexity of conflicts and the ethical dilemmas associated with them. In this uncertain future, the pursuit of security and peace becomes a constant struggle against emerging threats and a call for the development of effective defense and diplomatic strategies',
             'cost' => 102400,
             'dependence' => 1000,
@@ -163,7 +163,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 1200,
-            'title' => 'Future of War 3 stars',
+            'title' => 'Future 3 stars',
             'description' => 'The "Future of War" is a dark and challenging horizon where technology and strategy intertwine in a scenario of increasingly sophisticated and devastating conflicts. In this context, advanced weapons such as autonomous drones, anti-missile defense systems, and military artificial intelligence shape the battlefield, redefining the tactics and challenges faced by armed forces. As the boundaries between the physical and digital blur, the military future is permeated by cyber attacks, electronic warfare, and information manipulation, increasing the complexity of conflicts and the ethical dilemmas associated with them. In this uncertain future, the pursuit of security and peace becomes a constant struggle against emerging threats and a call for the development of effective defense and diplomatic strategies',
             'cost' => 240800,
             'dependence' => 1100,
@@ -307,7 +307,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 2300,
-            'title' => 'Future of Economy 1 star',
+            'title' => 'Future 1 star',
             'description' => 'The demand of minerals increases as research and development progress in areas such as nuclear fusion, advanced lighting, medical diagnostics, and cutting-edge technologies. The future of economy, specially the mining, plays a vital role in supplying this essential element to drive innovation in various industries.',
             'cost' => 102400,
             'dependence' => 2200,
@@ -320,7 +320,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 2400,
-            'title' => 'Future of Economy 2 stars',
+            'title' => 'Future 2 stars',
             'description' => 'The demand of minerals increases as research and development progress in areas such as nuclear fusion, advanced lighting, medical diagnostics, and cutting-edge technologies. The future of economy, specially the mining, plays a vital role in supplying this essential element to drive innovation in various industries.',
             'cost' => 204800,
             'dependence' => 2300,
@@ -333,7 +333,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 2500,
-            'title' => 'Future of Economy 3 stars',
+            'title' => 'Future 3 stars',
             'description' => 'The demand of minerals increases as research and development progress in areas such as nuclear fusion, advanced lighting, medical diagnostics, and cutting-edge technologies. The future of economy, specially the mining, plays a vital role in supplying this essential element to drive innovation in various industries.',
             'cost' => 409600,
             'dependence' => 2400,
@@ -464,7 +464,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 3500,
-            'title' => 'Future of Technology 1 star',
+            'title' => 'Future 1 star',
             'description' => 'The "Technological Future" is a vibrant horizon full of promises, where imagination and innovation come together to shape a world of infinite possibilities. In this scenario, revolutionary advancements drive society forward, from artificial intelligence to biotechnology, renewable energies to space exploration, radically transforming the way we live, work, and connect. With each new breakthrough, the technological future invites us to explore new frontiers, expand the limits of knowledge, and create a smarter, more sustainable, and interconnected world.',
             'cost' => 51200,
             'dependence' => 3400,
@@ -477,7 +477,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 3600,
-            'title' => 'Future of Technology 2 stars',
+            'title' => 'Future 2 stars',
             'description' => 'The "Technological Future" is a vibrant horizon full of promises, where imagination and innovation come together to shape a world of infinite possibilities. In this scenario, revolutionary advancements drive society forward, from artificial intelligence to biotechnology, renewable energies to space exploration, radically transforming the way we live, work, and connect. With each new breakthrough, the technological future invites us to explore new frontiers, expand the limits of knowledge, and create a smarter, more sustainable, and interconnected world.',
             'cost' => 102400,
             'dependence' => 3500,
@@ -490,7 +490,7 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 3700,
-            'title' => 'Future of Technology 3 stars',
+            'title' => 'Future 3 stars',
             'description' => 'The "Technological Future" is a vibrant horizon full of promises, where imagination and innovation come together to shape a world of infinite possibilities. In this scenario, revolutionary advancements drive society forward, from artificial intelligence to biotechnology, renewable energies to space exploration, radically transforming the way we live, work, and connect. With each new breakthrough, the technological future invites us to explore new frontiers, expand the limits of knowledge, and create a smarter, more sustainable, and interconnected world.',
             'cost' => 204800,
             'dependence' => 3600,
