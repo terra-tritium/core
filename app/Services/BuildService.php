@@ -105,6 +105,13 @@ class BuildService
             $this->starNewMining($p1, $building, 3, 1, $require->metal);
         }
 
+        // Military Camp
+        if ($building->build == 11) {
+            if (!$this->researchService->isResearched($player, 200)) {
+                return false;
+            }
+        }
+
         // Shield
         if ($building->build == 12) {
             if (!$this->researchService->isResearched($player, 100)) {
