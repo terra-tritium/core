@@ -9,6 +9,7 @@ use App\Models\Building;
 use App\Models\Requires;
 use App\Services\PlanetService;
 use App\Services\PlayerService;
+use App\Services\ResearchService;
 
 class BuildService
 {
@@ -23,6 +24,7 @@ class BuildService
     public function __construct() {
         $this->playerService = new PlayerService();
         $this->planetService = new PlanetService();
+        $this->researchService = new ResearchService();
     }
 
     private function starNewMining($p1, $building, $resourceMining, $resourceSpend, $require) {
@@ -101,6 +103,13 @@ class BuildService
         // Crystal Mining
         if ($building->build == 6) {
             $this->starNewMining($p1, $building, 3, 1, $require->metal);
+        }
+
+        // Shield
+        if ($building->build == 12) {
+            if (!$this->researchService->isResearched($player, 100)) {
+                return false;
+            }
         }
 
         if ($building->build == 3 || $building->code > 6) {

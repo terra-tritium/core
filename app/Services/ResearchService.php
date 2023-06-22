@@ -73,4 +73,9 @@ class ResearchService
         $building->workers = $power;
         $building->save();
     }
+
+    public function isResearched($player, $code) {
+        $researched = Researched::where([['player', $player->id], ['code', $code]])->first();
+        return $researched ? true : false;
+    }
 }
