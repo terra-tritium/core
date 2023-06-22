@@ -126,6 +126,13 @@ class BuildService
             }
         }
 
+        // Diplomacy
+        if ($building->build == 14) {
+            if (!$this->researchService->isResearched($player, 400)) {
+                return false;
+            }
+        }
+
         if ($building->build == 3 || $building->code > 6) {
             if ($this->planetService->enoughBalance($p1, $require->metal, 1)) {
                 $p1 = $this->planetService->removeMetal($p1, $require->metal);

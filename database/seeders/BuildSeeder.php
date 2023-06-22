@@ -212,7 +212,7 @@ class BuildSeeder extends Seeder
 
         DB::table('builds')->insert([
             "name" => "Diplomacy",
-            "code" => 15,
+            "code" => 14,
             "image" => "build-14.png",
             "description" => "Resource trades between players",   
             "effect" => "A cada nível de expanção reduz a taxa de fee e aumenta alcance de trocas",
