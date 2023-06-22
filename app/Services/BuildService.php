@@ -105,6 +105,13 @@ class BuildService
             $this->starNewMining($p1, $building, 3, 1, $require->metal);
         }
 
+        // Shipyard
+        if ($building->build == 9) {
+            if (!$this->researchService->isResearched($player, 300)) {
+                return false;
+            }
+        }
+
         // Military Camp
         if ($building->build == 11) {
             if (!$this->researchService->isResearched($player, 200)) {
