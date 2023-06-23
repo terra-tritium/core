@@ -57,6 +57,21 @@ class ResearchService
             $this->bonusService->addSpeedTravel($player, 1);
         }
 
+        # Future War 1
+        if ($research->code == 1000) {
+            $this->bonusService->addSpeedProduceUnit($player, 1);
+        }
+
+        # Future War 2
+        if ($research->code == 1100) {
+            $this->bonusService->addSpeedProduceUnit($player, 1);
+        }
+
+        # Future War 3
+        if ($research->code == 1200) {
+            $this->bonusService->addSpeedProduceUnit($player, 1);
+        }
+
         $researched->save();
         $player->save();
         return $researched;
