@@ -97,11 +97,17 @@ class BuildService
 
         // Uranium Mining
         if ($building->build == 5) {
+            if (!$this->researchService->isResearched($player, 1300)) {
+                return false;
+            }
             $this->starNewMining($p1, $building, 2, 1, $require->metal);
         }
 
         // Crystal Mining
         if ($building->build == 6) {
+            if (!$this->researchService->isResearched($player, 1300)) {
+                return false;
+            }
             $this->starNewMining($p1, $building, 3, 1, $require->metal);
         }
 
