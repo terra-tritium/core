@@ -107,6 +107,12 @@ class ResearchService
             $this->bonusService->addDiscountEnergy($player, 1);
         }
 
+        # Locator
+        if ($research->code == 3300) {
+            $this->bonusService->addSpeedTravel($player, 1);
+        }
+
+
         $researched->save();
         $player->save();
         return $researched;

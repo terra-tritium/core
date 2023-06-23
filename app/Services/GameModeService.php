@@ -13,6 +13,7 @@ class GameModeService
     $isSpaceMining = Researched::where([['player', $player->id], ['code', 2000]])->first();
     $isSpaceEngineering = Researched::where([['player', $player->id], ['code', 2800]])->first();
     $isStelarNavigator = Researched::where([['player', $player->id], ['code', 3100]])->first();
+    $isWisdom = Researched::where([['player', $player->id], ['code', 3200]])->first();
 
     $gameModes = GameMode::orderBy('code')->get();
     $elegibleGameModes = [];
@@ -22,6 +23,11 @@ class GameModeService
       switch($gm->code) {
         case 2 :
           if ($isWarCompetence) {
+            array_push($elegibleGameModes, $gm);
+          }
+          break;
+        case 3 :
+          if ($isWisdom) {
             array_push($elegibleGameModes, $gm);
           }
           break;
