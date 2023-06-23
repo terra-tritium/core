@@ -8,19 +8,28 @@ use App\Models\Researched;
 class GameModeService
 {
   public function list ($player) {
-    $isDefenceResearch = Researched::where([['player', $player->id], ['code', 800]])->first();
+    $isDefence = Researched::where([['player', $player->id], ['code', 800]])->first();
+    $isWarCompetence = Researched::where([['player', $player->id], ['code', 900]])->first();
 
     $gameModes = GameMode::orderBy('code')->get();
     $elegibleGameModes = [];
 
     foreach($gameModes as $gm) {
-      if ($gm->code == 5) {
-        # Research defence include protector mode
-        if ($isDefenceResearch) {
+
+      switch($gm->code) {
+        case 2 :
+          if ($isWarCompetence) {
+            array_push($elegibleGameModes, $gm);
+          }
+          break;
+        case 5 : 
+          if ($isDefence) {
+            array_push($elegibleGameModes, $gm);
+          }
+          break;
+        default:
           array_push($elegibleGameModes, $gm);
-        }
-      } else {
-        array_push($elegibleGameModes, $gm);
+          break;
       }
     }
 
