@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Battle;
-use App\Models\BattleSlot;
 use App\Models\BattleStage;
 use App\Jobs\BattleJob;
 
@@ -58,8 +57,6 @@ class BattleService
         $this->attackReserve = $aUnits;
         $this->defenseReserve = $dUnits;
         
-        $this->loadReverve($battle);
-        
         $battle = $this->calculateStage($battle->id);
     }
     
@@ -67,20 +64,22 @@ class BattleService
     public function calculateStage($battleId) {
         
         $battle = Battle::find($battleId);
+
+        //Validar com uma versão antiga desse arquivo se esse realmente é o lugar 
+        //da chamada dessa função
+        $this->loadReverve($battle);
         
         $battle = $this->fillSlots($battle);
-        
         $battle->stage += 1;
         $battle->save();
-        
         $stage = $this->createNewStage($battle);
-
+       
         # Start job for new stage if no end
         if (!$this->isEnd()) {
             BattleJob::dispatch(
                 $this,
                 $battle->id
-            )->delay(now()->addSeconds(env("TRITIUM_STAGE_SPEED") / 1000 ));
+            )->delay(now()->addSeconds(env("TRITIUM_STAGE_SPEED")));
         } else {
             if ($this->attackReserve == 0 || $this->currentStage->attackGaveUp == true) {
                 $battle->result = 2;
@@ -94,7 +93,7 @@ class BattleService
 
     private function createNewStage($battle) {
 
-        $desistiu = rand(0, 1);
+        //$desistiu = rand(0, 1);
 
         $stage = new BattleStage();
         $stage->number = $battle->stage;
@@ -112,82 +111,89 @@ class BattleService
         #$stage->defenseGaveUp = ($desistiu == 1) ? true : false;
 
         $stage = $this->resolveConfrontation($battle, $stage);
-
+        
         $stage->save();
         $this->currentStage = $stage;
+
 
         return $stage;
     }
 
     private function resolveConfrontation($battle, $stage) {
-
-        $aSlots = json_decode($battle->attackSlots);
-        $dSlots = json_decode($battle->defenseSlots);
+        $aSlots =  $battle->attackSlots;
+        $dSlots =  $battle->defenseSlots;
         $stage->attackSlots = $battle->attackSlots;
         $stage->defenseSlots = $battle->defenseSlots;
-
-        
+       
         # execute attack
-        for ($i=0; $i < count($aSlots); $i++) {
-            
-            if ($aSlots[$i]->qtd > 0) {
-
-                for ($j=0; $j < count($dSlots); $j++) {
+        foreach($aSlots as $aSlot) {
+            if ($aSlot->qtd > 0) {
+                 
+                foreach($dSlots as $dSlot) {
                     $demage = 0;
                     $kills = 0;
                     $units = [];
                     
-                    if ($dSlots[$j]->qtd > 0) {
-
-                        $demage = (($aSlots[$i]->attack * $aSlots[$i]->size) - ($dSlots[$j]->defense * $dSlots[$j]->size));
+                    if ($dSlot->qtd > 0) {
+                        /*RVB
+                        Sempre será 0, porque na tabela units o valor de attack, defense e size são iguais
+                        assim nunca terá mortes a ser descontado  no $demage.
+                        Teremos que fazer um calculo quando o valor de kills for igual a zero.
+                        */
+                        $demage = (($aSlot->attack * $aSlot->size) - ($dSlot->defense * $dSlot->size));
+                        
                         if ($demage < 0) { $demage = 0; }
 
-                        $kills = floor($demage / $dSlots[$j]->life);
-
-                        if ($dSlots[$j]->qtd - $kills < 0) {
-                            $dSlots[$j]->kills += $dSlots[$j]->qtd;
-                            $dSlots[$j]->qtd = 0;
+                        $kills = floor($demage / $dSlot->life);
+                         
+                        if (($dSlot->qtd - $kills) <= 0) {
+                            $dSlot->kills += $dSlot->qtd;
+                            $dSlot->qtd = 0;
                         } else {
-                            $dSlots[$j]->kills += $kills;
-                            $dSlots[$j]->qtd -= $kills;
+                            $dSlot->kills += $kills;
+                            $dSlot->qtd -= $kills;
                         }
 
                         $stage->defenseDemage += $demage;
-                        $stage->defenseKills = $dSlots[$j]->kills;
+                        $stage->defenseKills = $dSlot->kills;
                         $stage->defenseSlots = json_encode($dSlots);
                         break;
                     }
                 }
             }
         }
-
+       
         #execute defense
-        for ($i=0; $i < count($dSlots); $i++) {
+        foreach ($dSlots as $dSlot) {
 
-            if ($dSlots[$i]->qtd > 0) {
+            if ($dSlot->qtd > 0) {
 
-                for ($j=0; $j < count($aSlots); $j++) {
+                foreach ($aSlots as $aSlot) {
+                    
                     $demage = 0;
                     $kills = 0;
-                    $units = [];
                     
-                    if ($aSlots[$j]->qtd > 0) {
-
-                        $demage = (($dSlots[$i]->attack * $dSlots[$i]->size) - ($aSlots[$j]->defense * $aSlots[$j]->size));
+                    if ($aSlot->qtd > 0) {
+                        
+                        $demage = (($dSlot->attack * $dSlot->size) - ($aSlot->defense * $aSlot->size));
                         if ($demage < 0) { $demage = 0; }
-
-                        $kills = floor($demage / $aSlots[$j]->life);
-
-                        if ($aSlots[$j]->qtd - $kills < 0) {
-                            $aSlots[$j]->kills += $aSlots[$j]->qtd;
-                            $aSlots[$j]->qtd = 0;
+                        /*RVB
+                        Sempre será 0, porque na tabela units o valor de attack, defense e size são iguais
+                        assim nunca terá mortes a ser descontado  no $demage.
+                        Teremos que fazer um calculo quando o valor de kills for igual a zero.
+                        */
+                        $kills = floor($demage / $aSlot->life);
+                        
+                        if (($aSlot->qtd - $kills) <= 0)  {
+                            $aSlot->kills += $aSlot->qtd;
+                            $aSlot->qtd = 0;
                         } else {
-                            $aSlots[$j]->kills += $kills;
-                            $aSlots[$j]->qtd -= $kills;
+                            $aSlot->kills += $kills;
+                            $aSlot->qtd -= $kills;
                         }
 
                         $stage->attackDemage += $demage;
-                        $stage->attackKills = $aSlots[$j]->kills;
+                        $stage->attackKills = $aSlot->kills;
                         $stage->attackSlots = json_encode($aSlots);
                         break;
                     }
@@ -197,10 +203,17 @@ class BattleService
 
         $stage->attackReserve = json_encode($this->attackReserve);
         $stage->defenseReserve = json_encode($this->defenseReserve);
-        $battle->attackSlots = json_encode($this->attackReserve);
-        $battle->defenseSlots = json_encode($this->defenseReserve);
-        $battle->save();
 
+        /* RVB
+            Analisar porque isso foi feito, pois o attackReserve e defenseReserve são diferente dos attackSlots e defenseSlots
+        */
+        //$battle->attackSlots = json_encode($this->attackReserve);
+        //$battle->defenseSlots = json_encode($this->defenseReserve);
+        
+        $battle->attackReserve = json_encode($this->attackReserve);
+        $battle->defenseReserve = json_encode($this->defenseReserve);
+        $battle->save();
+         
         return $stage;
     }
 
@@ -220,10 +233,14 @@ class BattleService
         }
     }
 
-    private function calculateRangeSize($batle) {
-        $attackSize = count($this->attackReserve);
-        $defenseSize = count($this->defenseReserve);
-
+    private function calculateRangeSize($battle) {
+        /* RVB
+        Esse calculo deve ser revisto pois a quantidade de attackReserve e defenseReserve são baseado na 
+        quantidade slots e não a quantidade  de unidade. Que talvez nunca vai ser superior a rangeLimit1 e rangeLimit2.
+        */
+        $attackSize = count(json_decode($battle->attackReserve));
+        $defenseSize = count(json_decode($battle->defenseReserve));
+       
         $smallerUnitsSize = 0;
 
         if ($attackSize > $defenseSize) {
@@ -246,7 +263,6 @@ class BattleService
     private function fillSlots($battle) {
 
         $range = $this->calculateRangeSize($battle);
-
         switch ($range) {
             case 1: 
                 $this->droidSlotSize = $this->droidSlotSize * $this->sizeFator1;
@@ -283,7 +299,7 @@ class BattleService
             $this->launchersSlotSize,
             $this->specialSlotSize
         ));
-
+      
         $battle = $this->loadSlots($battle, 'attack');
         $battle = $this->loadSlots($battle, 'defense');
 
@@ -292,9 +308,10 @@ class BattleService
 
     private function loadSlots($battle, $side) {
         $slot = [];
-
+       
         $slot = ($side == "attack") ? $battle->attackSlots : $battle->defenseSlots;
-
+        
+        $slot = json_decode($slot); 
         $slot = $this->selectUnits('r1c1', $slot, $side);
         $slot = $this->selectUnits('r1c2', $slot, $side);
         $slot = $this->selectUnits('r1c3', $slot, $side);
@@ -328,32 +345,37 @@ class BattleService
     }
 
     private function selectUnits($position, $slot, $side) {
-
-        for ($i=0; $i < 10; $i++) {
-            if (!empty($slot[$i]['pos'])) {
+       
+        //RVB 
+        //Corrigido
+        //Porque fazer isso 10 vezes se o slot tem o tamanho fixo de 7 
+        for ($i=0; $i < 7; $i++) {
+            if (!empty($slot[$i]->pos)) {
                 
-                if ($slot[$i]['pos'] == $position) {
-                    switch ($slot[$i]['type']) {
+                if ($slot[$i]->pos == $position) {
+                    switch ($slot[$i]->type) {
                         case 'D':
-                            $slot[$i] = $this->moveUnits($slot[$i], 'D', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
+                            $slot[$i] = $this->moveUnits($slot[$i], 'D', $side, ($this->droidSlotSize - $slot[$i]->qtd));
                             break;
                         case 'V':
-                            $slot[$i] = $this->moveUnits($slot[$i], 'V', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
+                            $slot[$i] = $this->moveUnits($slot[$i], 'V', $side, ($this->vehicleSlotSize - $slot[$i]->qtd));
                             break;
                         case 'L':
-                            $slot[$i] = $this->moveUnits($slot[$i], 'V', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
+                            $slot[$i] = $this->moveUnits($slot[$i], 'L', $side, ($this->launchersSlotSize - $slot[$i]->qtd));
                             break;
                         case 'E':
-                            $slot[$i] = $this->moveUnits($slot[$i], 'V', $side, ($this->droidSlotSize - $slot[$i]['qtd']));
+                            $slot[$i] = $this->moveUnits($slot[$i], 'E', $side, ($this->specialSlotSize - $slot[$i]->qtd));
                             break;
                     }
                 }
             }
         }
-
+       
         return $slot;
     }
 
+    //RVB
+    //Resolver distribuição de unidades nos slots
     private function moveUnits($slot, $type, $side, $available) {
 
         $qtdMove = 0;
@@ -368,32 +390,32 @@ class BattleService
             $reserve = $this->defenseReserve;
         }
 
-        foreach ($reserve as $troop) {
-            if ($type == $troop->type) {
-                if ($troop->quantity >= $available) {
+        for($i=0; $i < count($reserve) ; $i++){
+            if ($type == $reserve[$i]->type) {
+                if ($reserve[$i]->quantity >= $available) {
                     $qtdMove = $available;
-                    $troop->quantity -= $available;
+                    $reserve[$i]->quantity -= $available;
                 } else {
-                    $qtdMove += $troop->quantity;
-                    $troop->quantity = 0;
+                    $qtdMove += $reserve[$i]->quantity;
+                    $reserve[$i]->quantity = 0;
                 }
-                $attackLevel = $troop->attack;
-                $attackDefense = $troop->defense;
-                $life = $troop->life;
+                $attackLevel = $reserve[$i]->attack;
+                $defenseLevel = $reserve[$i]->defense;
+                $life = $reserve[$i]->life;
             }
         }
-
+        
         if ($side == "attack") {
             $this->attackReserve = $reserve;
         } else {
             $this->defenseReserve = $reserve;
         }
 
-        $slot['qtd'] = $qtdMove;
-        $slot['attack'] = $attackLevel;
-        $slot['defense'] = $defenseLevel;
-        $slot['life'] = $life;
-
+        $slot->qtd = $qtdMove;
+        $slot->attack  = $attackLevel;
+        $slot->defense  = $defenseLevel;
+        $slot->life  = $life;
+        
         return $slot;
     }
 
@@ -509,5 +531,4 @@ class BattleService
         
         return $slotPositions[$strategy];
     }
- 
 }

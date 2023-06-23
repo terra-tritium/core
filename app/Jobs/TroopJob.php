@@ -45,7 +45,6 @@ class TroopJob implements ShouldQueue
 
             $troop = Troop::where([["planet", $this->planet],["unit", $unit["id"]]])->first();
             $prod = Production::find($this->production);
-            $prod->executed = true;
             
             if ($troop) {
                 $troop->quantity += $unit["quantity"];
@@ -56,8 +55,9 @@ class TroopJob implements ShouldQueue
                 $troop->unit = $unit["id"];
                 $troop->quantity = $unit["quantity"];
             }
-            $prod->save();
-            $troop->save();
+            if($troop->save()){
+                $prod->delete();
+            }
         }
     }
 }

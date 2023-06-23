@@ -20,8 +20,8 @@ class TravelService
     }
 
     public function start ($player, $travel) {
-
-        $travel = json_decode($travel);
+        
+        $travel =  json_decode (json_encode ($travel), FALSE);
         $newTravel = new Travel();
         if ($travel->action < 1 || $travel->action > 5) {
             return "Invalid action type";
@@ -101,9 +101,9 @@ class TravelService
 
     public function back ($travel) {
         $now = time();
-        $travelTime = $now - $currentTravel->start;
 
         $currentTravel = Travel::find($travel);
+        $travelTime = $now - $currentTravel->start;
         $currentTravel->arrival = $travelTime;
         $currentTravel->status = 0;
 
@@ -190,13 +190,13 @@ class TravelService
         foreach($troops as $key => $troop)
         {
             $troopModel = Troop::where(['unit' => $troop->unit,'player' => $player,'planet' => $planet])->first();
-            if($troop->quantity <= $troopModel->quantity)
+            if($troop->quantity > $troopModel->quantity)
             {
-                return true;
+                return false;
             }
-
-            return false;
         }
+
+        return true;
     }
 
     public function getPlanet($location) {
