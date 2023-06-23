@@ -9,4 +9,5 @@ class Effect extends Model
 {
     use HasFactory;
     protected $table = 'effects';
+    public $timestamps = false;
 }

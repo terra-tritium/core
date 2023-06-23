@@ -7,12 +7,14 @@ use App\Models\Research;
 use App\Models\Building;
 use App\Services\PlayerService;
 use App\Services\WorkerService;
+use App\Services\BonusService;
 
 class ResearchService
 {
     public function __construct () {
         $this->playerService = new PlayerService();
         $this->workerService = new WorkerService();
+        $this->bonusService = new BonusService();
     }
 
     public function laboratoryConfig ($player, $planet, $power) {
@@ -44,6 +46,16 @@ class ResearchService
         
         # Don't have enough balance
         if ($player->researchPoints < 0) { return false; }
+
+        $existsResearch = Researched::where([['player', $player->id], ['code', $research->code]])->first();
+
+        # Already researched
+        if ($existsResearch) { return false; }
+
+        # Hyperspeed
+        if ($research->code == "600") {
+            $this->bonusService->addSpeedTravel($player, 1);
+        }
 
         $researched->save();
         $player->save();

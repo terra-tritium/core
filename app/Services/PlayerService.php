@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Player;
 use App\Models\Planet;
+use App\Models\Effect;
 use App\Models\AlianceRanking;
 use App\Services\PlanetService;
 
@@ -74,6 +75,18 @@ class PlayerService
     $planet->researchPoints = 0;
     $planet->pwResearch = 0;
     $planet->save();
+
+    $effect = new Effect();
+    $effect->speedProduceUnit = 0;
+    $effect->speedProduceShip = 0;
+    $effect->speedBuild = 0;
+    $effect->speedResearch = 0;
+    $effect->speedTravel = 0;
+    $effect->speedMining = 0;
+    $effect->costBuild = 0;
+    $effect->protect = 0;
+    $effect->extraAttack = 0;
+    $effect->save();
   }
 
   private function startAlocation() {
