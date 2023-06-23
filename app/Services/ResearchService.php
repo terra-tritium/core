@@ -82,6 +82,11 @@ class ResearchService
             $this->bonusService->addDiscountHumanoid($player, 1);
         }
 
+        # Power Supply
+        if ($research->code == 2100) {
+            $this->bonusService->addDiscountEnergy($player, 1);
+        }
+
         $researched->save();
         $player->save();
         return $researched;
