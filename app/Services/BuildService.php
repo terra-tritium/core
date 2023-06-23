@@ -132,6 +132,13 @@ class BuildService
             }
         }
 
+        // Market
+        if ($building->build == 13) {
+            if (!$this->researchService->isResearched($player, 1500)) {
+                return false;
+            }
+        }
+
         // Diplomacy
         if ($building->build == 14) {
             if (!$this->researchService->isResearched($player, 400)) {
