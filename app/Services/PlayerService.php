@@ -87,6 +87,7 @@ class PlayerService
     $effect->costBuild = 0;
     $effect->protect = 0;
     $effect->extraAttack = 0;
+    $effect->energyDiscount = 0;
     $effect->save();
   }
 

@@ -72,6 +72,11 @@ class ResearchService
             $this->bonusService->addSpeedProduceUnit($player, 1);
         }
 
+        # Energy Renewable
+        if ($research->code == 1600) {
+            $this->bonusService->addEnergyDiscount($player, 1);
+        }
+
         $researched->save();
         $player->save();
         return $researched;

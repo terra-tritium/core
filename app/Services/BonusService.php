@@ -59,4 +59,10 @@ class BonusService
     $effect->extraAttack += $value;
     $effect->save();
   }
+
+  public function addEnergyDiscount ($player, $value) {
+    $effect = Effect::where('player', $player->id)->firstOrFail();
+    $effect->energyDiscount += $value;
+    $effect->save();
+  }
 }

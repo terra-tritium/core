@@ -267,6 +267,7 @@ return new class extends Migration
             $table->integer("costBuild");
             $table->integer("protect");
             $table->integer("extraAttack");
+            $table->integer("energyDiscount");
         });
         Schema::create('researchs', function (Blueprint $table) {
             $table->id();
