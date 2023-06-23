@@ -112,6 +112,25 @@ class ResearchService
             $this->bonusService->addSpeedTravel($player, 1);
         }
 
+        # Alien Technology
+        if ($research->code == 3400) {
+            $this->bonusService->addSpeedProduceShip($player, 1);
+        }
+
+        # Future Science 1
+        if ($research->code == 3500) {
+            $this->bonusService->addSpeedResearch($player, 1);
+        }
+
+        # Future Science 2
+        if ($research->code == 3600) {
+            $this->bonusService->addSpeedResearch($player, 1);
+        }
+
+        # Future Science 3
+        if ($research->code == 3700) {
+            $this->bonusService->addSpeedResearch($player, 1);
+        }
 
         $researched->save();
         $player->save();
