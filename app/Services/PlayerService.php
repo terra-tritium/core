@@ -77,6 +77,7 @@ class PlayerService
     $planet->save();
 
     $effect = new Effect();
+    $effect->player = $player->id;
     $effect->speedProduceUnit = 0;
     $effect->speedProduceShip = 0;
     $effect->speedBuild = 0;

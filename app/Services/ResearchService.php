@@ -53,7 +53,7 @@ class ResearchService
         if ($existsResearch) { return false; }
 
         # Hyperspeed
-        if ($research->code == "600") {
+        if ($research->code == 600) {
             $this->bonusService->addSpeedTravel($player, 1);
         }
 
