@@ -125,6 +125,13 @@ class BuildService
             }
         }
 
+        // Battery House
+        if ($building->build == 10) {
+            if (!$this->researchService->isResearched($player, 2700)) {
+                return false;
+            }
+        }
+
         // Military Camp
         if ($building->build == 11) {
             if (!$this->researchService->isResearched($player, 200)) {

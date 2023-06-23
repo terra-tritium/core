@@ -87,6 +87,21 @@ class ResearchService
             $this->bonusService->addDiscountEnergy($player, 1);
         }
 
+        # Futere Economy 1
+        if ($research->code == 2300) {
+            $this->bonusService->addSpeedMining($player, 1);
+        }
+
+        # Futere Economy 2
+        if ($research->code == 2400) {
+            $this->bonusService->addSpeedMining($player, 1);
+        }
+
+        # Futere Economy 3
+        if ($research->code == 2500) {
+            $this->bonusService->addSpeedMining($player, 1);
+        }
+
         $researched->save();
         $player->save();
         return $researched;
