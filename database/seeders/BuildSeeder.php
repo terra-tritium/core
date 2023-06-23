@@ -46,7 +46,7 @@ class BuildSeeder extends Seeder
         ]);
 
         DB::table('builds')->insert([
-            "name" => "Humanoids",
+            "name" => "Humanoid Factory",
             "code" => 3,
             "image" => "build-03.png",
             "description" => "A fábrica de robôs humanoides é uma sinfonia de tecnologia e criatividade, onde a inteligência artificial e a engenharia se unem para criar máquinas surpreendentes que imitam a forma humana. É uma obra de arte mecânica, onde a ciência e a arte se complementam para produzir robôs humanoides capazes de realizar tarefas complexas e interagir com o mundo ao nosso redor. É a visão de um futuro onde a tecnologia e a humanidade trabalham juntas para melhorar a vida e a sociedade.",
