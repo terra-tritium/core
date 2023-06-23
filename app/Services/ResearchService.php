@@ -74,7 +74,12 @@ class ResearchService
 
         # Energy Renewable
         if ($research->code == 1600) {
-            $this->bonusService->addEnergyDiscount($player, 1);
+            $this->bonusService->addDiscountEnergy($player, 1);
+        }
+
+        # Factory
+        if ($research->code == 1900) {
+            $this->bonusService->addDiscountHumanoid($player, 1);
         }
 
         $researched->save();

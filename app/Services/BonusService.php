@@ -42,12 +42,6 @@ class BonusService
     $effect->save();
   }
 
-  public function addCostBuild ($player, $value) {
-    $effect = Effect::where('player', $player->id)->firstOrFail();
-    $effect->costBuild += $value;
-    $effect->save();
-  }
-
   public function addProtect ($player, $value) {
     $effect = Effect::where('player', $player->id)->firstOrFail();
     $effect->protect += $value;
@@ -60,9 +54,21 @@ class BonusService
     $effect->save();
   }
 
-  public function addEnergyDiscount ($player, $value) {
+  public function addDiscountEnergy ($player, $value) {
     $effect = Effect::where('player', $player->id)->firstOrFail();
-    $effect->energyDiscount += $value;
+    $effect->discountEnergy += $value;
+    $effect->save();
+  }
+
+  public function addDiscountHumanoid ($player, $value) {
+    $effect = Effect::where('player', $player->id)->firstOrFail();
+    $effect->discountHumanoid += $value;
+    $effect->save();
+  }
+
+  public function addDiscountBuild ($player, $value) {
+    $effect = Effect::where('player', $player->id)->firstOrFail();
+    $effect->discountBuild += $value;
     $effect->save();
   }
 }

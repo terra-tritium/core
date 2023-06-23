@@ -264,10 +264,11 @@ return new class extends Migration
             $table->integer("speedResearch");
             $table->integer("speedTravel");
             $table->integer("speedMining");
-            $table->integer("costBuild");
             $table->integer("protect");
             $table->integer("extraAttack");
-            $table->integer("energyDiscount");
+            $table->integer("discountEnergy");
+            $table->integer("discountHumanoid");
+            $table->integer("discountBuild");
         });
         Schema::create('researchs', function (Blueprint $table) {
             $table->id();

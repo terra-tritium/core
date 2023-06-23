@@ -84,10 +84,11 @@ class PlayerService
     $effect->speedResearch = 0;
     $effect->speedTravel = 0;
     $effect->speedMining = 0;
-    $effect->costBuild = 0;
     $effect->protect = 0;
     $effect->extraAttack = 0;
-    $effect->energyDiscount = 0;
+    $effect->discountEnergy = 0;
+    $effect->discountBuild = 0;
+    $effect->discountHumanoid = 0;
     $effect->save();
   }
 
