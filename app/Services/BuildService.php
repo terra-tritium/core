@@ -111,6 +111,13 @@ class BuildService
             $this->starNewMining($p1, $building, 3, 1, $require->metal);
         }
 
+        // Warehouse
+        if ($building->build == 8) {
+            if (!$this->researchService->isResearched($player, 1800)) {
+                return false;
+            }
+        }
+
         // Shipyard
         if ($building->build == 9) {
             if (!$this->researchService->isResearched($player, 300)) {
