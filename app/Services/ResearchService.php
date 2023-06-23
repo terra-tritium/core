@@ -102,6 +102,11 @@ class ResearchService
             $this->bonusService->addSpeedMining($player, 1);
         }
 
+        # Ligth Reflexion
+        if ($research->code == 2800) {
+            $this->bonusService->addDiscountEnergy($player, 1);
+        }
+
         $researched->save();
         $player->save();
         return $researched;
