@@ -6,11 +6,19 @@ use App\Models\Country;
 use App\Models\GameMode;
 use App\Models\Player;
 use App\Models\Effect;
+use App\Services\GameModeService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class GameModeController extends Controller
 {
+
+    protected $gameModeService;
+
+    public function __construct(GameModeService $gameModeService)
+    {
+        $this->gameModeService = $gameModeService;
+    }
 
     /**
      * * @OA\Get(
@@ -32,11 +40,12 @@ class GameModeController extends Controller
      * @throws \Exception
      */
     public function list() {
-        try {
-            return GameMode::orderBy('code')->get();
-        } catch (\Exception $e) {
-            throw new \Exception('An error occurred while getting game modes.', 500);
-        }
+        // try {
+            $player = Player::getPlayerLogged();
+            return $this->gameModeService->list($player);
+        // } catch (\Exception $e) {
+        //     throw new \Exception('An error occurred while getting game modes.', 500);
+        // }
     }
 
     /**
