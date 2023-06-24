@@ -30,4 +30,10 @@ class NFTController extends Controller
 
     $nftUserConfig->save();
   }
+
+  public function get() {
+    $player = Player::getPlayerLogged();
+    $nftUserConfig = NFTConfig::where('player', $player->id)->first();
+    return $nftUserConfig;
+  }
 }

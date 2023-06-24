@@ -171,6 +171,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('nft')->group(function () {
         Route::post('/config/{slot}/{code}', [NFTController::class, 'config']);
+        Route::get('/config/get', [NFTController::class, 'get']);
     });
 });
 /**
