@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\NFTConfig;
+use App\Models\Player;
 
 class NFTController extends Controller
 {

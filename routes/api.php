@@ -18,6 +18,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\FactoryController;
 use App\Http\Controllers\AliancesController;
 use App\Http\Controllers\TradingController;
+use App\Http\Controllers\NFTController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
