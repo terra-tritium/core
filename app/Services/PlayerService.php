@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Player;
 use App\Models\Planet;
 use App\Models\Effect;
+use App\Models\NFTConfig;
 use App\Models\AlianceRanking;
 use App\Services\PlanetService;
 
@@ -90,6 +91,15 @@ class PlayerService
     $effect->discountBuild = 0;
     $effect->discountHumanoid = 0;
     $effect->save();
+
+    $nftConfig = new NFTConfig();
+    $nftConfig->player = $player->id;
+    $nftConfig->slot1 = 0;
+    $nftConfig->slot2 = 0;
+    $nftConfig->slot3 = 0;
+    $nftConfig->slot4 = 0;
+    $nftConfig->slot5 = 0;
+    $nftConfig->save();
   }
 
   private function startAlocation() {

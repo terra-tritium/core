@@ -168,7 +168,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/trading-process/{id}',[TradingController::class, 'getTradingProcess']);
     });
 
-
+    Route::prefix('nft')->group(function () {
+        Route::post('/config/{slot}/{code}', [NFTController::class, 'config']);
+    });
 });
 /**
  * Rota Publica, ping

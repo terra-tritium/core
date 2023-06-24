@@ -396,6 +396,17 @@ return new class extends Migration
         /**
          *FIM DAS TABELAS REFERENTE AO MERCADO
          */
+        Schema::create('nftconfig', function (Blueprint $table) {
+            $table->id();
+            $table->integer('player')->constrained("players");
+            # Slots of control panel
+            $table->integer("slot1");
+            $table->integer("slot2");
+            $table->integer("slot3");
+            $table->integer("slot4");
+            # Slot commandant colonizer
+            $table->integer("slot5");
+        });
     }
 
 
