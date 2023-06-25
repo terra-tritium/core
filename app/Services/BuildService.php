@@ -146,6 +146,10 @@ class BuildService
             if (!$this->researchService->isResearched($player, 100)) {
                 return false;
             }
+            # Only construct allow in slot 4
+            if ($building->slot != 4) {
+                return false;
+            }
         }
 
         // Market
