@@ -97,6 +97,7 @@ class BuildService
 
         // Uranium Mining
         if ($building->build == 5) {
+            if ($p1->resource != "uranium") {return false;}
             if (!$this->researchService->isResearched($player, 1300)) {
                 return false;
             }
@@ -105,6 +106,7 @@ class BuildService
 
         // Crystal Mining
         if ($building->build == 6) {
+            if ($p1->resource != "crystal") {return false;}
             if (!$this->researchService->isResearched($player, 1300)) {
                 return false;
             }
