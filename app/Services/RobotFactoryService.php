@@ -35,10 +35,13 @@ class RobotFactoryService
       return false;
     }
 
+    $player->score += $qtd * env('TRITIUM_HUMANOID_POINTS');
+
     $planet->energy -= $cost;
     $planet->workers += $qtd;
     $planet->workersWaiting += $qtd;
 
+    $player->save();
     $planet->save();
   }
 }
