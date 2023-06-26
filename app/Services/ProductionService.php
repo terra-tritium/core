@@ -93,14 +93,14 @@ class ProductionService
     $p1->save();
   }
 
-  public function productionPlayer($player,$planet){
+  public function productionPlayer($player,$planet,$executed = false){
     
-    $filter = ['player'=> $player->id,'executed'=> false];
+    $filter = ['player'=> $player->id,'executed'=> $executed];
     if(!is_null($planet) && !empty($planet))
     {
       $filter['planet'] = $planet;
     }
-    $productionModel =  Production::where($filter)->get();
+    $productionModel =  Production::where($filter)->orderBy("ready")->get();
     $units = [];
 
     foreach($productionModel as $key => $production){
