@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Aliance;
 use App\Models\Aliances;
+use App\Models\Player;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -108,6 +111,8 @@ class AliancesController extends Controller
             $aliances = app(Aliances::class);
             $aliances->name = $request->input('name');
             $aliances->description = $request->input('description');
+            $aliances->type = $request->input('type');
+            $aliances->founder = Player::getPlayerLogged();
 
             if ($request->hasFile('avatar')) {
                 $file = $request->file('avatar');
@@ -178,6 +183,10 @@ class AliancesController extends Controller
 
             if ($request->has('description')) {
                 $aliances->description = $request->input('description');
+            }
+
+            if ($request->has('type')) {
+                $aliances->type = $request->input('type');
             }
 
             if ($request->hasFile('avatar')) {
@@ -258,6 +267,94 @@ class AliancesController extends Controller
             Log::error($exception);
             return response()->json(['message' => 'Error: failed to update avatar'],
                 Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function joinAliance(Request $request)
+    {
+        $aliancaId = $request->input('alianca_id');
+        $aliance = Aliance::findOrFail($aliancaId);
+
+        $player = Player::getPlayerLogged();
+        $player->aliance = $aliancaId;
+        $player->save();
+
+        if ($aliance->type == 0) {
+            $player->aliance = $aliancaId;
+            $player->save();
+            return response()->json(['message' => 'Player joined the alliance successfully'], Response::HTTP_OK);
+        } elseif ($aliance->type == 1) {
+
+            $existingRequest = DB::table('aliances_requests')
+                ->where('player_id', $player->id)
+                ->where('aliance_id', $aliancaId)
+                ->first();
+
+            if ($existingRequest) {
+                return response()->json(['message' => 'Request already sent. Wait for founder approval.']);
+            }
+
+            DB::table('aliances_requests')->insert([
+                'player_id' => $player->id,
+                'founder_id' => $aliance->founder,
+                'message' => 'Solicitação de entrada na aliança',
+                'status' => 0,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            return response()->json(['message' => 'Request sent to alliance founder'], Response::HTTP_OK);
+        } else {
+            return response()->json(['message' => 'Invalid alliance type'], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function handlePlayerRequest(Request $request)
+    {
+        $playerId = $request->input('player_id');
+        $alianceId = $request->input('aliance_id');
+        $acceptRequest = $request->input('accept_request'); // true or false
+
+        if ($acceptRequest) {
+            $result = $this->alianceService->acceptPlayerRequest($playerId, $alianceId);
+
+            if ($result) {
+                // Atualizar a solicitação com o status de aceitação
+                DB::table('aliances_requests')
+                    ->where('player_id', $playerId)
+                    ->where('aliance_id', $alianceId)
+                    ->update([
+                        'status' => 'accepted',
+                        'message' => 'Request accepted by founder.',
+                    ]);
+
+                // Atualizar o jogador com o ID da aliança
+                Player::where('id', $playerId)->update(['aliance' => $alianceId]);
+
+                return response()->json(['message' => 'Player accepted into the alliance.']);
+            } else {
+                // Atualizar a solicitação com o status de recusa
+                DB::table('aliances_requests')
+                    ->where('player_id', $playerId)
+                    ->where('aliance_id', $alianceId)
+                    ->update([
+                        'status' => 'failed',
+                        'message' => 'Failed to accept player into alliance.',
+                    ]);
+
+                return response()->json(['message' => 'Failed to accept player into alliance.']);
+            }
+        } else {
+            // Atualizar a solicitação com o status de recusa
+            DB::table('aliances_requests')
+                ->where('player_id', $playerId)
+                ->where('aliance_id', $alianceId)
+                ->update([
+                    'status' => 'rejected',
+                    'message' => 'Request declined by founder.',
+                ]);
+
+            return response()->json(['message' => 'Player declined in alliance.']);
         }
     }
 
