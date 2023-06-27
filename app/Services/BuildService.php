@@ -10,6 +10,7 @@ use App\Models\Requires;
 use App\Services\PlanetService;
 use App\Services\PlayerService;
 use App\Services\ResearchService;
+use App\Services\WorkerService;
 
 class BuildService
 {
@@ -25,6 +26,7 @@ class BuildService
         $this->playerService = new PlayerService();
         $this->planetService = new PlanetService();
         $this->researchService = new ResearchService();
+        $this->workerService = new WorkerService();
     }
 
     private function starNewMining($p1, $building, $resourceMining, $resourceSpend, $require) {
@@ -226,6 +228,24 @@ class BuildService
         $player = $this->playerService->addBuildScore($player, $require->uranium * $this->premiumScoreFator);
         $player = $this->playerService->addBuildScore($player, $require->crystal * $this->premiumScoreFator);
         $player->save();
+    }
+
+    public function demolish($buildId) {
+        $building = Building::find($buildId);
+
+        # Don't demolish all colonizators, have to have at least one
+        if ($building->build == 1) {
+            $countColonizator = Building::where('build', 1)->count();
+            if ($countColonizator <= 1) {
+                return false;
+            }
+        }
+
+        if ($building->build == 4 || $building->build == 5 || $building->build == 6 || $building->build == 7) {
+            $this->workerService->configWorkers($building->planet, 0, $building->id);
+        }
+
+        $building->delete();
     }
 
     public function upgrade($buildingId) {
