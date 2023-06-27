@@ -319,7 +319,6 @@ class AliancesController extends Controller
             $result = $this->alianceService->acceptPlayerRequest($playerId, $alianceId);
 
             if ($result) {
-                // Atualizar a solicitação com o status de aceitação
                 DB::table('aliances_requests')
                     ->where('player_id', $playerId)
                     ->where('aliance_id', $alianceId)
@@ -328,12 +327,10 @@ class AliancesController extends Controller
                         'message' => 'Request accepted by founder.',
                     ]);
 
-                // Atualizar o jogador com o ID da aliança
                 Player::where('id', $playerId)->update(['aliance' => $alianceId]);
 
                 return response()->json(['message' => 'Player accepted into the alliance.']);
             } else {
-                // Atualizar a solicitação com o status de recusa
                 DB::table('aliances_requests')
                     ->where('player_id', $playerId)
                     ->where('aliance_id', $alianceId)
@@ -345,7 +342,6 @@ class AliancesController extends Controller
                 return response()->json(['message' => 'Failed to accept player into alliance.']);
             }
         } else {
-            // Atualizar a solicitação com o status de recusa
             DB::table('aliances_requests')
                 ->where('player_id', $playerId)
                 ->where('aliance_id', $alianceId)

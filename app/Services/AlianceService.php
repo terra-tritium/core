@@ -9,7 +9,6 @@ class AlianceService
 {
     public function acceptPlayerRequest($playerId, $alianceId)
     {
-        // Verificar se o jogador solicitou entrada na aliança
         $request = DB::table('aliances_requests')
             ->where('player_id', $playerId)
             ->where('aliance_id', $alianceId)
