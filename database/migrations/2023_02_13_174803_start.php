@@ -129,7 +129,7 @@ return new class extends Migration
             $table->integer('attackStrategy');
             $table->integer('defenseStrategy');
             $table->integer('aliance')->nullable()->unsigned();
-            $table->dateTime('leave_aliance_date')->nullable()->unsigned();
+            $table->dateTime('leave_aliance_date')->nullable();
             $table->bigInteger("ready")->nullable();
             $table->bigInteger("researchPoints");
             # Score rankings
@@ -343,10 +343,6 @@ return new class extends Migration
             $table->text('message');
             $table->boolean('status')->default(0);
             $table->timestamps();
-
-            $table->foreign('player_id')->references('id')->on('players')->onDelete('cascade');
-            $table->foreign('founder_id')->references('id')->on('players')->onDelete('cascade');
-
         });
 
         /**
