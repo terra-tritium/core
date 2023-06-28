@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Aliance;
 use App\Models\Aliances;
 use App\Models\Player;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -270,6 +272,39 @@ class AliancesController extends Controller
         }
     }
 
+    /**
+     *
+     * @OA\Post(
+     *     path="/aliances/join",
+     *     operationId="joinAliance",
+     *     tags={"Aliances"},
+     *     summary="Join an alliance",
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="alianca_id",
+     *                     type="integer",
+     *                     description="ID of the alliance",
+     *                 ),
+     *                 example={"alianca_id": 123}
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Player joined the alliance successfully",
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Bad request",
+     *     )
+     * )
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function joinAliance(Request $request)
     {
         $aliancaId = $request->input('alianca_id');
@@ -277,7 +312,15 @@ class AliancesController extends Controller
 
         $player = Player::getPlayerLogged();
         $player->aliance = $aliancaId;
-        $player->save();
+
+        if ($player->leave_date) {
+            $leaveDate = Carbon::parse($player->leave_date);
+
+            if (Carbon::now()->diffInDays($leaveDate) < 5) {
+                return response()->json(['message' => 'The player must wait 5 days before joining a new alliance.'],
+                    Response::HTTP_BAD_REQUEST);
+            }
+        }
 
         if ($aliance->type == 0) {
             $player->aliance = $aliancaId;
@@ -294,14 +337,7 @@ class AliancesController extends Controller
                 return response()->json(['message' => 'Request already sent. Wait for founder approval.']);
             }
 
-            DB::table('aliances_requests')->insert([
-                'player_id' => $player->id,
-                'founder_id' => $aliance->founder,
-                'message' => 'Solicitação de entrada na aliança',
-                'status' => 0,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+            $this->sendAliancesRequest($player->id,$aliance->founder);
 
             return response()->json(['message' => 'Request sent to alliance founder'], Response::HTTP_OK);
         } else {
@@ -309,6 +345,49 @@ class AliancesController extends Controller
         }
     }
 
+    /**
+     *
+     * @OA\Post(
+     *     path="/aliances/request",
+     *     operationId="handlePlayerRequest",
+     *     tags={"Aliances"},
+     *     summary="Handle player request for alliance",
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="player_id",
+     *                     type="integer",
+     *                     description="ID of the player",
+     *                 ),
+     *                 @OA\Property(
+     *                     property="aliance_id",
+     *                     type="integer",
+     *                     description="ID of the alliance",
+     *                 ),
+     *                 @OA\Property(
+     *                     property="accept_request",
+     *                     type="boolean",
+     *                     description="Whether to accept the player request or not",
+     *                 ),
+     *                 example={"player_id": 123, "aliance_id": 456, "accept_request": true}
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Player accepted into the alliance",
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Failed to accept player into alliance",
+     *     )
+     * )
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function handlePlayerRequest(Request $request)
     {
         $playerId = $request->input('player_id');
@@ -354,6 +433,141 @@ class AliancesController extends Controller
         }
     }
 
+    /**
+     *
+     * @OA\Post(
+     *     path="/aliances/leave",
+     *     operationId="leaveAliance",
+     *     tags={"Aliances"},
+     *     summary="Leave an alliance",
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="player_id",
+     *                     type="integer",
+     *                     description="ID of the player",
+     *                 ),
+     *                 example={"player_id": 123}
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Player has successfully exited the alliance",
+     *     ),
+     *     @OA\Response(
+     *         response="404",
+     *         description="Player not found",
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="The player is not in an alliance",
+     *     )
+     * )
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function leaveAliance(Request $request)
+    {
+        $playerId = $request->input('player_id');
+        $player = Player::find($playerId);
+
+        if (!$player) {
+            return response()->json(['message' => 'Player not found.'], 404);
+        }
+
+        if (!$player->aliance) {
+            return response()->json(['message' => 'The player is not in an alliance.'], 400);
+        }
+
+        $player->aliance = null;
+        $player->leave_date = Carbon::now();
+        $player->save();
+
+        return response()->json(['message' => 'Player has successfully exited the alliance.']);
+    }
+
+    /**
+     *
+     *  @OA\Post(
+     *     path="/aliances/kick-player",
+     *     operationId="kickPlayer",
+     *     tags={"Aliances"},
+     *     summary="Kick a player from the alliance",
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="player_id",
+     *                     type="integer",
+     *                     description="ID of the player to be kicked",
+     *                 ),
+     *                 @OA\Property(
+     *                     property="aliance_id",
+     *                     type="integer",
+     *                     description="ID of the alliance",
+     *                 ),
+     *                 example={"player_id": 123, "aliance_id": 456}
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Player successfully kicked out of the alliance",
+     *     ),
+     *     @OA\Response(
+     *         response="404",
+     *         description="Player not found",
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="The player does not belong to this alliance",
+     *     ),
+     *     @OA\Response(
+     *         response="403",
+     *         description="You are not allowed to kick players from this alliance",
+     *     )
+     * )
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function kickPlayer(Request $request)
+    {
+        $playerId = $request->input('player_id');
+        $aliancId = $request->input('aliance_id');
+
+        $loggedPlayer = Player::getPlayerLogged();
+        $founderId = $loggedPlayer->id;
+        $aliance = Aliance::find($aliancId);
+
+        if (!$aliance || $aliance->founder !== $founderId) {
+            return response()->json(['message' => 'You are not allowed to kick players from this alliance.'],
+                Response::HTTP_FORBIDDEN);
+        }
+
+        $player = Player::find($playerId);
+
+        if (!$player) {
+            return response()->json(['message' => 'Player not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($player->aliance !== $aliancId) {
+            return response()->json(['message' => 'The player does not belong to this alliance.'],
+                Response::HTTP_BAD_REQUEST);
+        }
+
+        $player->aliance = null;
+        $player->save();
+
+        return response()->json(['message' => 'Player successfully kicked out of the alliance.'],
+            Response::HTTP_OK);
+    }
+
+
     public function addImage($imageFile)
     {
         $fileName = time() . '_' . $imageFile->getClientOriginalName();
@@ -363,5 +577,15 @@ class AliancesController extends Controller
         return $fileUrl;
     }
 
-
+    public function sendAliancesRequest($playerId, $founderId)
+    {
+        return DB::table('aliances_requests')->insert([
+            'player_id' => $playerId,
+            'founder_id' => $founderId,
+            'message' => 'Solicitação de entrada na aliança',
+            'status' => 0,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+    }
 }

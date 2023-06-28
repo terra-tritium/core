@@ -129,6 +129,7 @@ return new class extends Migration
             $table->integer('attackStrategy');
             $table->integer('defenseStrategy');
             $table->integer('aliance')->nullable()->unsigned();
+            $table->dateTime('leave_aliance_date')->nullable()->unsigned();
             $table->bigInteger("ready")->nullable();
             $table->bigInteger("researchPoints");
             # Score rankings

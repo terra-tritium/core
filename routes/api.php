@@ -157,6 +157,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/list', [AliancesController::class, 'index']);
         Route::delete('/delete/{id}', [AliancesController::class, 'destroy']);
         Route::put('/update-avatar/{id}', [AliancesController::class, 'updateAvatar']);
+        Route::post('/aliances/join', [AliancesController::class,'joinAliance']);
+        Route::post('/aliances/request', [AliancesController::class,'handlePlayerRequest']);
+        Route::post('/aliances/leave',[AliancesController::class,'leaveAliance']);
+        Route::post('/aliances/kick-player', [AliancesController::class, 'kickPlayer']);
     });
 
     Route::prefix('trading')->group(function () {
