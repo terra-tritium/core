@@ -1,0 +1,56 @@
+
+
+1 - Calculo do tamanho máximo de um slots 
+
+		O sistema pega quem tem a menor
+	quantidade de unidade	e verificar 
+	se esse valor é menor que 1000 e retorna 1,
+	se forma maior e menor
+	que 1500 retorna 2, se for maior que 
+	1500 retorna 3.
+		
+		
+	(D) DroidSlotSize = 50;
+	(V) VehicleSlotSize = 20;
+	(L) LaunchersSlotSize = 20;
+	(S) SpecialSlotSize = 5
+
+	Retorno 1 :	
+		(D,V,L,S)_SlotSize * sizeFator1 (1)
+	
+	Retorno 2 :	
+		(D,V,L,S)_SlotSize * sizeFator2 (5)
+	
+	Retorno 3 :	
+		(D,V,L,S)_SlotSize * sizeFator3 (10)
+	
+
+2 - Carregamento dos slots de batalha com as unidades da batalha:
+
+	As unidades de attackSlots e defenseSlots serão 
+	preenchidas em um slot de cada vez com os dados 
+	salvos na attackReserve e defenseReserve da batalha.
+	
+	Calculo e regra para definiar a distribuição das unidades nos slots de batalha feito no calculateStage:
+		
+		1 - seleciona a batalha e aloca os dados de attackReserve e defenseReserve para serem utilizdos posteriormente;
+		2 - calcula o tamanho máximo de alocação de unidades em um slot (formula do calculo na etapa anterior);
+		3 - Cria um slots attackSlots e defenseSlots somente com o tamanho máximo de unidades  e estratégia;		
+		4 - Move a quantidade de unidades, por tipo, para o slots
+		calculando a diferença entre o tamanho máximo do slot 
+		menos a quantidade de unidades do attackSlots[r1c1][D,L,S,V] 
+		ou defenseSlots[r1c1][D,L,S,V] .
+		
+			Movendo as trops para os slots:
+
+			1 - verificar se é  attack ou defense
+			2 - carrega os dados de attackReserve/defenseReserve
+			para serem distribuidos nos slots
+			3 - verificar o tipo da unidade e subtrai a quantidade com o tamanho máximo do slots[r1c1]
+			4 - Obtem os dados armazenados nas variaveis attackReserve e defenseReserve para serem distribuidos entre os slots e caso sobre 
+			alguma unidade, subtrai do attackDemage e defenseReserve.
+
+3 - Resvolvendo o conflito e criando stages :
+    Essa etapa é executando assim que os slots da batalha é criado ou alterado e sempre os campos attackReserve, attackSlots, defenseReserve e attackReserve serão alterados após a finalização do stages .
+     
+	1 - 
