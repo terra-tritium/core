@@ -69,9 +69,10 @@ class BattleService
         $this->loadReserve($battle);
         
         $battle = $this->fillSlots($battle);
-         
+
         $battle->stage += 1;
         $battle->save();
+         dd( $this->attackReserve);
         $stage = $this->createNewStage($battle);
        
         # Start job for new stage if no end
@@ -81,10 +82,13 @@ class BattleService
                 $battle->id
             )->delay(now()->addSeconds(env("TRITIUM_STAGE_SPEED")));
         } else {
-            if ($this->attackReserve == 0 || $this->currentStage->attackGaveUp == true) {
+            $attackSize     = $this->getSizeTroop($this->attackReserve);
+            $defenseSize    = $this->getSizeTroop($this->defenseReserve);
+
+            if ($attackSize == 0 || $this->currentStage->attackGaveUp == true) {
                 $battle->result = 2;
             }
-            if ($this->defenseReserve == 0 || $this->currentStage->defenseGaveUp == true) {
+            if ($defenseSize == 0 || $this->currentStage->defenseGaveUp == true) {
                 $battle->result = 1;
             }
             $battle->save();
@@ -153,7 +157,8 @@ class BattleService
                         }
 
                         $stage->defenseDemage += $demage;
-                        $stage->defenseKills = $dSlot->kills;
+                        //$stage->defenseKills = $dSlot->kills;
+                        $stage->defenseKills = json_encode($dSlot);
                         $stage->defenseSlots = json_encode($dSlots);
                         break;
                     }
@@ -191,7 +196,8 @@ class BattleService
                         }
 
                         $stage->attackDemage += $demage;
-                        $stage->attackKills = $aSlot->kills;
+                        //$stage->attackKills = $aSlot->kills;
+                        $stage->attackKills = json_encode($aSlot);
                         $stage->attackSlots = json_encode($aSlots);
                         break;
                     }
@@ -199,8 +205,6 @@ class BattleService
             }
         }
         
-        dd('Fim aqui');
-
         $stage->attackReserve = json_encode($this->attackReserve);
         $stage->defenseReserve = json_encode($this->defenseReserve);
 
@@ -219,12 +223,9 @@ class BattleService
 
     private function isEnd() {
 
-       // $attackSize = count($this->attackReserve);
-       // $defenseSize = count($this->defenseReserve);
-
         $attackSize     = $this->getSizeTroop($this->attackReserve);
         $defenseSize    = $this->getSizeTroop($this->defenseReserve);
-
+        
         if (
             $attackSize == 0 || 
             $defenseSize == 0 || 
@@ -402,6 +403,7 @@ class BattleService
         $q =  0;
         $availableR  =  $available ;
 
+        //Esta errado tem que fazer o calculo apenas em uma unidade até zerar
         foreach($j as $jj){
             $q = $reserve[$jj]->quantity  ;
             if ($different > 0) { 

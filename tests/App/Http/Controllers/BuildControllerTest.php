@@ -16,7 +16,7 @@ class BuildControllerTest extends TestCase
         $createPlayer = [  'email' => 'nicplayer2@gmail.com', 
                             'name' => 'nicplayer2',
                             'country'=> 2,
-                            'password' => '123456',
+                            'password' => '123',
                             'address'];
 
         $response = $this->json('POST', 'api/player/register', $createPlayer, ['Accept' => 'application/json']);
@@ -28,7 +28,7 @@ class BuildControllerTest extends TestCase
     # php artisan test --filter=BuildControllerTest::test_build
     public function test_build()
     {
-        $loginData = ['email' => 'nicplayer2@gmail.com', 'password' => '123456'];
+        $loginData = ['email' => 'nicplayer2@gmail.com', 'password' => '123'];
 
         $response = $this->json('POST', 'api/user/login', $loginData, ['Accept' => 'application/json']);
         
@@ -51,16 +51,17 @@ class BuildControllerTest extends TestCase
     # php artisan test --filter=BuildControllerTest::test_build_troop_production
     public function test_build_troop_production()
     {
-        $loginData = ['email' => 'nicplayer2@gmail.com', 'password' => '123456'];
+        $loginData = ['email' => 'nicplayer2@gmail.com', 'password' => '123'];
 
         $response = $this->json('POST', 'api/user/login', $loginData, ['Accept' => 'application/json']);
         
         $content = json_decode($response->getContent(), true);
         $token = $content['token'];
-        $planet = 2 ;
+        $planet = 152 ;
 
-        $data = ['id'=> 2, 'quantity' => 30 ];
-        
+        $data =    ['id'=> 2, 'quantity' => 18 ] ;
+                 
+
         $response = $this->withHeaders(['Authorization'=>'Bearer '.$token,
                                         'Accept' => 'application/json'])
                                         ->post('/api/troop/production/'.$planet, $data);
@@ -71,7 +72,7 @@ class BuildControllerTest extends TestCase
     # php artisan test --filter=BuildControllerTest::test_build_producing
     public function test_build_producing()
     {
-        $loginData = ['email' => 'nicplayer@gmail.com', 'password' => '123456'];
+        $loginData = ['email' => 'nicplayer@gmail.com', 'password' => '123'];
 
         $response = $this->json('POST', 'api/user/login', $loginData, ['Accept' => 'application/json']);
         
