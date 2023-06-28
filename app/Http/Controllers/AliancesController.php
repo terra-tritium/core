@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Aliance;
 use App\Models\Aliances;
 use App\Models\Player;
+use App\Services\AlianceService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -388,14 +389,14 @@ class AliancesController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function handlePlayerRequest(Request $request)
+    public function handlePlayerRequest(Request $request, AlianceService $alianceService)
     {
         $playerId = $request->input('player_id');
         $alianceId = $request->input('aliance_id');
         $acceptRequest = $request->input('accept_request'); // true or false
 
         if ($acceptRequest) {
-            $result = $this->alianceService->acceptPlayerRequest($playerId, $alianceId);
+            $result =$alianceService->acceptPlayerRequest($playerId, $alianceId);
 
             if ($result) {
                 DB::table('aliances_requests')
