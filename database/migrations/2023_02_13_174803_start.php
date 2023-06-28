@@ -26,6 +26,8 @@ return new class extends Migration
             $table->bigInteger("attackScore")->default(0);
             $table->bigInteger("defenseScore")->default(0);
             $table->bigInteger("warScore")->default(0);
+            $table->integer('founder')->constrained("players");
+            $table->bigInteger("type")->default(0)->comment('0 - Aberta , 1 - Fechada')->change();
         });
 
         Schema::create('aliances_ranking', function (Blueprint $table) {
@@ -127,6 +129,7 @@ return new class extends Migration
             $table->integer('attackStrategy');
             $table->integer('defenseStrategy');
             $table->integer('aliance')->nullable()->unsigned();
+            $table->dateTime('leave_aliance_date')->nullable()->unsigned();
             $table->bigInteger("ready")->nullable();
             $table->bigInteger("researchPoints");
             # Score rankings
@@ -331,6 +334,19 @@ return new class extends Migration
             $table->string("name");
             $table->string("x");
             $table->string("y");
+        });
+
+        Schema::create('aliances_requests', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('player_id')->constrained("players");
+            $table->bigInteger('founder_id')->constrained("players");;
+            $table->text('message');
+            $table->boolean('status')->default(0);
+            $table->timestamps();
+
+            $table->foreign('player_id')->references('id')->on('players')->onDelete('cascade');
+            $table->foreign('founder_id')->references('id')->on('players')->onDelete('cascade');
+
         });
 
         /**
