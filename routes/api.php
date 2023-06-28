@@ -152,16 +152,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/aliances', [RankingController::class, 'getAlianceRanking']);
     });
 
-    Route::prefix('alliances')->group(function () {
+    Route::prefix('aliance')->group(function () {
         Route::post('/create', [AliancesController::class, 'create']);
         Route::put('/edit/{id}', [AliancesController::class, 'update']);
         Route::get('/list', [AliancesController::class, 'index']);
         Route::delete('/delete/{id}', [AliancesController::class, 'destroy']);
         Route::put('/update-avatar/{id}', [AliancesController::class, 'updateAvatar']);
-        Route::post('/aliances/join', [AliancesController::class,'joinAliance']);
-        Route::post('/aliances/request', [AliancesController::class,'handlePlayerRequest']);
-        Route::post('/aliances/leave',[AliancesController::class,'leaveAliance']);
-        Route::post('/aliances/kick-player', [AliancesController::class, 'kickPlayer']);
+        Route::post('/join', [AliancesController::class,'joinAliance']);
+        Route::post('/request', [AliancesController::class,'handlePlayerRequest']);
+        Route::post('/leave',[AliancesController::class,'leaveAliance']);
+        Route::post('/kick-player', [AliancesController::class, 'kickPlayer']);
     });
 
     Route::prefix('trading')->group(function () {
