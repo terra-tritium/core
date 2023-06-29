@@ -211,7 +211,7 @@ class BuildSeeder extends Seeder
         ]);
 
         DB::table('builds')->insert([
-            "name" => "Diplomacy",
+            "name" => "Galactic Council",
             "code" => 14,
             "image" => "build-14.png",
             "description" => "Resource trades between players",   

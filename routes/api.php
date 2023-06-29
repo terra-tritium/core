@@ -152,7 +152,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/aliances', [RankingController::class, 'getAlianceRanking']);
     });
 
-    Route::prefix('aliances')->group(function () {
+    Route::prefix('aliance')->group(function () {
         Route::post('/create', [AliancesController::class, 'create']);
         Route::put('/edit/{id}', [AliancesController::class, 'update']);
         Route::get('/list', [AliancesController::class, 'index']);

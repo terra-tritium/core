@@ -15,7 +15,7 @@ class TravelControllerTest extends TestCase
     public function test_travel()
     {
 
-        $loginData = ['email' => 'nicplayer@gmail.com', 'password' => '123456'];
+        $loginData = ['email' => 'nicplayer@gmail.com', 'password' => '123'];
 
         $response = $this->json('POST', 'api/user/login', $loginData, ['Accept' => 'application/json']);
         
@@ -24,11 +24,11 @@ class TravelControllerTest extends TestCase
 
         $data = [
                     'action'    => 1,
-                    'to'        => 'A000:2',
-                    'from'      => 'A000:1',
+                    'from'      => 'A010:1',
+                    'to'        => 'A010:2',
                     'troop' =>[
-                        ['unit' => 1, 'quantity' => 20],
-                        ['unit' => 2, 'quantity' => 20],
+                        ['unit' => 1, 'quantity' => 28],
+                        ['unit' => 2, 'quantity' => 30],
                     ] 
                 ];
         
