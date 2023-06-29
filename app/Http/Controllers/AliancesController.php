@@ -568,6 +568,55 @@ class AliancesController extends Controller
             Response::HTTP_OK);
     }
 
+    /**
+     *  @OA\Get(
+     *     path="/aliances/{alianceId}/players",
+     *     summary="Listar jogadores de uma aliança",
+     *     tags={"Aliances"},
+     *     @OA\Parameter(
+     *         name="alianceId",
+     *         in="path",
+     *         description="ID da aliança",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de jogadores da aliança",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Player")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Aliança não encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Aliança não encontrada.")
+     *         )
+     *     ),
+     * )
+     *
+     * @param $aliancId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function listPlayers($alianceId)
+    {
+        $aliance = Aliance::find($alianceId);
+
+        if (!$aliance) {
+            return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        $players = Player::where('aliance', $alianceId)->get();
+
+        return response()->json($players);
+    }
+
+
 
     public function addImage($imageFile)
     {
