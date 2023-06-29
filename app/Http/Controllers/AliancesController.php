@@ -61,7 +61,7 @@ class AliancesController extends Controller
     public function index()
     {
         try {
-            $aliances = Aliances::all();
+            $aliances = Aliance::all();
 
             return response()->json($aliances, Response::HTTP_OK);
         } catch (Throwable $exception) {
