@@ -56,6 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/details/{id}', [PlayerController::class, 'getDetails']);
         Route::post('/new', [PlayerController::class, 'register']);
         Route::post('/list-name/{id}', [PlayerController::class, 'getNameUser']);
+        Route::post('/change-name', [PlayerController::class, 'changeName']);
     });
 
     Route::group(['prefix' => 'build'], function () {

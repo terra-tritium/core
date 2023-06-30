@@ -216,4 +216,13 @@ class PlayerService
     $planets = Planet::where('player', $playerLogged->id)->get();
     return $planets;
   }
+
+  public function changeName($player, $newName)
+  {
+    $playerModel = Player::find($player);
+    $playerModel->name = $newName;
+    $playerModel->save();
+    
+    return true;
+  }
 }
