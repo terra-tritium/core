@@ -66,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/workers', [BuildController::class, 'workers']);
         Route::get('/requires/{build}', [BuildController::class, 'requires']);
         Route::get('/require/{build}/{level}', [BuildController::class, 'require']);
+        Route::post('/demolish/{build}', [BuildController::class, 'demolish']);
     });
 
     Route::get('/building/list/{planet}', [BuildController::class, 'listBildings']);
@@ -151,12 +152,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/aliances', [RankingController::class, 'getAlianceRanking']);
     });
 
-    Route::prefix('alliances')->group(function () {
+    Route::prefix('aliance')->group(function () {
         Route::post('/create', [AliancesController::class, 'create']);
         Route::put('/edit/{id}', [AliancesController::class, 'update']);
         Route::get('/list', [AliancesController::class, 'index']);
         Route::delete('/delete/{id}', [AliancesController::class, 'destroy']);
         Route::put('/update-avatar/{id}', [AliancesController::class, 'updateAvatar']);
+        Route::post('/join', [AliancesController::class,'joinAliance']);
+        Route::post('/request', [AliancesController::class,'handlePlayerRequest']);
+        Route::post('/leave',[AliancesController::class,'leaveAliance']);
+        Route::post('/kick-player', [AliancesController::class, 'kickPlayer']);
+        Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
     });
 
     Route::prefix('trading')->group(function () {

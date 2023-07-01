@@ -260,6 +260,42 @@ class BuildController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/build/demolish",
+     *     tags={"Build"},
+     *     summary="Demolish a building",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", description="Building ID")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Building demolish successful"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid building ID"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error demolishing building"
+     *     )
+     * )
+     */
+    public function demolish($buildId) {
+        try {
+
+            $this->buildService->demolish($buildId);
+
+            return response()->json(['message' => 'Build demolish successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
      * @param $build
      * @return \Illuminate\Http\JsonResponse
      */

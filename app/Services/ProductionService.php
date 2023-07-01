@@ -25,12 +25,11 @@ class ProductionService
       $production = new Production();
       $production->player = $player;
       $production->planet = $planet;
-      $finalTime = 0;
   
-      $finalTime = time() + ($unitModel->time *  $unit['quantity'] * env("TRITIUM_PRODUCTION_SPEED") );
+      $timeConstruction = ($unitModel->time *  $unit['quantity'] * env("TRITIUM_PRODUCTION_SPEED") );
       $newUnit[] = $unit;
       
-      $production->ready = $finalTime;
+      $production->ready = time() + $timeConstruction;
       $production->objects = json_encode($newUnit);
       $production->executed = false;
       $production->save();
@@ -41,7 +40,7 @@ class ProductionService
           $player,
           $newUnit,
           $production->id
-        )->delay(now()->addSeconds($finalTime));
+        )->delay(now()->addSeconds($timeConstruction));
       }
   
       if ($type == "fleet") {
@@ -50,7 +49,7 @@ class ProductionService
           $player,
           $newUnit,
           $production->id
-        )->delay(now()->addSeconds($finalTime));
+        )->delay(now()->addSeconds($timeConstruction));
       }
     }else{
       return false;

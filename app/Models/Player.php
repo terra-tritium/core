@@ -7,6 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ *
+ *  @OA\Schema(
+ *     schema="Player",
+ *     required={"id", "name"},
+ *     @OA\Property(property="id", type="integer", format="int64"),
+ *     @OA\Property(property="name", type="string"),
+ *
+ * )
+ */
 class Player extends Model
 {
     use HasFactory;
@@ -15,7 +25,7 @@ class Player extends Model
 
     public static function getPlayerLogged() {
         if (!Auth::check()) { return false; }
-        
+
         return DB::table('players')->where('user', auth()->user()->id)->first();
     }
 

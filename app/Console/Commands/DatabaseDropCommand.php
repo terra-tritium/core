@@ -32,8 +32,8 @@ class DatabaseDropCommand extends Command
         try {
             $connection = DB::connection();
 
-            $connection->select("SELECT 1 FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '".env('DB_DATABASE')."'");
-            
+            $connection->select("SELECT 1 FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?", [env('DB_DATABASE')]);
+
             DB::statement('DROP DATABASE ' . env('DB_DATABASE'));
 
         } catch (\Exception $exception) {
