@@ -102,5 +102,8 @@ class TradingController extends Controller
     public function getTradingProcess($id){
         return $this->tradingService->getTradingProcess($id);
     }
+    public function finishTrading(Request $request){
+        return $this->tradingService->finish($request);
+    }
 
 }
