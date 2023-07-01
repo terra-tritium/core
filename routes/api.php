@@ -167,6 +167,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/my-history/{id}', [TradingController::class, 'getAllOrdersPlayer']);
         Route::patch('/cancel/{id}', [TradingController::class, 'cancelOrder']);
         Route::get('/trading-process/{id}',[TradingController::class, 'getTradingProcess']);
+        Route::post('/finish', [TradingController::class, 'finishTrading']);
     });
 
     Route::prefix('nft')->group(function () {
