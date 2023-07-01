@@ -365,6 +365,7 @@ return new class extends Migration
             $table->boolean('status')->default(true);
             $table->timestamp('createdAt')->useCurrent();
             $table->timestamp('updatedAt')->nullable();
+            
 
             $table->foreign('idPlanetCreator')->references('id')->on('planets');
             // $table->foreign('idResource')->references('id')->on('Resource');
@@ -393,6 +394,38 @@ return new class extends Migration
             $table->unsignedInteger('deliveryTime')->default(0)->change();
 
         });
+
+        Schema::create('safe', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('idPlanetCreator')->nullable();
+
+            $table->unsignedBigInteger('idPlanetSale')->nullable();
+            $table->unsignedBigInteger('idPlanetPurch')->nullable();
+            $table->unsignedBigInteger('idTrading')->nullable();;
+            $table->unsignedBigInteger('idMarket')->nullable();
+            $table->unsignedBigInteger('quantity');//
+
+            $table->double('price',8,3);//
+            $table->double('total',8,3);//
+            $table->double('distance',11,3);//
+            $table->unsignedBigInteger('deliveryTime');//
+           
+            $table->boolean('status')->default(true);
+            $table->char('type',1);//
+            $table->timestamp('createdAt')->useCurrent();
+            $table->timestamp('updatedAt')->nullable();
+            $table->string('resource',20);
+            $table->string('currency',20);
+
+            $table->unsignedInteger('transportShips')->default(0);
+
+            $table->foreign('idPlanetSale')->references('id')->on('planets');
+            $table->foreign('idPlanetPurch')->references('id')->on('planets');
+            $table->foreign('idTrading')->references('id')->on('trading');
+            $table->foreign('idMarket')->references('id')->on('market');
+
+        });
+
         /**
          *FIM DAS TABELAS REFERENTE AO MERCADO
          */
