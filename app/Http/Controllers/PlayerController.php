@@ -294,4 +294,50 @@ class PlayerController extends Controller
         }
     }
 
+    /**
+     *
+     * @OA\Post(
+     *     path="/player/change-name",
+     *     operationId="changeName",
+     *     tags={"Players"},
+     *     summary="Change name player",
+     *     @OA\Parameter(
+     *         name="name",
+     *         required=true,
+     *         description="Player's name",
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Player not found"
+     *     )
+     * )
+     *
+     * @param $id
+     * @return array
+     */
+    public function changeName(Request $request)
+    {
+        try {
+            $player = Player::getPlayerLogged();
+            if (!$player) {
+                return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            }
+            $name = $request->name;
+            $result = $this->playerService->changeName($player->id, $name);
+
+            return response()->json($result, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
 }
