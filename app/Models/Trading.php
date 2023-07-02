@@ -15,6 +15,8 @@ class Trading extends Model
     protected $fillable = [
         'resource',
         'idPlanetCreator',
+        'idPlanetInterested',
+        'currency',
         'idMarket',
         'type',
         'price',
@@ -33,7 +35,7 @@ class Trading extends Model
             ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')
             ->join('players as p', 'p.id', '=', 'planeta.id')
             ->where('m.status', true)
-            ->where('t.status', true)
+            ->where('t.status', 1)
             ->where('m.region', '=', $region)
             ->where('t.resource', '=', $resource)
             ->where('t.type', '=', $type)
@@ -72,6 +74,7 @@ class Trading extends Model
         $orders = DB::table($this->table . ' as t')
             ->select(
                 't.id',
+                't.idPlanetInterested',
                 't.status as statusTrading',
                 't.quantity',
                 't.type',
@@ -85,7 +88,10 @@ class Trading extends Model
                 'tf.finishedAt'
             )
             ->leftJoin('trading_finished as tf', 'tf.idTrading', '=', 't.id')
-            ->where('t.idPlanetCreator', $player)
+            ->where(function ($query) use ($player) {
+                $query->where('t.idPlanetCreator', $player)
+                    ->orWhere('t.idPlanetInterested', $player);
+            })
             ->where('t.resource', $resource)
             ->orderBy('t.createdAt', 'DESC')
             ->get();

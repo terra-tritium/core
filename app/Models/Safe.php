@@ -13,6 +13,7 @@ class Safe extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'idPlanetCreator',
         'idPlanetSale',
         'idPlanetPurch',
         'idMarket',

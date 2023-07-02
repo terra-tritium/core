@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Market;
 use App\Models\Planet;
 use App\Models\Player;
+use App\Models\Safe;
 use App\Models\Trading;
 use DateTime;
 use Illuminate\Http\Response;
@@ -134,9 +135,11 @@ class TradingService
         }
         return response(['message' => 'Trading nao encontrada', 'success' => false], Response::HTTP_NOT_FOUND);
     }
-  
+
     public function finish($request)
     {
+        $panetaInteressado = 0;
+
         try {
             if ($request->idPlanetPurch == $request->idPlanetSale) {
                 return response(['message' => 'A negociação deve ser realizada entre planetas diferentes ', 'success' => false], Response::HTTP_BAD_REQUEST);
@@ -162,7 +165,9 @@ class TradingService
             $planetaPassivo = Planet::find($request->idPlanetSale);
             $resourceKey = strtolower($request->resource);
             $quantidade = $request->quantity;
+            //S pq o passivo esta vendendo e o ativo comprando
             if ($request->type == 'S') {
+                $panetaInteressado = $request->idPlanetPurch;
                 //verificar se tem saldo suficiente para compra 
                 if ($request->currency == 'energy') {
                     $total = $request->price * $request->quantity;
@@ -181,8 +186,14 @@ class TradingService
                     //notificar o passivo que foi cancelado
                     return response(['message' => 'O vendedor não possui recurso para concluir essa transação', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
+                if(!$this->safe($trading, $request)){
+                    return response(['message' => 'Algum erro na hora de comprar, verificar a causa', 'success' => false], Response::HTTP_BAD_REQUEST);
+                }
+                
             }
+            //P pq o passivo esta comprando e o ativo vendendo
             if ($request->type == 'P') {
+                $panetaInteressado = $request->idPlanetSale;
                 //verificar se o ativo (vendedor) possui a quantidade de recurso
                 if ($planeta[0]->{$resourceKey} < $request->quantity) {
                     return response(['message' => 'Você não possui essa quantidade de recurso para venda', 'success' => false], Response::HTTP_BAD_REQUEST);
@@ -196,16 +207,112 @@ class TradingService
                 } else {
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
+
+                if(!$this->safe($trading, $request)){
+                    return response(['message' => 'Algum erro na hora de vender, verificar a causa', 'success' => false], Response::HTTP_BAD_REQUEST);
+                }
             }
         } catch (Exception $e) {
             return response(["message" => "error " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        $key = strtolower($request->resource);
+        
         return response([
             'message' => 'Finish', 'success' => true,
             'planetaPassivo' => $planetaPassivo,
-            'recursoNegociacao' => $planetaPassivo->{$key},
-            'new' => $request->toArray(), 'planeta' => $planeta, 'currency' => $request->currency
+            'panetaInteressado' => $panetaInteressado,
+            'new2' => $request->toArray(), 'planeta' => $planeta, 'currency' => $request->currency
         ], Response::HTTP_OK);
+    }
+
+    public function safe(Trading $trading, $request)
+    {
+        try {
+            $planetaInteressado = $request->type == 'S' ? $request->idPlanetPurch : $request->idPlanetSale;
+            $success = $this->atualizaStatusTrading($trading, $planetaInteressado);
+            if ($success) {
+                $successSafe = $this->saveSafe($request, $trading->idMarket,$trading->idPlanetCreator, 1);
+                $successDebito = $this->debitarSaldosPlaneta($request);
+                return ($successDebito && $successSafe);
+            }
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    /**
+     * @todo alterar o currency quando tiver tratando com tritium
+     */
+    private function atualizaStatusTrading(Trading $trading, $planetaInteressado)
+    {
+        $trading->idPlanetInterested = $planetaInteressado;
+        $trading->status = 3;
+        $trading->currency = 'energy'; //default
+        $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
+        return $trading->save();
+    }
+    /**
+     * @todo calcular a distancia
+     */
+    private function saveSafe($request, $idMarket,$planetCreator ,$transportShips = 1)
+    {
+        try {
+            $safe = new Safe();
+            $safe->idPlanetSale = $request->idPlanetSale;
+            $safe->idPlanetPurch = $request->idPlanetPurch;
+            $safe->idPlanetCreator = $planetCreator;
+            $safe->status = 3;
+            $safe->deliveryTime = 50;
+            $safe->type = $request->type;
+            $safe->currency = $request->currency;
+            $safe->resource = strtolower($request->resource);
+            $safe->quantity = $request->quantity;
+            $safe->price = $request->price;
+            $safe->total = $request->price * $request->quantity;
+            $safe->idMarket = $idMarket;
+            $safe->idTrading = $request->idTrading;
+            $safe->transportShips = $transportShips;
+            $safe->distance = 5000;
+            $safe->save();
+            return $safe->save();
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+     /**
+     * @todo fazer a logica com negociação envolvendo tritium e quantidade de cargueiros
+     */
+    private function debitarSaldosPlaneta($request)
+    {
+        $idPlanetaPassivo = 0;
+        $idPlanetaAtivo = 0;
+        try {
+            $keyResource = strtolower($request->resource);
+            if ($request->type == 'S') {
+                $planetaPassivo = Planet::find($request->idPlanetSale);
+                $planetaAtivo = Planet::find($request->idPlanetPurch);
+                //planeta passivo (vendedor) subtrai o recurso que está sendo vendido
+                $planetaPassivo->{$keyResource} = ($planetaPassivo->{$keyResource} - $request->quantity);
+                if ($request->currency == 'energy') {
+                    $planetaAtivo->energy = $planetaAtivo->energy - ($request->quantity * $request->price);
+                }
+                $planetaAtivo->transportShips = $planetaAtivo->transportShips - 1;
+                $planetaPassivo->save();
+                $planetaAtivo->save();
+            } else {
+                $idPlanetaPassivo = $request->idPlanetPurch;
+                $idPlanetaAtivo = $request->idPlanetSale;
+                $planetaPassivo = Planet::find($idPlanetaPassivo);
+                $planetaAtivo = Planet::find($idPlanetaAtivo);
+                if ($request->currency == 'energy') {
+                    $planetaPassivo->energy = $planetaPassivo->energy - ($request->quantity * $request->price);
+                }
+                $planetaAtivo->{$keyResource} = $planetaAtivo->{$keyResource} - $request->quantity;
+                $planetaAtivo->transportShips = $planetaAtivo->transportShips - 1;
+                $planetaAtivo->save();
+                $planetaPassivo->save();
+            }
+            return true; //corrigir o que ta retornando
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }

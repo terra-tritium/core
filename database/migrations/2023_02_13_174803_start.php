@@ -367,9 +367,11 @@ return new class extends Migration
         Schema::create('trading', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('idPlanetCreator');
+            $table->unsignedBigInteger('idPlanetInterested')->nullable();;
             // $table->unsignedBigInteger('idResource');
             $table->unsignedBigInteger('idMarket');
             $table->string('resource',20);
+            $table->string('currency',20)->default('energy');
             $table->char('type',1);//
             $table->unsignedBigInteger('quantity');//
             $table->double('price',8,3);//
