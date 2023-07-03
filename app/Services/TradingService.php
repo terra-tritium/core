@@ -151,15 +151,15 @@ class TradingService
             $planeta = $this->getPlanetUserLogged();
             //verifica se o status pode ser alterado e quem ta alterando a ordem é quem criou
             if ($trading->status != 1) {
-                return response(['message' => 'Status não pode ser alterado ', 'success' => false], Response::HTTP_BAD_REQUEST);
+                return response(['message' => 'Essa ordem não está mais disponível ','code'=> 4001 ,'success' => false], Response::HTTP_BAD_REQUEST);
             }
 
             if ($request->price <= 0 || $request->quantity <= 0) {
-                return response(['message' => 'Quantidade e/ou preço devem ser superior a zero', 'success' => false], Response::HTTP_BAD_REQUEST);
+                return response(['message' => 'Quantidade e/ou preço devem ser superior a zero','code'=> 4002, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
             //verificar se tem cargueiro para buscar
             if ($planeta[0]->transportShips <= 0) {
-                return response(['message' => 'Você não possui cargueiro disponível para realizar o transporte', 'success' => false], Response::HTTP_BAD_REQUEST);
+                return response(['message' => 'Você não possui a quantidade necessária de cargueiros para realizar o transporte', 'code'=>4003, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
             /**Verificações para finalização de compra, o ativo está comprando */
             $planetaPassivo = Planet::find($request->idPlanetSale);
@@ -172,7 +172,7 @@ class TradingService
                 if ($request->currency == 'energy') {
                     $total = $request->price * $request->quantity;
                     if ($total > $planeta[0]->energy) {
-                        return response(['message' => 'Você não possui saldo suficiente para concluir a transação', 'success' => false], Response::HTTP_BAD_REQUEST);
+                        return response(['message' => 'Você não possui saldo suficiente para concluir a transação','code'=>4004, 'success' => false], Response::HTTP_BAD_REQUEST);
                     }
                 } else {
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
@@ -184,10 +184,10 @@ class TradingService
                     $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                     $trading->save();
                     //notificar o passivo que foi cancelado
-                    return response(['message' => 'O vendedor não possui recurso para concluir essa transação', 'success' => false], Response::HTTP_BAD_REQUEST);
+                    return response(['message' => 'O vendedor não possui recurso para concluir essa transação','code' => 4005, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 if(!$this->safe($trading, $request)){
-                    return response(['message' => 'Algum erro na hora de comprar, verificar a causa', 'success' => false], Response::HTTP_BAD_REQUEST);
+                    return response(['message' => 'Algum erro na hora de comprar, verificar a causa','code'=>4006, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 
             }
@@ -196,24 +196,24 @@ class TradingService
                 $panetaInteressado = $request->idPlanetSale;
                 //verificar se o ativo (vendedor) possui a quantidade de recurso
                 if ($planeta[0]->{$resourceKey} < $request->quantity) {
-                    return response(['message' => 'Você não possui essa quantidade de recurso para venda', 'success' => false], Response::HTTP_BAD_REQUEST);
+                    return response(['message' => 'Você não possui essa quantidade de recurso para venda','code' => 4007, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 if ($request->currency == 'energy') {
                     $total = $request->price * $request->quantity;
                     //verifica se o quem deseja comprar tem energia suficiente
                     if ($planetaPassivo->energy < $total) {
-                        return response(['message' => 'O planeta comprador não possui energia suficiente para comprar', 'success' => false], Response::HTTP_BAD_REQUEST);
+                        return response(['message' => 'O planeta comprador não possui energia suficiente para comprar','code'=>4008, 'success' => false], Response::HTTP_BAD_REQUEST);
                     }
                 } else {
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
 
                 if(!$this->safe($trading, $request)){
-                    return response(['message' => 'Algum erro na hora de vender, verificar a causa', 'success' => false], Response::HTTP_BAD_REQUEST);
+                    return response(['message' => 'Algum erro na hora de vender, verificar a causa','code'=>4009, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
             }
         } catch (Exception $e) {
-            return response(["message" => "error " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response(["message" => "error " . $e->getMessage(),"code"=>4010], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         
         return response([
