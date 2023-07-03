@@ -4,7 +4,7 @@
 ## Requirements
 
     MariaDB 10.7.4
-    Laravel 9
+    Laravel 10
     PHP 8.1.11
 
 ## Start local database
