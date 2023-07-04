@@ -97,4 +97,10 @@ class Trading extends Model
             ->get();
         return $orders;
     }
+
+    // public function getDadosTradingSafe($ids){
+    //     $trads = DB::table($this->table . ' as t')
+    //             ->join('safe as s', 's.idTrading' , '=', 's.id')
+    //             ->where;
+    // }
 }

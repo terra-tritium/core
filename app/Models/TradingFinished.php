@@ -13,8 +13,8 @@ class TradingFinished extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'idPlanetSale',
-        'idPlanetPurch',
+        'idPlanetCreator',
+        'idPlanetInterested',
         'quantity',
         'price',
         'distance',
@@ -22,6 +22,12 @@ class TradingFinished extends Model
         'idTrading',
         'status',
         'finishedAt',
+        'createdAt',
+        'currency',
+        'type',
+        'idMarket',
+        'resource',
+        'transportShips'
     ];
 
     
