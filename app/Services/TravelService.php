@@ -275,7 +275,7 @@ class TravelService
      * Get all missions by type
      */
     public function getMissions($action) {
-        $missions = Travel::where([['action', $action], ['status', 1]])->get();
+        $missions = Travel::with('from', 'to')->where([['action', $action], ['status', 2]])->get();
         return $missions;
     }
 
