@@ -77,6 +77,21 @@ class TravelController extends Controller
         }
     }
 
+    public function missions($action) {
+        try {
+            $player = Player::getPlayerLogged();
+            if (!$player) {
+                return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $missions = $this->travelService->getMissions($action);
+
+            return response()->json($missions, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     /**
      *
      * @OA\Post(

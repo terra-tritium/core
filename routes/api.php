@@ -114,6 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('travel')->group(function () {
         Route::get('/list', [TravelController::class, 'list']);
         Route::get('/current', [TravelController::class, 'current']);
+        Route::get('/missions/{action}', [TravelController::class, 'missions']);
         Route::post('/start', [TravelController::class, 'start']);
         Route::post('/back', [TravelController::class, 'back']);
     });

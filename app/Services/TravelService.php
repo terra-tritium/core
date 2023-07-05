@@ -216,13 +216,13 @@ class TravelService
             $unit = Unit::find($troop->unit);
             $type = $this->getTypeUnit($unit->type);
             $units [] = [
-                            'unit'=> $troop->unit,
-                            'quantity'=> $troop->quantity,
-                            'type'=> $type,
-                            'attack'=> $unit->attack,
-                            'defense'=> $unit->defense ,
-                            'life'=> $unit->life
-                        ];
+                'unit'=> $troop->unit,
+                'quantity'=> $troop->quantity,
+                'type'=> $type,
+                'attack'=> $unit->attack,
+                'defense'=> $unit->defense ,
+                'life'=> $unit->life
+            ];
         }
 
         return $units;
@@ -239,13 +239,13 @@ class TravelService
             $type = $this->getTypeUnit($unit->type);
 
             $units [] = [
-                            'unit'=> $troop->unit,
-                            'quantity'=> $troop->quantity,
-                            'type'=> $type,
-                            'attack'=> $unit->attack,
-                            'defense'=> $unit->defense ,
-                            'life'=> $unit->life
-                        ];
+                'unit'=> $troop->unit,
+                'quantity'=> $troop->quantity,
+                'type'=> $type,
+                'attack'=> $unit->attack,
+                'defense'=> $unit->defense ,
+                'life'=> $unit->life
+            ];
         }
 
         return $units;
@@ -271,6 +271,14 @@ class TravelService
         return $type;
     }
 
+    /**
+     * Get all missions by type
+     */
+    public function getMissions($action) {
+        $missions = Travel::where([['action', $action], ['status', 1]])->get();
+        return $missions;
+    }
+
     public function starBattleTravel($travel)
     {
         $travelModel = Travel::find($travel);
@@ -286,7 +294,7 @@ class TravelService
         $dStrategy = $defense->defenseStrategy;
         $dPlanet = $travelModel->receptor;
 
-        $this->battleService->startNewBattle($attack->id,  $defense->id, $aUnits, $dUnits, $aStrategy, $dStrategy,$dPlanet);
+        $this->battleService->startNewBattle($attack->id,  $defense->id, $aUnits, $dUnits, $aStrategy, $dStrategy, $dPlanet);
     }
 
 }
