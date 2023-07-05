@@ -50,7 +50,7 @@ class TravelService
         $newTravel->action = $travel->action;
         $newTravel->player = $player;
         $newTravel->start = $now;
-        $newTravel->arrival = $now + $travelTime;
+        $newTravel->arrival = $now + ($travelTime * 1000);
         $newTravel->status = 1;
         $newTravel->receptor = $this->getReceptor($travel->to);
 
@@ -93,7 +93,7 @@ class TravelService
         
         $newTravel->save();
         $this->removeTroop($player, $travel->from, $travel->troop);
-        TravelJob::dispatch($newTravel->id, $this)->delay(now()->addSeconds($travelTime / 1000));
+        TravelJob::dispatch($newTravel->id, $this)->delay(now()->addSeconds($travelTime));
     }
 
     public function back ($travel) {
@@ -275,7 +275,7 @@ class TravelService
      * Get all missions by type
      */
     public function getMissions($action) {
-        $missions = Travel::with('from', 'to')->where([['action', $action], ['status', 2]])->get();
+        $missions = Travel::with('from', 'to')->where([['action', $action], ['status', 1]])->orderBy('arrival')->get();
         return $missions;
     }
 
