@@ -203,8 +203,8 @@ return new class extends Migration
             $table->id();
             $table->integer('player')->constrained("players");
             $table->integer("receptor");
-            $table->string("from");
-            $table->string("to");
+            $table->string("from")->constrained("planets");
+            $table->string("to")->constrained("planets");
             $table->bigInteger("arrival");
             $table->bigInteger("start");
             $table->integer('status');
