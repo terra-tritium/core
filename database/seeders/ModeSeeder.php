@@ -19,56 +19,56 @@ class ModeSeeder extends Seeder
             'name' => "Conquer",
             'code' => 1,
             'description' => 'description',
-            'image' => 'mode01.png'
+            'image' => 'conquer.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Space Titan",
             'code' => 2,
             'description' => 'description',
-            'image' => 'mode01.png'
+            'image' => 'spacetitan.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Researcher",
             'code' => 3,
             'description' => 'description',
-            'image' => 'mode01.png'
+            'image' => 'researcher.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Engineer",
             'code' => 4,
             'description' => 'description',
-            'image' => 'mode01.png'
+            'image' => 'engineer.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Protector",
             'code' => 5,
             'description' => 'description',
-            'image' => 'mode01.png'
+            'image' => 'protector.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Builder",
             'code' => 6,
             'description' => 'description',
-            'image' => 'mode01.png'
+            'image' => 'builder.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Navigator",
             'code' => 7,
             'description' => 'description',
-            'image' => 'mode01.png'
+            'image' => 'navigator.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Miner",
             'code' => 8,
             'description' => 'description',
-            'image' => 'mode01.png'
+            'image' => 'miner.png'
         ]);
     }
 }
