@@ -35,7 +35,7 @@ class Trading extends Model
             ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')
             ->join('players as p', 'p.id', '=', 'planeta.id')
             ->where('m.status', true)
-            ->where('t.status', 1)
+            ->where('t.status', config('MARKET_STATUS_OPEN'))
             ->where('m.region', '=', $region)
             ->where('t.resource', '=', $resource)
             ->where('t.type', '=', $type)
@@ -55,7 +55,7 @@ class Trading extends Model
         $resources = DB::table('planets as p')
             ->leftJoin('trading as t', function ($join) {
                 $join->on('p.player', '=', 't.idPlanetCreator')
-                    ->where('t.status', 1)
+                    ->where('t.status', config('MARKET_STATUS_OPEN'))
                     ->where('t.type', 'S');
             })
             ->where('p.player', $player)
@@ -71,6 +71,7 @@ class Trading extends Model
     }
     public function getAllOrderPlayer($player, $resource)
     {
+        $status = [config('MARKET_STATUS_OPEN'), config('MARKET_STATUS_PENDING')];
         $orders = DB::table($this->table . ' as t')
             ->select(
                 't.id',
@@ -93,14 +94,9 @@ class Trading extends Model
                     ->orWhere('t.idPlanetInterested', $player);
             })
             ->where('t.resource', $resource)
+            ->whereIn('t.status',$status)
             ->orderBy('t.createdAt', 'DESC')
             ->get();
         return $orders;
     }
-
-    // public function getDadosTradingSafe($ids){
-    //     $trads = DB::table($this->table . ' as t')
-    //             ->join('safe as s', 's.idTrading' , '=', 's.id')
-    //             ->where;
-    // }
 }

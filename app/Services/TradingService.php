@@ -11,6 +11,7 @@ use App\Models\TradingFinished;
 use DateTime;
 use Illuminate\Http\Response;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class TradingService
 {
@@ -116,7 +117,7 @@ class TradingService
                 if ($trading->status != 1 || $trading->idPlanetCreator != $planeta[0]->player) {
                     return response(['message' => 'Status não pode ser alterado ou não é o criador', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
-                $trading->status = 0;
+                $trading->status = config('MARKET_STATUS_CANCELED');
                 $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                 $trading->save();
                 return response(['message' => 'New order sale successfully registered!', 'success' => true, 'new' => $trading], Response::HTTP_OK);
@@ -128,9 +129,10 @@ class TradingService
     }
     public function getTradingProcess($id)
     {
+        $status = config('MARKET_STATUS_OPEN');
         if ($id) {
             $this->trading = Trading::where('id', $id)
-                ->where('status', 1)
+                ->where('status', $status)
                 ->first();
             return $this->trading;
         }
@@ -181,7 +183,8 @@ class TradingService
                 //verificar se o passivo ainda possui recurso suficiente para venda
                 // $quantidade = 8000;
                 if ($quantidade > $planetaPassivo->{$resourceKey}) {
-                    $trading->status = 0;
+                    $status = config('MARKET_STATUS_CANCELED');
+                    $trading->status = $status;
                     $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                     $trading->save();
                     //notificar o passivo que foi cancelado
@@ -243,8 +246,10 @@ class TradingService
      */
     private function atualizaStatusTrading(Trading $trading, $planetaInteressado)
     {
+        $status = config('MARKET_STATUS_PENDING');
+
         $trading->idPlanetInterested = $planetaInteressado;
-        $trading->status = 3;
+        $trading->status = $status;
         $trading->currency = 'energy'; //default
         $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
         return $trading->save();
@@ -254,12 +259,13 @@ class TradingService
      */
     private function saveSafe($request, $idMarket, $planetCreator, $transportShips = 1)
     {
+        $status = config('MARKET_STATUS_PENDING');
         try {
             $safe = new Safe();
             $safe->idPlanetSale = $request->idPlanetSale;
             $safe->idPlanetPurch = $request->idPlanetPurch;
             $safe->idPlanetCreator = $planetCreator;
-            $safe->status = 3;
+            $safe->status = $status;
             $safe->deliveryTime = 50;
             $safe->type = $request->type;
             $safe->currency = $request->currency;
@@ -315,26 +321,86 @@ class TradingService
             return false;
         }
     }
-
+    private function deleteTradingConcluidos($concluidos)
+    {
+        if ($concluidos) {
+            foreach ($concluidos as $concluido) {
+                $trading = Trading::find($concluido->idTrading);
+                $safe = Safe::where('idTrading', $concluido->idTrading)->first();
+                if ($safe)
+                    $safe->delete();
+                if ($trading) 
+                    $trading->delete();
+            }
+        }
+    }
     public function verificaTradeConcluidoSafe()
     {
         $safe = new Safe();
         $dadosSafe = $safe->getDadosSafe();
         $filtrado = $this->getDeliveryTimeConclued($dadosSafe);
         $atualizar = $this->atualizaStatusTradingConclued($filtrado['concluido']);
-
+        //debitar e creditar valores para os usuarios
+        $executados = $this->updateResourceTradeConclued($filtrado['concluido']);
+        //deletar da tabela trading e deixar apenas na finish
+        //deletar da safe
+        $this->deleteTradingConcluidos($filtrado['concluido']);
         return response([
             'message' => 'Finish', 'success' => true,
             'info' => $dadosSafe,
             'filter' => $filtrado,
-            'atualizarq' => $atualizar
+            'atualizarq' => $atualizar,
+            'executados' => $executados
         ], Response::HTTP_OK);
+    }
+    /**
+     * @todo colocar o calculo de distancia
+     *   Se o planeta é o planeta vendedor, o recurso não volta para ele, ele apenas recebe o pagamento em energia
+     *  o recurso irá sair da safe e irá para o comprador, no momento do inicio da transação foi debitado o recurso de seus cofres
+     *
+     *   se o planeta é o comprador, a energia não volta para ele, ele irá receber a quantidade de recurso comprado
+     *   e o vendedor receberar a energia, aumenta a quantidade de recursos em seus cofres mas nesse momento não toca na energia
+     */
+    private function updateResourceTradeConclued($concluidos)
+    {
+        $compradores = [];
+        $vendedores = [];
+        $cargueiros = [];
+        if ($concluidos) {
+            foreach ($concluidos as $conc) {
+                if ($conc->type === 'S') {
+                    $planetaVendedor = Planet::find($conc->idPlanetSale);
+                    $planetaVendedor->energy += ($conc->quantity * $conc->price);
+                    $vendedores[] = $planetaVendedor;
+                    $planetaVendedor->save();
+                } else {
+                    $keyRecurso = $conc->resource;
+                    $planetaComprador = Planet::find($conc->idPlanetPurch);
+                    $planetaComprador->{$keyRecurso} = ($planetaComprador->{$keyRecurso} + $conc->quantity);
+                    $compradores[] = $planetaComprador;
+                    $planetaComprador->save();
+                }
+                /**Devolve o cargueiro para o ativo */
+                if ($conc->idPlanetPurch == $conc->idPlanetInterested) {
+                    $cargueiros[] = $conc->idPlanetInterested;
+                    $cargueiros = $conc->transportShips;
+                    DB::table('planets')->where('id', $conc->idPlanetInterested)->update([
+                        'transportShips' => DB::raw("transportShips + $cargueiros")
+                    ]);
+                }
+            }
+        }
+        /** 
+         *@todo retirar o retorno, apenas para fins de logs 
+         */
+        return ['compradores ' => $compradores, 'vendedores ' => $vendedores, 'cargueirosid' => $cargueiros];
     }
     /**
      * @todo colocar o calculo de distancia
      */
     private function atualizaStatusTradingConclued($concluidos)
     {
+        $status = config('MARKET_STATUS_FINISHED');
         try {
             foreach ($concluidos as $c) {
                 $finished = new TradingFinished();
@@ -346,14 +412,14 @@ class TradingService
                 $finished->distance = $c->distance;
                 $finished->deliveryTime = $c->deliveryTime;
                 $finished->idTrading = $c->id;
-                $finished->status = 3; //concluido
+                $finished->status = $status; //concluido
                 $finished->currency = $c->currency;
                 $finished->type = $c->type;
                 $finished->idMarket = $c->idMarket;
                 $finished->resource = $c->resource;
                 $finished->transportShips = $c->transportShips;
                 $finished->finishedAt = $c->tempoFinal;
-                $finished->save();
+                return $finished->save();
             }
         } catch (Exception $e) {
             return response(["message" => "error finished trading" . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
