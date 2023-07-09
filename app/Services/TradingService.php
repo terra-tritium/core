@@ -114,7 +114,7 @@ class TradingService
                 }
                 $planeta = $this->getPlanetUserLogged();
                 //verifica se o status pode ser alterado e quem ta alterando a ordem é quem criou
-                if ($trading->status != 1 || $trading->idPlanetCreator != $planeta[0]->player) {
+                if ($trading->status != config('MARKET_STATUS_OPEN') || $trading->idPlanetCreator != $planeta[0]->player) {
                     return response(['message' => 'Status não pode ser alterado ou não é o criador', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 $trading->status = config('MARKET_STATUS_CANCELED');
@@ -153,7 +153,7 @@ class TradingService
             }
             $planeta = $this->getPlanetUserLogged();
             //verifica se o status pode ser alterado e quem ta alterando a ordem é quem criou
-            if ($trading->status != 1) {
+            if ($trading->status != config('MARKET_STATUS_OPEN')) {
                 return response(['message' => 'Essa ordem não está mais disponível ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
 
@@ -334,6 +334,9 @@ class TradingService
             }
         }
     }
+    /**
+     * Inicio verificação
+     */
     public function verificaTradeConcluidoSafe()
     {
         $safe = new Safe();
