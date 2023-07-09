@@ -52,7 +52,7 @@ class TravelService
         $newTravel->player = $player;
         $newTravel->start = $now;
         $newTravel->arrival = $now + $travelTime;
-        $newTravel->status = 1;
+        $newTravel->status = ENV('MARKET_STATUS_OPEN');
         $newTravel->receptor = $this->getReceptor($travel->to);
         # Troop
         if (isset($travel->troop)) {
