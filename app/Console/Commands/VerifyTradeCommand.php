@@ -43,7 +43,6 @@ class VerifyTradeCommand extends Command
         } catch (\Exception $exception) {
             Log::error('Erro no agendamento: ' . $exception->getMessage());
         //    Notification::route('discord', 'terra-tritium')->notify(new ExceptionNotification($exception));
-
         }
 
     }
