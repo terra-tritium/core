@@ -44,6 +44,7 @@ class TravelService
                 return "You don't have enough troops";
             }
         }
+        //subir
         $now = time();
         $travelTime = env("TRITIUM_TRAVEL_SPEED") * $this->calcDistance($travel->from, $travel->to);
         $newTravel->from = $travel->from;

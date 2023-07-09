@@ -88,6 +88,7 @@ class TradingController extends Controller
     {
         return $this->tradingService->newPurchOrder($request);
     }
+    //subir
     public function getAllOrdersPlayer($id = 'Crystal')
     {
         $planeta = $this->tradingService->getPlanetUserLogged();

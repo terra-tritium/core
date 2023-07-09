@@ -11,7 +11,7 @@ class Trading extends Model
     use HasFactory;
     protected $table = 'trading';
     public $timestamps = false;
-
+//new trade
     protected $fillable = [
         'resource',
         'idPlanetCreator',

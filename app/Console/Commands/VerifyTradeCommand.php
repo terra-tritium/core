@@ -28,7 +28,7 @@ class VerifyTradeCommand extends Command
 
     /**
      * Execute the console command.
-     *
+     *subir new file
      * @return int
      */
     public function handle()

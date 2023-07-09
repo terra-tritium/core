@@ -12,7 +12,7 @@ use DateTime;
 use Illuminate\Http\Response;
 use Exception;
 use Illuminate\Support\Facades\DB;
-
+//new trade service
 class TradingService
 {
     private $trading;

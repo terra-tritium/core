@@ -11,7 +11,7 @@ class TradingFinished extends Model
     use HasFactory;
     protected $table = 'trading_finished';
     public $timestamps = false;
-
+//subir
     protected $fillable = [
         'idPlanetCreator',
         'idPlanetInterested',
