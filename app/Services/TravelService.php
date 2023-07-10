@@ -34,17 +34,14 @@ class TravelService
         if ($travel->from == $travel->to) {
             return "Impossible travel";
         }
-
-        $planetFrom = $this->getPlanet($travel->from);
-
+        
         if ($travel->action === 1 && !isset($travel->troop))  {
             return "Set the troop";
-        }elseif ($travel->action === 1){
-            if(!$this->hasTroopsAvailable($player,$planetFrom,$travel->troop)){
+        } elseif ($travel->action === 1) {
+            if(!$this->hasTroopsAvailable($player, $travel->from, $travel->troop)){
                 return "You don't have enough troops";
             }
         }
-        //subir
         $now = time();
         $travelTime = env("TRITIUM_TRAVEL_SPEED") * $this->calcDistance($travel->from, $travel->to);
         $newTravel->from = $travel->from;
@@ -52,9 +49,10 @@ class TravelService
         $newTravel->action = $travel->action;
         $newTravel->player = $player;
         $newTravel->start = $now;
-        $newTravel->arrival = $now + $travelTime;
-        $newTravel->status = ENV('MARKET_STATUS_OPEN');
+        $newTravel->arrival = $now + ($travelTime * 1000);
+        $newTravel->status = 1;
         $newTravel->receptor = $this->getReceptor($travel->to);
+
         # Troop
         if (isset($travel->troop)) {
             $newTravel->troop = json_encode($travel->troop);
@@ -93,11 +91,8 @@ class TravelService
         }
         
         $newTravel->save();
-
-        $this->removeTroop($player,$planetFrom,$travel->troop);
-
-        TravelJob::dispatch($newTravel->id, $this)->delay(now()->addSeconds($travelTime / 1000));
-
+        $this->removeTroop($player, $travel->from, $travel->troop);
+        TravelJob::dispatch($newTravel->id, $this)->delay(now()->addSeconds($travelTime));
     }
 
     public function back ($travel) {
@@ -116,32 +111,15 @@ class TravelService
     }
 
     public function calcDistance($from, $to) {
-        $positionFrom = $this->convertPosition($from);
-        $positionTo = $this->convertPosition($to);
-       
-        if (!($positionFrom && $positionTo)) {
-            return false;
-        }
 
-        $diffRegion = abs(ord($positionFrom->region) - ord($positionTo->region));
-        $diffQuadrant = abs($positionFrom->quadrant - $positionTo->quadrant);
-        $diffPosition = abs($positionFrom->position - $positionTo->position);
+        $planetFrom = Planet::where(['id' => $from])->firstOrFail();
+        $planetTo = Planet::where(['id' => $to])->firstOrFail();
+
+        $diffRegion = abs(ord($planetFrom->region) - ord($planetTo->region));
+        $diffQuadrant = abs((int) $planetFrom->quadrant - (int) $planetTo->quadrant);
+        $diffPosition = abs((int) $planetFrom->position - (int) $planetTo->position);
 
         return ($diffRegion * 100) + ($diffQuadrant * 10) + $diffPosition;
-    }
-
-    public function convertPosition($location) {
-        $position = new Position();
-        $position->region = substr($location, 0, 1);
-        $position->quadrant = substr($location, 1, 3);
-        $position->quadrant_full = substr($location, 0, 4);
-        $l = explode(":", $location);
-        $position->position = $l[1];
-        if (!$this->isValidRegion($position->region)) { return false; }
-        if (!$this->isValidQuadrant($position->quadrant)) { return false; }
-        if (!$this->isValidPosition($position->position)) { return false; }
-        
-        return $position;
     }
 
     public function isValidRegion($letter) {
@@ -172,13 +150,8 @@ class TravelService
         }
     }
 
-    public function getReceptor($location) {
-        $position = $this->convertPosition($location);
-        $planet = Planet::where([
-            ["quadrant", $position->quadrant_full],
-            ["position", $position->position],
-            ["region", $position->region]
-        ])->first();
+    public function getReceptor($planetId) {
+        $planet = Planet::where(['id' => $planetId])->firstOrFail();
         if ($planet) {
             return $planet->player;
         } else {
@@ -186,11 +159,12 @@ class TravelService
         }
     }
 
-    public function hasTroopsAvailable($player,$planet,$troops)
+    public function hasTroopsAvailable($player, $planet, $troops)
     {
         foreach($troops as $key => $troop)
         {
-            $troopModel = Troop::where(['unit' => $troop->unit,'player' => $player,'planet' => $planet])->first();
+            $troopModel = Troop::where(['unit' => $troop->unit, 'player' => $player, 'planet' => $planet])->first();
+
             if($troop->quantity > $troopModel->quantity)
             {
                 return false;
@@ -203,10 +177,10 @@ class TravelService
     public function getPlanet($location) {
         $position = $this->convertPosition($location);
         $planet = Planet::where([
-                                    ["quadrant", $position->quadrant_full],
-                                    ["position", $position->position],
-                                    ["region", $position->region]
-                                ])->first();
+            ["quadrant", $position->quadrant_full],
+            ["position", $position->position],
+            ["region", $position->region]
+        ])->first();
         
         if ($planet) {
             return $planet->id;
@@ -215,12 +189,18 @@ class TravelService
         }
     }
 
-    public function removeTroop($player,$planet,$troops){ 
+    public function removeTroop($player, $planet, $troops){ 
+        
         foreach($troops as $key => $troop)
         {  
-            $troopm = Troop::where(['unit' => $troop->unit,'player' => $player,'planet' => $planet])->first();
+            $troopm = Troop::where([
+                ['unit', $troop->unit],
+                ['player', $player],
+                ['planet', $planet]
+            ])->first();
+
             $troopm->quantity = ($troopm->quantity -  $troop->quantity);
-            $troopm->save();       
+            $troopm->save();
         }
     }
 
@@ -235,13 +215,13 @@ class TravelService
             $unit = Unit::find($troop->unit);
             $type = $this->getTypeUnit($unit->type);
             $units [] = [
-                            'unit'=> $troop->unit,
-                            'quantity'=> $troop->quantity,
-                            'type'=> $type,
-                            'attack'=> $unit->attack,
-                            'defense'=> $unit->defense ,
-                            'life'=> $unit->life
-                        ];
+                'unit'=> $troop->unit,
+                'quantity'=> $troop->quantity,
+                'type'=> $type,
+                'attack'=> $unit->attack,
+                'defense'=> $unit->defense ,
+                'life'=> $unit->life
+            ];
         }
 
         return $units;
@@ -258,13 +238,13 @@ class TravelService
             $type = $this->getTypeUnit($unit->type);
 
             $units [] = [
-                            'unit'=> $troop->unit,
-                            'quantity'=> $troop->quantity,
-                            'type'=> $type,
-                            'attack'=> $unit->attack,
-                            'defense'=> $unit->defense ,
-                            'life'=> $unit->life
-                        ];
+                'unit'=> $troop->unit,
+                'quantity'=> $troop->quantity,
+                'type'=> $type,
+                'attack'=> $unit->attack,
+                'defense'=> $unit->defense ,
+                'life'=> $unit->life
+            ];
         }
 
         return $units;
@@ -290,6 +270,14 @@ class TravelService
         return $type;
     }
 
+    /**
+     * Get all missions by type
+     */
+    public function getMissions($action) {
+        $missions = Travel::with('from', 'to')->where([['action', $action], ['status', 1]])->orderBy('arrival')->get();
+        return $missions;
+    }
+
     public function starBattleTravel($travel)
     {
         $travelModel = Travel::find($travel);
@@ -305,7 +293,7 @@ class TravelService
         $dStrategy = $defense->defenseStrategy;
         $dPlanet = $travelModel->receptor;
 
-        $this->battleService->startNewBattle($attack->id,  $defense->id, $aUnits, $dUnits, $aStrategy, $dStrategy,$dPlanet);
+        $this->battleService->startNewBattle($attack->id,  $defense->id, $aUnits, $dUnits, $aStrategy, $dStrategy, $dPlanet);
     }
 
 }
