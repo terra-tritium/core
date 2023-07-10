@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -426,6 +427,8 @@ return new class extends Migration
             $table->unsignedBigInteger('idTrading')->nullable();;
             $table->unsignedBigInteger('idMarket')->nullable();
             $table->unsignedBigInteger('quantity');//
+            $table->boolean('loaded')->default(true);
+
 
             $table->double('price',8,3);//
             $table->double('total',8,3);//
@@ -462,6 +465,37 @@ return new class extends Migration
             # Slot commandant colonizer
             $table->integer("slot5");
         });
+
+        DB::unprepared('
+            CREATE OR REPLACE FUNCTION calc_distancia(idPlaneta1 INT, idPlaneta2 INT)
+            RETURNS INT
+            BEGIN
+                DECLARE regiao1 INT;
+                DECLARE regiao2 INT;
+                DECLARE quadrant1 INT;
+                DECLARE quadrant2 INT;
+                DECLARE position1 INT;
+                DECLARE position2 INT;
+                DECLARE diffRegiao INT;
+                DECLARE diffQuadrant INT;
+                DECLARE diffPosition INT;
+                DECLARE distancia INT;
+
+                SELECT ASCII(region) INTO regiao1 FROM planets WHERE id = idPlaneta1;
+                SELECT ASCII(region) INTO regiao2 FROM planets WHERE id = idPlaneta2;
+                SELECT CAST(SUBSTRING(quadrant, 2, 4) AS SIGNED) INTO quadrant1 FROM planets WHERE id = idPlaneta1;
+                SELECT CAST(SUBSTRING(quadrant, 2, 4) AS SIGNED) INTO quadrant2 FROM planets WHERE id = idPlaneta2;
+                SELECT `position` INTO position1 FROM planets WHERE id = idPlaneta1;
+                SELECT `position` INTO position2 FROM planets WHERE id = idPlaneta2;
+
+                SET diffRegiao = ABS(regiao1 - regiao2);
+                SET diffQuadrant = ABS(quadrant1 - quadrant2);
+                SET diffPosition = ABS(position1 - position2);
+                SET distancia = (diffRegiao * 100) + (diffQuadrant * 10) + diffPosition;
+
+                RETURN distancia;
+            END
+        ');
     }
 
 
@@ -473,5 +507,7 @@ return new class extends Migration
     public function down()
     {
         //
+        DB::unprepared('DROP FUNCTION IF EXISTS calc_distancia');
+
     }
 };

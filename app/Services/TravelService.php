@@ -44,7 +44,6 @@ class TravelService
                 return "You don't have enough troops";
             }
         }
-        //subir
         $now = time();
         $travelTime = env("TRITIUM_TRAVEL_SPEED") * $this->calcDistance($travel->from, $travel->to);
         $newTravel->from = $travel->from;
@@ -53,7 +52,7 @@ class TravelService
         $newTravel->player = $player;
         $newTravel->start = $now;
         $newTravel->arrival = $now + $travelTime;
-        $newTravel->status = ENV('MARKET_STATUS_OPEN');
+        $newTravel->status = 1;
         $newTravel->receptor = $this->getReceptor($travel->to);
         # Troop
         if (isset($travel->troop)) {

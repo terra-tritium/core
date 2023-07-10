@@ -29,7 +29,8 @@ class Safe extends Model
         'status',
         'createdAt',
         'updatedAt',
-        'transportShips'
+        'transportShips',
+        'loaded'
     ];
 
 

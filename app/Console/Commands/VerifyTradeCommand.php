@@ -28,7 +28,7 @@ class VerifyTradeCommand extends Command
 
     /**
      * Execute the console command.
-     *subir new file
+     *
      * @return int
      */
     public function handle()
@@ -38,9 +38,12 @@ class VerifyTradeCommand extends Command
             $tradeService->verificaTradeConcluidoSafe();
             $rotina = new RotinaDBG();
             $rotina->save();
+           
             
         } catch (\Exception $exception) {
             Log::error('Erro no agendamento: ' . $exception->getMessage());
+        //    Notification::route('discord', 'terra-tritium')->notify(new ExceptionNotification($exception));
+
         }
 
     }

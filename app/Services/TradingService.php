@@ -5,9 +5,11 @@ namespace App\Services;
 use App\Models\Market;
 use App\Models\Planet;
 use App\Models\Player;
+use App\Models\Position;
 use App\Models\Safe;
 use App\Models\Trading;
 use App\Models\TradingFinished;
+use App\Models\Travel;
 use DateTime;
 use Illuminate\Http\Response;
 use Exception;
@@ -16,7 +18,6 @@ use Illuminate\Support\Facades\DB;
 class TradingService
 {
     private $trading;
-
     public function __construct(Trading $trading)
     {
         $this->trading = $trading;
@@ -29,7 +30,7 @@ class TradingService
     public function getAllTradingByMarketResource($resource, $type, $orderby, $column)
     {
         $planeta = $this->getPlanetUserLogged();
-        $trads = $this->trading->getDadosTradingByResourceAndMarket($resource, $planeta[0]->region, $type, $orderby, $column);
+        $trads = $this->trading->getDadosTradingByResourceAndMarket($planeta[0]->id,$resource, $planeta[0]->region, $type, $orderby, $column);
         return $trads;
     }
     public function myResources()
@@ -114,10 +115,10 @@ class TradingService
                 }
                 $planeta = $this->getPlanetUserLogged();
                 //verifica se o status pode ser alterado e quem ta alterando a ordem é quem criou
-                if ($trading->status != config('MARKET_STATUS_OPEN') || $trading->idPlanetCreator != $planeta[0]->player) {
+                if ($trading->status !=  env("MARKET_STATUS_OPEN") || $trading->idPlanetCreator != $planeta[0]->player) {
                     return response(['message' => 'Status não pode ser alterado ou não é o criador', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
-                $trading->status = config('MARKET_STATUS_CANCELED');
+                $trading->status =  env("MARKET_STATUS_CANCELED");
                 $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                 $trading->save();
                 return response(['message' => 'New order sale successfully registered!', 'success' => true, 'new' => $trading], Response::HTTP_OK);
@@ -129,10 +130,9 @@ class TradingService
     }
     public function getTradingProcess($id)
     {
-        $status = config('MARKET_STATUS_OPEN');
         if ($id) {
             $this->trading = Trading::where('id', $id)
-                ->where('status', $status)
+                ->where('status',  env("MARKET_STATUS_OPEN"))
                 ->first();
             return $this->trading;
         }
@@ -143,17 +143,35 @@ class TradingService
     {
         $panetaInteressado = 0;
 
+
         try {
             if ($request->idPlanetPurch == $request->idPlanetSale) {
                 return response(['message' => 'A negociação deve ser realizada entre planetas diferentes ', 'success' => false], Response::HTTP_BAD_REQUEST);
             }
             $trading = Trading::find($request->idTrading);
+            
+            /*$planetaPassivo = Planet::find($request->idPlanetSale);
+            $planeta = $this->getPlanetUserLogged();
+            $distance = $this->calcDistance($planeta[0], $planetaPassivo);
+            $travelTime = env("TRITIUM_TRAVEL_SPEED") * $distance;
+
+            // $safe = $this->safe($trading, $request);
+
+            return response([
+                'message' => 'Finish', 'success' => true,
+                'distance' => $distance,
+                'time' =>$travelTime,
+                'planetaPassivo' => $planetaPassivo,
+                'panetaInteressado' => $panetaInteressado,
+                'new2' => $request->toArray(), 'planeta' => $planeta, 'currency' => $request->currency
+            ], Response::HTTP_OK);
+*/
             if (!$trading) {
                 return response(['message' => 'Trading não encontrado', 'success' => false], Response::HTTP_NOT_FOUND);
             }
             $planeta = $this->getPlanetUserLogged();
             //verifica se o status pode ser alterado e quem ta alterando a ordem é quem criou
-            if ($trading->status != config('MARKET_STATUS_OPEN')) {
+            if ($trading->status !=  env("MARKET_STATUS_OPEN")) {
                 return response(['message' => 'Essa ordem não está mais disponível ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
 
@@ -168,7 +186,7 @@ class TradingService
             $planetaPassivo = Planet::find($request->idPlanetSale);
             $resourceKey = strtolower($request->resource);
             $quantidade = $request->quantity;
-            //S pq o passivo esta vendendo e o ativo comprando
+            //S pq o passivo esta vendendo e o ativo comprando, ativo tem que buscar
             if ($request->type == 'S') {
                 $panetaInteressado = $request->idPlanetPurch;
                 //verificar se tem saldo suficiente para compra 
@@ -183,19 +201,27 @@ class TradingService
                 //verificar se o passivo ainda possui recurso suficiente para venda
                 // $quantidade = 8000;
                 if ($quantidade > $planetaPassivo->{$resourceKey}) {
-                    $status = config('MARKET_STATUS_CANCELED');
+                    $status =  env("MARKET_STATUS_CANCELED");
                     $trading->status = $status;
                     $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                     $trading->save();
                     //notificar o passivo que foi cancelado
                     return response(['message' => 'O vendedor não possui recurso para concluir essa transação', 'code' => 4005, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
-                if (!$this->safe($trading, $request)) {
+                $distance = $this->calcDistance($planeta[0], $planetaPassivo);
+                // return response(['distancia'=>$distance,'Ativo'=>$planeta[0], 'passivo'=>$planetaPassivo ,'tipo'=>$request->type, 'desc'=>"ativo tem que ir buscar "]);
+
+                // Sair para a viagem antes de salvar na safe
+                if (!$this->safe($trading, $request,$distance)) {
                     return response(['message' => 'Algum erro na hora de comprar, verificar a causa', 'code' => 4006, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
+                //retorno visual, deletar
+                return response(['Ativo'=>$planeta[0], 'passivo'=>$planetaPassivo ,'tipo'=>$request->type, 'desc'=>"ativo tem que ir buscar "]);
+
             }
-            //P pq o passivo esta comprando e o ativo vendendo
+            //P pq o passivo esta comprando e o ativo vendendo o ativo tem que levar
             if ($request->type == 'P') {
+                $planetaPassivo = Planet::find($request->idPlanetPurch);
                 $panetaInteressado = $request->idPlanetSale;
                 //verificar se o ativo (vendedor) possui a quantidade de recurso
                 if ($planeta[0]->{$resourceKey} < $request->quantity) {
@@ -210,10 +236,12 @@ class TradingService
                 } else {
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
-
-                if (!$this->safe($trading, $request)) {
+                $distance = $this->calcDistance($planeta[0], $planetaPassivo);
+                if (!$this->safe($trading, $request,$distance)) {
                     return response(['message' => 'Algum erro na hora de vender, verificar a causa', 'code' => 4009, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
+                //retorno visual, deletar
+                return response(['Ativo'=>$planeta[0], 'passivo'=>$planetaPassivo ,'tipo'=>$request->type, 'desc'=>"ativo tem que entregra de imediato"]);
             }
         } catch (Exception $e) {
             return response(["message" => "error " . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -222,20 +250,95 @@ class TradingService
         return response([
             'message' => 'Finish', 'success' => true,
             'planetaPassivo' => $planetaPassivo,
+            'planetaAtivo' => $planeta[0],
             'panetaInteressado' => $panetaInteressado,
             'new2' => $request->toArray(), 'planeta' => $planeta, 'currency' => $request->currency
         ], Response::HTTP_OK);
     }
+    /**
+     * $from Ativo
+     * $to passivo 
+     */
+    public function calcDistance($from, $to)
+    {
+        $positionFrom = $this->convertPosition($from);
+        $positionTo = $this->convertPosition($to);
+        if (!($positionFrom && $positionTo)) {
+            return false;
+        }
+        $diffRegion = abs(ord($positionFrom->region) - ord($positionTo->region));
+        $diffQuadrant = abs($positionFrom->quadrant - $positionTo->quadrant);
+        $diffPosition = abs($positionFrom->position - $positionTo->position);
+        // return ['diiffRegion' =>$diffRegion, 'diffQuadrant' => $diffQuadrant, 'diffPosition' => $diffPosition, 'calc' =>($diffRegion * 100) + ($diffQuadrant * 10) + $diffPosition];
+        return ($diffRegion * 100) + ($diffQuadrant * 10) + $diffPosition;
+    }
 
-    public function safe(Trading $trading, $request)
+    public function convertPosition($location)
+    {
+        $position = new Position();
+        $position->region = substr($location->region, 0, 1);
+        $position->quadrant = substr($location->quadrant, 1, 3);
+        $position->quadrant_full = substr($location->quadrant, 0, 4);
+        $position->position = $location->position;
+        if (!$this->isValidRegion($position->region)) {
+            return false;
+        }
+        if (!$this->isValidQuadrant($position->quadrant)) {
+            return false;
+        }
+        if (!$this->isValidPosition($position->position)) {
+            return false;
+        }
+
+        return $position;
+    }
+
+    public function isValidRegion($letter)
+    {
+        $valorAscii = ord($letter);
+        $valorAsciiA = ord('A');
+        $valorAsciiP = ord('P');
+        if ($valorAscii >= $valorAsciiA && $valorAscii <= $valorAsciiP) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function isValidQuadrant($quadrant)
+    {
+        if ($quadrant >= 0 && $quadrant < 100) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function isValidPosition($position)
+    {
+        if ($position > 0 && $position <= 16) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    
+
+    public function safe(Trading $trading, $request, $distancia)
     {
         try {
             $planetaInteressado = $request->type == 'S' ? $request->idPlanetPurch : $request->idPlanetSale;
             $success = $this->atualizaStatusTrading($trading, $planetaInteressado);
             if ($success) {
-                $successSafe = $this->saveSafe($request, $trading->idMarket, $trading->idPlanetCreator, 1);
-                $successDebito = $this->debitarSaldosPlaneta($request);
-                return ($successDebito && $successSafe);
+                $successSafe = $this->saveSafe($request, $trading->idMarket, $trading->idPlanetCreator, $distancia,1);
+                //debitar automatico, pois o cargueiro ja sai carregado com o recurso
+                if ($request->type == 'P') {
+                     $successDebito = $this->debitarSaldosPlaneta($request);
+                    return ($successDebito && $successSafe);
+                }
+                return $successSafe;
             }
         } catch (Exception $e) {
             return false;
@@ -246,27 +349,25 @@ class TradingService
      */
     private function atualizaStatusTrading(Trading $trading, $planetaInteressado)
     {
-        $status = config('MARKET_STATUS_PENDING');
 
         $trading->idPlanetInterested = $planetaInteressado;
-        $trading->status = $status;
+        $trading->status = env("MARKET_STATUS_PENDING");
         $trading->currency = 'energy'; //default
         $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
         return $trading->save();
     }
-    /**
-     * @todo calcular a distancia
-     */
-    private function saveSafe($request, $idMarket, $planetCreator, $transportShips = 1)
+    
+    private function saveSafe($request, $idMarket, $planetCreator, $distancia,$transportShips = 1)
     {
-        $status = config('MARKET_STATUS_PENDING');
         try {
+            //ida e volta
+            $travelTime = (env("TRITIUM_TRAVEL_SPEED") * $distancia) * 2 ;
             $safe = new Safe();
             $safe->idPlanetSale = $request->idPlanetSale;
             $safe->idPlanetPurch = $request->idPlanetPurch;
             $safe->idPlanetCreator = $planetCreator;
-            $safe->status = $status;
-            $safe->deliveryTime = 50;
+            $safe->status = env("MARKET_STATUS_PENDING");
+            $safe->deliveryTime = $travelTime;
             $safe->type = $request->type;
             $safe->currency = $request->currency;
             $safe->resource = strtolower($request->resource);
@@ -276,11 +377,12 @@ class TradingService
             $safe->idMarket = $idMarket;
             $safe->idTrading = $request->idTrading;
             $safe->transportShips = $transportShips;
-            $safe->distance = 5000;
+            $safe->distance = $distancia;
+            $safe->loaded = $request->type == 'P'; //nessa caso o cargueiro sai carregado 
             $safe->save();
             return $safe->save();
         } catch (Exception $e) {
-            return false;
+            return $e;
         }
     }
     /**
@@ -329,7 +431,7 @@ class TradingService
                 $safe = Safe::where('idTrading', $concluido->idTrading)->first();
                 if ($safe)
                     $safe->delete();
-                if ($trading) 
+                if ($trading)
                     $trading->delete();
             }
         }
@@ -403,7 +505,6 @@ class TradingService
      */
     private function atualizaStatusTradingConclued($concluidos)
     {
-        $status = config('MARKET_STATUS_FINISHED');
         try {
             foreach ($concluidos as $c) {
                 $finished = new TradingFinished();
@@ -415,7 +516,7 @@ class TradingService
                 $finished->distance = $c->distance;
                 $finished->deliveryTime = $c->deliveryTime;
                 $finished->idTrading = $c->id;
-                $finished->status = $status; //concluido
+                $finished->status = env("MARKET_STATUS_FINISHED"); //concluido
                 $finished->currency = $c->currency;
                 $finished->type = $c->type;
                 $finished->idMarket = $c->idMarket;
