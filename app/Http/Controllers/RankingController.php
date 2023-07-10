@@ -22,23 +22,38 @@ class RankingController extends Controller
     }
 
     public function players($type) {
-        $player = Player::getPlayerLogged();
-        switch ($type) {
-            case "top":
-                return Ranking::orderBy(RankingCategory::SCORE, 'DESC')->take(4)->get();
-            case "general":
-                return Ranking::orderBy(RankingCategory::SCORE, 'DESC')->paginate($this->itensPerPage);
-            case "builder":
-                return Ranking::orderBy(RankingCategory::BUILD_SCORE, 'DESC')->paginate($this->itensPerPage);
-            case "military":
-                return Ranking::orderBy(RankingCategory::MILITARY_SCORE, 'DESC')->paginate($this->itensPerPage);
-            case "attack":
-                return Ranking::orderBy(RankingCategory::ATTACK_SCORE, 'DESC')->paginate($this->itensPerPage);
-            case "defense":
-                return Ranking::orderBy(RankingCategory::DEFENSE_SCORE, 'DESC')->paginate($this->itensPerPage);
-            case "energy":
-                return Ranking::orderBy(RankingCategory::ENERGY, 'DESC')->paginate($this->itensPerPage);
-        }
+        
+            $type = $request->input('type', 'general');
+            $player = Player::getPlayerLogged();
+            
+            switch ($type) {
+                case "top":
+                    $query = Ranking::orderBy(RankingCategory::SCORE, 'DESC')->take(4);
+                    break;
+                case "general":
+                    $query = Ranking::orderBy(RankingCategory::SCORE, 'DESC');
+                    break;
+                case "builder":
+                    $query = Ranking::orderBy(RankingCategory::BUILD_SCORE, 'DESC');
+                    break;
+                case "military":
+                    $query = Ranking::orderBy(RankingCategory::MILITARY_SCORE, 'DESC');
+                    break;
+                case "attack":
+                    $query = Ranking::orderBy(RankingCategory::ATTACK_SCORE, 'DESC');
+                    break;
+                case "defense":
+                    $query = Ranking::orderBy(RankingCategory::DEFENSE_SCORE, 'DESC');
+                    break;
+                case "energy":
+                    $query = Ranking::orderBy(RankingCategory::ENERGY, 'DESC');
+                    break;
+                default:
+                    return response()->json(['error' => 'Invalid ranking type'], 400);
+            }
+    
+            $rankings = $query->skip(0)->take($this->itemsPerPage)->get();
+            return response()->json($rankings);
     }
 
     public function aliances($type) {
