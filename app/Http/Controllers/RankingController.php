@@ -21,11 +21,11 @@ class RankingController extends Controller
         $this->rankingService = $rankingService;
     }
 
-    public function players($type) {
-        
+    public function players(Request $request) {
+
             $type = $request->input('type', 'general');
             $player = Player::getPlayerLogged();
-            
+
             switch ($type) {
                 case "top":
                     $query = Ranking::orderBy(RankingCategory::SCORE, 'DESC')->take(4);
@@ -51,8 +51,8 @@ class RankingController extends Controller
                 default:
                     return response()->json(['error' => 'Invalid ranking type'], 400);
             }
-    
-            $rankings = $query->skip(0)->take($this->itemsPerPage)->get();
+
+            $rankings = $query->skip(0)->take($this->itensPerPage)->get();
             return response()->json($rankings);
     }
 
