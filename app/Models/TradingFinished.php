@@ -11,10 +11,10 @@ class TradingFinished extends Model
     use HasFactory;
     protected $table = 'trading_finished';
     public $timestamps = false;
-
+//subir
     protected $fillable = [
-        'idPlanetSale',
-        'idPlanetPurch',
+        'idPlanetCreator',
+        'idPlanetInterested',
         'quantity',
         'price',
         'distance',
@@ -22,6 +22,12 @@ class TradingFinished extends Model
         'idTrading',
         'status',
         'finishedAt',
+        'createdAt',
+        'currency',
+        'type',
+        'idMarket',
+        'resource',
+        'transportShips'
     ];
 
     

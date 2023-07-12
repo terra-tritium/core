@@ -29,10 +29,20 @@ class Safe extends Model
         'status',
         'createdAt',
         'updatedAt',
-        'transportShips'
+        'transportShips',
+        'loaded'
     ];
 
 
-
-    
+    public function getDadosSafe()
+    {
+        $results = DB::table($this->table . ' as s')
+            ->select('s.*','t.status as status_trading','t.idPlanetInterested','t.createdAt')
+            ->selectRaw('TIMESTAMPADD(SECOND, s.deliveryTime, s.createdAt) AS tempoFinal')
+            ->selectRaw("IF(TIMESTAMPADD(SECOND, s.deliveryTime, s.createdAt) >= NOW(), false, true) AS concluido")
+            ->selectRaw("IF(TIMESTAMPADD(SECOND, s.deliveryTime, s.createdAt) >= NOW(), TIMESTAMPDIFF(MINUTE, NOW(), TIMESTAMPADD(SECOND, s.deliveryTime, s.createdAt)), 0) AS minutosRestantes")
+            ->join('trading as t', 't.id', '=', 's.idTrading')
+            ->get();
+            return $results;
+    }
 }

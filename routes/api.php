@@ -176,6 +176,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/cancel/{id}', [TradingController::class, 'cancelOrder']);
         Route::get('/trading-process/{id}',[TradingController::class, 'getTradingProcess']);
         Route::post('/finish', [TradingController::class, 'finishTrading']);
+        Route::get('/safe/conclued',[TradingController::class, 'verificaTradeConcluidoSafe'] );
     });
 
     Route::prefix('nft')->group(function () {

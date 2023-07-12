@@ -202,7 +202,7 @@ class PlayerController extends Controller
         $player->name = $request->input("name");
         $player->user = $user->id;
         $this->playerService->register($player);
-
+//subir
         return response(['message' => 'Player created success!','success'=>true],Response::HTTP_OK);
 
     }
