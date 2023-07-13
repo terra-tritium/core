@@ -17,26 +17,22 @@ class LogController extends Controller
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $logs = Logbook::where('player', $player->id)->get();
+        $logs = Logbook::where('player', $player->id)->orderBy('date', 'desc')->limit(100)->get();
 
         return response()->json($logs);
     }
 
-    public function create() {
+    public function create(Request $request) {
         $player = Player::getPlayerLogged();
 
         if (!$player) {
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
 
-        if (request()->input('type') < 0 || request()->input('type') > 5) {
-            return response()->json(['error' => 'Invalid type.'], Response::HTTP_BAD_REQUEST);
-        }
-
         $log = new Logbook();
         $log->player = $player->id;
-        $log->message = request()->input('message');
-        $lot->type = request()->input('type');
+        $log->text = $request->input('text');
+        $log->type = $request->input('type');
         $log->save();
 
         return response()->json($log);
