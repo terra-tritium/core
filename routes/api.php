@@ -19,6 +19,7 @@ use App\Http\Controllers\FactoryController;
 use App\Http\Controllers\AliancesController;
 use App\Http\Controllers\TradingController;
 use App\Http\Controllers\NFTController;
+use App\Http\Controllers\LogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -152,6 +153,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('ranking')->group(function () {
         Route::get('/players', [RankingController::class, 'getPlayerRanking']);
         Route::get('/aliances', [RankingController::class, 'getAlianceRanking']);
+    });
+
+    Route::prefix('logs')->group(function () {
+        Route::get('/logs', [LogController::class, 'logs']);
+        Route::post('/create', [LogController::class, 'create']);
     });
 
     Route::prefix('aliance')->group(function () {

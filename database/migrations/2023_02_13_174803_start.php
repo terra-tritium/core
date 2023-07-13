@@ -158,6 +158,8 @@ return new class extends Migration
         Schema::create('logbook', function (Blueprint $table) {
             $table->id();
             $table->string("text");
+            $table->number("type");
+            $table->timestamp("date")->useCurrent();
             $table->foreignId('player')->constrained("players");
             $table->foreignId('planet')->constrained("planets");
         });

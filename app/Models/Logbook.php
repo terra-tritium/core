@@ -9,4 +9,5 @@ class Logbook extends Model
 {
     use HasFactory;
     protected $table = 'logbook';
+    public $timestamps = false;
 }
