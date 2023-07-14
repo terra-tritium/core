@@ -296,20 +296,26 @@ return new class extends Migration
             $table->foreignId("attack")->constrained("players");
             $table->foreignId("defense")->constrained("players");
             $table->foreignId('planet')->constrained("planets");
+            $table->integer("status");
             $table->string("attackDemage")->nullable();
             $table->string("defenseDemage")->nullable();
-            $table->integer("attackStrategy");
-            $table->integer("defenseStrategy");
             $table->integer("result")->nullable();
             $table->bigInteger("start");
             $table->integer("stage");
             $table->json('resources')->nullable();
-            $table->json('attackUnits');
-            $table->json('defenseUnits');
-            $table->json('attackReserve');
-            $table->json('defenseReserve');
             $table->json('attackSlots')->nullable();
             $table->json('defenseSlots')->nullable();
+        });
+        Schema::create('fighters', function (Blueprint $table) {
+            $table->id();
+            $table->integer('side');
+            $table->integer('strategy');
+            $table->integer('player')->constrained("players");
+            $table->integer("battle")->constrained("battles");
+            $table->bigInteger("start");
+            $table->integer('stage');
+            $table->json('units');
+            $table->json('reserve');
         });
         Schema::create('stages', function (Blueprint $table) {
             $table->id();
