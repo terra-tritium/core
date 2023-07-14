@@ -11,7 +11,7 @@ class Trading extends Model
     use HasFactory;
     protected $table = 'trading';
     public $timestamps = false;
-
+    //new trade
     protected $fillable = [
         'resource',
         'idPlanetCreator',
@@ -26,16 +26,21 @@ class Trading extends Model
         'updatedAt',
     ];
 
-    public function getDadosTradingByResourceAndMarket($resource, $region, $type, $orderby, $column)
+    public function getDadosTradingByResourceAndMarket($idPlanetaLogado, $resource, $region, $type, $orderby, $column)
     {
         $orderByDirection = $orderby == 'A' ? 'asc' : 'desc';
         $columnOrder = $column ? 't.createdAt' : 't.' . $column;
-        $trading = DB::table($this->table . ' as t')->select("t.*", "p.name")
+        $trading = DB::table($this->table . ' as t')
+            ->select(
+                "t.*",
+                "p.name",
+                DB::raw("(SELECT origin.calc_distancia(p.id, $idPlanetaLogado)) AS distance"),
+            )
             ->join('market as m', 'm.id', '=', 't.idMarket')
             ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')
             ->join('players as p', 'p.id', '=', 'planeta.id')
             ->where('m.status', true)
-            ->where('t.status', 1)
+            ->where('t.status', env("MARKET_STATUS_OPEN"))
             ->where('m.region', '=', $region)
             ->where('t.resource', '=', $resource)
             ->where('t.type', '=', $type)
@@ -55,7 +60,7 @@ class Trading extends Model
         $resources = DB::table('planets as p')
             ->leftJoin('trading as t', function ($join) {
                 $join->on('p.player', '=', 't.idPlanetCreator')
-                    ->where('t.status', 1)
+                    ->where('t.status', env("MARKET_STATUS_OPEN"))
                     ->where('t.type', 'S');
             })
             ->where('p.player', $player)
@@ -71,6 +76,7 @@ class Trading extends Model
     }
     public function getAllOrderPlayer($player, $resource)
     {
+        $status = [env("MARKET_STATUS_OPEN"), env("MARKET_STATUS_PENDING")];
         $orders = DB::table($this->table . ' as t')
             ->select(
                 't.id',
@@ -93,6 +99,7 @@ class Trading extends Model
                     ->orWhere('t.idPlanetInterested', $player);
             })
             ->where('t.resource', $resource)
+            ->whereIn('t.status', $status)
             ->orderBy('t.createdAt', 'DESC')
             ->get();
         return $orders;
