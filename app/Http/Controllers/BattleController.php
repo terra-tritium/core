@@ -51,6 +51,18 @@ class BattleController extends Controller
         return Battle::find($id);
     }
 
+    public function list () {
+        $player = Player::getPlayerLogged();
+
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $battles = Battle::where('player', $player->id)->orderBy('start', 'desc')->limit(12)->get();
+
+        return response()->json($battles);
+    }
+
     public function stages ($id) {
         return BattleStage::where('battle', $id)->get();
     }

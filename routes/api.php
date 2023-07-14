@@ -126,6 +126,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/start/{defense}/{planet}', [BattleController::class, 'start']);
         Route::get('/view/{id}', [BattleController::class, 'view']);
         Route::get('/stages/{id}', [BattleController::class, 'stages']);
+        Route::get('/list', [BattleController::class, 'list']);
     });
 
     Route::prefix('quadrant')->group(function () {
