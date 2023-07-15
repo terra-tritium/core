@@ -17,7 +17,7 @@ class VerifyTradeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'trade:verify';
+    protected $signature = 'trade:verifytrades';
 
     /**
      * The console command description.
