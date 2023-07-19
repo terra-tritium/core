@@ -30,7 +30,7 @@ class TradingService
     public function getAllTradingByMarketResource($resource, $type, $orderby, $column)
     {
         $planeta = $this->getPlanetUserLogged();
-        $trads = $this->trading->getDadosTradingByResourceAndMarket($planeta[0]->id,$resource, $planeta[0]->region, $type, $orderby, $column);
+        $trads = $this->trading->getDadosTradingByResourceAndMarket($planeta[0]->id, $resource, $planeta[0]->region, $type, $orderby, $column);
         return $trads;
     }
     public function myResources()
@@ -149,7 +149,7 @@ class TradingService
                 return response(['message' => 'A negociação deve ser realizada entre planetas diferentes ', 'success' => false], Response::HTTP_BAD_REQUEST);
             }
             $trading = Trading::find($request->idTrading);
-            
+
             /*$planetaPassivo = Planet::find($request->idPlanetSale);
             $planeta = $this->getPlanetUserLogged();
             $distance = $this->calcDistance($planeta[0], $planetaPassivo);
@@ -212,12 +212,11 @@ class TradingService
                 // return response(['distancia'=>$distance,'Ativo'=>$planeta[0], 'passivo'=>$planetaPassivo ,'tipo'=>$request->type, 'desc'=>"ativo tem que ir buscar "]);
 
                 // Sair para a viagem antes de salvar na safe
-                if (!$this->safe($trading, $request,$distance)) {
+                if (!$this->safe($trading, $request, $distance)) {
                     return response(['message' => 'Algum erro na hora de comprar, verificar a causa', 'code' => 4006, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 //retorno visual, deletar
-                return response(['Ativo'=>$planeta[0], 'passivo'=>$planetaPassivo ,'tipo'=>$request->type, 'desc'=>"ativo tem que ir buscar "]);
-
+                return response(['Ativo' => $planeta[0], 'passivo' => $planetaPassivo, 'tipo' => $request->type, 'desc' => "ativo tem que ir buscar "]);
             }
             //P pq o passivo esta comprando e o ativo vendendo o ativo tem que levar
             if ($request->type == 'P') {
@@ -237,11 +236,11 @@ class TradingService
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 $distance = $this->calcDistance($planeta[0], $planetaPassivo);
-                if (!$this->safe($trading, $request,$distance)) {
+                if (!$this->safe($trading, $request, $distance)) {
                     return response(['message' => 'Algum erro na hora de vender, verificar a causa', 'code' => 4009, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 //retorno visual, deletar
-                return response(['Ativo'=>$planeta[0], 'passivo'=>$planetaPassivo ,'tipo'=>$request->type, 'desc'=>"ativo tem que entregra de imediato"]);
+                return response(['Ativo' => $planeta[0], 'passivo' => $planetaPassivo, 'tipo' => $request->type, 'desc' => "ativo tem que entregra de imediato"]);
             }
         } catch (Exception $e) {
             return response(["message" => "error " . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -324,7 +323,7 @@ class TradingService
     }
 
 
-    
+
 
     public function safe(Trading $trading, $request, $distancia)
     {
@@ -332,10 +331,10 @@ class TradingService
             $planetaInteressado = $request->type == 'S' ? $request->idPlanetPurch : $request->idPlanetSale;
             $success = $this->atualizaStatusTrading($trading, $planetaInteressado);
             if ($success) {
-                $successSafe = $this->saveSafe($request, $trading->idMarket, $trading->idPlanetCreator, $distancia,1);
+                $successSafe = $this->saveSafe($request, $trading->idMarket, $trading->idPlanetCreator, $distancia, 1);
                 //debitar automatico, pois o cargueiro ja sai carregado com o recurso
                 if ($request->type == 'P') {
-                     $successDebito = $this->debitarSaldosPlaneta($request);
+                    $successDebito = $this->debitarSaldosPlaneta($request);
                     return ($successDebito && $successSafe);
                 }
                 return $successSafe;
@@ -356,12 +355,12 @@ class TradingService
         $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
         return $trading->save();
     }
-    
-    private function saveSafe($request, $idMarket, $planetCreator, $distancia,$transportShips = 1)
+
+    private function saveSafe($request, $idMarket, $planetCreator, $distancia, $transportShips = 1)
     {
         try {
             //ida e volta
-            $travelTime = (env("TRITIUM_TRAVEL_SPEED") * $distancia) * 2 ;
+            $travelTime = (env("TRITIUM_TRAVEL_SPEED") * $distancia) * 2;
             $safe = new Safe();
             $safe->idPlanetSale = $request->idPlanetSale;
             $safe->idPlanetPurch = $request->idPlanetPurch;
@@ -445,6 +444,7 @@ class TradingService
         $dadosSafe = $safe->getDadosSafe();
         $filtrado = $this->getDeliveryTimeConclued($dadosSafe);
         $atualizar = $this->atualizaStatusTradingConclued($filtrado['concluido']);
+        $metadeTempo = $this->atualizaTradingMetadeTempoConcluido($filtrado['metadeTempo']);
         //debitar e creditar valores para os usuarios
         $executados = $this->updateResourceTradeConclued($filtrado['concluido']);
         //deletar da tabela trading e deixar apenas na finish
@@ -455,7 +455,8 @@ class TradingService
             'info' => $dadosSafe,
             'filter' => $filtrado,
             'atualizarq' => $atualizar,
-            'executados' => $executados
+            'executados' => $executados,
+            'metadeAtualizado' =>$metadeTempo
         ], Response::HTTP_OK);
     }
     /**
@@ -501,6 +502,33 @@ class TradingService
         return ['compradores ' => $compradores, 'vendedores ' => $vendedores, 'cargueirosid' => $cargueiros];
     }
     /**
+     * atualiza as informações quando a metade do tempo de entrega se passou
+     * caso o ativo esteja buscando e a metade passou, o cargueiro vai ficar carregado e deve-se debitar e creditar os valores
+     * caso o ativo esteja entregando, o cargueiro deve ficar vazio.
+     * caso o ativo vá entregar, com metade do tempo deve-se concluir a transação e a outra metade o cargueiro deve retornar vazio
+     * retornando o array apenas para fins visual
+     */
+    private function atualizaTradingMetadeTempoConcluido($trades)
+    {
+        $atualizados = [];
+        try {
+            foreach ($trades as $t) {
+                $safe = Safe::find($t->safeId);
+                if (!$safe || $t->concluido) continue;
+                if ($safe->type == 'S') {
+                    $safe->loaded = true;
+                    $success = $this->debitarSaldosPlaneta($safe);
+                    if (!$success) continue;
+                    $successUpdate = $safe->save();
+                    $atualizados[] = $safe;
+                }
+            }
+        } catch (Exception $e) {
+            return response(["message" => "error in the middle of the transaction" . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        return $atualizados;
+    }
+    /**
      * @todo colocar o calculo de distancia
      */
     private function atualizaStatusTradingConclued($concluidos)
@@ -533,6 +561,7 @@ class TradingService
     {
         $concluidos = [];
         $naoConcluidos = [];
+        $metadeTempo = [];
         if ($dadosSafe) {
             foreach ($dadosSafe as $dados) {
                 if ($dados->concluido) {
@@ -540,8 +569,11 @@ class TradingService
                 } else {
                     $naoConcluidos[] = $dados;
                 }
+                if (!$dados->concluido && $dados->atingiuMetadeTempo) {
+                    $metadeTempo[] = $dados;
+                }
             }
         }
-        return ['concluido' => $concluidos, 'naoConcluido' => $naoConcluidos];
+        return ['concluido' => $concluidos, 'naoConcluido' => $naoConcluidos, 'metadeTempo' => $metadeTempo];
     }
 }

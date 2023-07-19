@@ -22,7 +22,7 @@ class TradingSeeder  extends Seeder
         $resurce = ['Crystal','Uranium','Metal'];
         for ($i = 1; $i <= 150; $i++) {
             $quantidade = rand(1,20);
-            $precoUnitario =  rand(1, 1000);
+            $precoUnitario =  rand(1, 100);
             DB::table('trading')->insert(
                 [
                     'idPlanetCreator' => $i,
