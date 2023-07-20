@@ -49,7 +49,7 @@ class TravelService
         $newTravel->action = $travel->action;
         $newTravel->player = $player;
         $newTravel->start = $now;
-        $newTravel->arrival = $now + ($travelTime * 1000);
+        $newTravel->arrival = $now + $travelTime;
         $newTravel->status = 1;
         $newTravel->receptor = $this->getReceptor($travel->to);
 

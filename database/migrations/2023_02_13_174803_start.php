@@ -297,6 +297,8 @@ return new class extends Migration
             $table->integer("status");
             $table->string("attackDemage")->nullable();
             $table->string("defenseDemage")->nullable();
+            $table->json('attackUnits')->nullable();
+            $table->json('defenseUnits')->nullable();
             $table->integer("result")->nullable();
             $table->bigInteger("start");
             $table->integer("stage");

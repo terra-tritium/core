@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Battle;
 use App\Models\BattleStage;
+use App\Models\Fighters;
 use App\Jobs\BattleJob;
 
 class BattleService
@@ -40,21 +41,36 @@ class BattleService
 
     public function startNewBattle ($attack, $defense, $aUnits, $dUnits, $aStrategy, $dStrategy,$dPlanet) {
         $battle = new Battle();
-        $battle->attack = $attack;
-        $battle->defense = $defense;
-        $battle->attackUnits = json_encode($aUnits);
-        $battle->defenseUnits = json_encode($dUnits);
-        $battle->attackStrategy = $aStrategy;
-        $battle->defenseStrategy = $dStrategy;
+        $battle->attackUnits = [];
+        $battle->defenseUnits = [];
         $battle->stage = 0;
         $battle->start = time();
-        $battle->attackReserve = json_encode($aUnits);
-        $battle->defenseReserve = json_encode($dUnits);
         $battle->planet = $dPlanet;
         $battle->save();
-        
-        $this->attackReserve = $aUnits;
-        $this->defenseReserve = $dUnits;
+
+        $attack = new Fighters();
+        $attack->battle = $battle->id;
+        $attack->player = $attack->id;
+        $attack->side = 1;
+        $attack->strategy = $aStrategy;
+        $attack->demage = 0;
+        $attack->start = time();
+        $attack->stage = 0;
+        $attack->units = json_encode($aUnits);
+        $attack->reserve = [];
+        $attack->save();
+
+        $defense = new Fighters();
+        $defense->battle = $battle->id;
+        $defense->player = $attack->id;
+        $defense->side = 2;
+        $defense->strategy = $dStrategy;
+        $defense->demage = 0;
+        $defense->start = time();
+        $defense->stage = 0;
+        $defense->units = json_encode($dUnits);
+        $defense->reserve = [];
+        $defense->save();
 
         //$this->loadReverve($battle);
 
