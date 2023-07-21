@@ -456,7 +456,7 @@ class TradingService
             'filter' => $filtrado,
             'atualizarq' => $atualizar,
             'executados' => $executados,
-            'metadeAtualizado' =>$metadeTempo
+            'metadeAtualizado' => $metadeTempo
         ], Response::HTTP_OK);
     }
     /**
@@ -510,6 +510,7 @@ class TradingService
      */
     private function atualizaTradingMetadeTempoConcluido($trades)
     {
+        //Verificando quando a transação chegou na metade do tempo, quando for o ativo buscando, o cargueiro fica carregado e debita sua energia e irá retorna para sua origem
         $atualizados = [];
         try {
             foreach ($trades as $t) {
@@ -564,14 +565,12 @@ class TradingService
         $metadeTempo = [];
         if ($dadosSafe) {
             foreach ($dadosSafe as $dados) {
-                if ($dados->concluido) {
+                if ($dados->concluido)
                     $concluidos[] = $dados;
-                } else {
+                else
                     $naoConcluidos[] = $dados;
-                }
-                if (!$dados->concluido && $dados->atingiuMetadeTempo) {
+                if (!$dados->concluido && $dados->atingiuMetadeTempo)
                     $metadeTempo[] = $dados;
-                }
             }
         }
         return ['concluido' => $concluidos, 'naoConcluido' => $naoConcluidos, 'metadeTempo' => $metadeTempo];
