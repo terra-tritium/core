@@ -39,42 +39,42 @@ class BattleService
         $this->currentStage = new BattleStage();
     }
 
-    public function startNewBattle ($attack, $defense, $aUnits, $dUnits, $aStrategy, $dStrategy,$dPlanet) {
+    public function startNewBattle ($attack, $defense, $aUnits, $dUnits, $aStrategy, $dStrategy, $dPlanet) {
+
         $battle = new Battle();
-        $battle->attackUnits = [];
-        $battle->defenseUnits = [];
-        $battle->stage = 0;
-        $battle->start = time();
         $battle->planet = $dPlanet;
+        $battle->status = 0;
+        $battle->start = time();
+        $battle->stage = 0;
         $battle->save();
 
         $attack = new Fighters();
         $attack->battle = $battle->id;
-        $attack->player = $attack->id;
+        $attack->player = $attack;
         $attack->side = 1;
         $attack->strategy = $aStrategy;
         $attack->demage = 0;
         $attack->start = time();
         $attack->stage = 0;
         $attack->units = json_encode($aUnits);
-        $attack->reserve = [];
+        $attack->reserve = json_encode([]);
         $attack->save();
 
         $defense = new Fighters();
         $defense->battle = $battle->id;
-        $defense->player = $attack->id;
+        $defense->player = $defense;
         $defense->side = 2;
         $defense->strategy = $dStrategy;
         $defense->demage = 0;
         $defense->start = time();
         $defense->stage = 0;
         $defense->units = json_encode($dUnits);
-        $defense->reserve = [];
+        $defense->reserve = json_encode([]);
         $defense->save();
 
-        //$this->loadReverve($battle);
+        // //$this->loadReverve($battle);
 
-        $battle = $this->calculateStage($battle->id);
+        // $battle = $this->calculateStage($battle->id);
     }
     
     # Job call

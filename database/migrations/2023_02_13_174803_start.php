@@ -314,7 +314,7 @@ return new class extends Migration
             $table->bigInteger("start");
             $table->integer('stage');
             $table->json('units');
-            $table->json('reserve');
+            $table->json('reserve')->nullable();
         });
         Schema::create('stages', function (Blueprint $table) {
             $table->id();
