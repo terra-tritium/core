@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 //use App\Models\DefenseMode;
 use App\Models\Player;
 use App\Models\Battle;
+use App\Models\Fighters;
 use App\Models\BattleStage;
 use App\Services\BattleService;
 use App\Services\PlayerService;
@@ -58,7 +59,7 @@ class BattleController extends Controller
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $battles = Battle::where('player', $player->id)->orderBy('start', 'desc')->limit(12)->get();
+        $battles = Fighters::where('player', $player->id)->orderBy('start', 'desc')->limit(12)->get();
 
         return response()->json($battles);
     }

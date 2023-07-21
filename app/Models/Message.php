@@ -61,26 +61,27 @@ class Message extends Model
     public function getAllMessageNotRead($recipientId)
     {
         $msgs = DB::table('users as u')
-        ->select('u.id','u.name', DB::raw('MAX(m.createdAt) as createdAt'), DB::raw('MAX(m.read) as `read`'))
-        ->join('messages as m', 'u.id', '=', 'm.senderId')
-        ->where('m.recipientId', $recipientId)
-        ->where('m.read', false)
-        ->groupBy('u.id','m.senderId','u.name')
-        ->orderBy('read', 'ASC')
-        ->orderBy('createdAt', 'DESC')
-        ->get();
+            ->select('u.id', 'u.name', DB::raw('MAX(m.createdAt) as createdAt'), DB::raw('MAX(m.read) as `read`'))
+            ->join('messages as m', 'u.id', '=', 'm.senderId')
+            ->where('m.recipientId', $recipientId)
+            ->where('m.read', false)
+            ->groupBy('u.id', 'm.senderId', 'u.name')
+            ->orderBy('read', 'ASC')
+            ->orderBy('createdAt', 'DESC')
+            ->get();
         return $msgs;
     }
     /**
      * Recupera a ultima msg não lida enviada por um usuario
      */
-    public function getLastMessageNotReadBySender($recipientId, $senderId){
+    public function getLastMessageNotReadBySender($recipientId, $senderId)
+    {
         $msg = DB::table('messages as m')
-        ->where('recipientId', $recipientId)
-        ->where('senderId', $senderId)
-        ->where('read', false)
-        ->orderBy('createdAt', 'desc')
-        ->first();
+            ->where('recipientId', $recipientId)
+            ->where('senderId', $senderId)
+            ->where('read', false)
+            ->orderBy('createdAt', 'desc')
+            ->first();
         return $msg;
     }
 
@@ -106,26 +107,36 @@ class Message extends Model
     /**
      * Pegar os usuário onde ja tiveram interações
      */
-    public function getSenders($recipientId)
+    public function getSenders($userId)
     {
-        $messages = DB::table('users')
-            ->join('messages', 'users.id', '=', 'messages.senderId')
-            ->select('users.name', 'users.id as senderId', DB::raw('MAX(messages.createdAt) as createdAt'),
-                DB::raw('MAX(messages.read) as `read`'))
-            ->where('messages.recipientId', $recipientId)
-            ->groupBy('users.id', 'users.name', 'messages.senderId')
-            ->orderBy('messages.read')
+        $users = DB::table('messages as m')
+            ->select(DB::raw('CASE WHEN recipientId = ' . $userId . ' THEN senderId ELSE recipientId END AS id_usuario'))
+            ->select('users.name','users.id as userId')
+            ->selectRaw('MAX(m.createdAt) AS createdAt')
+            ->selectRaw('SUM(m.read = 0) AS countNotRead')
+            ->join('users', function ($join) use ($userId) {
+                $join->on('users.id', '=', DB::raw('CASE WHEN recipientId = ' . $userId . ' THEN senderId ELSE recipientId END'));
+            })
+            ->where(function ($query) use ($userId) {
+                $query->where('senderId', $userId)
+                    ->orWhere('recipientId', $userId);
+            })
+            ->groupBy('users.id', 'users.name')
+            ->orderByDesc('countNotRead')
             ->orderByDesc('createdAt')
             ->get();
 
-        return $messages;
+        return $users;
+
     }
     public function getConversation($recipientId, $senderId)
     {
         $messages =  DB::table('messages')
             ->select('*')
-            ->selectRaw("CASE WHEN senderId = ? THEN true WHEN recipientId = ? THEN false END AS sender",
-                [$senderId, $senderId])
+            ->selectRaw(
+                "CASE WHEN senderId = ? THEN true WHEN recipientId = ? THEN false END AS sender",
+                [$senderId, $senderId]
+            )
             ->where(function ($query) use ($senderId, $recipientId) {
                 $query->where('senderId', $senderId)
                     ->where('recipientId', $recipientId);
