@@ -310,6 +310,7 @@ return new class extends Migration
             $table->integer('strategy');
             $table->integer('player')->constrained("players");
             $table->integer("battle")->constrained("battles");
+            $table->foreignId('planet')->constrained("planets");
             $table->string("demage")->nullable();
             $table->bigInteger("start");
             $table->integer('stage');

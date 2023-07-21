@@ -56,6 +56,7 @@ class BattleService
         $player1->demage = 0;
         $player1->start = time();
         $player1->stage = 0;
+        $player1->planet = $dPlanet;
         $player1->units = json_encode($aUnits);
         $player1->save();
 
@@ -67,6 +68,7 @@ class BattleService
         $player2->demage = 0;
         $player2->start = time();
         $player2->stage = 0;
+        $player2->planet = $dPlanet;
         $player2->units = json_encode($dUnits);
         $player2->save();
 
