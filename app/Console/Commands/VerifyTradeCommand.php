@@ -47,6 +47,11 @@ class VerifyTradeCommand extends Command
         }
 
     }
+    //    * * * * *  cd /home/kleiton/Documentos/projetos/tritium/back/core  && php artisan trade:verifytrades && php artisan schedule:run >> /dev/null 2>&1
+
+
+    // * * * * * cd /home/kleiton/Documentos/projetos/tritium/back/core    && php artisan schedule:run >> /dev/null 2>&1
+
 
     protected function calculateTotalEnergy($playerId)
     {

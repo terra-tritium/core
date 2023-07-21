@@ -323,8 +323,6 @@ class TradingService
     }
 
 
-
-
     public function safe(Trading $trading, $request, $distancia)
     {
         try {
@@ -333,11 +331,11 @@ class TradingService
             if ($success) {
                 $successSafe = $this->saveSafe($request, $trading->idMarket, $trading->idPlanetCreator, $distancia, 1);
                 //debitar automatico, pois o cargueiro ja sai carregado com o recurso
-                if ($request->type == 'P') {
-                    $successDebito = $this->debitarSaldosPlaneta($request);
-                    return ($successDebito && $successSafe);
-                }
-                return $successSafe;
+                // if ($request->type == 'P') {
+                $successDebito = $this->debitarSaldosPlaneta($request, false);
+                return ($successDebito && $successSafe);
+                // }
+                // return $successSafe;
             }
         } catch (Exception $e) {
             return false;
@@ -387,7 +385,7 @@ class TradingService
     /**
      * @todo fazer a logica com negociação envolvendo tritium e quantidade de cargueiros
      */
-    private function debitarSaldosPlaneta($request)
+    private function debitarSaldosPlaneta($request, $isMid = false)
     {
         $idPlanetaPassivo = 0;
         $idPlanetaAtivo = 0;
@@ -396,12 +394,18 @@ class TradingService
             if ($request->type == 'S') {
                 $planetaPassivo = Planet::find($request->idPlanetSale);
                 $planetaAtivo = Planet::find($request->idPlanetPurch);
-                //planeta passivo (vendedor) subtrai o recurso que está sendo vendido
-                $planetaPassivo->{$keyResource} = ($planetaPassivo->{$keyResource} - $request->quantity);
-                if ($request->currency == 'energy') {
+                //planeta passivo (vendedor) subtrai o recurso que está sendo vendido, apenas quando inicia e nao no meio da transação
+                // $planetaPassivo->{$keyResource} = ($planetaPassivo->{$keyResource} - $request->quantity);
+                if ($request->currency == 'energy' && !$isMid)  {
                     $planetaAtivo->energy = $planetaAtivo->energy - ($request->quantity * $request->price);
+                    $planetaAtivo->transportShips = $planetaAtivo->transportShips - 1;
                 }
-                $planetaAtivo->transportShips = $planetaAtivo->transportShips - 1;
+                //quando pegar o recurso, retira a quantidade de recurso do vendedor e realiza o pagamento, no caso quando o ativo busca
+                if($request->currency == 'energy' && $isMid){
+                    $planetaPassivo->energy += ($request->quantity * $request->price);
+                    $planetaPassivo->{$keyResource} = $planetaAtivo->{$keyResource} - $request->quantity;
+                }
+            
                 $planetaPassivo->save();
                 $planetaAtivo->save();
             } else {
@@ -409,11 +413,15 @@ class TradingService
                 $idPlanetaAtivo = $request->idPlanetSale;
                 $planetaPassivo = Planet::find($idPlanetaPassivo);
                 $planetaAtivo = Planet::find($idPlanetaAtivo);
-                if ($request->currency == 'energy') {
+                if ($request->currency == 'energy' && $isMid) {
                     $planetaPassivo->energy = $planetaPassivo->energy - ($request->quantity * $request->price);
+                    $planetaAtivo->energy = $planetaAtivo->energy + ($request->quantity * $request->price);
+                    
                 }
-                $planetaAtivo->{$keyResource} = $planetaAtivo->{$keyResource} - $request->quantity;
-                $planetaAtivo->transportShips = $planetaAtivo->transportShips - 1;
+                if($request->currency == 'energy' && !$isMid){
+                    $planetaAtivo->{$keyResource} = $planetaAtivo->{$keyResource} - $request->quantity;
+                    $planetaAtivo->transportShips = $planetaAtivo->transportShips - 1;
+                }
                 $planetaAtivo->save();
                 $planetaPassivo->save();
             }
@@ -427,12 +435,39 @@ class TradingService
         if ($concluidos) {
             foreach ($concluidos as $concluido) {
                 $trading = Trading::find($concluido->idTrading);
+                $this->saveTradeFinish($trading);
                 $safe = Safe::where('idTrading', $concluido->idTrading)->first();
                 if ($safe)
                     $safe->delete();
                 if ($trading)
                     $trading->delete();
             }
+        }
+    }
+    /**
+     * @todo preencher distancia, tempo e qtd cargueiros
+     */
+    private function saveTradeFinish($trade){
+        try{
+        $finished = new TradingFinished();
+        $finished->idPlanetCreator = $trade->idPlanetCreator;
+        $finished->idPlanetInterested = $trade->idPlanetInterested;
+        $finished->quantity =$trade->quantity;
+        $finished->price = $trade->price;
+        $finished->distance = 1;
+        $finished->deliveryTime = 1;
+        $finished->idTrading = $trade->id;
+        $finished->status = $trade->status;
+        $finished->finishedAt = (new DateTime())->format('Y-m-d H:i:s');
+        $finished->createdAt = $trade->createdAt;
+        $finished->currency = $trade->currency;
+        $finished->type = $trade->type;
+        $finished->idMarket = $trade->idMarket;
+        $finished->resource = $trade->resource;
+        $finished->transportShips = 1;
+        $finished->save();
+        }catch(Exception $e){
+            return $e;
         }
     }
     /**
@@ -474,13 +509,18 @@ class TradingService
         $cargueiros = [];
         if ($concluidos) {
             foreach ($concluidos as $conc) {
+                $keyRecurso = $conc->resource;
                 if ($conc->type === 'S') {
                     $planetaVendedor = Planet::find($conc->idPlanetSale);
-                    $planetaVendedor->energy += ($conc->quantity * $conc->price);
-                    $vendedores[] = $planetaVendedor;
+                    $planetaComprador = Planet::find($conc->idPlanetPurch);
+                    $planetaComprador->{$keyRecurso} = ($planetaComprador->{$keyRecurso} + $conc->quantity);
+                    $compradores[] = $planetaComprador;
+                    $planetaComprador->save();
                     $planetaVendedor->save();
+
+                    // $planetaVendedor->energy += ($conc->quantity * $conc->price);
+                    $vendedores[] = $planetaVendedor;
                 } else {
-                    $keyRecurso = $conc->resource;
                     $planetaComprador = Planet::find($conc->idPlanetPurch);
                     $planetaComprador->{$keyRecurso} = ($planetaComprador->{$keyRecurso} + $conc->quantity);
                     $compradores[] = $planetaComprador;
@@ -516,13 +556,13 @@ class TradingService
             foreach ($trades as $t) {
                 $safe = Safe::find($t->safeId);
                 if (!$safe || $t->concluido) continue;
-                if ($safe->type == 'S') {
-                    $safe->loaded = true;
-                    $success = $this->debitarSaldosPlaneta($safe);
+                // if ($safe->type == 'S') {
+                    $safe->loaded = !$safe->loaded;
+                    $success = $this->debitarSaldosPlaneta($safe, true);
                     if (!$success) continue;
                     $successUpdate = $safe->save();
                     $atualizados[] = $safe;
-                }
+                // }
             }
         } catch (Exception $e) {
             return response(["message" => "error in the middle of the transaction" . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
