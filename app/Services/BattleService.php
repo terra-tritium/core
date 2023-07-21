@@ -48,29 +48,27 @@ class BattleService
         $battle->stage = 0;
         $battle->save();
 
-        $attack = new Fighters();
-        $attack->battle = $battle->id;
-        $attack->player = $attack;
-        $attack->side = 1;
-        $attack->strategy = $aStrategy;
-        $attack->demage = 0;
-        $attack->start = time();
-        $attack->stage = 0;
-        $attack->units = json_encode($aUnits);
-        $attack->reserve = json_encode([]);
-        $attack->save();
+        $player1 = new Fighters();
+        $player1->battle = $battle->id;
+        $player1->player = $attack;
+        $player1->side = 1;
+        $player1->strategy = $aStrategy;
+        $player1->demage = 0;
+        $player1->start = time();
+        $player1->stage = 0;
+        $player1->units = json_encode($aUnits);
+        $player1->save();
 
-        $defense = new Fighters();
-        $defense->battle = $battle->id;
-        $defense->player = $defense;
-        $defense->side = 2;
-        $defense->strategy = $dStrategy;
-        $defense->demage = 0;
-        $defense->start = time();
-        $defense->stage = 0;
-        $defense->units = json_encode($dUnits);
-        $defense->reserve = json_encode([]);
-        $defense->save();
+        $player2 = new Fighters();
+        $player2->battle = $battle->id;
+        $player2->player = $defense;
+        $player2->side = 2;
+        $player2->strategy = $dStrategy;
+        $player2->demage = 0;
+        $player2->start = time();
+        $player2->stage = 0;
+        $player2->units = json_encode($dUnits);
+        $player2->save();
 
         // //$this->loadReverve($battle);
 

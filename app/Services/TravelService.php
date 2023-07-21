@@ -214,14 +214,14 @@ class TravelService
 
             $unit = Unit::find($troop->unit);
             $type = $this->getTypeUnit($unit->type);
-            $units [] = [
+            array_push($units, [
                 'unit'=> $troop->unit,
                 'quantity'=> $troop->quantity,
                 'type'=> $type,
                 'attack'=> $unit->attack,
-                'defense'=> $unit->defense ,
+                'defense'=> $unit->defense,
                 'life'=> $unit->life
-            ];
+            ]);
         }
 
         return $units;
@@ -236,15 +236,14 @@ class TravelService
         foreach($troops as $key => $troop){
             $unit = Unit::find($troop->unit);
             $type = $this->getTypeUnit($unit->type);
-
-            $units [] = [
+            array_push($units, [
                 'unit'=> $troop->unit,
                 'quantity'=> $troop->quantity,
                 'type'=> $type,
                 'attack'=> $unit->attack,
                 'defense'=> $unit->defense ,
                 'life'=> $unit->life
-            ];
+            ]);
         }
 
         return $units;
