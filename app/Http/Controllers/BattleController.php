@@ -59,7 +59,7 @@ class BattleController extends Controller
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $battles = Fighters::where('player', $player->id)->orderBy('start', 'desc')->limit(12)->get();
+        $battles = Fighters::with('battle')->where('player', $player->id)->orderBy('start', 'desc')->limit(12)->get();
 
         return response()->json($battles);
     }
