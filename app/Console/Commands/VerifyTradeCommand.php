@@ -35,7 +35,7 @@ class VerifyTradeCommand extends Command
     {
         try {
             $tradeService = new TradingService(new Trading());
-            $tradeService->verificaTradeConcluidoSafe();
+            // $tradeService->verificaTradeConcluidoSafe();
             $rotina = new RotinaDBG();
             $rotina->save();
            
