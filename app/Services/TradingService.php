@@ -14,7 +14,6 @@ use DateTime;
 use Illuminate\Http\Response;
 use Exception;
 use Illuminate\Support\Facades\DB;
-//new trade service
 class TradingService
 {
     private $trading;
@@ -193,84 +192,7 @@ class TradingService
                 }
                 //retorno visual, deletar
                 return response(['Ativo' => $planeta[0], 'passivo' => $planetaPassivo, 'tipo' => $request->type, 'desc' => "ativo tem que ir buscar "]);
-
-            }else{
-                return response(['tipo' => $request->type, 'desc' => "ativo tem que ir Levar, fazer a logica "]);
-
-            }
-        } catch (Exception $e) {
-            return response(["message" => "error " . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-        return response([
-            'message' => 'trade ', 'Requisicao' => $request->toArray(),
-            'trade' => $trading
-        ], Response::HTTP_OK);
-    }
-    public function finish2($request)
-    {
-        $panetaInteressado = 0;
-
-
-        try {
-            if ($request->idPlanetPurch == $request->idPlanetSale) {
-                return response(['message' => 'A negociação deve ser realizada entre planetas diferentes ', 'success' => false], Response::HTTP_BAD_REQUEST);
-            }
-            $trading = Trading::find($request->idTrading);
-
-            if (!$trading) {
-                return response(['message' => 'Trading não encontrado', 'success' => false], Response::HTTP_NOT_FOUND);
-            }
-            $planeta = $this->getPlanetUserLogged();
-            //verifica se o status pode ser alterado e quem ta alterando a ordem é quem criou
-            if ($trading->status !=  env("MARKET_STATUS_OPEN")) {
-                return response(['message' => 'Essa ordem não está mais disponível ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
-            }
-
-            if ($request->price <= 0 || $request->quantity <= 0) {
-                return response(['message' => 'Quantidade e/ou preço devem ser superior a zero', 'code' => 4002, 'success' => false], Response::HTTP_BAD_REQUEST);
-            }
-            //verificar se tem cargueiro para buscar
-            if ($planeta[0]->transportShips <= 0) {
-                return response(['message' => 'Você não possui a quantidade necessária de cargueiros para realizar o transporte', 'code' => 4003, 'success' => false], Response::HTTP_BAD_REQUEST);
-            }
-            /**Verificações para finalização de compra, o ativo está comprando */
-            $planetaPassivo = Planet::find($request->idPlanetSale);
-            $resourceKey = strtolower($request->resource);
-            $quantidade = $request->quantity;
-            //S pq o passivo esta vendendo e o ativo comprando, ativo tem que buscar
-            if ($request->type == 'S') {
-                $panetaInteressado = $request->idPlanetPurch;
-                //verificar se tem saldo suficiente para compra 
-                if ($request->currency == 'energy') {
-                    $total = $request->price * $request->quantity;
-                    if ($total > $planeta[0]->energy) {
-                        return response(['message' => 'Você não possui saldo suficiente para concluir a transação', 'code' => 4004, 'success' => false], Response::HTTP_BAD_REQUEST);
-                    }
-                } else {
-                    return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
-                }
-                //verificar se o passivo ainda possui recurso suficiente para venda
-                // $quantidade = 8000;
-                if ($quantidade > $planetaPassivo->{$resourceKey}) {
-                    $status =  env("MARKET_STATUS_CANCELED");
-                    $trading->status = $status;
-                    $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
-                    $trading->save();
-                    //notificar o passivo que foi cancelado
-                    return response(['message' => 'O vendedor não possui recurso para concluir essa transação', 'code' => 4005, 'success' => false], Response::HTTP_BAD_REQUEST);
-                }
-                $distance = $this->calcDistance($planeta[0], $planetaPassivo);
-                // return response(['distancia'=>$distance,'Ativo'=>$planeta[0], 'passivo'=>$planetaPassivo ,'tipo'=>$request->type, 'desc'=>"ativo tem que ir buscar "]);
-
-                // Sair para a viagem antes de salvar na safe
-                if (!$this->safe($trading, $request, $distance)) {
-                    return response(['message' => 'Algum erro na hora de comprar, verificar a causa', 'code' => 4006, 'success' => false], Response::HTTP_BAD_REQUEST);
-                }
-                //retorno visual, deletar
-                return response(['Ativo' => $planeta[0], 'passivo' => $planetaPassivo, 'tipo' => $request->type, 'desc' => "ativo tem que ir buscar "]);
-            }
-            //P pq o passivo esta comprando e o ativo vendendo o ativo tem que levar
-            if ($request->type == 'P') {
+            } else {
                 $planetaPassivo = Planet::find($request->idPlanetPurch);
                 $panetaInteressado = $request->idPlanetSale;
                 //verificar se o ativo (vendedor) possui a quantidade de recurso
@@ -287,6 +209,8 @@ class TradingService
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 $distance = $this->calcDistance($planeta[0], $planetaPassivo);
+                $deb = $this->safe($trading, $request, $distance);
+                return response($deb);
                 if (!$this->safe($trading, $request, $distance)) {
                     return response(['message' => 'Algum erro na hora de vender, verificar a causa', 'code' => 4009, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
@@ -296,15 +220,12 @@ class TradingService
         } catch (Exception $e) {
             return response(["message" => "error " . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
         return response([
-            'message' => 'Finish', 'success' => true,
-            'planetaPassivo' => $planetaPassivo,
-            'planetaAtivo' => $planeta[0],
-            'panetaInteressado' => $panetaInteressado,
-            'new2' => $request->toArray(), 'planeta' => $planeta, 'currency' => $request->currency
+            'message' => 'trade ', 'Requisicao' => $request->toArray(),
+            'trade' => $trading
         ], Response::HTTP_OK);
     }
+
     /**
      * $from Ativo
      * $to passivo 
@@ -381,6 +302,7 @@ class TradingService
             if ($success) {
                 $successSafe = $this->saveSafe($request, $trading->idMarket, $trading->idPlanetCreator, $distancia, 1);
                 $successDebito = $this->debitarSaldosPlaneta($request, 'inicio');
+                return $successDebito;
                 return ($successDebito && $successSafe);
             }
         } catch (Exception $e) {
@@ -429,7 +351,8 @@ class TradingService
         }
     }
 
-    public function verificaAndamentoSafe(){
+    public function verificaAndamentoSafe()
+    {
         $safe = new Safe();
         $dadosSafe = $safe->getDadosSafe();
         $filtrado = $this->getDeliveryTimeConclued($dadosSafe);
@@ -442,14 +365,14 @@ class TradingService
             'message' => 'Finish', 'success' => true,
             'info' => $dadosSafe,
             'filter' => $filtrado,
-            'atualizarq' => $atualizar,
+            'atualizarqe' => $atualizar,
             'executados' => $executados,
             'saveFinish' => $saveFinish,
             'delete' => $delete
         ], Response::HTTP_OK);
     }
 
-    
+
     /**
      * @todo colocar o calculo de distancia
      *   Se o planeta é o planeta vendedor, o recurso não volta para ele, ele apenas recebe o pagamento em energia
@@ -460,17 +383,18 @@ class TradingService
      */
     private function updateResourceTradeConclued($concluidos)
     {
+        $status = '';
         if ($concluidos) {
             foreach ($concluidos as $conc) {
-                if($conc->step === 'F') continue;
+                if ($conc->step === 'F') continue;
                 $status = $this->debitarSaldosPlaneta($conc, 'fim');
-                if(!$status) return false;
+                if (!$status) return false;
                 DB::table('safe')->where('id', $conc->safeId)->update([
-                    'step' =>DB::raw("'F'")
+                    'step' => DB::raw("'F'")
                 ]);
             }
         }
-        return true;
+        return 'atualizou a situação da trade';
     }
     /**
      * atualiza as informações quando a metade do tempo de entrega se passou
@@ -486,19 +410,20 @@ class TradingService
         try {
             foreach ($trades as $t) {
                 $safe = Safe::find($t->safeId);
+                // return $safe;
                 if (!$safe || $t->concluido || $safe->step == 'M') continue;
                 $safe->loaded = !$safe->loaded;
                 $safe->step = 'M';
                 $success = $this->debitarSaldosPlaneta($safe, 'meio');
+                $atualizados[] = $success;
                 if (!$success) continue;
                 $successUpdate = $safe->save();
-                $atualizados[] = $safe;
-                // }
+                // $atualizados[] = $safe;
             }
         } catch (Exception $e) {
             return response(["message" => "error in the middle of the transaction" . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return $atualizados;
+        return "atualizou depois metade tempo concluido";
     }
     private function getDeliveryTimeConclued($dadosSafe)
     {
@@ -524,7 +449,7 @@ class TradingService
     {
         try {
             foreach ($concluidos as $c) {
-                if($c->step != 'F') continue;
+                if ($c->step != 'F') continue;
                 $finished = new TradingFinished();
                 $finished->createdAt = $c->createdAt;
                 $finished->idPlanetCreator = $c->idPlanetCreator;
@@ -542,7 +467,7 @@ class TradingService
                 $finished->transportShips = $c->transportShips;
                 $finished->finishedAt = $c->tempoFinal;
                 $status = $finished->save();
-                if(!$status) continue;
+                if (!$status) continue;
             }
         } catch (Exception $e) {
             return response(["message" => "error finished trading" . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -561,28 +486,24 @@ class TradingService
                     $trading->delete();
             }
         }
-        return "deletou?";
+        return "deletou trade e safe concluidos";
     }
-    
-
-    //GPT
-
     private function debitarSaldosPlanetaInicio($request, $etapa)
     {
         try {
-            $keyResource = strtolower($request->resource);
-            if ($request->type === 'S') {
-                // Etapa: Início
+            if ($request->type === 'S' && $etapa === 'inicio') {
                 $planetaAtivo = Planet::find($request->idPlanetPurch);
                 $planetaAtivo->energy -= ($request->quantity * $request->price);
                 $planetaAtivo->transportShips -= 1;
                 $planetaAtivo->save();
-            } elseif ($request->type === 'P') {
-                // Etapa: Início
-                $planetaAtivo = Planet::find($request->idPlanetPurch);
+                return "Debitando o inicio, ativo comprando";
+            } elseif ($request->type === 'P' && $etapa === 'inicio') {
+                $keyResource = strtolower($request->resource);
+                $planetaAtivo = Planet::find($request->idPlanetSale);
                 $planetaAtivo->{$keyResource} -= $request->quantity;
                 $planetaAtivo->transportShips -= 1;
                 $planetaAtivo->save();
+                return "Debitando o inicio, ativo vendendo";
             }
             return true; // Corrigir o que está retornando se necessário
         } catch (Exception $e) {
@@ -590,33 +511,46 @@ class TradingService
         }
     }
 
-    private function debitarSaldosPlanetaMeioFim($request, $etapa)
+    private function debitarSaldosPlanetaMeio($request, $etapa)
     {
         try {
             $keyResource = strtolower($request->resource);
             if ($request->type === 'S' && $etapa === 'meio') {
-                // Etapa: Meio
                 $planetaPassivo = Planet::find($request->idPlanetSale);
                 $planetaPassivo->energy += ($request->quantity * $request->price);
                 $planetaPassivo->{$keyResource} -= $request->quantity;
                 $planetaPassivo->save();
-            } elseif ($request->type === 'P') {
-                // Etapa: Meio
-                $planetaPassivo = Planet::find($request->idPlanetSale);
-                $planetaPassivo->{$keyResource} -= $request->quantity;
-                $planetaPassivo->energy += ($request->quantity * $request->price);
-                $planetaPassivo->save();
-            } 
-            if ($request->type === 'S' && $etapa === 'fim') {
-                // Etapa: Fim
-                $planetaAtivo = Planet::find($request->idPlanetPurch);
-                $planetaAtivo->{$keyResource} += $request->quantity;
-                $planetaAtivo->transportShips += 1;
-                $planetaAtivo->save();
+                return "Debitando o meio, ativo comprando";
             }
-            return true; // Corrigir o que está retornando se necessário
+            if ($request->type === 'P' && $etapa === 'meio') {
+                $planetaPassivo = Planet::find($request->idPlanetPurch);
+                $planetaPassivo->{$keyResource} += $request->quantity;
+                $planetaPassivo->energy -= ($request->quantity * $request->price);
+                $planetaPassivo->save();
+                return "Debitando o inicio, ativo vendendo";
+            }
+
+            // return true; // Corrigir o que está retornando se necessário
         } catch (Exception $e) {
             return false;
+        }
+    }
+    private function debitarSadosPlanetaFim($request, $etapa)
+    {
+        if ($request->type === 'P' && $etapa === 'fim') {
+            $planetaAtivo = Planet::find($request->idPlanetSale);
+            $planetaAtivo->energy += ($request->quantity * $request->price);;
+            $planetaAtivo->transportShips += 1;
+            $planetaAtivo->save();
+            return "Debitando o fim, ativo vendendo";
+        }
+        if ($request->type === 'S' && $etapa === 'fim') {
+            $keyResource = strtolower($request->resource);
+            $planetaAtivo = Planet::find($request->idPlanetPurch);
+            $planetaAtivo->{$keyResource} += $request->quantity;
+            $planetaAtivo->transportShips += 1;
+            $planetaAtivo->save();
+            return "Debitando o fim, ativo comprando";
         }
     }
 
@@ -624,8 +558,12 @@ class TradingService
     {
         if ($etapa === 'inicio') {
             return $this->debitarSaldosPlanetaInicio($request, $etapa);
-        } elseif ($etapa === 'meio' || $etapa === 'fim') {
-            return $this->debitarSaldosPlanetaMeioFim($request, $etapa);
+        }
+        if ($etapa === 'meio') {
+            return $this->debitarSaldosPlanetaMeio($request, $etapa);
+        }
+        if ($etapa === 'fim') {
+            return $this->debitarSadosPlanetaFim($request, $etapa);
         }
     }
 }
