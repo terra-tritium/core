@@ -297,6 +297,8 @@ return new class extends Migration
             $table->integer("status");
             $table->string("attackDemage")->nullable();
             $table->string("defenseDemage")->nullable();
+            $table->json('attackUnits')->nullable();
+            $table->json('defenseUnits')->nullable();
             $table->integer("result")->nullable();
             $table->bigInteger("start");
             $table->integer("stage");
@@ -308,11 +310,12 @@ return new class extends Migration
             $table->integer('strategy');
             $table->integer('player')->constrained("players");
             $table->integer("battle")->constrained("battles");
+            $table->foreignId('planet')->constrained("planets");
             $table->string("demage")->nullable();
             $table->bigInteger("start");
             $table->integer('stage');
             $table->json('units');
-            $table->json('reserve');
+            $table->json('reserve')->nullable();
         });
         Schema::create('stages', function (Blueprint $table) {
             $table->id();

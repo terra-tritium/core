@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Battle;
 use App\Models\BattleStage;
+use App\Models\Fighters;
 use App\Jobs\BattleJob;
 
 class BattleService
@@ -38,27 +39,42 @@ class BattleService
         $this->currentStage = new BattleStage();
     }
 
-    public function startNewBattle ($attack, $defense, $aUnits, $dUnits, $aStrategy, $dStrategy,$dPlanet) {
+    public function startNewBattle ($attack, $defense, $aUnits, $dUnits, $aStrategy, $dStrategy, $dPlanet) {
+
         $battle = new Battle();
-        $battle->attack = $attack;
-        $battle->defense = $defense;
-        $battle->attackUnits = json_encode($aUnits);
-        $battle->defenseUnits = json_encode($dUnits);
-        $battle->attackStrategy = $aStrategy;
-        $battle->defenseStrategy = $dStrategy;
-        $battle->stage = 0;
-        $battle->start = time();
-        $battle->attackReserve = json_encode($aUnits);
-        $battle->defenseReserve = json_encode($dUnits);
         $battle->planet = $dPlanet;
+        $battle->status = 0;
+        $battle->start = time();
+        $battle->stage = 0;
         $battle->save();
-        
-        $this->attackReserve = $aUnits;
-        $this->defenseReserve = $dUnits;
 
-        //$this->loadReverve($battle);
+        $player1 = new Fighters();
+        $player1->battle = $battle->id;
+        $player1->player = $attack;
+        $player1->side = 1;
+        $player1->strategy = $aStrategy;
+        $player1->demage = 0;
+        $player1->start = time();
+        $player1->stage = 0;
+        $player1->planet = $dPlanet;
+        $player1->units = json_encode($aUnits);
+        $player1->save();
 
-        $battle = $this->calculateStage($battle->id);
+        $player2 = new Fighters();
+        $player2->battle = $battle->id;
+        $player2->player = $defense;
+        $player2->side = 2;
+        $player2->strategy = $dStrategy;
+        $player2->demage = 0;
+        $player2->start = time();
+        $player2->stage = 0;
+        $player2->planet = $dPlanet;
+        $player2->units = json_encode($dUnits);
+        $player2->save();
+
+        // //$this->loadReverve($battle);
+
+        // $battle = $this->calculateStage($battle->id);
     }
     
     # Job call
