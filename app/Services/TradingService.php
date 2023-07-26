@@ -14,6 +14,7 @@ use DateTime;
 use Illuminate\Http\Response;
 use Exception;
 use Illuminate\Support\Facades\DB;
+
 class TradingService
 {
     private $trading;
@@ -356,8 +357,9 @@ class TradingService
         $filtrado = $this->getDeliveryTimeConclued($dadosSafe);
         $atualizar = $this->atualizaTradingMetadeTempoConcluido($filtrado['metadeTempo']);
         $executados = $this->updateResourceTradeConclued($filtrado['concluido']);
-        $saveFinish = $this->saveTradeFinish($filtrado['concluido']);
-        $delete = $this->deleteTradingConcluidos($filtrado['concluido']);
+        $parcial = $this->updateTradeParcial($filtrado['conclusaoParcial']);
+        // $saveFinish = $this->saveTradeFinish($filtrado['concluido']);
+        // $delete = $this->deleteTradingConcluidos($filtrado['concluido']);
 
         return response([
             'message' => 'Finish', 'success' => true,
@@ -365,12 +367,27 @@ class TradingService
             'filter' => $filtrado,
             'atualizarqe' => $atualizar,
             'executados' => $executados,
-            'saveFinish' => $saveFinish,
-            'delete' => $delete
+            'conclusaoParcial' => $parcial,
+            // 'saveFinish' => $saveFinish,
+            // 'delete' => $delete
         ], Response::HTTP_OK);
     }
 
-
+    /**
+     * Nessa situação, entrará os dados onde o tempo de entrega foi rapido e não deu tempo de executar a rotina de atualização, ou seja,
+     * no intervalo de uma rotina e outra, o tempo da transação foi concluído porém não foi debitado/creditado os recursos do meio da transação
+     * para ambos os planetas
+     */
+    private function updateTradeParcial($parcial){
+        if($parcial){
+            foreach($parcial as $p){
+                $p->concluido = false;
+                $this->atualizaTradingMetadeTempoConcluido(array($p));
+                $this->updateResourceTradeConclued(array($p));
+            }
+        }
+        return "executou o parcial";
+    }
     /**
      * @todo colocar o calculo de distancia
      *   Se o planeta é o planeta vendedor, o recurso não volta para ele, ele apenas recebe o pagamento em energia
@@ -416,6 +433,7 @@ class TradingService
                 $atualizados[] = $success;
                 if (!$success) continue;
                 $successUpdate = $safe->save();
+                return "atualizou aqui";
                 // $atualizados[] = $safe;
             }
         } catch (Exception $e) {
@@ -428,17 +446,20 @@ class TradingService
         $concluidos = [];
         $naoConcluidos = [];
         $metadeTempo = [];
+        $conclusaoParcial = [];
         if ($dadosSafe) {
             foreach ($dadosSafe as $dados) {
-                if ($dados->concluido && $dados->atingiuMetadeTempo)
+                if ($dados->concluido && $dados->atingiuMetadeTempo && $dados->step == 'M')
                     $concluidos[] = $dados;
+                if ($dados->concluido && $dados->atingiuMetadeTempo && $dados->step != 'M')
+                    $conclusaoParcial[] = $dados;
                 if (!$dados->concluido && !$dados->atingiuMetadeTempo)
                     $naoConcluidos[] = $dados;
                 if (!$dados->concluido && $dados->atingiuMetadeTempo)
                     $metadeTempo[] = $dados;
             }
         }
-        return ['concluido' => $concluidos, 'naoConcluido' => $naoConcluidos, 'metadeTempo' => $metadeTempo];
+        return ['concluido' => $concluidos, 'naoConcluido' => $naoConcluidos, 'metadeTempo' => $metadeTempo, 'conclusaoParcial' => $conclusaoParcial];
     }
     /**
      * @todo colocar o calculo de distancia
@@ -553,11 +574,11 @@ class TradingService
 
     private function debitarSaldosPlaneta($request, $etapa)
     {
-        if ($etapa === 'inicio') 
+        if ($etapa === 'inicio')
             return $this->debitarSaldosPlanetaInicio($request, $etapa);
-        if ($etapa === 'meio') 
+        if ($etapa === 'meio')
             return $this->debitarSaldosPlanetaMeio($request, $etapa);
-        if ($etapa === 'fim') 
+        if ($etapa === 'fim')
             return $this->debitarSadosPlanetaFim($request, $etapa);
     }
 }
