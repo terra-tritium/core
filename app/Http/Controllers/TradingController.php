@@ -107,7 +107,8 @@ class TradingController extends Controller
         return $this->tradingService->finish($request);
     }
     public function verificaTradeConcluidoSafe(){
-        return $this->tradingService->verificaTradeConcluidoSafe();
+        return $this->tradingService->verificaAndamentoSafe();
+        // return true;
     }
 
 }

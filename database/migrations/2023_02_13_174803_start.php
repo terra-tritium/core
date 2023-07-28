@@ -412,6 +412,7 @@ return new class extends Migration
             $table->string('currency',20);
             $table->unsignedBigInteger('idMarket')->nullable();
             $table->unsignedInteger('transportShips');
+            $table->char('type',1);//
 
             $table->foreign('idPlanetCreator')->references('id')->on('planets');
             $table->foreign('idPlanetInterested')->references('id')->on('planets');
@@ -448,6 +449,8 @@ return new class extends Migration
             $table->timestamp('updatedAt')->nullable();
             $table->string('resource',20);
             $table->string('currency',20);
+            $table->char('step',1)->default('I');//
+
 
             $table->unsignedInteger('transportShips')->default(0);
 
