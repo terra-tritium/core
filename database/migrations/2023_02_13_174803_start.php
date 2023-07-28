@@ -43,6 +43,33 @@ return new class extends Migration
             $table->bigInteger("defenseScore");
             $table->bigInteger("warScore");
         });
+
+        Schema::create('aliances_members', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('player_id')->constrained("players");
+            $table->unsignedBigInteger('idAliance');
+            $table->char('status',1)->default('A');
+            $table->string('role',20)->default('member');
+            $table->timestamp('createdAt')->useCurrent();
+            $table->timestamp('dateAdmission')->nullable();
+            $table->timestamp('dateOf')->nullable();
+            // $table->foreign('idPlayer')->references('id')->on('players');
+            $table->foreign('idAliance')->references('id')->on('aliances');
+            //            $table->foreign('idMarket')->references('id')->on('market');
+
+        });
+
+        Schema::create('aliances_requests', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('player_id')->constrained("players");
+            $table->bigInteger('founder_id')->constrained("players");;
+            $table->text('message');
+            $table->boolean('status')->default(0);
+            $table->timestamps();
+        });
+
+        //fim aliança
+
         Schema::create('planets', function (Blueprint $table) {
             $table->id()->index();
             $table->integer('player')->constrained("players")->index();
@@ -344,14 +371,7 @@ return new class extends Migration
             $table->string("y");
         });
 
-        Schema::create('aliances_requests', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('player_id')->constrained("players");
-            $table->bigInteger('founder_id')->constrained("players");;
-            $table->text('message');
-            $table->boolean('status')->default(0);
-            $table->timestamps();
-        });
+       
 
         /**
          *INICIO DAS TABELAS REFERENTE AO MERCADO
@@ -457,6 +477,7 @@ return new class extends Migration
             $table->foreign('idMarket')->references('id')->on('market');
 
         });
+        
 
         /**
          *FIM DAS TABELAS REFERENTE AO MERCADO
@@ -503,6 +524,8 @@ return new class extends Migration
                 RETURN distancia;
             END
         ');
+        
+        
     }
 
 

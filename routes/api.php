@@ -172,6 +172,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/leave',[AliancesController::class,'leaveAliance']);
         Route::post('/kick-player', [AliancesController::class, 'kickPlayer']);
         Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
+        Route::get('/my-aliance', [AliancesController::class,'myAliance']);
     });
 
     Route::prefix('trading')->group(function () {
@@ -190,6 +191,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/config/{slot}/{code}', [NFTController::class, 'config']);
         Route::get('/config/get', [NFTController::class, 'get']);
     });
+
+ 
 });
 /**
  * Rota Publica, ping

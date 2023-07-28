@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aliance;
-use App\Models\Aliances;
+use App\Models\AlianceMember;
+use App\Models\Planet;
 use App\Models\Player;
 use App\Services\AlianceService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -67,8 +69,10 @@ class AliancesController extends Controller
         } catch (Throwable $exception) {
             Log::error($exception);
 
-            return response()->json(['message' => 'Error finding alliances'],
-                Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(
+                ['message' => 'Error finding alliances'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -111,26 +115,30 @@ class AliancesController extends Controller
         ]);
 
         try {
-            $aliances = app(Aliances::class);
-            $aliances->name = $request->input('name');
-            $aliances->description = $request->input('description');
-            $aliances->type = $request->input('type');
-            $aliances->founder = Player::getPlayerLogged();
+            $alianceService = new AlianceService();
+            return $alianceService->founderAliance($request);
 
-            if ($request->hasFile('avatar')) {
-                $file = $request->file('avatar');
-                $fileUrl = $this->addImage($file);
-                $aliances->avatar = $fileUrl;
-            }
+            // throw new Exception("O valor não pode ser negativo.",400);
+            // // $aliances->description = $request->input('')
+            // return ['member'=>$successMember,'success'=>$success,'id'=>$aliances->id,'req'=>$request->toArray(), 'player'=>$player, 'alianca' => $aliances];
+            // return response(['message' => 'Essa ordem não está mais disponível ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
 
-            $aliances->save();
 
-            return response()->json($aliances, Response::HTTP_OK);
+            // if ($request->hasFile('avatar')) {
+            //     $file = $request->file('avatar');
+            //     $fileUrl = $this->addImage($file);
+            //     $aliances->avatar = $fileUrl;
+            // }
+
+
+            // return response()->json($aliances, Response::HTTP_OK);
 
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error : failed to create alliances'],
-                Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(
+                ['message' => 'Error : failed to create alliances'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -171,7 +179,7 @@ class AliancesController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        $aliances = Aliances::findOrFail($id);
+        $aliances = Aliance::findOrFail($id);
 
         try {
             $aliances->fill($request->all([
@@ -202,8 +210,10 @@ class AliancesController extends Controller
             return response()->json($aliances, Response::HTTP_OK);
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error : failed to update alliances'],
-                Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(
+                ['message' => 'Error : failed to update alliances'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -242,20 +252,22 @@ class AliancesController extends Controller
     public function destroy(int $id)
     {
         try {
-            $aliances = Aliances::findOrFail($id);
+            $aliances = Aliance::findOrFail($id);
             $aliances->delete();
 
             return response()->json(['message' => 'Alliances deleted successfully'], Response::HTTP_OK);
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error deleting Alliances'],
-                Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(
+                ['message' => 'Error deleting Alliances'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
     public function updateAvatar(Request $request, int $id)
     {
-        $aliances = Aliances::findOrFail($id);
+        $aliances = Aliance::findOrFail($id);
 
         try {
             if ($request->file('avatar')) {
@@ -268,8 +280,10 @@ class AliancesController extends Controller
             return response()->json($aliances, Response::HTTP_OK);
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'Error: failed to update avatar'],
-                Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(
+                ['message' => 'Error: failed to update avatar'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -318,8 +332,10 @@ class AliancesController extends Controller
             $leaveDate = Carbon::parse($player->leave_date);
 
             if (Carbon::now()->diffInDays($leaveDate) < 5) {
-                return response()->json(['message' => 'The player must wait 5 days before joining a new alliance.'],
-                    Response::HTTP_BAD_REQUEST);
+                return response()->json(
+                    ['message' => 'The player must wait 5 days before joining a new alliance.'],
+                    Response::HTTP_BAD_REQUEST
+                );
             }
         }
 
@@ -338,7 +354,7 @@ class AliancesController extends Controller
                 return response()->json(['message' => 'Request already sent. Wait for founder approval.']);
             }
 
-            $this->sendAliancesRequest($player->id,$aliance->founder);
+            $this->sendAliancesRequest($player->id, $aliance->founder);
 
             return response()->json(['message' => 'Request sent to alliance founder'], Response::HTTP_OK);
         } else {
@@ -396,7 +412,7 @@ class AliancesController extends Controller
         $acceptRequest = $request->input('accept_request'); // true or false
 
         if ($acceptRequest) {
-            $result =$alianceService->acceptPlayerRequest($playerId, $alianceId);
+            $result = $alianceService->acceptPlayerRequest($playerId, $alianceId);
 
             if ($result) {
                 DB::table('aliances_requests')
@@ -542,12 +558,15 @@ class AliancesController extends Controller
         $aliancId = $request->input('aliance_id');
 
         $loggedPlayer = Player::getPlayerLogged();
+
         $founderId = $loggedPlayer->id;
         $aliance = Aliance::find($aliancId);
 
         if (!$aliance || $aliance->founder !== $founderId) {
-            return response()->json(['message' => 'You are not allowed to kick players from this alliance.'],
-                Response::HTTP_FORBIDDEN);
+            return response()->json(
+                ['message' => 'You are not allowed to kick players from this alliance.'],
+                Response::HTTP_FORBIDDEN
+            );
         }
 
         $player = Player::find($playerId);
@@ -557,15 +576,19 @@ class AliancesController extends Controller
         }
 
         if ($player->aliance !== $aliancId) {
-            return response()->json(['message' => 'The player does not belong to this alliance.'],
-                Response::HTTP_BAD_REQUEST);
+            return response()->json(
+                ['message' => 'The player does not belong to this alliance.'],
+                Response::HTTP_BAD_REQUEST
+            );
         }
 
         $player->aliance = null;
         $player->save();
 
-        return response()->json(['message' => 'Player successfully kicked out of the alliance.'],
-            Response::HTTP_OK);
+        return response()->json(
+            ['message' => 'Player successfully kicked out of the alliance.'],
+            Response::HTTP_OK
+        );
     }
 
     /**
@@ -637,5 +660,17 @@ class AliancesController extends Controller
             'created_at' => now(),
             'updated_at' => now()
         ]);
+    }
+
+    public function getPlanetUserLogged()
+    {
+        $player = Player::getPlayerLogged();
+        return Planet::where('player', $player->id)->get();
+    }
+    public function myAliance()
+    {
+        $player = Player::getPlayerLogged();
+        $alianceMember = AlianceMember::where('player_id', $player->id)->get();
+        return response()->json($alianceMember);
     }
 }
