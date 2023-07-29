@@ -68,4 +68,7 @@ class AlianceService
         $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
         return $alianceMember->save();
     }
+    public function getMembersAliance($alianceId){
+        return (new AlianceMember())->getMembers($alianceId);
+    }
 }

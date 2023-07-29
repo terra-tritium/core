@@ -670,7 +670,26 @@ class AliancesController extends Controller
     public function myAliance()
     {
         $player = Player::getPlayerLogged();
-        $alianceMember = AlianceMember::where('player_id', $player->id)->get();
-        return response()->json($alianceMember);
+        $aliance = Aliance::find($player->aliance);
+        if (!$aliance) {
+            return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
+        }
+        return response()->json($aliance, Response::HTTP_OK);
+    }
+    public function listMembers($alianceId)
+    {
+        $alianceService = new AlianceService();
+        return response()->json($alianceService->getMembersAliance($alianceId), Response::HTTP_OK);
     }
 }
+/*
+  $aliance = Aliance::find($alianceId);
+
+        if (!$aliance) {
+            return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        $players = Player::where('aliance', $alianceId)->get();
+
+        return response()->json($players);
+*/

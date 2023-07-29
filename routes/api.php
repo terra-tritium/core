@@ -173,6 +173,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/kick-player', [AliancesController::class, 'kickPlayer']);
         Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
         Route::get('/my-aliance', [AliancesController::class,'myAliance']);
+        Route::get('/members/{alianceId}', [AliancesController::class,'listMembers']);
+        // Route::get('/details/{alianceId}', [AliancesController::class, 'details']);
     });
 
     Route::prefix('trading')->group(function () {

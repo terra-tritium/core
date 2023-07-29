@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class AlianceMember extends Model
 {
@@ -20,4 +21,14 @@ class AlianceMember extends Model
         'dateOf',
         'idAliance'
     ];
+
+    public function getMembers($alianceId)
+    {
+        $members = DB::table($this->table . ' as am')
+            ->select('am.id', 'am.player_id', 'am.idAliance', 'am.role', 'am.createdAt', 'am.dateAdmission', 'p.name')
+            ->join('players as p', 'p.id', '=', 'am.player_id')
+            ->where('am.status', 'A')
+            ->where('am.idAliance', $alianceId)->get();
+        return $members;    
+    }
 }
