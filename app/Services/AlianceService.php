@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Models\Aliance;
 use App\Models\AlianceMember;
 use App\Models\Building;
+use App\Models\Logbook;
 use App\Models\Player;
 use DateTime;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -100,5 +102,38 @@ class AlianceService
         ]);
 
         return response()->json([], Response::HTTP_ACCEPTED);
+    }
+    public function deleteAliance($alianceId)
+    {
+        try {
+            $aliances = Aliance::findOrFail($alianceId);
+            $members = AlianceMember::where([['idAliance', '=', $alianceId]])->get();
+            if ($members) {
+                foreach ($members as $member) {
+                    DB::table('players')->where('id', $member->player_id)->update([
+                        'aliance' => DB::raw("null")
+                    ]);
+                    $this->notify($member->player_id, "Alliance deleted", "aliance");
+                    $membro = AlianceMember::find($member->id);
+                    $membro->delete();
+                }
+            }
+            $aliances->delete();
+
+        } catch (Exception $e) {
+            Log::error('Erro no agendamento: ' . $e->getMessage());
+            return response()->json(['message' => "erro ao deletar aliança" .$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json(['message' => 'Alliances deleted successfully'], Response::HTTP_OK);
+    }
+
+    private function notify($playerId, $text, $type)
+    {
+        $log = new Logbook();
+        $log->player = $playerId;
+        $log->text = $text;
+        $log->type = $type;
+        $log->save();
     }
 }

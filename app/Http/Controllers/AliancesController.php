@@ -63,7 +63,7 @@ class AliancesController extends Controller
     public function index()
     {
         try {
-            
+
             // $aliances = Aliance::all();
             $aliance = new Aliance();
 
@@ -253,11 +253,10 @@ class AliancesController extends Controller
      */
     public function destroy(int $id)
     {
-        try {
-            $aliances = Aliance::findOrFail($id);
-            $aliances->delete();
 
-            return response()->json(['message' => 'Alliances deleted successfully'], Response::HTTP_OK);
+        try {
+            $alianceService = new AlianceService();
+            return $alianceService->deleteAliance($id);
         } catch (Throwable $exception) {
             Log::error($exception);
             return response()->json(
@@ -691,7 +690,8 @@ class AliancesController extends Controller
         $alianceService = new AlianceService();
         return response()->json($alianceService->getMembersAliance($alianceId), Response::HTTP_OK);
     }
-    public function removeMember($memberId){
+    public function removeMember($memberId)
+    {
         $alianceService = new AlianceService();
         return $alianceService->removeMember($memberId);
     }

@@ -165,7 +165,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create', [AliancesController::class, 'create']);
         Route::put('/edit/{id}', [AliancesController::class, 'update']);
         Route::get('/list', [AliancesController::class, 'index']);
-        Route::delete('/delete/{id}', [AliancesController::class, 'destroy']);
+        Route::delete('/delete/{idAliance}', [AliancesController::class, 'destroy']);
         Route::put('/update-avatar/{id}', [AliancesController::class, 'updateAvatar']);
         Route::post('/join', [AliancesController::class,'joinAliance']);
         Route::post('/request', [AliancesController::class,'handlePlayerRequest']);
