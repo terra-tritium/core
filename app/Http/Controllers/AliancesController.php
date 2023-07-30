@@ -63,9 +63,11 @@ class AliancesController extends Controller
     public function index()
     {
         try {
-            $aliances = Aliance::all();
+            
+            // $aliances = Aliance::all();
+            $aliance = new Aliance();
 
-            return response()->json($aliances, Response::HTTP_OK);
+            return response()->json($aliance->getAliances(), Response::HTTP_OK);
         } catch (Throwable $exception) {
             Log::error($exception);
 
@@ -672,7 +674,8 @@ class AliancesController extends Controller
         $player = Player::getPlayerLogged();
         $aliance = Aliance::find($player->aliance);
         if (!$aliance) {
-            return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
+            //nenhuma aliança viinculada
+            return response()->json(['message' => 'Does not have allaince.'], Response::HTTP_NO_CONTENT);
         }
         return response()->json($aliance, Response::HTTP_OK);
     }
