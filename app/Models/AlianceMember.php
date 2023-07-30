@@ -28,7 +28,9 @@ class AlianceMember extends Model
             ->select('am.id', 'am.player_id', 'am.idAliance', 'am.role', 'am.createdAt', 'am.dateAdmission', 'p.name')
             ->join('players as p', 'p.id', '=', 'am.player_id')
             ->where('am.status', 'A')
-            ->where('am.idAliance', $alianceId)->get();
+            ->where('am.idAliance', $alianceId)
+            ->orderBy('p.name')
+            ->get();
         return $members;    
     }
 }

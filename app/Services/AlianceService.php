@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Aliance;
 use App\Models\AlianceMember;
+use App\Models\Building;
 use App\Models\Player;
 use DateTime;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +48,7 @@ class AlianceService
             $success = $aliances->save();
             if (!$success)
                 throw new \Exception('Erro ao salvar a aliança');
-            $successMember = $this->createNewAlianceFounder($player->id, $aliances->id,"founder");
+            $successMember = $this->createNewAlianceFounder($player->id, $aliances->id, "founder");
             if (!$successMember)
                 throw new \Exception('Erro ao criar o fundador da aliança');
             //atualiza a alianca na tabela de usuarios
@@ -68,7 +69,21 @@ class AlianceService
         $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
         return $alianceMember->save();
     }
-    public function getMembersAliance($alianceId){
+    public function getMembersAliance($alianceId)
+    {
         return (new AlianceMember())->getMembers($alianceId);
+    }
+    public function getDetailsMyAliance($playerId)
+    {
+        $alianceMember = AlianceMember::where('player_id', $playerId)->first();
+        $aliance = Aliance::find($alianceMember->idAliance ?? 0);
+        if (!$alianceMember || !$aliance) {
+            return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
+        }
+        $responseData = $alianceMember;
+        $responseData['open'] = 'alterar form';
+        $responseData['countMembers'] = AlianceMember::where([['idAliance', '=', $alianceMember->idAliance], ['status', '=', 'A']])->count();
+        return response()->json($responseData,Response::HTTP_OK);
+
     }
 }

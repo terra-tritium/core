@@ -676,6 +676,13 @@ class AliancesController extends Controller
         }
         return response()->json($aliance, Response::HTTP_OK);
     }
+
+    public function alianceDetailsCreated()
+    {
+        $alianceService = new AlianceService();
+        $player = Player::getPlayerLogged();
+        return $alianceService->getDetailsMyAliance($player->id);
+    }
     public function listMembers($alianceId)
     {
         $alianceService = new AlianceService();
