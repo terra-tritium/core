@@ -83,7 +83,22 @@ class AlianceService
         $responseData = $alianceMember;
         $responseData['open'] = 'alterar form';
         $responseData['countMembers'] = AlianceMember::where([['idAliance', '=', $alianceMember->idAliance], ['status', '=', 'A']])->count();
-        return response()->json($responseData,Response::HTTP_OK);
+        return response()->json($responseData, Response::HTTP_OK);
+    }
+    public function removeMember($memberId)
+    {
+        $member = AlianceMember::find($memberId);
+        $player = Player::find($member->player_id ?? 0);
+        if (!$member || !$player) {
+            return response()->json(['message' => 'Member not found.'], Response::HTTP_NOT_FOUND);
+        }
+        $member->status = 'R';
+        $member->dateOf = (new DateTime())->format('Y-m-d H:i:s');
+        $member->save();
+        DB::table('players')->where('id', $player->id)->update([
+            'aliance' => DB::raw("null")
+        ]);
 
+        return response()->json([], Response::HTTP_ACCEPTED);
     }
 }

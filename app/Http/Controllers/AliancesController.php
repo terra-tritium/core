@@ -688,6 +688,10 @@ class AliancesController extends Controller
         $alianceService = new AlianceService();
         return response()->json($alianceService->getMembersAliance($alianceId), Response::HTTP_OK);
     }
+    public function removeMember($memberId){
+        $alianceService = new AlianceService();
+        return $alianceService->removeMember($memberId);
+    }
 }
 /*
   $aliance = Aliance::find($alianceId);
