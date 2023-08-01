@@ -13,19 +13,24 @@ class UserService
 
     public function createToken($request)
     {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
-            $user   = Auth::user(); 
+        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
+            $user   = Auth::user();
+            $user->tokens()->where('id', '!=', $user->currentAccessToken()->id)->delete();
+
+            $token = $user->createToken('AppCoreTritium')->plainTextToken;
+
+
             $planets = Player::getMyPlanets();
 
-            $success['token']   =  $user->createToken('AppCoreTritium')->plainTextToken; 
+            $success['token']   =  $token;
             $success['name']    =  $user->name;
             $success['planet']  =  $planets[0]->id;
-            
+
             return $success;
-            
-        } 
-        else{ 
+
+        }
+        else{
            return false;
-        } 
+        }
     }
 }

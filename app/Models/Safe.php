@@ -30,7 +30,8 @@ class Safe extends Model
         'createdAt',
         'updatedAt',
         'transportShips',
-        'loaded'
+        'loaded',
+        'step'
     ];
 
 
