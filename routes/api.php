@@ -165,13 +165,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create', [AliancesController::class, 'create']);
         Route::put('/edit/{id}', [AliancesController::class, 'update']);
         Route::get('/list', [AliancesController::class, 'index']);
-        Route::delete('/delete/{id}', [AliancesController::class, 'destroy']);
+        Route::delete('/delete/{idAliance}', [AliancesController::class, 'destroy']);
         Route::put('/update-avatar/{id}', [AliancesController::class, 'updateAvatar']);
         Route::post('/join', [AliancesController::class,'joinAliance']);
         Route::post('/request', [AliancesController::class,'handlePlayerRequest']);
         Route::post('/leave',[AliancesController::class,'leaveAliance']);
         Route::post('/kick-player', [AliancesController::class, 'kickPlayer']);
         Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
+        Route::get('/my-aliance', [AliancesController::class,'myAliance']);
+        Route::get('/my-aliance/details', [AliancesController::class, 'alianceDetailsCreated']);
+        Route::get('/members/{alianceId}', [AliancesController::class,'listMembers']);
+        Route::patch('member/remove/{memberId}', [AliancesController::class, 'removeMember']);
+        // Route::get('/details/{alianceId}', [AliancesController::class, 'details']);
     });
 
     Route::prefix('trading')->group(function () {
@@ -190,6 +195,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/config/{slot}/{code}', [NFTController::class, 'config']);
         Route::get('/config/get', [NFTController::class, 'get']);
     });
+
+ 
 });
 /**
  * Rota Publica, ping
