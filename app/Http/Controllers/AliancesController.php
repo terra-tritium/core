@@ -691,6 +691,10 @@ class AliancesController extends Controller
         $alianceService = new AlianceService();
         return response()->json($alianceService->getMembersAliance($alianceId), Response::HTTP_OK);
     }
+    public function listMembersPending($alianceId){
+        $alianceService = new AlianceService();
+        return response()->json($alianceService->getMembersPending($alianceId), Response::HTTP_OK);
+    }
     public function removeMember($memberId)
     {
         $alianceService = new AlianceService();
@@ -699,7 +703,7 @@ class AliancesController extends Controller
 
     public function allLogos()
     {
-        $logos = Logo::where(['available', '=', true])->get();
+        $logos = Logo::where('available',true)->get();
         if (!$logos) {
             return response()->json(['message' => 'Logos not found.'], Response::HTTP_NOT_FOUND);
         }

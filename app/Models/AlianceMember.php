@@ -33,4 +33,14 @@ class AlianceMember extends Model
             ->get();
         return $members;    
     }
+    public function getMembersPending($alianceId){
+        $members = DB::table($this->table . ' as am')
+        ->select('am.id', 'am.player_id', 'am.idAliance', 'am.role', 'am.createdAt', 'am.dateAdmission', 'p.name')
+        ->join('players as p', 'p.id', '=', 'am.player_id')
+        ->where('am.status', 'P')
+        ->where('am.idAliance', $alianceId)
+        ->orderBy('am.createdAt')
+        ->get();
+        return $members;
+    }
 }

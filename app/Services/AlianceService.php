@@ -75,6 +75,9 @@ class AlianceService
     {
         return (new AlianceMember())->getMembers($alianceId);
     }
+    public function getMembersPending($alianceId){
+        return (new AlianceMember())->getMembersPending($alianceId);
+    }
     public function getDetailsMyAliance($playerId)
     {
         $alianceMember = AlianceMember::where('player_id', $playerId)->first();
@@ -83,6 +86,7 @@ class AlianceService
             return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
         }
         $responseData = $alianceMember;
+        $responseData['logo'] = $aliance->logo;
         $responseData['open'] = 'alterar form';
         $responseData['countMembers'] = AlianceMember::where([['idAliance', '=', $alianceMember->idAliance], ['status', '=', 'A']])->count();
         return response()->json($responseData, Response::HTTP_OK);
