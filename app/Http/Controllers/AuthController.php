@@ -66,7 +66,7 @@ class AuthController extends Controller
     public function createToken(Request $request)
     {
         $success = $this->userService->createToken($request);
-
+        
         if($success)
         {
             return response([

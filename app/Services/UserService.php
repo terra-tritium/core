@@ -15,6 +15,13 @@ class UserService
     {
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
             $user   = Auth::user();
+            $planets = Player::getMyPlanets();
+
+            $success['token']   =  "teste";
+            $success['name']    =  $user->name;
+            $success['planet']  =  $planets[0]->id;
+
+            return $success;
             $user->tokens()->where('id', '!=', $user->currentAccessToken()->id)->delete();
 
             $token = $user->createToken('AppCoreTritium')->plainTextToken;

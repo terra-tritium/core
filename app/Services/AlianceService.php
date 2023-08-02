@@ -45,7 +45,7 @@ class AlianceService
             $aliances = new Aliance();
             $aliances->name = $request->input('name');
             $aliances->description = $request->input('description');
-            $aliances->avatar = $request->input('logo');
+            $aliances->logo = $request->input('logo');
             $aliances->founder = $player->id;
             $success = $aliances->save();
             if (!$success)

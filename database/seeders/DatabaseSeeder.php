@@ -26,7 +26,8 @@ class DatabaseSeeder extends Seeder
             // ResourcesSeeder::class,
             MarketSeeder::class,
             PlayerSeeder::class,
-            TradingSeeder::class
+            TradingSeeder::class,
+            LogoSeeder::class
         ]);
     }
 }
