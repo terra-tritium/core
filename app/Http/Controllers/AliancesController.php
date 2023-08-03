@@ -709,4 +709,7 @@ class AliancesController extends Controller
         }
         return response()->json($logos, Response::HTTP_OK);
     }
+    public function updateRequestMember($idMemberRequest, $action){
+        return (new AlianceService)->updateRequestMember($idMemberRequest,$action);
+    }
 }

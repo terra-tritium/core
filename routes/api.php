@@ -178,6 +178,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/members/pending/{alianceId}',[AliancesController::class, 'listMembersPending']);
         Route::patch('member/remove/{memberId}', [AliancesController::class, 'removeMember']);
         Route::get('/logos',[AliancesController::class, 'allLogos']);
+        Route::put('/member/update-request/{idMemberAliance}/{action}',[AliancesController::class, 'updateRequestMember']);
         // Route::get('/details/{alianceId}', [AliancesController::class, 'details']);
     });
 
