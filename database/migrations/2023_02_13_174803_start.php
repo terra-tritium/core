@@ -17,8 +17,8 @@ return new class extends Migration
         Schema::create('aliances', function (Blueprint $table) {
             $table->id()->index();
             $table->string("description")->nullable();
-            $table->string("name");
-            $table->string('avatar')->nullable();
+            $table->string("name")->unique();
+            $table->string('logo')->nullable();
             $table->bigInteger("energy")->default(0);
             $table->bigInteger("score")->default(0);
             $table->bigInteger("buildScore")->default(0);
@@ -66,6 +66,13 @@ return new class extends Migration
             $table->text('message');
             $table->boolean('status')->default(0);
             $table->timestamps();
+        });
+
+        Schema::create('logo', function(Blueprint $table){
+            $table->id();
+            $table->string('name','100')->unique();
+            $table->string('alt',100)->nullable();
+            $table->boolean('available')->default(true);
         });
 
         //fim aliança

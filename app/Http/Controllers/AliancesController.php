@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Aliance;
 use App\Models\AlianceMember;
+use App\Models\Logo;
 use App\Models\Planet;
 use App\Models\Player;
 use App\Services\AlianceService;
@@ -24,7 +25,7 @@ use Throwable;
  *     @OA\Property(property="id", type="integer"),
  *     @OA\Property(property="name", type="string"),
  *     @OA\Property(property="description", type="string"),
- *     @OA\Property(property="avatar", type="file")
+ *     @OA\Property(property="logo", type="file")
  * )
  *
  * @OA\Schema(
@@ -89,7 +90,7 @@ class AliancesController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="name", type="string"),
      *             @OA\Property(property="description", type="string"),
-     *             @OA\Property(property="avatar", type="file")
+     *             @OA\Property(property="logo", type="file")
      *         )
      *     ),
      *     @OA\Response(
@@ -126,10 +127,10 @@ class AliancesController extends Controller
             // return response(['message' => 'Essa ordem não está mais disponível ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
 
 
-            // if ($request->hasFile('avatar')) {
-            //     $file = $request->file('avatar');
+            // if ($request->hasFile('logo')) {
+            //     $file = $request->file('logo');
             //     $fileUrl = $this->addImage($file);
-            //     $aliances->avatar = $fileUrl;
+            //     $aliances->logo = $fileUrl;
             // }
 
 
@@ -187,7 +188,7 @@ class AliancesController extends Controller
             $aliances->fill($request->all([
                 'name',
                 'description',
-                'avatar'
+                'logo'
             ]));
 
             if ($request->has('name')) {
@@ -202,9 +203,9 @@ class AliancesController extends Controller
                 $aliances->type = $request->input('type');
             }
 
-            if ($request->hasFile('avatar')) {
-                $imagePath = $request->file('avatar')->store('public/uploads');
-                $aliances->avatar = $imagePath;
+            if ($request->hasFile('logo')) {
+                $imagePath = $request->file('logo')->store('public/uploads');
+                $aliances->logo = $imagePath;
             }
 
             $aliances->save();
@@ -266,14 +267,14 @@ class AliancesController extends Controller
         }
     }
 
-    public function updateAvatar(Request $request, int $id)
+    public function updateLogo(Request $request, int $id)
     {
         $aliances = Aliance::findOrFail($id);
 
         try {
-            if ($request->file('avatar')) {
-                $imagePath = $request->file('avatar')->store('images');
-                $aliances->avatar = $imagePath;
+            if ($request->file('logo')) {
+                $imagePath = $request->file('logo')->store('images');
+                $aliances->logo = $imagePath;
             }
 
             $aliances->save();
@@ -282,7 +283,7 @@ class AliancesController extends Controller
         } catch (Throwable $exception) {
             Log::error($exception);
             return response()->json(
-                ['message' => 'Error: failed to update avatar'],
+                ['message' => 'Error: failed to update logo'],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -690,20 +691,25 @@ class AliancesController extends Controller
         $alianceService = new AlianceService();
         return response()->json($alianceService->getMembersAliance($alianceId), Response::HTTP_OK);
     }
+    public function listMembersPending($alianceId){
+        $alianceService = new AlianceService();
+        return response()->json($alianceService->getMembersPending($alianceId), Response::HTTP_OK);
+    }
     public function removeMember($memberId)
     {
         $alianceService = new AlianceService();
         return $alianceService->removeMember($memberId);
     }
-}
-/*
-  $aliance = Aliance::find($alianceId);
 
-        if (!$aliance) {
-            return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
+    public function allLogos()
+    {
+        $logos = Logo::where('available',true)->get();
+        if (!$logos) {
+            return response()->json(['message' => 'Logos not found.'], Response::HTTP_NOT_FOUND);
         }
-
-        $players = Player::where('aliance', $alianceId)->get();
-
-        return response()->json($players);
-*/
+        return response()->json($logos, Response::HTTP_OK);
+    }
+    public function updateRequestMember($idMemberRequest, $action){
+        return (new AlianceService)->updateRequestMember($idMemberRequest,$action);
+    }
+}

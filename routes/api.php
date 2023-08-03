@@ -166,7 +166,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/edit/{id}', [AliancesController::class, 'update']);
         Route::get('/list', [AliancesController::class, 'index']);
         Route::delete('/delete/{idAliance}', [AliancesController::class, 'destroy']);
-        Route::put('/update-avatar/{id}', [AliancesController::class, 'updateAvatar']);
+        Route::put('/update-logo/{id}', [AliancesController::class, 'updateLogo']);
         Route::post('/join', [AliancesController::class,'joinAliance']);
         Route::post('/request', [AliancesController::class,'handlePlayerRequest']);
         Route::post('/leave',[AliancesController::class,'leaveAliance']);
@@ -175,7 +175,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/my-aliance', [AliancesController::class,'myAliance']);
         Route::get('/my-aliance/details', [AliancesController::class, 'alianceDetailsCreated']);
         Route::get('/members/{alianceId}', [AliancesController::class,'listMembers']);
+        Route::get('/members/pending/{alianceId}',[AliancesController::class, 'listMembersPending']);
         Route::patch('member/remove/{memberId}', [AliancesController::class, 'removeMember']);
+        Route::get('/logos',[AliancesController::class, 'allLogos']);
+        Route::put('/member/update-request/{idMemberAliance}/{action}',[AliancesController::class, 'updateRequestMember']);
         // Route::get('/details/{alianceId}', [AliancesController::class, 'details']);
     });
 

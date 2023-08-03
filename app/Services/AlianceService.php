@@ -45,7 +45,7 @@ class AlianceService
             $aliances = new Aliance();
             $aliances->name = $request->input('name');
             $aliances->description = $request->input('description');
-            $aliances->avatar = $request->input('logo');
+            $aliances->logo = $request->input('logo');
             $aliances->founder = $player->id;
             $success = $aliances->save();
             if (!$success)
@@ -75,6 +75,9 @@ class AlianceService
     {
         return (new AlianceMember())->getMembers($alianceId);
     }
+    public function getMembersPending($alianceId){
+        return (new AlianceMember())->getMembersPending($alianceId);
+    }
     public function getDetailsMyAliance($playerId)
     {
         $alianceMember = AlianceMember::where('player_id', $playerId)->first();
@@ -83,6 +86,7 @@ class AlianceService
             return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
         }
         $responseData = $alianceMember;
+        $responseData['logo'] = $aliance->logo;
         $responseData['open'] = 'alterar form';
         $responseData['countMembers'] = AlianceMember::where([['idAliance', '=', $alianceMember->idAliance], ['status', '=', 'A']])->count();
         return response()->json($responseData, Response::HTTP_OK);
@@ -127,7 +131,32 @@ class AlianceService
 
         return response()->json(['message' => 'Alliances deleted successfully'], Response::HTTP_OK);
     }
-
+    public function updateRequestMember($memberRequestId, $typeAction ){
+        $alianceMember = AlianceMember::find($memberRequestId);
+        $player = Player::find($alianceMember->player_id);
+        if(!$alianceMember || !$player){
+            return response()->json(['message' => 'Member request not found.'], Response::HTTP_NOT_FOUND);
+        }
+        if($player->aliance){
+            return response()->json(['message' => "The player is already part of an alliance."], Response::HTTP_NOT_ACCEPTABLE);
+        }
+        if(!$this->availableSlot($alianceMember->idAliance)){
+            return response()->json(['message' => "No slots available."], Response::HTTP_NOT_ACCEPTABLE);
+        }
+        if($typeAction == 'A'){
+            $alianceMember->status = $typeAction;
+            $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
+            $alianceMember->save();
+            $player->aliance = $alianceMember->idAliance;
+            $player->save();
+            $this->notify($player->id, "You have been accepted.","aliance");
+        }
+        if($typeAction == 'R'){
+            $alianceMember->delete();
+            $this->notify($player->id, "You have not been accepted","aliance");
+        }
+        return response()->json([],Response::HTTP_ACCEPTED);
+    }
     private function notify($playerId, $text, $type)
     {
         $log = new Logbook();
@@ -135,5 +164,17 @@ class AlianceService
         $log->text = $text;
         $log->type = $type;
         $log->save();
+    }
+
+    /**
+     * @todo recuperar a quantide supotada para a aliança
+     */
+    private function getSupportedMemberCount($idAliance){
+        return 10 * 1;
+    }
+    private function availableSlot($idAliance){
+        $countMembers = AlianceMember::where([['idAliance','=',$idAliance],['status','=','A']])->count();
+        $supported = $this->getSupportedMemberCount($idAliance);
+        return $countMembers < $supported;
     }
 }
