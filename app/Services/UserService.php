@@ -17,19 +17,7 @@ class UserService
             $user   = Auth::user();
             $planets = Player::getMyPlanets();
 
-            $success['token']   =  "teste";
-            $success['name']    =  $user->name;
-            $success['planet']  =  $planets[0]->id;
-
-            return $success;
-            $user->tokens()->where('id', '!=', $user->currentAccessToken()->id)->delete();
-
-            $token = $user->createToken('AppCoreTritium')->plainTextToken;
-
-
-            $planets = Player::getMyPlanets();
-
-            $success['token']   =  $token;
+            $success['token']   =  $user->createToken('AppCoreTritium')->plainTextToken;
             $success['name']    =  $user->name;
             $success['planet']  =  $planets[0]->id;
 
@@ -37,7 +25,7 @@ class UserService
 
         }
         else{
-           return false;
+            return false;
         }
     }
 }
