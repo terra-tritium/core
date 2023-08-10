@@ -10,4 +10,5 @@ class Planet extends Model
     use HasFactory;
     protected $table = 'planets';
     public $timestamps = false;
+    
 }
