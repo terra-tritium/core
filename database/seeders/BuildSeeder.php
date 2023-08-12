@@ -35,8 +35,7 @@ class BuildSeeder extends Seeder
             "code" => 2,
             "image" => "build-02.png",
             "description" => "The Energy Harvesting is a dance of light and movement, where nature is converted into a source in a clean and inexhaustible way. It is the realization of the human ambition to find clean and renewable energy sources that can sustain the new world in constant evolution. With its bold shapes and sophisticated technology, the Energy Harvesting is like a graceful dancer, dancing with the sun and wind to fuel our future.",
-            "effect" => "Allows capturing and storing energy through solar panels
-            Enables building battery houses",
+            "effect" => "Allows capturing and storing energy through solar panels Enables building battery houses",
             "metalStart" => 100,
             "uraniumStart" => 50,
             "crystalStart" => 50,
