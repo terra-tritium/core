@@ -4,13 +4,49 @@ namespace App\Http\Controllers;
 
 use App\Models\Quadrant;
 use App\Models\Planet;
+use App\Services\QuadrantService;
 use Illuminate\Http\Request;
 
 class QuadrantController extends Controller
 {
 
-    public function show($code) {
-        return Quadrant::where("quadrant", $code)->firstOrFail();
+    protected $quadrantService;
+
+    public  function __construct(QuadrantService $quadrantService)
+    {
+        $this->quadrantService =  $quadrantService;
+    }
+
+     /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Quadrant  $quadrant
+     * @return \Illuminate\Http\Response
+     *
+     * @OA\Get (
+     *     path="/api/quadrant/show/{code}/{planet?}",
+     *     tags={"Quadrant"},
+     *     summary="Get details Quadrant ",
+     *     security={
+     *         {"bearerAuthTroop": {}}
+     *     },
+     *     @OA\Response(response="200", description="Resposta bem-sucedida")
+     * )
+     *  @OA\SecurityScheme(
+     *     type="http",
+     *     scheme="bearer",
+     *     securityScheme="bearerAuthTroop"
+     * )
+     *
+     */
+    public function show($code, $planet = 0) {
+
+        $distante = $this->quadrantService->calcDistanceQuadrant($code, $planet);
+
+        $quadrant = Quadrant::where("quadrant", $code)->firstOrFail();
+        $quadrant->distance = $distante ;
+
+        return $quadrant ;
     }
 
     public function planets($quadrant) {

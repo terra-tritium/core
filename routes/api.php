@@ -130,7 +130,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('quadrant')->group(function () {
-        Route::get('/show/{code}', [QuadrantController::class, 'show']);
+        Route::get('/show/{code}/{planet?}', [QuadrantController::class, 'show']);
         Route::get('/map/{region}', [QuadrantController::class, 'map']);
         Route::get('/planets/{quadrant}', [QuadrantController::class, 'planets']);
     });
