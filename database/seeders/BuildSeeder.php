@@ -215,7 +215,7 @@ class BuildSeeder extends Seeder
             "code" => 14,
             "image" => "build-14.png",
             "description" => "Nestled in the heart of the universe, the 'Galactic Conclave' is a shining beacon of hope and collaboration. This magnificent structure celebrates the essence of the human and intergalactic spirit, serving as a sacred gathering point for all cosmic explorers in search of powerful alliances. With its futuristic and gleaming architecture, the 'Galactic Conclave' radiates vibrant and welcoming energy, attracting players from every corner of the space. As travelers converge upon this center of unity, diversity intertwines with harmony, forming indestructible bonds between civilizations. Within its hallowed halls, secrets are shared, strategies are devised, and a symphony of cooperation resonates with each step. It is here, in the heart of the 'Galactic Conclave,' that the destiny of the galaxy is shaped by joined hands, writing a tale of unity, trust, and cosmic prosperity.",   
-            "effect" => "A cada nível de expanção reduz a taxa de fee e aumenta alcance de trocas",
+            "effect" => "Allow to join and create alliances with other players",
             "metalStart" => 100,
             "uraniumStart" => 50,
             "crystalStart" => 50,
