@@ -171,11 +171,10 @@ class AlianceService
     public function getAvailableName($name)
     {
         $findName = Aliance::where([['name', '=', $name]])->get();
-        if($findName){
-            return response()->json(['aki'], 200);
-        }
-        return $findName;
-        
+        if (count($findName) > 0)
+            return response()->json(['message' => "Name not available"], Response::HTTP_CONFLICT);
+        else
+            return response()->json($findName, Response::HTTP_OK);
     }
     /**
      * @todo recuperar a quantide supotada para a aliança
