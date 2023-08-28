@@ -717,4 +717,7 @@ class AliancesController extends Controller
     {
         return (new AlianceService)->updateRequestMember($idMemberRequest, $action);
     }
+    public function getAvailableName($name){
+        return (new AlianceService)->getAvailableName($name);
+    }
 }

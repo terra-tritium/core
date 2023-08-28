@@ -168,7 +168,15 @@ class AlianceService
         $log->type = $type;
         $log->save();
     }
-
+    public function getAvailableName($name)
+    {
+        $findName = Aliance::where([['name', '=', $name]])->get();
+        if($findName){
+            return response()->json(['aki'], 200);
+        }
+        return $findName;
+        
+    }
     /**
      * @todo recuperar a quantide supotada para a aliança
      */
