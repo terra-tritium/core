@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Aliance;
 use App\Models\AlianceMember;
+use App\Models\Building;
 use App\Models\Logo;
 use App\Models\Planet;
 use App\Models\Player;
@@ -67,8 +68,10 @@ class AliancesController extends Controller
 
             // $aliances = Aliance::all();
             $aliance = new Aliance();
-
-            return response()->json($aliance->getAliances(), Response::HTTP_OK);
+            $dadosAlianca = $aliance->getAliances();
+            $aliancesService = new AlianceService();
+            $dadosAlianceBuild = $aliancesService->getDadosBuildsAliance($dadosAlianca);
+            return response()->json($dadosAlianceBuild, Response::HTTP_OK);
         } catch (Throwable $exception) {
             Log::error($exception);
 
@@ -691,7 +694,8 @@ class AliancesController extends Controller
         $alianceService = new AlianceService();
         return response()->json($alianceService->getMembersAliance($alianceId), Response::HTTP_OK);
     }
-    public function listMembersPending($alianceId){
+    public function listMembersPending($alianceId)
+    {
         $alianceService = new AlianceService();
         return response()->json($alianceService->getMembersPending($alianceId), Response::HTTP_OK);
     }
@@ -703,13 +707,17 @@ class AliancesController extends Controller
 
     public function allLogos()
     {
-        $logos = Logo::where('available',true)->get();
+        $logos = Logo::where('available', true)->get();
         if (!$logos) {
             return response()->json(['message' => 'Logos not found.'], Response::HTTP_NOT_FOUND);
         }
         return response()->json($logos, Response::HTTP_OK);
     }
-    public function updateRequestMember($idMemberRequest, $action){
-        return (new AlianceService)->updateRequestMember($idMemberRequest,$action);
+    public function updateRequestMember($idMemberRequest, $action)
+    {
+        return (new AlianceService)->updateRequestMember($idMemberRequest, $action);
+    }
+    public function getAvailableName($name){
+        return (new AlianceService)->getAvailableName($name);
     }
 }

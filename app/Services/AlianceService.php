@@ -6,12 +6,14 @@ use App\Models\Aliance;
 use App\Models\AlianceMember;
 use App\Models\Building;
 use App\Models\Logbook;
+use App\Models\Planet;
 use App\Models\Player;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -75,7 +77,8 @@ class AlianceService
     {
         return (new AlianceMember())->getMembers($alianceId);
     }
-    public function getMembersPending($alianceId){
+    public function getMembersPending($alianceId)
+    {
         return (new AlianceMember())->getMembersPending($alianceId);
     }
     public function getDetailsMyAliance($playerId)
@@ -123,39 +126,39 @@ class AlianceService
                 }
             }
             $aliances->delete();
-
         } catch (Exception $e) {
             Log::error('Erro no agendamento: ' . $e->getMessage());
-            return response()->json(['message' => "erro ao deletar aliança" .$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => "erro ao deletar aliança" . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json(['message' => 'Alliances deleted successfully'], Response::HTTP_OK);
     }
-    public function updateRequestMember($memberRequestId, $typeAction ){
+    public function updateRequestMember($memberRequestId, $typeAction)
+    {
         $alianceMember = AlianceMember::find($memberRequestId);
         $player = Player::find($alianceMember->player_id);
-        if(!$alianceMember || !$player){
+        if (!$alianceMember || !$player) {
             return response()->json(['message' => 'Member request not found.'], Response::HTTP_NOT_FOUND);
         }
-        if($player->aliance){
+        if ($player->aliance) {
             return response()->json(['message' => "The player is already part of an alliance."], Response::HTTP_NOT_ACCEPTABLE);
         }
-        if(!$this->availableSlot($alianceMember->idAliance)){
+        if (!$this->availableSlot($alianceMember->idAliance)) {
             return response()->json(['message' => "No slots available."], Response::HTTP_NOT_ACCEPTABLE);
         }
-        if($typeAction == 'A'){
+        if ($typeAction == 'A') {
             $alianceMember->status = $typeAction;
             $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
             $alianceMember->save();
             $player->aliance = $alianceMember->idAliance;
             $player->save();
-            $this->notify($player->id, "You have been accepted.","aliance");
+            $this->notify($player->id, "You have been accepted.", "aliance");
         }
-        if($typeAction == 'R'){
+        if ($typeAction == 'R') {
             $alianceMember->delete();
-            $this->notify($player->id, "You have not been accepted","aliance");
+            $this->notify($player->id, "You have not been accepted", "aliance");
         }
-        return response()->json([],Response::HTTP_ACCEPTED);
+        return response()->json([], Response::HTTP_ACCEPTED);
     }
     private function notify($playerId, $text, $type)
     {
@@ -165,16 +168,42 @@ class AlianceService
         $log->type = $type;
         $log->save();
     }
-
+    public function getAvailableName($name)
+    {
+        $findName = Aliance::where([['name', '=', $name]])->get();
+        if($findName){
+            return response()->json(['aki'], 200);
+        }
+        return $findName;
+        
+    }
     /**
      * @todo recuperar a quantide supotada para a aliança
      */
-    private function getSupportedMemberCount($idAliance){
+    private function getSupportedMemberCount($idAliance)
+    {
         return 10 * 1;
     }
-    private function availableSlot($idAliance){
-        $countMembers = AlianceMember::where([['idAliance','=',$idAliance],['status','=','A']])->count();
+    private function availableSlot($idAliance)
+    {
+        $countMembers = AlianceMember::where([['idAliance', '=', $idAliance], ['status', '=', 'A']])->count();
         $supported = $this->getSupportedMemberCount($idAliance);
         return $countMembers < $supported;
+    }
+    public function getLevelAliancesFounder($idFounder, $aliances)
+    {
+    }
+    public function getDadosBuildsAliance($dadosAlianca)
+    {
+        $aliancas = [];
+        foreach ($dadosAlianca as $dados) {
+            $aliance = new Aliance();
+            $level = $aliance->getLevelBuildAliance($dados->founder);
+            $alianca = (array) $dados;
+            $alianca['level'] = $level;
+            $alianca['totalMembers'] = $level * env("COUNT_MEMBER_LEVEL_ALIANCE");
+            $aliancas[] = $alianca;
+        }
+        return $aliancas;
     }
 }
