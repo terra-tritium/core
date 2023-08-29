@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
+use DateTime;
+
 
 /**
  *   @OA\Schema(
@@ -291,6 +293,7 @@ class AliancesController extends Controller
             );
         }
     }
+    
 
     /**
      *
@@ -327,13 +330,10 @@ class AliancesController extends Controller
      */
     public function joinAliance(Request $request)
     {
-        $aliancaId = $request->input('alianca_id');
-        $aliance = Aliance::findOrFail($aliancaId);
+        return (new AlianceService)->joinAlliance($request->input('alianca_id'));
+        
 
-        $player = Player::getPlayerLogged();
-        $player->aliance = $aliancaId;
-
-        if ($player->leave_date) {
+       /* if ($player->leave_date) {
             $leaveDate = Carbon::parse($player->leave_date);
 
             if (Carbon::now()->diffInDays($leaveDate) < 5) {
@@ -364,7 +364,7 @@ class AliancesController extends Controller
             return response()->json(['message' => 'Request sent to alliance founder'], Response::HTTP_OK);
         } else {
             return response()->json(['message' => 'Invalid alliance type'], Response::HTTP_BAD_REQUEST);
-        }
+        }*/
     }
 
     /**

@@ -28,7 +28,9 @@ return new class extends Migration
             $table->bigInteger("defenseScore")->default(0);
             $table->bigInteger("warScore")->default(0);
             $table->integer('founder')->constrained("players");
-            $table->bigInteger("type")->default(0)->comment('0 - Aberta , 1 - Fechada')->change();
+            $table->char('status',1)->default('F');
+
+            // $table->bigInteger("type")->default(0)->comment('0 - Aberta , 1 - Fechada')->change();
         });
 
         Schema::create('aliances_ranking', function (Blueprint $table) {
