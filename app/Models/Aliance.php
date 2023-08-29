@@ -15,7 +15,8 @@ class Aliance extends Model
     protected $fillable = [
         'name',
         'description',
-        'logo'
+        'logo',
+        'status'
     ];
     public function getAliances()
     {

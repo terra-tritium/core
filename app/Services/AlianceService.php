@@ -49,6 +49,7 @@ class AlianceService
             $aliances->description = $request->input('description');
             $aliances->logo = $request->input('logo');
             $aliances->founder = $player->id;
+            $aliances->status = $request->input('status');
             $success = $aliances->save();
             if (!$success)
                 throw new \Exception('Erro ao salvar a aliança');
@@ -72,6 +73,50 @@ class AlianceService
         $alianceMember->role = $role;
         $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
         return $alianceMember->save();
+    }
+    public function joinAlliance($aliancaId)
+    {
+        $aliance = Aliance::findOrFail($aliancaId);
+
+        $player = Player::getPlayerLogged();
+        $player->aliance = $aliancaId;
+        if ($aliance->status === 'A') {
+            //verificar se tem vaga, ingressar, avisar founder
+            $success =  $this->saveRequest($player->id, $aliance->id, $aliance->status);
+            if ($success) {
+                $this->notify($aliance->founder, "A new member has joined the alliance!", "aliance");
+                DB::table('players')->where('id', $player->id)->update([
+                    'aliance' => DB::raw($aliance->id)
+                ]);
+                $this->notify($player->id, "You are now a part of an alliance!", "aliance");
+            }
+        } else {
+            $this->notify($aliance->founder, "A member has requested to join the alliance!", "aliance");
+            $this->notify($player->id, "Request sent for review!", "aliance");
+            return $this->saveRequest($player->id, $aliance->id, $aliance->status);
+        }
+        return response()->json(['alianca' => $aliance, 'player' => $player], Response::HTTP_OK);
+    }
+    //"SQLSTATE[HY000]: General error: 1364 Field 'idAliance' doesn't have a default value (Connection: mysql, SQL: insert into `aliances_members` (`player_id`, `status`, `role`, `dateAdmission`) values (39, A, member, ?))"
+
+    private function saveRequest($playerId, $alianceId, $status)
+    {
+        $alianceMember = new AlianceMember();
+        $alianceMember->idAliance = $alianceId;
+        $alianceMember->player_id = $playerId;
+        $alianceMember->status = $status === 'F' ? 'P' : 'A';
+        $alianceMember->role = 'member';
+        $alianceMember->dateAdmission = $status === 'A' ? (new DateTime())->format('Y-m-d H:i:s') : null;
+        return $alianceMember->save();
+        /*
+          'player_id',
+        'createdAt',
+        'role',
+        'status',
+        'dateAdmission',
+        'dateOf',
+        'idAliance'
+        */
     }
     public function getMembersAliance($alianceId)
     {
@@ -171,11 +216,10 @@ class AlianceService
     public function getAvailableName($name)
     {
         $findName = Aliance::where([['name', '=', $name]])->get();
-        if($findName){
-            return response()->json(['aki'], 200);
-        }
-        return $findName;
-        
+        if (count($findName) > 0)
+            return response()->json(['message' => "Name not available"], Response::HTTP_CONFLICT);
+        else
+            return response()->json($findName, Response::HTTP_OK);
     }
     /**
      * @todo recuperar a quantide supotada para a aliança
