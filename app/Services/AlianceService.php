@@ -43,8 +43,13 @@ class AlianceService
     public function founderAliance(Request $request)
     {
         try {
+
             $player = Player::getPlayerLogged();
-            $aliances = new Aliance();
+            if ($request->input('id')) {
+                $aliances = Aliance::find($request->id);
+            } else {
+                $aliances = new Aliance();
+            }
             $aliances->name = $request->input('name');
             $aliances->description = $request->input('description');
             $aliances->logo = $request->input('logo');
@@ -53,13 +58,16 @@ class AlianceService
             $success = $aliances->save();
             if (!$success)
                 throw new \Exception('Erro ao salvar a aliança');
-            $successMember = $this->createNewAlianceFounder($player->id, $aliances->id, "founder");
-            if (!$successMember)
-                throw new \Exception('Erro ao criar o fundador da aliança');
-            //atualiza a alianca na tabela de usuarios
-            DB::table('players')->where('id', $player->id)->update([
-                'aliance' => DB::raw("$aliances->id")
-            ]);
+
+            if (!$request->input('id')) {
+                $successMember = $this->createNewAlianceFounder($player->id, $aliances->id, "founder");
+                if (!$successMember)
+                    throw new \Exception('Erro ao criar o fundador da aliança');
+                //atualiza a alianca na tabela de usuarios
+                DB::table('players')->where('id', $player->id)->update([
+                    'aliance' => DB::raw("$aliances->id")
+                ]);
+            }
         } catch (Throwable $exception) {
             Log::error($exception);
             return response(['message' => 'Erro ao criar aliança ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
