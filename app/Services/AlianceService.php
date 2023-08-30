@@ -135,7 +135,6 @@ class AlianceService
         }
         $responseData = $alianceMember;
         $responseData['logo'] = $aliance->logo;
-        $responseData['open'] = 'alterar form';
         $responseData['countMembers'] = AlianceMember::where([['idAliance', '=', $alianceMember->idAliance], ['status', '=', 'A']])->count();
         return response()->json($responseData, Response::HTTP_OK);
     }
@@ -185,7 +184,7 @@ class AlianceService
         if (!$alianceMember || !$player) {
             return response()->json(['message' => 'Member request not found.'], Response::HTTP_NOT_FOUND);
         }
-        if ($player->aliance) {
+        if ($player->aliance && $typeAction == 'A') {
             return response()->json(['message' => "The player is already part of an alliance."], Response::HTTP_NOT_ACCEPTABLE);
         }
         if (!$this->availableSlot($alianceMember->idAliance)) {
@@ -201,7 +200,10 @@ class AlianceService
         }
         if ($typeAction == 'R') {
             $alianceMember->delete();
-            $this->notify($player->id, "You have not been accepted", "aliance");
+            DB::table('players')->where('id', $alianceMember->player_id)->update([
+                'aliance' => DB::raw("null")
+            ]);
+            $this->notify($player->id, $alianceMember->status === 'P' ? "You have not been accepted" : "You have been removed from the alliance", "aliance");
         }
         return response()->json([], Response::HTTP_ACCEPTED);
     }
@@ -249,5 +251,35 @@ class AlianceService
             $aliancas[] = $alianca;
         }
         return $aliancas;
+    }
+    public function exit($alianceId)
+    {
+        try {
+            $player = Player::getPlayerLogged();
+            $member = AlianceMember::where('player_id', '=', $player->id)->first();
+            $aliance = Aliance::find($alianceId);
+            DB::table('aliances_members')
+                ->where('player_id', $player->id)
+                ->delete();
+            DB::table('players')->where('id', $player->id)->update([
+                'aliance' => DB::raw("null")
+            ]);
+            $this->notify($player->id, "You left the alliance!", "aliance");
+            $this->notify($aliance->founder, "A member left the alliance", "aliance");
+            return response()->json([], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Erro ao deixar a aliança'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    public function cancelRequest()
+    {
+        try {
+            $player = Player::getPlayerLogged();
+            $memberRequest = AlianceMember::where('player_id', '=', $player->id)->first();
+            $memberRequest->delete();
+            return response()->json([], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Erro ao cancelar requisição'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
