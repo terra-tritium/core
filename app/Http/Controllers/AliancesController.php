@@ -678,7 +678,12 @@ class AliancesController extends Controller
         $aliance = Aliance::find($player->aliance);
         if (!$aliance) {
             //nenhuma aliança viinculada
-            return response()->json(['message' => 'Does not have allaince.'], Response::HTTP_NO_CONTENT);
+            $alianceMemberPending = AlianceMember::where([['player_id', '=', $player->id], ['status','=','P']])->first();
+            if($alianceMemberPending){
+                return response()->json($alianceMemberPending, Response::HTTP_OK);
+            }else{
+                return response()->json(['message' => 'Does not have allaince.'], Response::HTTP_NO_CONTENT);
+            }
         }
         return response()->json($aliance, Response::HTTP_OK);
     }
@@ -722,5 +727,8 @@ class AliancesController extends Controller
     }
     public function exit($alianceId){
         return (new AlianceService)->exit($alianceId);
+    }
+    public function cancelRequest(){
+        return (new AlianceService)->cancelRequest();
     }
 }

@@ -181,6 +181,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/member/update-request/{idMemberAliance}/{action}',[AliancesController::class, 'updateRequestMember']);
         Route::get('/available-name/{name}',[AliancesController::class, 'getAvailableName']);
         Route::put('/exit/{alianceId}',[AliancesController::class, 'exit']);
+        Route::put('/cancel-request',[AliancesController::class, 'cancelRequest']);
         //oute::post('/member/new-request',[AliancesController::controller ,''])
         // Route::get('/details/{alianceId}', [AliancesController::class, 'details']);
     });
