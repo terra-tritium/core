@@ -180,6 +180,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/logos',[AliancesController::class, 'allLogos']);
         Route::put('/member/update-request/{idMemberAliance}/{action}',[AliancesController::class, 'updateRequestMember']);
         Route::get('/available-name/{name}',[AliancesController::class, 'getAvailableName']);
+        Route::put('/exit/{alianceId}',[AliancesController::class, 'exit']);
         //oute::post('/member/new-request',[AliancesController::controller ,''])
         // Route::get('/details/{alianceId}', [AliancesController::class, 'details']);
     });

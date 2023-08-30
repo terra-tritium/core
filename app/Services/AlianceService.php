@@ -250,4 +250,23 @@ class AlianceService
         }
         return $aliancas;
     }
+    public function exit($alianceId)
+    {
+        try {
+            $player = Player::getPlayerLogged();
+            $member = AlianceMember::where('player_id', '=', $player->id)->first();
+            $aliance = Aliance::find($alianceId);
+            DB::table('aliances_members')
+                ->where('player_id', $player->id)
+                ->delete();
+            DB::table('players')->where('id', $player->id)->update([
+                'aliance' => DB::raw("null")
+            ]);
+            $this->notify($player->id, "You left the alliance!", "aliance");
+            $this->notify($aliance->founder, "A member left the alliance", "aliance");
+            return response()->json([], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Erro ao deixar a aliança'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

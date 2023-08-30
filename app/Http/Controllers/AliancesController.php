@@ -720,4 +720,7 @@ class AliancesController extends Controller
     public function getAvailableName($name){
         return (new AlianceService)->getAvailableName($name);
     }
+    public function exit($alianceId){
+        return (new AlianceService)->exit($alianceId);
+    }
 }
