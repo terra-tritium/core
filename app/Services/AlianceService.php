@@ -105,7 +105,6 @@ class AlianceService
         }
         return response()->json(['alianca' => $aliance, 'player' => $player], Response::HTTP_OK);
     }
-    //"SQLSTATE[HY000]: General error: 1364 Field 'idAliance' doesn't have a default value (Connection: mysql, SQL: insert into `aliances_members` (`player_id`, `status`, `role`, `dateAdmission`) values (39, A, member, ?))"
 
     private function saveRequest($playerId, $alianceId, $status)
     {
@@ -231,12 +230,13 @@ class AlianceService
         else
             return response()->json($findName, Response::HTTP_OK);
     }
-    /**
-     * @todo recuperar a quantide supotada para a aliança
-     */
+    
     private function getSupportedMemberCount($idAliance)
     {
-        return 10 * 1;
+        $alianca = Aliance::findOrFail($idAliance);
+        $aliance = new Aliance();
+        $level = $aliance->getLevelBuildAliance($alianca->founder);
+        return $level * env("COUNT_MEMBER_LEVEL_ALIANCE");
     }
     private function availableSlot($idAliance)
     {

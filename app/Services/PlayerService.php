@@ -13,26 +13,37 @@ class PlayerService
 {
   protected $planetService;
 
-  public function __construct () {
+  public function __construct()
+  {
     $this->planetService = new PlanetService();
   }
 
-  public function addBuildScore (Player $player, $units) {
+  public function addBuildScore(Player $player, $units)
+  {
     $player->buildScore += $units;
     return $player;
   }
 
-  public function register(Player $player) {
-    $player->score = 0;
-    $player->buildScore = 0;
-    $player->attackScore = 0;
-    $player->defenseScore = 0;
-    $player->militaryScore = 0;
-    $player->researchScore = 0;
+  public function register(Player $player)
+  {
+    // $player->score = 0;
+    // $player->buildScore = 0;
+    // $player->attackScore = 0;
+    // $player->defenseScore = 0;
+    // $player->militaryScore = 0;
+    // $player->researchScore = 0;
     $player->gameMode = 1;
     $player->attackStrategy = 1;
     $player->defenseStrategy = 1;
-    $player->researchPoints = 0;
+    $player->researchPoints = rand(0,9);
+
+    $player->score = rand(1, 17);
+    $player->buildScore = rand(0, 17);
+    $player->attackScore = rand(0, 17);
+    $player->defenseScore = rand(0, 17);
+    $player->militaryScore = rand(0, 17);
+    $player->researchScore = rand(0, 17);
+
     $player->save();
 
     $newAlocation = $this->startAlocation();
@@ -102,7 +113,8 @@ class PlayerService
     $nftConfig->save();
   }
 
-  private function startAlocation() {
+  private function startAlocation()
+  {
     $coords = [];
     $lastPlanet = Planet::orderBy('id', 'desc')->first();
 
@@ -127,8 +139,8 @@ class PlayerService
         $coords['quadrant'] = $lastQuadrant;
         $coords['position'] = $lastPosition;
       } else {
-          $coords['quadrant'] = $this->nextQuadrant($lastQuadrant);
-          $coords['position'] = 1;
+        $coords['quadrant'] = $this->nextQuadrant($lastQuadrant);
+        $coords['position'] = 1;
       }
       $cont++;
     } while ($this->coordInUse($coords) == true && $cont < 1600);
@@ -158,12 +170,13 @@ class PlayerService
       default:
         $coords['type'] = 4;
         break;
-      }
+    }
 
     return $coords;
   }
 
-  private function nextQuadrant($quadrant) {
+  private function nextQuadrant($quadrant)
+  {
     $nextLetter = substr($quadrant, 0, 1);
     $nextNumber = substr($quadrant, 2, 2) + 1;
     if ($nextNumber == 100) {
@@ -174,11 +187,12 @@ class PlayerService
         $nextLetter = chr(ord(substr($quadrant, 0, 1)) + 1);
       }
     }
-    $next =  $nextLetter . str_pad($nextNumber, 3 , '0' , STR_PAD_LEFT);
+    $next =  $nextLetter . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
     return $next;
   }
 
-  private function coordInUse($coords) {
+  private function coordInUse($coords)
+  {
     $planet = Planet::where('quadrant', $coords['quadrant'])->where('position', $coords['position'])->first();
     if ($planet) {
       return true;
@@ -187,7 +201,8 @@ class PlayerService
     }
   }
 
-  public function getDetails($id) {
+  public function getDetails($id)
+  {
     $details = [];
     $player = Player::where('id', $id)->firstOrFail();
     $details['name'] = $player->name;
@@ -203,7 +218,8 @@ class PlayerService
     return $details;
   }
 
-  public function iSplayerOwnerPlanet($player, $planet) {
+  public function iSplayerOwnerPlanet($player, $planet)
+  {
     $planet = Planet::where(['player' => $player, 'id' => $planet])->first();
     if ($planet) {
       return true;
@@ -211,7 +227,8 @@ class PlayerService
     return false;
   }
 
-  public function getPlanets() {
+  public function getPlanets()
+  {
     $playerLogged = Player::getPlayerLogged();
     $planets = Planet::where('player', $playerLogged->id)->get();
     return $planets;
@@ -222,7 +239,7 @@ class PlayerService
     $playerModel = Player::find($player);
     $playerModel->name = $newName;
     $playerModel->save();
-    
+
     return true;
   }
 }
