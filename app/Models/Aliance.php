@@ -38,4 +38,37 @@ class Aliance extends Model
             ->sum('b.level');
         return $level;
     }
+    public function getSumScoresMembers()
+    {
+        $aliances = Aliance::select(
+            'aliances.name',
+            'aliances.id',
+            DB::raw('SUM(players.attackScore) as attackScore'),
+            DB::raw('SUM(players.score) as score'),
+            DB::raw('SUM(players.buildScore) as buildScore'),
+            DB::raw('SUM(players.defenseScore) as defenseScore'),
+            DB::raw('SUM(players.militaryScore) as militaryScore'),
+            DB::raw('SUM(players.researchScore) as researchScore')
+        )
+            ->join('aliances_members', 'aliances_members.idAliance', '=', 'aliances.id')
+            ->join('players', 'players.id', '=', 'aliances_members.player_id')
+            ->where('aliances_members.status', 'A')
+            ->groupBy('aliances.id')
+            ->groupBy('aliances.name')
+            ->get();
+
+        return $aliances;
+    }
+    public function getMembersAliance($idAliance)
+    {
+        $members = DB::table('aliances as a')
+            ->select('p.*', 'a.name', 'a.founder')
+            // ->select('a.*')
+            ->join('aliances_members as am', 'am.idAliance', '=', 'a.id')
+            ->join('players as p', 'p.id', '=', 'am.player_id')
+            ->where('a.id', $idAliance)
+            ->where('am.status', 'A')
+            ->get();
+        return $members;
+    }
 }

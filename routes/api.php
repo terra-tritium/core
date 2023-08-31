@@ -184,6 +184,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/cancel-request',[AliancesController::class, 'cancelRequest']);
         //oute::post('/member/new-request',[AliancesController::controller ,''])
         // Route::get('/details/{alianceId}', [AliancesController::class, 'details']);
+        Route::get("/scores", [AliancesController::class, 'getScoresAliance']);
     });
 
     Route::prefix('trading')->group(function () {
