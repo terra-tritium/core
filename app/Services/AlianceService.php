@@ -68,6 +68,7 @@ class AlianceService
                     'aliance' => DB::raw("$aliances->id")
                 ]);
             }
+            //
         } catch (Throwable $exception) {
             Log::error($exception);
             return response(['message' => 'Erro ao criar aliança ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
@@ -194,7 +195,7 @@ class AlianceService
         if ($player->aliance && $typeAction == 'A') {
             return response()->json(['message' => "The player is already part of an alliance."], Response::HTTP_NOT_ACCEPTABLE);
         }
-        if (!$this->availableSlot($alianceMember->idAliance)) {
+        if (!$this->availableSlot($alianceMember->idAliance) && $typeAction == 'A') {
             return response()->json(['message' => "No slots available."], Response::HTTP_NOT_ACCEPTABLE);
         }
         if ($typeAction == 'A') {

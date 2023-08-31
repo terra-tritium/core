@@ -9,6 +9,7 @@ use App\Models\Logo;
 use App\Models\Planet;
 use App\Models\Player;
 use App\Services\AlianceService;
+use App\Services\RankingService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -730,5 +731,9 @@ class AliancesController extends Controller
     }
     public function cancelRequest(){
         return (new AlianceService)->cancelRequest();
+    }
+    public function getScoresAliance(){
+        $ranking = new RankingService();
+        return $ranking->initScoresAliance();
     }
 }
