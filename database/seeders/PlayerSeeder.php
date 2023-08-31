@@ -30,6 +30,7 @@ class PlayerSeeder extends Seeder
             $player->name = $user->name;
             $player->country = rand(1, 6);
             $player->user = $user->id;
+           
             $PlayerService->register($player);
         });
         DB::table('planets')->update(['name' => DB::raw("CONCAT(name, id)")]);

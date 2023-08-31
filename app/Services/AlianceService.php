@@ -43,8 +43,13 @@ class AlianceService
     public function founderAliance(Request $request)
     {
         try {
+
             $player = Player::getPlayerLogged();
-            $aliances = new Aliance();
+            if ($request->input('id')) {
+                $aliances = Aliance::find($request->id);
+            } else {
+                $aliances = new Aliance();
+            }
             $aliances->name = $request->input('name');
             $aliances->description = $request->input('description');
             $aliances->logo = $request->input('logo');
@@ -53,13 +58,16 @@ class AlianceService
             $success = $aliances->save();
             if (!$success)
                 throw new \Exception('Erro ao salvar a aliança');
-            $successMember = $this->createNewAlianceFounder($player->id, $aliances->id, "founder");
-            if (!$successMember)
-                throw new \Exception('Erro ao criar o fundador da aliança');
-            //atualiza a alianca na tabela de usuarios
-            DB::table('players')->where('id', $player->id)->update([
-                'aliance' => DB::raw("$aliances->id")
-            ]);
+
+            if (!$request->input('id')) {
+                $successMember = $this->createNewAlianceFounder($player->id, $aliances->id, "founder");
+                if (!$successMember)
+                    throw new \Exception('Erro ao criar o fundador da aliança');
+                //atualiza a alianca na tabela de usuarios
+                DB::table('players')->where('id', $player->id)->update([
+                    'aliance' => DB::raw("$aliances->id")
+                ]);
+            }
         } catch (Throwable $exception) {
             Log::error($exception);
             return response(['message' => 'Erro ao criar aliança ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
@@ -97,7 +105,6 @@ class AlianceService
         }
         return response()->json(['alianca' => $aliance, 'player' => $player], Response::HTTP_OK);
     }
-    //"SQLSTATE[HY000]: General error: 1364 Field 'idAliance' doesn't have a default value (Connection: mysql, SQL: insert into `aliances_members` (`player_id`, `status`, `role`, `dateAdmission`) values (39, A, member, ?))"
 
     private function saveRequest($playerId, $alianceId, $status)
     {
@@ -223,12 +230,13 @@ class AlianceService
         else
             return response()->json($findName, Response::HTTP_OK);
     }
-    /**
-     * @todo recuperar a quantide supotada para a aliança
-     */
+    
     private function getSupportedMemberCount($idAliance)
     {
-        return 10 * 1;
+        $alianca = Aliance::findOrFail($idAliance);
+        $aliance = new Aliance();
+        $level = $aliance->getLevelBuildAliance($alianca->founder);
+        return $level * env("COUNT_MEMBER_LEVEL_ALIANCE");
     }
     private function availableSlot($idAliance)
     {
