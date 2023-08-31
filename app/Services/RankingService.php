@@ -96,32 +96,27 @@ class RankingService
     public function initScoresAliance()
     {
         $aliances = new Aliance();
-        $arrAlianca = $aliances->getAliances();
         $sumScoreMembers = $aliances->getSumScoresMembers();
-        foreach($sumScoreMembers as $scores){
-            // return $scores;
+        AlianceRanking::truncate();
+
+        foreach ($sumScoreMembers as $scores) {
             $aliance = Aliance::find($scores->id);
             $aliance->score = $scores->score;
             $aliance->buildScore = $scores->buildScore;
             $aliance->defenseScore = $scores->defenseScore;
             // $aliance->militaryScore = $scores->militaryScore;
             // $aliance->researchScore = $scores->researchScore;
-            $aliance->attackScore = $scores->attackScore;;
+            $aliance->attackScore = $scores->attackScore;
+            $this->atualizaRanking($aliance);
             $aliance->save();
-            // return $aliance;
         }
+
         return $sumScoreMembers;
-        // $members = [];
-        // foreach ($arrAlianca as $alianca) {
-        //     $membrosDaAlianca = $aliances->getMembersAliance($alianca->id);
-        //     $members[$alianca->id] = $membrosDaAlianca;
-        //    return $this->calculaScores($membrosDaAlianca);
-        // }
-        // return $members;
     }
-    private function atualizaRanking($dados){
-        $findAlianceDelete = AlianceRanking::where('aliance',$dados->aliance);
-        if($findAlianceDelete){
+    private function atualizaRanking($dados)
+    {
+        $findAlianceDelete = AlianceRanking::where('aliance', $dados->aliance);
+        if ($findAlianceDelete) {
             $findAlianceDelete->delete();
         }
         $alianceRanking = new AlianceRanking();
@@ -135,24 +130,23 @@ class RankingService
         $alianceRanking->defenseScore = $dados->defenseScore;
         $alianceRanking->warScore = 0;
         $alianceRanking->save();
-
     }
     private function calculaScores($members)
     {
 
-        $aliance = Aliance::find($members[0]->aliance); // Supondo que você esteja usando o primeiro membro para pegar o ID da aliança
+        $aliance = Aliance::find($members[0]->aliance);
 
         if (!$aliance) {
             return response()->json(['message' => 'Aliança não encontrada.'], 404);
         }
-        
+
         $aliance->name = $members[0]->name;
         $aliance->founder = $members[0]->founder;
-        $aliance->score = 0; // Zerar o score para recalcular
-        $aliance->buildScore = 0; // Zerar o buildScore para recalcular
-        $aliance->attackScore = 0; // Zerar o attackScore para recalcular
-        $aliance->defenseScore = 0; // Zerar o defenseScore para recalcular
-        
+        $aliance->score = 0;
+        $aliance->buildScore = 0;
+        $aliance->attackScore = 0;
+        $aliance->defenseScore = 0;
+
         foreach ($members as $member) {
             $aliance->score += $member->score;
             $aliance->buildScore += $member->buildScore;
@@ -161,28 +155,10 @@ class RankingService
         }
 
         $aliance->save();
-        $findAlianceDelete = AlianceRanking::where('aliance', $aliance->id)->first(); // Adicionei ->first() para obter o registro
+        $findAlianceDelete = AlianceRanking::where('aliance', $aliance->id)->first();
 
         if ($findAlianceDelete) {
             $findAlianceDelete->delete();
         }
-        return ['id'=>$aliance->id];
-        /*
-        $aliance = new Aliance();
-        foreach ($members as $member) {
-            $aliance->founder = $member->founder;
-            $aliance->score += $member->score;
-            $aliance->buildScore += $member->buildScore;
-
-            //  $aliance->labScore += $member->labScore;    
-            // $aliance->trade
-            $aliance->attackScore += $member->attackScore;
-            $aliance->defenseScore += $member->defenseScore;
-            // $aliance->warScore += $member->war
-        }
-        $update = new Aliance();
-        $update->where('id', $aliance->id)->update($aliance->toArray());
-        $this->atualizaRanking($aliance);*/
-
     }
 }
