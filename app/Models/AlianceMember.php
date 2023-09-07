@@ -19,7 +19,8 @@ class AlianceMember extends Model
         'status',
         'dateAdmission',
         'dateOf',
-        'idAliance'
+        'idAliance',
+        'idRank'
     ];
 
     public function getMembers($alianceId)

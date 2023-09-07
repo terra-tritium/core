@@ -8,6 +8,7 @@ use App\Models\Building;
 use App\Models\Logo;
 use App\Models\Planet;
 use App\Models\Player;
+use App\Models\RankMember;
 use App\Services\AlianceService;
 use App\Services\RankingService;
 use Carbon\Carbon;
@@ -735,5 +736,9 @@ class AliancesController extends Controller
     public function getScoresAliance(){
         $ranking = new RankingService();
         return $ranking->initScoresAliance();
+    }
+    public function getRanks(){
+        $rankMember = RankMember::where('visible',true)->get();
+        return response()->json($rankMember, Response::HTTP_OK);
     }
 }

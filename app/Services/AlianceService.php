@@ -80,6 +80,7 @@ class AlianceService
         $alianceMember->player_id = $playerId;
         $alianceMember->idAliance = $alianceId;
         $alianceMember->role = $role;
+        $alianceMember->idRank = env("MEMBER_FOUNDER");
         $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
         return $alianceMember->save();
     }
@@ -188,7 +189,7 @@ class AlianceService
     public function updateRequestMember($memberRequestId, $typeAction)
     {
         $alianceMember = AlianceMember::find($memberRequestId);
-        $player = Player::find($alianceMember->player_id);
+        $player = Player::find($alianceMember->player_id); 
         if (!$alianceMember || !$player) {
             return response()->json(['message' => 'Member request not found.'], Response::HTTP_NOT_FOUND);
         }
@@ -201,6 +202,7 @@ class AlianceService
         if ($typeAction == 'A') {
             $alianceMember->status = $typeAction;
             $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
+            $alianceMember->idRank = env("MEMBER_SOLDIER");
             $alianceMember->save();
             $player->aliance = $alianceMember->idAliance;
             $player->save();
