@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             PlayerSeeder::class,
             TradingSeeder::class,
             LogoSeeder::class,
+            RankMemberSeeder::class,
             AlianceSeeder::class
         ]);
     }

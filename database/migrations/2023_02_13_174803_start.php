@@ -14,6 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
+        
         Schema::create('aliances', function (Blueprint $table) {
             $table->id()->index();
             $table->string("description")->nullable();
@@ -46,6 +47,15 @@ return new class extends Migration
             $table->bigInteger("warScore");
         });
 
+        Schema::create('rank_member', function(Blueprint $table){
+            $table->id();
+            $table->integer('level');
+            $table->string('rankName','100');
+            $table->integer('limit')->nullable();
+            $table->string('description');
+            $table->boolean('visible')->default(true);
+        });
+
         Schema::create('aliances_members', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('player_id')->constrained("players");
@@ -55,10 +65,10 @@ return new class extends Migration
             $table->timestamp('createdAt')->useCurrent();
             $table->timestamp('dateAdmission')->nullable();
             $table->timestamp('dateOf')->nullable();
-            // $table->foreign('idPlayer')->references('id')->on('players');
-            $table->foreign('idAliance')->references('id')->on('aliances');
-            //            $table->foreign('idMarket')->references('id')->on('market');
+            $table->unsignedBigInteger('idRank')->nullable();
 
+            $table->foreign('idAliance')->references('id')->on('aliances');
+            $table->foreign('idRank')->references('id')->on('rank_member');
         });
 
         Schema::create('aliances_requests', function (Blueprint $table) {
@@ -76,6 +86,10 @@ return new class extends Migration
             $table->string('alt',100)->nullable();
             $table->boolean('available')->default(true);
         });
+
+
+
+
 
         //fim aliança
 
