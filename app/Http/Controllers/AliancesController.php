@@ -741,4 +741,10 @@ class AliancesController extends Controller
         $rankMember = RankMember::where('visible',true)->get();
         return response()->json($rankMember, Response::HTTP_OK);
     }
+    public function getMembersRank($idAliance){
+        return (new AlianceService)->getMembersRank($idAliance);
+    }
+    public function changeRankMember($idRank,$idMember,$idAliance){
+        return (new AlianceService)->changeRankMember($idRank,$idMember,$idAliance);
+    }
 }

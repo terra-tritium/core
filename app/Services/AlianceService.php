@@ -189,7 +189,7 @@ class AlianceService
     public function updateRequestMember($memberRequestId, $typeAction)
     {
         $alianceMember = AlianceMember::find($memberRequestId);
-        $player = Player::find($alianceMember->player_id); 
+        $player = Player::find($alianceMember->player_id);
         if (!$alianceMember || !$player) {
             return response()->json(['message' => 'Member request not found.'], Response::HTTP_NOT_FOUND);
         }
@@ -233,7 +233,7 @@ class AlianceService
         else
             return response()->json($findName, Response::HTTP_OK);
     }
-    
+
     private function getSupportedMemberCount($idAliance)
     {
         $alianca = Aliance::findOrFail($idAliance);
@@ -293,4 +293,66 @@ class AlianceService
             return response()->json(['message' => 'Erro ao cancelar requisição'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    public function getMembersRank($idAliance)
+    {
+        try {
+            $alianceMember = new AlianceMember();
+            $ranksMember = $alianceMember->getAlianceRanks($idAliance);
+            return response()->json($ranksMember, Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json($e, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    public function changeRankMember($idRank, $idMember, $idAliance)
+    {
+        try {
+            $alianceMember = AlianceMember::find($idMember);
+            $alianceMem = new AlianceMember();
+            $ranksMember = $alianceMem->getAlianceRanks($idAliance);
+            $membroRebaixado = 'rebaixado';
+            $promovido = "promovido";
+            foreach ($ranksMember as $rank) {
+                if ($rank->idRank == $idRank) {
+                    if (!$rank->roleAvailable) {
+                        $membroRebaixado = AlianceMember::where([['idAliance', '=', $idAliance], ['idRank', '=', $idRank]])->first();
+                        $this->alterarPatenteMembro($membroRebaixado, env("MEMBER_SOLDIER"));
+                        /**Rebaixa */
+                        $promovido = $alianceMember;
+                        $this->alterarPatenteMembro($alianceMember, $idRank);
+                        /**Promove */
+                        break;
+                    } else {
+                        $this->alterarPatenteMembro($alianceMember, $idRank);
+                    }
+                } else {
+                    /**Quando ainda não existe ninguem com esse cargo */
+                    $this->alterarPatenteMembro($alianceMember, $idRank);
+                }
+            }
+            // if (!$ranksMember) {
+            //     $promovido = "Foi promovido pq nao tinha membro nesse cargo";
+            //     $this->alterarPatenteMembro($alianceMember, $idRank);
+            // }
+
+            return response()->json(
+                [
+                    'Membro' => $alianceMember,
+                    'rankId' => $idRank,
+                    'ranks' => $ranksMember,
+                    'rebaixado' => $membroRebaixado,
+                    "promovido" => $promovido
+                ],
+                Response::HTTP_OK
+            );
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Erro ao trocar patente']);
+        }
+    }
+    private function alterarPatenteMembro($alianceMember, $idRank)
+    {
+        $alianceMember->idRank = $idRank;
+        $alianceMember->save();
+        $this->notify($alianceMember->player_id, "Your rank has been changed.", "aliance");
+    }
+    //$idRank,$idMember,$idAliance
 }

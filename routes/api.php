@@ -183,6 +183,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/exit/{alianceId}',[AliancesController::class, 'exit']);
         Route::put('/cancel-request',[AliancesController::class, 'cancelRequest']);
         Route::get('/ranks',[AliancesController::class, 'getRanks']);
+        Route::get('/members-rank/{idAliance}',[AliancesController::class, 'getMembersRank']);
+        Route::put('/change-rank/{idRank}/{idMember}/{idAliance}',[AliancesController::class, 'changeRankMember']);
+
         //oute::post('/member/new-request',[AliancesController::controller ,''])
         // Route::get('/details/{alianceId}', [AliancesController::class, 'details']);
         Route::get("/scores", [AliancesController::class, 'getScoresAliance']);
