@@ -185,6 +185,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/ranks',[AliancesController::class, 'getRanks']);
         Route::get('/members-rank/{idAliance}',[AliancesController::class, 'getMembersRank']);
         Route::put('/change-rank/{idRank}/{idMember}/{idAliance}',[AliancesController::class, 'changeRankMember']);
+        Route::put('/relinquish-rank/{idAliance}/{idMember}',[AliancesController::class, 'deixarRank']);
+//"Method App\\Http\\Controllers\\AliancesController::deixarRank does not exist."
 
         //oute::post('/member/new-request',[AliancesController::controller ,''])
         // Route::get('/details/{alianceId}', [AliancesController::class, 'details']);

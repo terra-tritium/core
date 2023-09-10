@@ -8,6 +8,7 @@ use App\Models\Building;
 use App\Models\Logbook;
 use App\Models\Planet;
 use App\Models\Player;
+use App\Models\RankMember;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -139,10 +140,15 @@ class AlianceService
     {
         $alianceMember = AlianceMember::where('player_id', $playerId)->first();
         $aliance = Aliance::find($alianceMember->idAliance ?? 0);
+        $rank = RankMember::find($alianceMember->idRank);
         if (!$alianceMember || !$aliance) {
             return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
         }
+        //"Attempt to read property \"{\"id\":1,\"level\":12,\"rankName\":\"Alliance Founder\",\"limit\":1,\"description\":\"Dissolver\\/Mudar nome e Delegar Cargos. Adiciona\\/expulsa novos membros\",\"visible\":0}\" on string"
+
         $responseData = $alianceMember;
+        $responseData['currentPlayer'] = $playerId;
+        $responseData['role']=$rank->rankName;
         $responseData['logo'] = $aliance->logo;
         $responseData['countMembers'] = AlianceMember::where([['idAliance', '=', $alianceMember->idAliance], ['status', '=', 'A']])->count();
         return response()->json($responseData, Response::HTTP_OK);
@@ -353,6 +359,20 @@ class AlianceService
         $alianceMember->idRank = $idRank;
         $alianceMember->save();
         $this->notify($alianceMember->player_id, "Your rank has been changed.", "aliance");
+    }
+    public function deixarCargo($idAliance, $idMember)
+    {
+        try {
+            $alianceMember = AlianceMember::find($idMember);
+            $aliance = Aliance::find($idAliance);
+            $alianceMember->idRank = env("MEMBER_SOLDIER");
+            $alianceMember->save();
+            $this->notify($alianceMember->player_id, "You relinquished your rank.", "aliance");
+            $this->notify($aliance->founder, "A member relinquished their rank.", "aliance");
+            return response()->json(['message' => 'Voce deixou seu cargo na aliança'], Response::HTTP_ACCEPTED);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Erro ao deixar patente'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
     //$idRank,$idMember,$idAliance
 }

@@ -747,4 +747,7 @@ class AliancesController extends Controller
     public function changeRankMember($idRank,$idMember,$idAliance){
         return (new AlianceService)->changeRankMember($idRank,$idMember,$idAliance);
     }
+    public function deixarRank($idAliance,$idMember){
+        return (new AlianceService)->deixarCargo($idAliance, $idMember);
+    }
 }
