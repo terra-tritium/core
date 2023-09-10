@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Fleet;
 use App\Services\ProductionService;
 
 class FleetService
@@ -19,5 +20,10 @@ class FleetService
         } else {
             return "No suficients Funds";
         }
+    }
+    public function getFleetPlayer($player){
+        $fleet = new Fleet();
+        $fleets = $fleet->getFleetPlayer($player);
+        return $fleets;
     }
 }

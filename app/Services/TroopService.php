@@ -32,4 +32,9 @@ class TroopService
         return $troops;
     }
     
+    public function getTroopPlayer($player){
+        $troop = new Troop();
+        $troops = $troop->getTroopPlayer($player);
+        return $troops;
+    }
 }

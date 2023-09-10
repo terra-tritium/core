@@ -10,7 +10,9 @@ use App\Models\Planet;
 use App\Models\Player;
 use App\Models\RankMember;
 use App\Services\AlianceService;
+use App\Services\FleetService;
 use App\Services\RankingService;
+use App\Services\TroopService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -749,5 +751,17 @@ class AliancesController extends Controller
     }
     public function deixarRank($idAliance,$idMember){
         return (new AlianceService)->deixarCargo($idAliance, $idMember);
+    }
+    public function getUnitsPlayer($playerId, $type){
+        if($type == "fleet"){
+            $fleetService = new FleetService();
+            $fleets = $fleetService->getFleetPlayer($playerId);
+            return response()->json($fleets,Response::HTTP_OK);
+        }
+        if($type == "troop"){
+            $troopService = new TroopService();
+            $troops = $troopService->getTroopPlayer($playerId);
+            return response()->json($troops,Response::HTTP_OK);
+        }
     }
 }
