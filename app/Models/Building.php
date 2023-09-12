@@ -19,4 +19,18 @@ class Building extends Model
     use HasFactory;
     protected $table = 'buildings';
     public $timestamps = false;
+
+    public function build()
+    {
+        return $this->hasOne(
+            Build::class,
+            'id',
+            'build'
+        );
+    }
+
+    public function planet()
+    {
+        return $this->belongsTo(Planet::class, 'id', 'planet');
+    }
 }
