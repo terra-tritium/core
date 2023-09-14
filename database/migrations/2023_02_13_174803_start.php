@@ -87,8 +87,29 @@ return new class extends Migration
             $table->boolean('available')->default(true);
         });
 
+        Schema::create('chat_group', function(Blueprint $table){
+            $table->id();
+            $table->unsignedBigInteger('idAliance');
+            $table->string('groupName','255')->nullabe();
+            $table->timestamp('createdAt')->useCurrent();
+            $table->boolean('status')->default(0);
+            $table->foreign('idAliance')->references('id')->on('aliances');
 
+        });
 
+        Schema::create('message_group', function(Blueprint $table){
+            $table->id();
+            $table->unsignedBigInteger('idChatGroup');
+            $table->unsignedBigInteger('remetenteId');
+            $table->string('message','255')->nullabe();
+            $table->timestamp('createdAt')->useCurrent();
+            $table->boolean('status')->default(0);
+
+            $table->foreign('idChatGroup')->references('id')->on('chat_group');
+            // $table->foreign('remetenteId')->references('id')->on('players');
+
+        });
+        
 
 
         //fim aliança

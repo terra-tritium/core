@@ -764,4 +764,7 @@ class AliancesController extends Controller
             return response()->json($troops,Response::HTTP_OK);
         }
     }
+    public function newMessageGroup(Request $request){
+        return response()->json(["mandou"=>$request->toArray()], Response::HTTP_OK);
+    }
 }

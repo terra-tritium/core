@@ -72,7 +72,7 @@ class AlianceService
             //
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response(['message' => 'Erro ao criar aliança ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
+            return response(['message' => 'Erro ao criar aliança ', 'code' => 400, 'err'=>$exception, 'success' => false], Response::HTTP_BAD_REQUEST);
         }
     }
     public function createNewAlianceFounder($playerId, $alianceId, $role = "member")

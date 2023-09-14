@@ -15,9 +15,9 @@ class RankMemberSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('rank_member ')->insert([
-            'id'=>1,
-            'level' => 12,
+        DB::table('rank_member')->insert([
+            "id"=>1,
+            "level" => 12,
             "rankName" => "Alliance Founder",
             "limit" => 1,
             "description" => "Dissolver/Mudar nome e Delegar Cargos. Adiciona/expulsa novos membros",
