@@ -19,5 +19,28 @@ class MessageGroup extends Model
         'createdAt',
         'status'
     ];
-   
+
+    public function getMessagesGroupAliance($idAliance, $idRementente)
+    {
+        
+        $messages = DB::table('origin.chat_group as cg')
+            ->join('origin.message_group as mg', 'mg.idChatGroup', '=', 'cg.id')
+            ->join('origin.players as p', 'p.id', '=', 'mg.remetenteId')
+            ->select(
+                'mg.id',
+                'cg.idAliance',
+                'mg.remetenteId',
+                'p.name as nameRemetente',
+                'mg.idChatGroup',
+                'mg.message',
+                'cg.groupName',
+                'mg.createdAt',
+                'mg.status',
+                DB::raw("CASE WHEN mg.remetenteId = $idRementente THEN true ELSE false END AS sender")
+            )
+            ->where('cg.idAliance', '=', $idAliance)
+            ->orderBy('mg.createdAt', 'ASC') 
+            ->get();
+        return $messages;    
+    }
 }

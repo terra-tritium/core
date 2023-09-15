@@ -8,6 +8,7 @@ use App\Models\Player;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use App\Models\Message;
+use App\Services\MessageService;
 use DateTime;
 use Exception;
 use Illuminate\Http\Response;
@@ -215,4 +216,5 @@ class MessageController extends Controller
         $msg = $message->getLastMessageNotReadBySender($player->user,$senderid);
         return $msg;
     }
+    
 }

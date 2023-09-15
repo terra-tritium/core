@@ -11,6 +11,7 @@ use App\Models\Player;
 use App\Models\RankMember;
 use App\Services\AlianceService;
 use App\Services\FleetService;
+use App\Services\MessageService;
 use App\Services\RankingService;
 use App\Services\TroopService;
 use Carbon\Carbon;
@@ -765,6 +766,14 @@ class AliancesController extends Controller
         }
     }
     public function newMessageGroup(Request $request){
-        return response()->json(["mandou"=>$request->toArray()], Response::HTTP_OK);
+        $messageService = new MessageService();
+        return $messageService->setMessageAlianceGroup($request);
+    }
+    public function getMessagesGroup($idAliance){
+        $messageService = new MessageService();
+        return $messageService->getMessagesGroupAliance($idAliance);
+    }
+    public function delMessage($idMessage){
+        return (new MessageService())->deleteMessage($idMessage);
     }
 }
