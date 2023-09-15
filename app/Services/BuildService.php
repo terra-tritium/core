@@ -14,20 +14,17 @@ use App\Services\WorkerService;
 
 class BuildService
 {
-    private $planetService;
-    private $playerService;
-
     private $basicScoreFator = 0.01;
     private $premiumScoreFator = 0.03;
     private $levelFactor = 100;
     private $initialBattery = 10000;
 
-    public function __construct() {
-        $this->playerService = new PlayerService();
-        $this->planetService = new PlanetService();
-        $this->researchService = new ResearchService();
-        $this->workerService = new WorkerService();
-    }
+    public function __construct(
+        private PlayerService $playerService = new PlayerService(),
+        private PlanetService $planetService = new PlanetService(),
+        private WorkerService $workerService = new WorkerService(),
+        private ResearchService $researchService = new ResearchService()
+    ) {}
 
     private function starNewMining($p1, $building, $resourceMining, $resourceSpend, $require) {
 
@@ -46,7 +43,7 @@ class BuildService
                 $hasBalance = $this->planetService->enoughBalance($p1, $require, $resourceSpend);
                 if ($hasBalance) { $p1 = $this->planetService->removeCrystal($p1, $require); }
                 break;
-        
+
             default:
                 break;
         }
@@ -62,7 +59,7 @@ class BuildService
         $building->level = 1;
         $building->workers = 0;
 
-        $p1 = Planet::find($building->planet); 
+        $p1 = Planet::find($building->planet);
         $build = Build::find($building->build);
         $playerLogged = Player::getPlayerLogged();
         $player = Player::findOrFail($playerLogged->id);
@@ -76,7 +73,7 @@ class BuildService
 
         $building->ready = time() + ($require->time * env("TRITIUM_BUILD_SPEED"));
         $p1->ready = $building->ready;
-        
+
         // Colonization
         if ($building->build == 1) {
             if ($this->planetService->enoughBalance($p1, $require->metal, 1)) {
@@ -190,12 +187,12 @@ class BuildService
         }
 
         // Laboratory
-        if ($building->build == 7) {
+        if ($building->build == Build::LABORATORY) {
             $p1->pwEnergy = 1;
         }
 
         $player = $this->playerService->addBuildScore($player, $this->levelFactor);
-        
+
         $building->planet = Planet::where([['player', $player->id], ['id', $building->planet]])->firstOrFail()->id;
 
         $building->save();
@@ -234,7 +231,7 @@ class BuildService
         $building = Building::find($buildId);
 
         # Don't demolish all colonizators, have to have at least one
-        if ($building->build == 1) {
+        if ($building->build == Build::COLONIZATION) {
             $countColonizator = Building::where('build', 1)->count();
             if ($countColonizator <= 1) {
                 return false;
@@ -272,17 +269,17 @@ class BuildService
         $building->level += 1;
 
         // Battery House
-        if ($building->build == 11) {
-            $player = $this->planetService->incrementBattery($planet, $this->initialBattery * $building->level);
+        if ($building->build == Build::BATERYHOUSE) {
+            $this->planetService->incrementBattery($planet, $this->initialBattery * $building->level);
         }
 
         // Energy
-        if ($building->build == 7) {
+        if ($building->build == Build::ENERGYCOLLECTOR) {
             $planet->pwEnergy = $building->level;
         }
 
         // Warehouse
-        if ($building->build == 8) {
+        if ($building->build == Build::WAREHOUSE) {
             $planet->capMetal = $building->level * 10000;
             $planet->capUranium = $building->level * 10000;
             $planet->capCrystal = $building->level * 10000;

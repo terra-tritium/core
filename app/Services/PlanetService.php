@@ -25,7 +25,7 @@ class PlanetService
   public function currentBalance($p1, $type) {
     # secounds in hour
     $sInHour = 3600;
-    
+
     $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $sInHour;
     $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $sInHour;
     $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $sInHour;
@@ -33,11 +33,11 @@ class PlanetService
     $activeLaboratory = ($this->timeNow - $p1->timeResearch) / $sInHour;
 
     switch ($type) {
-      case 0: 
+      case 0:
         return $p1->energy + ($p1->workersWaiting * (env("TRITIUM_ENERGY") * $activeEnergyMining));
-      case 1: 
+      case 1:
         return $p1->metal + ($p1->pwMetal * (env("TRITIUM_METAL") * $activeMetalMining));
-      case 2: 
+      case 2:
         return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM") * $activeUraniumMining));
       case 3:
         return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL") * $activeCrystalMining));
@@ -90,7 +90,7 @@ class PlanetService
         $planet->timeMetal = $this->timeNow;
         $planet->pwMetal = 0;
         break;
-    
+
       case 2:
         $planet->timeUranium = $this->timeNow;
         $planet->pwUranium = 0;
@@ -166,9 +166,9 @@ class PlanetService
     return $p1;
   }
 
-  public function incrementBattery($p1, $units) {
+  public function incrementBattery(&$p1, $units) {
     $p1->battery += $units;
     return $p1;
   }
- 
+
 }
