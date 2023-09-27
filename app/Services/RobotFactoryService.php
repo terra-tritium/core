@@ -28,16 +28,18 @@ class RobotFactoryService
 
     $this->workerService->syncronizeEnergy($planet);
 
-    $cost = $qtd * env('TRITIUM_HUMANOID_PRICE');
+    $energyCost = $qtd * env('TRITIUM_HUMANOID_PRICE');
+    $metalCost = $qtd * env('TRITIUM_HUMANOID_PRICE');
 
-    # enough energy?
-    if ($planet->energy < $cost) {
+    # enough energy and metal?
+    if ($planet->energy < $energyCost || $planet->metal < $metalCost) {
       return false;
     }
 
     $player->score += $qtd * env('TRITIUM_HUMANOID_POINTS');
 
-    $planet->energy -= $cost;
+    $planet->energy -= $energyCost;
+    $planet->metal -= $metalCost;
     $planet->workers += $qtd;
     $planet->workersWaiting += $qtd;
 
