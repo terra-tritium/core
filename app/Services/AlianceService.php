@@ -4,9 +4,7 @@ namespace App\Services;
 
 use App\Models\Aliance;
 use App\Models\AlianceMember;
-use App\Models\Building;
 use App\Models\Logbook;
-use App\Models\Planet;
 use App\Models\Player;
 use App\Models\RankMember;
 use DateTime;
@@ -118,15 +116,7 @@ class AlianceService
         $alianceMember->role = 'member';
         $alianceMember->dateAdmission = $status === 'A' ? (new DateTime())->format('Y-m-d H:i:s') : null;
         return $alianceMember->save();
-        /*
-          'player_id',
-        'createdAt',
-        'role',
-        'status',
-        'dateAdmission',
-        'dateOf',
-        'idAliance'
-        */
+    
     }
     public function getMembersAliance($alianceId)
     {
@@ -144,7 +134,6 @@ class AlianceService
         if (!$alianceMember || !$aliance) {
             return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
         }
-        //"Attempt to read property \"{\"id\":1,\"level\":12,\"rankName\":\"Alliance Founder\",\"limit\":1,\"description\":\"Dissolver\\/Mudar nome e Delegar Cargos. Adiciona\\/expulsa novos membros\",\"visible\":0}\" on string"
 
         $responseData = $alianceMember;
         $responseData['currentPlayer'] = $playerId;
@@ -374,5 +363,4 @@ class AlianceService
             return response()->json(['message' => 'Erro ao deixar patente'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    //$idRank,$idMember,$idAliance
 }

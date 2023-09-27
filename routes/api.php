@@ -162,14 +162,16 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('aliance')->group(function () {
+        Route::get('/list', [AliancesController::class, 'index']);
         Route::post('/create', [AliancesController::class, 'create']);
         Route::put('/edit/{id}', [AliancesController::class, 'update']);
-        Route::get('/list', [AliancesController::class, 'index']);
         Route::delete('/delete/{idAliance}', [AliancesController::class, 'destroy']);
+
         Route::put('/update-logo/{id}', [AliancesController::class, 'updateLogo']);
         Route::post('/join', [AliancesController::class,'joinAliance']);
         Route::post('/request', [AliancesController::class,'handlePlayerRequest']);
         Route::post('/leave',[AliancesController::class,'leaveAliance']);
+        
         Route::post('/kick-player', [AliancesController::class, 'kickPlayer']);
         Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
         Route::get('/my-aliance', [AliancesController::class,'myAliance']);
