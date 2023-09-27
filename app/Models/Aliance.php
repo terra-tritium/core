@@ -71,4 +71,26 @@ class Aliance extends Model
             ->get();
         return $members;
     }
+
+    public function listAlianceForChat()
+    {
+        $aliancas = DB::table('aliances as a')
+            ->leftJoin(
+                DB::raw('(
+                    SELECT idDestino as id, COUNT(*) as interacao_count
+                    FROM chat_aliance
+                    GROUP BY idDestino
+                    UNION ALL
+                    SELECT idOrigem as id, COUNT(*) as interacao_count
+                    FROM chat_aliance
+                    GROUP BY idOrigem
+        ) ca'), 'a.id', '=', 'ca.id')
+            ->select('a.id', 'a.name', 'a.logo', DB::raw('(MAX(ca.interacao_count) > 0) as interacao'))
+            ->groupBy('a.id', 'a.name', 'a.logo')
+            ->orderByDesc('interacao')
+            ->orderBy('a.name')
+            ->get();
+
+        return $aliancas;
+    }
 }

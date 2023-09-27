@@ -96,6 +96,21 @@ return new class extends Migration
             $table->foreign('idAliance')->references('id')->on('aliances');
 
         });
+/**
+ * Chat entre duas alianças
+ */
+        Schema::create('chat_aliance', function(Blueprint $table){
+            $table->id();
+            $table->unsignedBigInteger('idOrigem');
+            $table->unsignedBigInteger('idDestino');
+            $table->timestamp('createdAt')->useCurrent();
+            $table->varchar('status','1')->default('A');
+            $table->string('message','255')->nullabe();
+            $table->unsignedBigInteger('player');
+            $table->foreign('idOrigem')->references('id')->on('aliances');
+            $table->foreign('idDestino')->references('id')->on('aliances');
+
+        });
 
         Schema::create('message_group', function(Blueprint $table){
             $table->id();

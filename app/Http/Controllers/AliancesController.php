@@ -10,6 +10,7 @@ use App\Models\Planet;
 use App\Models\Player;
 use App\Models\RankMember;
 use App\Services\AlianceService;
+use App\Services\ChatAlianceService;
 use App\Services\FleetService;
 use App\Services\MessageService;
 use App\Services\RankingService;
@@ -298,7 +299,7 @@ class AliancesController extends Controller
             );
         }
     }
-    
+
 
     /**
      *
@@ -336,9 +337,9 @@ class AliancesController extends Controller
     public function joinAliance(Request $request)
     {
         return (new AlianceService)->joinAlliance($request->input('alianca_id'));
-        
 
-       /* if ($player->leave_date) {
+
+        /* if ($player->leave_date) {
             $leaveDate = Carbon::parse($player->leave_date);
 
             if (Carbon::now()->diffInDays($leaveDate) < 5) {
@@ -683,10 +684,10 @@ class AliancesController extends Controller
         $aliance = Aliance::find($player->aliance);
         if (!$aliance) {
             //nenhuma aliança viinculada
-            $alianceMemberPending = AlianceMember::where([['player_id', '=', $player->id], ['status','=','P']])->first();
-            if($alianceMemberPending){
+            $alianceMemberPending = AlianceMember::where([['player_id', '=', $player->id], ['status', '=', 'P']])->first();
+            if ($alianceMemberPending) {
                 return response()->json($alianceMemberPending, Response::HTTP_OK);
-            }else{
+            } else {
                 return response()->json(['message' => 'Does not have allaince.'], Response::HTTP_NO_CONTENT);
             }
         }
@@ -727,53 +728,84 @@ class AliancesController extends Controller
     {
         return (new AlianceService)->updateRequestMember($idMemberRequest, $action);
     }
-    public function getAvailableName($name){
+    public function getAvailableName($name)
+    {
         return (new AlianceService)->getAvailableName($name);
     }
-    public function exit($alianceId){
+    public function exit($alianceId)
+    {
         return (new AlianceService)->exit($alianceId);
     }
-    public function cancelRequest(){
+    public function cancelRequest()
+    {
         return (new AlianceService)->cancelRequest();
     }
-    public function getScoresAliance(){
+    public function getScoresAliance()
+    {
         $ranking = new RankingService();
         return $ranking->initScoresAliance();
     }
-    public function getRanks(){
-        $rankMember = RankMember::where('visible',true)->get();
+    public function getRanks()
+    {
+        $rankMember = RankMember::where('visible', true)->get();
         return response()->json($rankMember, Response::HTTP_OK);
     }
-    public function getMembersRank($idAliance){
+    public function getMembersRank($idAliance)
+    {
         return (new AlianceService)->getMembersRank($idAliance);
     }
-    public function changeRankMember($idRank,$idMember,$idAliance){
-        return (new AlianceService)->changeRankMember($idRank,$idMember,$idAliance);
+    public function changeRankMember($idRank, $idMember, $idAliance)
+    {
+        return (new AlianceService)->changeRankMember($idRank, $idMember, $idAliance);
     }
-    public function deixarRank($idAliance,$idMember){
+    public function deixarRank($idAliance, $idMember)
+    {
         return (new AlianceService)->deixarCargo($idAliance, $idMember);
     }
-    public function getUnitsPlayer($playerId, $type){
-        if($type == "fleet"){
+    public function getUnitsPlayer($playerId, $type)
+    {
+        if ($type == "fleet") {
             $fleetService = new FleetService();
             $fleets = $fleetService->getFleetPlayer($playerId);
-            return response()->json($fleets,Response::HTTP_OK);
+            return response()->json($fleets, Response::HTTP_OK);
         }
-        if($type == "troop"){
+        if ($type == "troop") {
             $troopService = new TroopService();
             $troops = $troopService->getTroopPlayer($playerId);
-            return response()->json($troops,Response::HTTP_OK);
+            return response()->json($troops, Response::HTTP_OK);
         }
     }
-    public function newMessageGroup(Request $request){
+    public function newMessageGroup(Request $request)
+    {
         $messageService = new MessageService();
         return $messageService->setMessageAlianceGroup($request);
     }
-    public function getMessagesGroup($idAliance){
+    public function getMessagesGroup($idAliance)
+    {
         $messageService = new MessageService();
         return $messageService->getMessagesGroupAliance($idAliance);
     }
-    public function delMessage($idMessage){
+    public function delMessage($idMessage)
+    {
         return (new MessageService())->deleteMessage($idMessage);
+    }
+
+    public function newMessageAliance(Request $request)
+    {
+        $chatAlianceService = new ChatAlianceService();
+        return $chatAlianceService->newMessageAlianceChat($request);
+    }
+
+    public function getMessageWithAliance($destino)
+    {
+        $chatAlianceService = new ChatAlianceService();
+        return $chatAlianceService->getMessageWithAliance($destino);
+    }
+
+    public function listAlianceForChat()
+    {
+        $aliance = new Aliance();
+        $aliances = $aliance->listAlianceForChat();
+        return response()->json($aliances, Response::HTTP_OK);
     }
 }

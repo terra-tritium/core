@@ -7,6 +7,9 @@ use App\Models\Planet;
 use App\Models\Effect;
 use App\Models\NFTConfig;
 use App\Models\AlianceRanking;
+use App\Models\Building;
+use App\Models\Fleet;
+use App\Models\Troop;
 use App\Services\PlanetService;
 
 class PlayerService
@@ -35,7 +38,7 @@ class PlayerService
     $player->gameMode = 1;
     $player->attackStrategy = 1;
     $player->defenseStrategy = 1;
-    $player->researchPoints = rand(0,9);
+    $player->researchPoints = rand(0, 9);
 
     $player->score = rand(1, 17);
     $player->buildScore = rand(0, 17);
@@ -87,6 +90,8 @@ class PlayerService
     $planet->researchPoints = 0;
     $planet->pwResearch = 0;
     $planet->save();
+    $this->createBuildings($planet->id);
+    $this->creatUnits($planet->id,$player->id);
 
     $effect = new Effect();
     $effect->player = $player->id;
@@ -111,6 +116,47 @@ class PlayerService
     $nftConfig->slot4 = 0;
     $nftConfig->slot5 = 0;
     $nftConfig->save();
+  }
+  private function creatUnits($planetId, $playerId)
+  {
+    for ($i = 0; $i <= rand(3, 8); $i++) {
+      $troops = new Troop();
+      $troops->player = $playerId;
+      $troops->planet = $planetId;
+      $troops->unit = rand(1, 12);
+      $troops->quantity = rand(1, 7);
+      $troops->save();
+      $fleet = new Fleet();
+      $fleet->player = $playerId;
+      $fleet->planet = $planetId;
+      $fleet->unit = rand(1,12);
+      $fleet->quantity = rand(1,7);
+      $fleet->save();
+    }
+  }
+  /**
+   * @TODO Remover função ao subir para produção
+   */
+  private function createBuildings($planetId)
+  {
+    $building = new Building();
+    $building->build = 1;
+    $building->planet = $planetId;
+    $building->slot = 10;
+    $building->level = 2;
+    $building->workers = 1000;
+    $building->ready = 1000;
+    $building->save();
+
+    // alianca
+    $building = new Building();
+    $building->build = 14;
+    $building->planet = $planetId;
+    $building->slot = 11;
+    $building->level = 2;
+    $building->workers = 1000;
+    $building->ready = 1000;
+    $building->save();
   }
 
   private function startAlocation()

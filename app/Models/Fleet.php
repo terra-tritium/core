@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\DB;
 class Fleet extends Model
 {
     use HasFactory;
-    protected $table = 'fleets';
+    protected $table = 'fleet';
+    public $timestamps = false;
 
     public function getFleetPlayer($playerId)
     {
