@@ -216,5 +216,9 @@ class MessageController extends Controller
         $msg = $message->getLastMessageNotReadBySender($player->user,$senderid);
         return $msg;
     }
+    public function searchUser($string){
+        $messageService = new MessageService();
+        return $messageService->searchUser($string);
+    }
     
 }

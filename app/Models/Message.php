@@ -111,7 +111,7 @@ class Message extends Model
     {
         $users = DB::table('messages as m')
             ->select(DB::raw('CASE WHEN recipientId = ' . $userId . ' THEN senderId ELSE recipientId END AS id_usuario'))
-            ->select('users.name','users.id as userId')
+            ->select('users.name', 'users.id as userId')
             ->selectRaw('MAX(m.createdAt) AS createdAt')
             ->selectRaw('SUM(m.read = 0) AS countNotRead')
             ->join('users', function ($join) use ($userId) {
@@ -127,7 +127,6 @@ class Message extends Model
             ->get();
 
         return $users;
-
     }
     public function getConversation($recipientId, $senderId)
     {
@@ -158,5 +157,21 @@ class Message extends Model
                 'read' => true,
                 'readAt' => time()
             ]);
+    }
+    public function searchUserByName($id, $search)
+    {
+        $users = User::whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
+            ->where('id', '!=', $id)
+            ->select('id', 'name', 'email','id as userId')
+            ->get();
+        return $users;
+    }
+    public function searchUserByEmail($id, $search)
+    {
+        $users = User::whereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%'])
+            ->where('id', '!=', $id)
+            ->select('id', 'name', 'email', 'id as userId')
+            ->get();
+        return $users;
     }
 }
