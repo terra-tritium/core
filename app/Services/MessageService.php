@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ChatGroup;
+use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\Player;
 use DateTime;
@@ -16,17 +17,17 @@ use Throwable;
 
 class MessageService
 {
-public function getMessagesGroupAliance($idAliance)
+    public function getMessagesGroupAliance($idAliance)
     {
         try {
             $loggedPlayer = Player::getPlayerLogged();
             $messageGroup = new MessageGroup();
             $mensagens = $messageGroup->getMessagesGroupAliance($idAliance, $loggedPlayer->id);
-            return response()->json($mensagens,Response::HTTP_OK);
+            return response()->json($mensagens, Response::HTTP_OK);
         } catch (Exception $e) {
             Log::error('Erro ao recuperar mensagens em grupo: ' . $e->getMessage());
             return response()->json(
-                ['message' => "Erro ao enviar messagem", 'error' =>$e->getMessage()],
+                ['message' => "Erro ao enviar messagem", 'error' => $e->getMessage()],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -75,17 +76,30 @@ public function getMessagesGroupAliance($idAliance)
         }
         return false;
     }
-    public function deleteMessage($idMessage){
-        try{
+    public function deleteMessage($idMessage)
+    {
+        try {
             $msg = MessageGroup::find($idMessage);
-            if($msg){
+            if ($msg) {
                 $msg->status = false;
                 $msg->save();
             }
-            return response()->json(['message'=>"atualizado"],Response::HTTP_ACCEPTED);
-        }catch(Exception $e){
+            return response()->json(['message' => "atualizado"], Response::HTTP_ACCEPTED);
+        } catch (Exception $e) {
             Log::error('Erro ao apagar a mensagem: ' . $e->getMessage());
-            return response()->json(['message'=>"erro ao deletar menesagem"], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => "erro ao deletar menesagem"], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+    public function searchUser($string)
+    {
+        $result = [];
+        $loggedPlayer = Player::getPlayerLogged();
+        $message = new Message();
+        if (strstr($string, "@")) {
+            $result = $message->searchUserByEmail($loggedPlayer->id, $string);
+        } else {
+            $result = $message->searchUserByName($loggedPlayer->id, $string);
+        }
+        return response()->json($result, Response::HTTP_OK);
     }
 }

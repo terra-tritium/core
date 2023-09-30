@@ -149,6 +149,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/conversation/{senderid}', [MessageController::class, 'getConversation']);
         Route::post('/new', [MessageController::class, 'newMessage']);
         Route::get('/lastmsg-sender/{senderid}', [MessageController::class, 'getLastMessageNotReadBySender']);
+
+        ROute::get('/search-usuer/{string}', [MessageController::class, 'searchUser']);
     });
 
     Route::prefix('ranking')->group(function () {
