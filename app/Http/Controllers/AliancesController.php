@@ -46,6 +46,11 @@ use DateTime;
  */
 class AliancesController extends Controller
 {
+    protected $alianceService;
+    public function __construct(AlianceService $alianceService)
+    {
+        $this->alianceService = $alianceService;
+    }
     /**
      * * @OA\Get(
      *     path="/aliances/list",
@@ -77,8 +82,7 @@ class AliancesController extends Controller
             // $aliances = Aliance::all();
             $aliance = new Aliance();
             $dadosAlianca = $aliance->getAliances();
-            $aliancesService = new AlianceService();
-            $dadosAlianceBuild = $aliancesService->getDadosBuildsAliance($dadosAlianca);
+            $dadosAlianceBuild = $this->alianceService->getDadosBuildsAliance($dadosAlianca);
             return response()->json($dadosAlianceBuild, Response::HTTP_OK);
         } catch (Throwable $exception) {
             Log::error($exception);
@@ -129,24 +133,7 @@ class AliancesController extends Controller
         ]);
 
         try {
-            $alianceService = new AlianceService();
-            return $alianceService->founderAliance($request);
-
-            // throw new Exception("O valor não pode ser negativo.",400);
-            // // $aliances->description = $request->input('')
-            // return ['member'=>$successMember,'success'=>$success,'id'=>$aliances->id,'req'=>$request->toArray(), 'player'=>$player, 'alianca' => $aliances];
-            // return response(['message' => 'Essa ordem não está mais disponível ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
-
-
-            // if ($request->hasFile('logo')) {
-            //     $file = $request->file('logo');
-            //     $fileUrl = $this->addImage($file);
-            //     $aliances->logo = $fileUrl;
-            // }
-
-
-            // return response()->json($aliances, Response::HTTP_OK);
-
+            return $this->alianceService->founderAliance($request);
         } catch (Throwable $exception) {
             Log::error($exception);
             return response()->json(
@@ -267,8 +254,7 @@ class AliancesController extends Controller
     {
 
         try {
-            $alianceService = new AlianceService();
-            return $alianceService->deleteAliance($id);
+            return $this->alianceService->deleteAliance($id);
         } catch (Throwable $exception) {
             Log::error($exception);
             return response()->json(
@@ -336,7 +322,7 @@ class AliancesController extends Controller
      */
     public function joinAliance(Request $request)
     {
-        return (new AlianceService)->joinAlliance($request->input('alianca_id'));
+        return $this->alianceService->joinAlliance($request->input('alianca_id'));
 
 
         /* if ($player->leave_date) {
@@ -640,17 +626,12 @@ class AliancesController extends Controller
     public function listPlayers($alianceId)
     {
         $aliance = Aliance::find($alianceId);
-
         if (!$aliance) {
             return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
         }
-
         $players = Player::where('aliance', $alianceId)->get();
-
         return response()->json($players);
     }
-
-
 
     public function addImage($imageFile)
     {
@@ -696,24 +677,20 @@ class AliancesController extends Controller
 
     public function alianceDetailsCreated()
     {
-        $alianceService = new AlianceService();
         $player = Player::getPlayerLogged();
-        return $alianceService->getDetailsMyAliance($player->id);
+        return $this->alianceService->getDetailsMyAliance($player->id);
     }
     public function listMembers($alianceId)
     {
-        $alianceService = new AlianceService();
-        return response()->json($alianceService->getMembersAliance($alianceId), Response::HTTP_OK);
+        return response()->json($this->alianceService->getMembersAliance($alianceId), Response::HTTP_OK);
     }
     public function listMembersPending($alianceId)
     {
-        $alianceService = new AlianceService();
-        return response()->json($alianceService->getMembersPending($alianceId), Response::HTTP_OK);
+        return response()->json($this->alianceService->getMembersPending($alianceId), Response::HTTP_OK);
     }
     public function removeMember($memberId)
     {
-        $alianceService = new AlianceService();
-        return $alianceService->removeMember($memberId);
+        return $this->alianceService->removeMember($memberId);
     }
 
     public function allLogos()
@@ -726,19 +703,19 @@ class AliancesController extends Controller
     }
     public function updateRequestMember($idMemberRequest, $action)
     {
-        return (new AlianceService)->updateRequestMember($idMemberRequest, $action);
+        return $this->alianceService->updateRequestMember($idMemberRequest, $action);
     }
     public function getAvailableName($name)
     {
-        return (new AlianceService)->getAvailableName($name);
+        return $this->alianceService->getAvailableName($name);
     }
     public function exit($alianceId)
     {
-        return (new AlianceService)->exit($alianceId);
+        return $this->alianceService->exit($alianceId);
     }
     public function cancelRequest()
     {
-        return (new AlianceService)->cancelRequest();
+        return $this->alianceService->cancelRequest();
     }
     public function getScoresAliance()
     {
@@ -752,15 +729,15 @@ class AliancesController extends Controller
     }
     public function getMembersRank($idAliance)
     {
-        return (new AlianceService)->getMembersRank($idAliance);
+        return $this->alianceService->getMembersRank($idAliance);
     }
     public function changeRankMember($idRank, $idMember, $idAliance)
     {
-        return (new AlianceService)->changeRankMember($idRank, $idMember, $idAliance);
+        return $this->alianceService->changeRankMember($idRank, $idMember, $idAliance);
     }
     public function deixarRank($idAliance, $idMember)
     {
-        return (new AlianceService)->deixarCargo($idAliance, $idMember);
+        return $this->alianceService->deixarCargo($idAliance, $idMember);
     }
     public function getUnitsPlayer($playerId, $type)
     {
