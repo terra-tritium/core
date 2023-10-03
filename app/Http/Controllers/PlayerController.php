@@ -340,4 +340,13 @@ class PlayerController extends Controller
 
     }
 
+    /**
+     * @todo retirar ao subir para produção
+     */
+    public function showAll(){
+        $player = new Player();
+        $players = $player::all();
+        return response()->json(["Count" => count($players), "Players" => $players], Response::HTTP_OK);
+    }
+
 }

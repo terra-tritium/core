@@ -13,6 +13,7 @@ class UpdateAllianceRankingsCommand extends Command
     protected $signature = 'aliances-rankings:update';
 
     protected $description = 'Update alliance rankings';
+    
 
     /**
      * Execute the console command.

@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('aliances-rankings:update')->everyThirtyMinutes();
         // $schedule->command('trade:verifytrades')->everyFiveMinutes();
 
-
+ 
         # Ranking
         $schedule->call(function () {
 
