@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Trading;
+use App\Services\AlianceService;
 use App\Services\TradingService;
 use Exception;
 use Illuminate\Http\Response;
@@ -13,17 +14,20 @@ class RotinasController extends Controller
 {
   public function exec()
   {
-    try{
-      $alianceController = new AliancesController();
+    try {
+      $alianceController = new AliancesController(new AlianceService());
       $tradeService = new TradingService(new Trading());
-      $tradeService->verificaAndamentoSafe();
-      $alianceController->getScoresAliance();
-      $this->updateRanking();
-      return response()->json(['message' => 'executado'], Response::HTTP_OK);
-    }catch(Exception $e){
-      return response()->json(['message'=>"Erro ao executar rotinas", 'msg'=>$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+      $responseTrade = $tradeService->verificaAndamentoSafe();
+      $responseAliance = $alianceController->getScoresAliance();
+      $responseRanking = $this->updateRanking();
+      return response()->json([
+        "trade" => $responseTrade,
+        "aliance" => $responseAliance,
+        "raking" => $responseRanking
+      ], Response::HTTP_OK);
+    } catch (Exception $e) {
+      return response()->json(['message' => "Erro ao executar rotinas", 'msg' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
-   
   }
   /**
    * Execute the console command.
@@ -58,8 +62,10 @@ class RotinasController extends Controller
           'aliance' => $player->aliance,
         ]);
       }
+      return "executado";
     } catch (\Exception $exception) {
       Log::error('Erro no agendamento: ' . $exception->getMessage());
+      return "Não executado";
       //    Notification::route('discord', 'terra-tritium')->notify(new ExceptionNotification($exception));
 
     }
@@ -72,5 +78,4 @@ class RotinasController extends Controller
 
     return $totalEnergy;
   }
-  
 }
