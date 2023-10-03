@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
 use App\Models\Researched;
 use App\Models\Research;
 use App\Models\Building;
@@ -11,13 +12,15 @@ use App\Services\BonusService;
 
 class ResearchService
 {
-    public function __construct () {
+    public function __construct()
+    {
         $this->playerService = new PlayerService();
         $this->workerService = new WorkerService();
         $this->bonusService = new BonusService();
     }
 
-    public function laboratoryConfig ($player, $planet, $power) {
+    public function laboratoryConfig($player, $planet, $power)
+    {
 
         $planet->workersWaiting = $planet->workers - ($planet->workersOnMetal + $planet->workersOnUranium + $planet->workersOnCrystal + $power);
 
@@ -33,7 +36,7 @@ class ResearchService
 
         $this->workerService->syncronizeEnergy($planet);
         $this->updateBuildPower($planet->id, $power);
-        
+
         return $planet;
     }
 
@@ -141,7 +144,6 @@ class ResearchService
         $player->save();
         return $researched;
     }
-
     public function planetSincronize($planet) {
         $planet->researchPoints = $planet->pwResearch * (time() - $planet->timeResearch) * env('TRITIUM_RESEARCH_SPEED');
         $planet->timeResearch = time();
@@ -158,15 +160,18 @@ class ResearchService
         }
         $player->researchPoints += $points;
         $player->save();
-    }
+    }  
 
-    public function updateBuildPower($planet, $power) {
+
+    public function updateBuildPower($planet, $power)
+    {
         $building = Building::where([['planet', $planet], ['build', 7]])->firstOrFail();
         $building->workers = $power;
         $building->save();
     }
 
-    public function isResearched($player, $code) {
+    public function isResearched($player, $code)
+    {
         $researched = Researched::where([['player', $player->id], ['code', $code]])->first();
         return $researched ? true : false;
     }

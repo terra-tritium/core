@@ -104,7 +104,7 @@ return new class extends Migration
             $table->unsignedBigInteger('idOrigem');
             $table->unsignedBigInteger('idDestino');
             $table->timestamp('createdAt')->useCurrent();
-            $table->varchar('status','1')->default('A');
+            $table->char('status','1')->default('A');
             $table->string('message','255')->nullabe();
             $table->unsignedBigInteger('player');
             $table->foreign('idOrigem')->references('id')->on('aliances');
