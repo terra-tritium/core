@@ -20,6 +20,7 @@ use App\Http\Controllers\AliancesController;
 use App\Http\Controllers\TradingController;
 use App\Http\Controllers\NFTController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\RotinasController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -51,6 +52,9 @@ Route::group(['prefix' => 'player'], function () {
     Route::get('/name/{userid}', [PlayerController::class, 'getNameUser']);
 });
 
+/**
+ * @todo retirar o /all
+ */
 Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'player'], function () {
         Route::get('/show', [PlayerController::class, 'show']);
@@ -58,6 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/new', [PlayerController::class, 'register']);
         Route::post('/list-name/{id}', [PlayerController::class, 'getNameUser']);
         Route::post('/change-name', [PlayerController::class, 'changeName']);
+        Route::get('/all',[PlayerController::class, 'showAll']);
     });
 
     Route::group(['prefix' => 'build'], function () {
@@ -150,7 +155,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/new', [MessageController::class, 'newMessage']);
         Route::get('/lastmsg-sender/{senderid}', [MessageController::class, 'getLastMessageNotReadBySender']);
 
-        ROute::get('/search-usuer/{string}', [MessageController::class, 'searchUser']);
+        Route::get('/search-usuer/{string}', [MessageController::class, 'searchUser']);
     });
 
     Route::prefix('ranking')->group(function () {
@@ -196,6 +201,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/chat/{idMessage}',[AliancesController::class, 'delMessage']);
         Route::post('/chat-aliance',[AliancesController::class, 'newMessageAliance']);
         Route::get('/chat-with-aliance/{destino}',[AliancesController::class, 'getMessageWithAliance']);
+
         Route::get("/scores", [AliancesController::class, 'getScoresAliance']);
     });
 
@@ -218,6 +224,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
  
 });
+/**
+ * @todo retirar a chamada da rotina
+ */
+Route::get('/rotinas',[RotinasController::class, 'exec']);
 /**
  * Rota Publica, ping
  */
