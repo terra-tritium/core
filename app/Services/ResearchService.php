@@ -45,8 +45,14 @@ class ResearchService
         $researched = new Researched();
         $researched->player = $player->id;
         $researched->code = $research->code;
-        $player->researchPoints -= $research->cost;
-        
+        $player->researchPoints -= $research->cost; 
+
+        $planets = $this->playerService->getPlanets($player);
+
+        if (count($planets) == 1) {
+            $planets[0]->researchPoints = $player->researchPoints; 
+        }
+  
         # Don't have enough balance
         if ($player->researchPoints < 0) { return false; }
 
@@ -142,6 +148,9 @@ class ResearchService
 
         $researched->save();
         $player->save();
+        if (count($planets) == 1) {
+            $planets[0]->save();
+        }
         return $researched;
     }
     public function planetSincronize($planet) {
