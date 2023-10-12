@@ -18,57 +18,57 @@ class ModeSeeder extends Seeder
         DB::table('modes')->insert([
             'name' => "Conquer",
             'code' => 1,
-            'description' => 'description',
+            'description' => '',
             'image' => 'conquer.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Space Titan",
             'code' => 2,
-            'description' => 'description',
+            'description' => 'Robot Construction Speed +20% / Attack +2% / Research Speed -20% / Mining Speed -5%',
             'image' => 'spacetitan.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Researcher",
             'code' => 3,
-            'description' => 'description',
+            'description' => 'Research Speed +20% / Construction Cost +20%',
             'image' => 'researcher.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Engineer",
             'code' => 4,
-            'description' => 'description',
+            'description' => 'Ship Construction Speed +20% / Research Speed -20%',
             'image' => 'engineer.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Protector",
             'code' => 5,
-            'description' => 'description',
+            'description' => 'Protection +20%',
             'image' => 'protector.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Builder",
             'code' => 6,
-            'description' => 'description',
+            'description' => 'Construction Cost -20% / Robot and Ship Construction Speed decreases -20%',
             'image' => 'builder.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Navigator",
             'code' => 7,
-            'description' => 'description',
+            'description' => 'Travel Speed +20% / Robot and Ship Construction Speed decreases -20%',
             'image' => 'navigator.png'
         ]);
 
         DB::table('modes')->insert([
             'name' => "Miner",
             'code' => 8,
-            'description' => 'description',
+            'description' => 'Mining Speed +2% / Protection -20%',
             'image' => 'miner.png'
-        ]);
+        ]);       
     }
 }
