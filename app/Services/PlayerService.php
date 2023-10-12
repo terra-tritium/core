@@ -29,23 +29,16 @@ class PlayerService
 
   public function register(Player $player)
   {
-    // $player->score = 0;
-    // $player->buildScore = 0;
-    // $player->attackScore = 0;
-    // $player->defenseScore = 0;
-    // $player->militaryScore = 0;
-    // $player->researchScore = 0;
+    $player->score = 0;
+    $player->buildScore = 0;
+    $player->attackScore = 0;
+    $player->defenseScore = 0;
+    $player->militaryScore = 0;
+    $player->researchScore = 0;
     $player->gameMode = 1;
     $player->attackStrategy = 1;
     $player->defenseStrategy = 1;
-    $player->researchPoints = rand(0, 9);
-
-    $player->score = rand(1, 17);
-    $player->buildScore = rand(0, 17);
-    $player->attackScore = rand(0, 17);
-    $player->defenseScore = rand(0, 17);
-    $player->militaryScore = rand(0, 17);
-    $player->researchScore = rand(0, 17);
+    $player->researchPoints = 0;
 
     $player->save();
 
@@ -169,7 +162,7 @@ class PlayerService
         'region' => 'A',
         'quadrant' => 'A000',
         'position' => 1,
-        'resource' => 'crystal',
+        'resource' => 'uranium',
         'type' => 1
       ];
     }
@@ -198,9 +191,9 @@ class PlayerService
     $coords['region'] = substr($coords['quadrant'], 0, 1);
 
     if ($coords['position'] % 2 == 0) {
-      $coords['resource'] = "uranium";
-    } else {
       $coords['resource'] = "crystal";
+    } else {
+      $coords['resource'] = "uranium";
     }
 
     switch ($coords['position']) {
