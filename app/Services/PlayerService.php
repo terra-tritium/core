@@ -52,6 +52,7 @@ class PlayerService
     $planet->quadrant = $newAlocation['quadrant'];
     $planet->position = $newAlocation['position'];
     $planet->type = $newAlocation['type'];
+    $planet->terrainType = $newAlocation['terrainType'];
     $planet->player = $player->id;
     $planet->workers = 30;
     $planet->workersWaiting = 30;
@@ -153,18 +154,19 @@ class PlayerService
   }
 
   private function startAlocation()
-  {
+{
     $coords = [];
     $lastPlanet = Planet::orderBy('id', 'desc')->first();
 
     if (!$lastPlanet) {
-      return [
-        'region' => 'A',
-        'quadrant' => 'A000',
-        'position' => 1,
-        'resource' => 'uranium',
-        'type' => 1
-      ];
+        return [
+            'region' => 'A',
+            'quadrant' => 'A000',
+            'position' => 1,
+            'resource' => 'uranium',
+            'type' => '1',
+            'terrainType' => 'Desert'
+        ];
     }
 
     $lastQuadrant = $lastPlanet->quadrant;
@@ -173,22 +175,27 @@ class PlayerService
     $cont = 0;
 
     do {
-      $lastPosition += 1;
-      if ($lastPosition <= 15) {
-        $coords['quadrant'] = $lastQuadrant;
-        $coords['position'] = $lastPosition;
-      } else {
-        $coords['quadrant'] = $this->nextQuadrant($lastQuadrant);
-        $coords['position'] = 1;
-      }
-      $cont++;
+        $lastPosition += 1;
+        if ($lastPosition <= 15) {
+            $coords['quadrant'] = $lastQuadrant;
+            $coords['position'] = $lastPosition;
+        } else {
+            $coords['quadrant'] = $this->nextQuadrant($lastQuadrant);
+            $coords['position'] = 1;
+        }
+        $cont++;
     } while ($this->coordInUse($coords) == true && $cont < 1600);
 
     if ($cont > 1599) {
-      return "end";
+        return "end";
     }
 
-    $coords['region'] = substr($coords['quadrant'], 0, 1);
+    $coords['region'] = substr($coords['quadrant'], 0, 1);   
+
+    $terrainTypes = ["Desert", "Grass", "Ice", "Vulcan"];    
+
+    $terrainIndex = (ord($coords['region']) - ord('A')) % 4;
+    $coords['terrainType'] = $terrainTypes[$terrainIndex];
 
     if ($coords['position'] % 2 == 0) {
       $coords['resource'] = "crystal";
@@ -212,23 +219,26 @@ class PlayerService
     }
 
     return $coords;
-  }
+}
 
-  private function nextQuadrant($quadrant)
-  {
+private function nextQuadrant($quadrant)
+{
     $nextLetter = substr($quadrant, 0, 1);
-    $nextNumber = substr($quadrant, 2, 2) + 1;
-    if ($nextNumber == 100) {
-      if ($nextLetter == "P") {
-        $nextLetter = "A";
-        $nextNumber = 1;
-      } else {
-        $nextLetter = chr(ord(substr($quadrant, 0, 1)) + 1);
-      }
+    $nextNumber = substr($quadrant, 1, 3) + 1;  
+    
+    if ($nextNumber == 1000) {  
+        if ($nextLetter == "P") {
+            $nextLetter = "A";
+            $nextNumber = 0;  
+        } else {
+            $nextLetter = chr(ord(substr($quadrant, 0, 1)) + 1);
+            $nextNumber = 0;  
+        }
     }
-    $next =  $nextLetter . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    $next = $nextLetter . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
     return $next;
-  }
+}
+
 
   private function coordInUse($coords)
   {
