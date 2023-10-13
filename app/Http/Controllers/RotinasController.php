@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Logbook;
 use App\Models\Trading;
 use App\Services\AlianceService;
 use App\Services\TradingService;
@@ -16,7 +17,7 @@ class RotinasController extends Controller
   {
     try {
       $alianceController = new AliancesController(new AlianceService());
-      $tradeService = new TradingService(new Trading());
+      $tradeService = new TradingService(new Trading(), new LogbookController());
       $responseTrade = $tradeService->verificaAndamentoSafe();
       $responseAliance = $alianceController->getScoresAliance();
       $responseRanking = $this->updateRanking();

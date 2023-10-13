@@ -11,7 +11,7 @@ class TradingFinished extends Model
     use HasFactory;
     protected $table = 'trading_finished';
     public $timestamps = false;
-//subir
+    //subir
     protected $fillable = [
         'idPlanetCreator',
         'idPlanetInterested',
@@ -30,5 +30,24 @@ class TradingFinished extends Model
         'transportShips'
     ];
 
-    
+
+    public function getLastTrading()
+    {
+        $resources = ['crystal', 'metal', 'uranium'];
+
+        $results = DB::table('trading_finished as tf')
+            ->whereIn('tf.resource', $resources)
+            ->select('tf.id', 'tf.quantity', 'tf.price', 'tf.resource', 'tf.currency', 'tf.idMarket')
+            ->whereIn('tf.finishedAt', function ($query) {
+                $query->select('max_finishedAt')
+                    ->from(function ($subquery) {
+                        $subquery->selectRaw('MAX(finishedAt) as max_finishedAt')
+                            ->from('trading_finished')
+                            ->groupBy('resource');
+                    }, 'subquery')
+                    ->whereColumn('subquery.max_finishedAt', 'tf.finishedAt');
+            })
+            ->get();
+        return $results;
+    }
 }

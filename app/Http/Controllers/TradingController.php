@@ -110,5 +110,8 @@ class TradingController extends Controller
         return $this->tradingService->verificaAndamentoSafe();
         // return true;
     }
+    public function lastTrading(){
+        return $this->tradingService->getLastTrading();
+    }
 
 }
