@@ -244,6 +244,10 @@ Route::get("/teste", function(){
     return "rota funcionando";
 });
 
+Route::get("/teste2", function(){
+    return "rota de pong funcionando";
+});
+
 /**
  * @todo remover endpoint antes de enviar para produção
  */
