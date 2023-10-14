@@ -132,7 +132,7 @@ class AlianceService
         try {
             $alianceMember = AlianceMember::where('player_id', $playerId)->first();
             $aliance = Aliance::find($alianceMember->idAliance ?? 0);
-            return response(['member'=>$alianceMember, "aliance"=>$aliance], Response::HTTP_OK);
+            // return response(['member'=>$alianceMember, "aliance"=>$aliance], Response::HTTP_OK);
             $rank = RankMember::find($alianceMember->idRank);
             if (!$alianceMember || !$aliance) {
                 return response(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
