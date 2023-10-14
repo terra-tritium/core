@@ -182,27 +182,27 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/kick-player', [AliancesController::class, 'kickPlayer']);
         Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
         Route::get('/my-aliance', [AliancesController::class,'myAliance']);
-        Route::get('/my-aliance/details', [AliancesController::class, 'alianceDetailsCreated']);
+        Route::get('/myaliance/details', [AliancesController::class, 'alianceDetailsCreated']);
         Route::get('/members/{alianceId}', [AliancesController::class,'listMembers']);
         Route::get('/members/pending/{alianceId}',[AliancesController::class, 'listMembersPending']);
         Route::patch('member/remove/{memberId}', [AliancesController::class, 'removeMember']);
         Route::get('/logos',[AliancesController::class, 'allLogos']);
         Route::put('/member/update-request/{idMemberAliance}/{action}',[AliancesController::class, 'updateRequestMember']);
-        Route::get('/available-name/{name}',[AliancesController::class, 'getAvailableName']);
+        Route::get('/availablename/{name}',[AliancesController::class, 'getAvailableName']);
         Route::put('/exit/{alianceId}',[AliancesController::class, 'exit']);
-        Route::put('/cancel-request',[AliancesController::class, 'cancelRequest']);
+        Route::put('/cancelrequest',[AliancesController::class, 'cancelRequest']);
         Route::get('/ranks',[AliancesController::class, 'getRanks']);
-        Route::get('/members-rank/{idAliance}',[AliancesController::class, 'getMembersRank']);
-        Route::put('/change-rank/{idRank}/{idMember}/{idAliance}',[AliancesController::class, 'changeRankMember']);
-        Route::put('/relinquish-rank/{idAliance}/{idMember}',[AliancesController::class, 'deixarRank']);
+        Route::get('/membersrank/{idAliance}',[AliancesController::class, 'getMembersRank']);
+        Route::put('/changerank/{idRank}/{idMember}/{idAliance}',[AliancesController::class, 'changeRankMember']);
+        Route::put('/relinquishrank/{idAliance}/{idMember}',[AliancesController::class, 'deixarRank']);
         Route::get('/member/units/{playerid}/{type}',[AliancesController::class, 'getUnitsPlayer']);
         /** Chat Alianca */
         Route::get('/list-aliance-chat',[AliancesController::class, 'listAlianceForChat']);
         Route::post('/chat',[AliancesController::class, 'newMessageGroup']);/*  */
         Route::get('/chat/{idAliance}',[AliancesController::class, 'getMessagesGroup']);
         Route::put('/chat/{idMessage}',[AliancesController::class, 'delMessage']);
-        Route::post('/chat-aliance',[AliancesController::class, 'newMessageAliance']);
-        Route::get('/chat-with-aliance/{destino}',[AliancesController::class, 'getMessageWithAliance']);
+        Route::post('/chataliance',[AliancesController::class, 'newMessageAliance']);
+        Route::get('/chatwithaliance/{destino}',[AliancesController::class, 'getMessageWithAliance']);
 
         Route::get("/scores", [AliancesController::class, 'getScoresAliance']);
     });
