@@ -174,15 +174,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/edit/{id}', [AliancesController::class, 'update']);
         Route::delete('/delete/{idAliance}', [AliancesController::class, 'destroy']);
 
-        Route::put('/update-logo/{id}', [AliancesController::class, 'updateLogo']);
+        Route::put('/updatelogo/{id}', [AliancesController::class, 'updateLogo']);
         Route::post('/join', [AliancesController::class,'joinAliance']);
         Route::post('/request', [AliancesController::class,'handlePlayerRequest']);
         Route::post('/leave',[AliancesController::class,'leaveAliance']);
         
-        Route::post('/kick-player', [AliancesController::class, 'kickPlayer']);
+        Route::post('/kickplayer', [AliancesController::class, 'kickPlayer']);
         Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
         Route::get('/my-aliance', [AliancesController::class,'myAliance']);
-        Route::get('/my-aliance/details', [AliancesController::class, 'alianceDetailsCreated']);
+        Route::get('/myaliance/details', [AliancesController::class, 'alianceDetailsCreated']);
         Route::get('/members/{alianceId}', [AliancesController::class,'listMembers']);
         Route::get('/members/pending/{alianceId}',[AliancesController::class, 'listMembersPending']);
         Route::patch('member/remove/{memberId}', [AliancesController::class, 'removeMember']);
@@ -217,6 +217,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/trading-process/{id}',[TradingController::class, 'getTradingProcess']);
         Route::post('/finish', [TradingController::class, 'finishTrading']);
         Route::get('/safe/conclued',[TradingController::class, 'verificaTradeConcluidoSafe'] );
+        Route::get('/last-trading',[TradingController::class, 'lastTrading'] );
+        Route::patch('/buy-freighter/{planetId}',[TradingController::class, 'buyFreighter']);
+
     });
 
     Route::prefix('nft')->group(function () {
@@ -236,7 +239,6 @@ Route::get('/rotinas',[RotinasController::class, 'exec']);
 Route::get('/ping',function(){
     return "pong";
 });
-
 
 /**
  * @todo remover endpoint antes de enviar para produção

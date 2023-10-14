@@ -70,7 +70,7 @@ class AlianceService
             //
         } catch (Throwable $exception) {
             Log::error($exception);
-            return response(['message' => 'Erro ao criar aliança ', 'code' => 400, 'err'=>$exception, 'success' => false], Response::HTTP_BAD_REQUEST);
+            return response(['message' => 'Erro ao criar aliança ', 'code' => 400, 'err' => $exception, 'success' => false], Response::HTTP_BAD_REQUEST);
         }
     }
     public function createNewAlianceFounder($playerId, $alianceId, $role = "member")
@@ -79,7 +79,9 @@ class AlianceService
         $alianceMember->player_id = $playerId;
         $alianceMember->idAliance = $alianceId;
         $alianceMember->role = $role;
-        $alianceMember->idRank = env("MEMBER_FOUNDER");
+        // $alianceMember->idRank = env("MEMBER_FOUNDER");
+        $alianceMember->idRank = 1;
+
         $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
         return $alianceMember->save();
     }
@@ -116,7 +118,6 @@ class AlianceService
         $alianceMember->role = 'member';
         $alianceMember->dateAdmission = $status === 'A' ? (new DateTime())->format('Y-m-d H:i:s') : null;
         return $alianceMember->save();
-    
     }
     public function getMembersAliance($alianceId)
     {
@@ -128,19 +129,24 @@ class AlianceService
     }
     public function getDetailsMyAliance($playerId)
     {
-        $alianceMember = AlianceMember::where('player_id', $playerId)->first();
-        $aliance = Aliance::find($alianceMember->idAliance ?? 0);
-        $rank = RankMember::find($alianceMember->idRank);
-        if (!$alianceMember || !$aliance) {
-            return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
-        }
+        try {
+            $alianceMember = AlianceMember::where('player_id', $playerId)->first();
+            $aliance = Aliance::find($alianceMember->idAliance ?? 0);
+            // return response(['member'=>$alianceMember, "aliance"=>$aliance], Response::HTTP_OK);
+            $rank = RankMember::find($alianceMember->idRank);
+            if (!$alianceMember || !$aliance) {
+                return response(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
+            }
 
-        $responseData = $alianceMember;
-        $responseData['currentPlayer'] = $playerId;
-        $responseData['role']=$rank->rankName;
-        $responseData['logo'] = $aliance->logo;
-        $responseData['countMembers'] = AlianceMember::where([['idAliance', '=', $alianceMember->idAliance], ['status', '=', 'A']])->count();
-        return response()->json($responseData, Response::HTTP_OK);
+            $responseData = $alianceMember;
+            $responseData['currentPlayer'] = $playerId;
+            $responseData['role'] = $rank->rankName;
+            $responseData['logo'] = $aliance->logo;
+            $responseData['countMembers'] = AlianceMember::where([['idAliance', '=', $alianceMember->idAliance], ['status', '=', 'A']])->count();
+            return response($responseData, Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response(["message"=>$e->getMessage(),"teste"=>'teste'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
     public function removeMember($memberId)
     {

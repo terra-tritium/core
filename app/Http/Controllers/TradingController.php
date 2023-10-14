@@ -6,7 +6,11 @@ use App\Models\Planet;
 use App\Models\Player;
 use App\Models\Trading;
 use App\Services\TradingService;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
+
 
 
 class TradingController extends Controller
@@ -109,6 +113,29 @@ class TradingController extends Controller
     public function verificaTradeConcluidoSafe(){
         return $this->tradingService->verificaAndamentoSafe();
         // return true;
+    }
+    public function lastTrading(){
+        return $this->tradingService->getLastTrading();
+    }
+    public function buyFreighter($planetId){
+        try{
+            $planet = Planet::find($planetId);
+            if(!$planet)
+                return response(['message'=>"planet not found", Response::HTTP_NOT_FOUND]);
+            if($planet->energy < 10)
+                return response(["message"=>"Insufficient energy to buy a freighter."], Response::HTTP_NOT_FOUND); 
+            $planet->energy -= 10;
+            $planet->transportShips += 1;
+            $planet->save();     
+            return response($planet,Response::HTTP_OK);      
+        }catch(Exception $e){
+            Log::error('Erro ao realizar compra de cargueiro ' . $e->getMessage());
+            return response(['message'=>"Erro ao realizar compra de cargueiro", Response::HTTP_INTERNAL_SERVER_ERROR]);
+
+        }
+        
+        return $planet;
+        // return response($, Response::HTTP_OK);
     }
 
 }
