@@ -240,6 +240,10 @@ Route::get('/ping',function(){
     return "pong";
 });
 
+Route::get('/teste2',function(){
+    return "pong de teste";
+});
+
 
 /**
  * @todo remover endpoint antes de enviar para produção
