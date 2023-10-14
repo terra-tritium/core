@@ -182,7 +182,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/kick-player', [AliancesController::class, 'kickPlayer']);
         Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
         Route::get('/my-aliance', [AliancesController::class,'myAliance']);
-        Route::get('/myaliance/details', [AliancesController::class, 'alianceDetailsCreated']);
+        Route::get('/my-aliance/details', [AliancesController::class, 'alianceDetailsCreated']);
         Route::get('/members/{alianceId}', [AliancesController::class,'listMembers']);
         Route::get('/members/pending/{alianceId}',[AliancesController::class, 'listMembersPending']);
         Route::patch('member/remove/{memberId}', [AliancesController::class, 'removeMember']);
