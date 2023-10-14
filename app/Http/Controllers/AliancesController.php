@@ -677,8 +677,9 @@ class AliancesController extends Controller
 
     public function alianceDetailsCreated()
     {
-        return response(['msg'=>'teste'], Response::HTTP_OK);
+        // return response(['msg'=>'teste'], Response::HTTP_OK);
         $player = Player::getPlayerLogged();
+        return response($player, Response::HTTP_OK);
         return $this->alianceService->getDetailsMyAliance($player->id);
     }
     public function listMembers($alianceId)
