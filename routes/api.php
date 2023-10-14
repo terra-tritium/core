@@ -237,6 +237,9 @@ Route::get('/ping',function(){
     return "pong";
 });
 
+Route::get("/teste", function(){
+    return "rota funcionando";
+});
 
 /**
  * @todo remover endpoint antes de enviar para produção
