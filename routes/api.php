@@ -174,14 +174,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/edit/{id}', [AliancesController::class, 'update']);
         Route::delete('/delete/{idAliance}', [AliancesController::class, 'destroy']);
 
-        Route::put('/update-logo/{id}', [AliancesController::class, 'updateLogo']);
+        Route::put('/updatelogo/{id}', [AliancesController::class, 'updateLogo']);
         Route::post('/join', [AliancesController::class,'joinAliance']);
         Route::post('/request', [AliancesController::class,'handlePlayerRequest']);
         Route::post('/leave',[AliancesController::class,'leaveAliance']);
         
-        Route::post('/kick-player', [AliancesController::class, 'kickPlayer']);
+        Route::post('/kickplayer', [AliancesController::class, 'kickPlayer']);
         Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
-        Route::get('/my-aliance', [AliancesController::class,'myAliance']);
+        Route::get('/myaliance', [AliancesController::class,'myAliance']);
         Route::get('/myaliance/details', [AliancesController::class, 'alianceDetailsCreated']);
         Route::get('/members/{alianceId}', [AliancesController::class,'listMembers']);
         Route::get('/members/pending/{alianceId}',[AliancesController::class, 'listMembersPending']);
@@ -197,7 +197,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/relinquishrank/{idAliance}/{idMember}',[AliancesController::class, 'deixarRank']);
         Route::get('/member/units/{playerid}/{type}',[AliancesController::class, 'getUnitsPlayer']);
         /** Chat Alianca */
-        Route::get('/list-aliance-chat',[AliancesController::class, 'listAlianceForChat']);
+        Route::get('/listaliancechat',[AliancesController::class, 'listAlianceForChat']);
         Route::post('/chat',[AliancesController::class, 'newMessageGroup']);/*  */
         Route::get('/chat/{idAliance}',[AliancesController::class, 'getMessagesGroup']);
         Route::put('/chat/{idMessage}',[AliancesController::class, 'delMessage']);
