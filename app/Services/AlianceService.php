@@ -79,7 +79,9 @@ class AlianceService
         $alianceMember->player_id = $playerId;
         $alianceMember->idAliance = $alianceId;
         $alianceMember->role = $role;
-        $alianceMember->idRank = env("MEMBER_FOUNDER");
+        // $alianceMember->idRank = env("MEMBER_FOUNDER");
+        $alianceMember->idRank = 1;
+
         $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
         return $alianceMember->save();
     }
