@@ -132,7 +132,7 @@ class AlianceService
         $aliance = Aliance::find($alianceMember->idAliance ?? 0);
         $rank = RankMember::find($alianceMember->idRank);
         if (!$alianceMember || !$aliance) {
-            return response()->json(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
+            return response(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
         }
 
         $responseData = $alianceMember;
@@ -140,7 +140,7 @@ class AlianceService
         $responseData['role']=$rank->rankName;
         $responseData['logo'] = $aliance->logo;
         $responseData['countMembers'] = AlianceMember::where([['idAliance', '=', $alianceMember->idAliance], ['status', '=', 'A']])->count();
-        return response()->json($responseData, Response::HTTP_OK);
+        return response($responseData, Response::HTTP_OK);
     }
     public function removeMember($memberId)
     {
