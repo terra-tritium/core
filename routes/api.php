@@ -192,7 +192,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/exit/{alianceId}',[AliancesController::class, 'exit']);
         Route::put('/cancel-request',[AliancesController::class, 'cancelRequest']);
         Route::get('/ranks',[AliancesController::class, 'getRanks']);
-        Route::get('/membersrank/{idAliance}',[AliancesController::class, 'getMembersRank']);
+        Route::get('/members-rank/{idAliance}',[AliancesController::class, 'getMembersRank']);
         Route::put('/change-rank/{idRank}/{idMember}/{idAliance}',[AliancesController::class, 'changeRankMember']);
         Route::put('/relinquish-rank/{idAliance}/{idMember}',[AliancesController::class, 'deixarRank']);
         Route::get('/member/units/{playerid}/{type}',[AliancesController::class, 'getUnitsPlayer']);
@@ -238,14 +238,6 @@ Route::get('/rotinas',[RotinasController::class, 'exec']);
  */
 Route::get('/ping',function(){
     return "pong";
-});
-
-Route::get("/teste", function(){
-    return "rota funcionando";
-});
-
-Route::get("/teste2", function(){
-    return "rota de pong funcionando";
 });
 
 /**
