@@ -137,6 +137,7 @@ return new class extends Migration
             $table->integer("level");
             $table->string('status');
             $table->integer('type');
+            $table->string('terrainType');
             # Position
             $table->string("region");
             $table->string("quadrant");
