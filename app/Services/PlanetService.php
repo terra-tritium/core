@@ -16,11 +16,20 @@ class PlanetService
   }
 
   public function syncronizeEnergy(Planet $planet) {
-    $currentBalance = $this->currentBalance($planet, 0);
+    $energyMultiplier = $planet->terrainType ? $planet->terrainType->energy : 1.0; 
+    $currentBalance = $this->currentBalance($planet, 0) * $energyMultiplier;
     $planet->energy = $currentBalance;
     $planet->timeEnergy = $this->timeNow;
     $planet->save();
-  }
+}
+
+public function syncronizeDefenseScore(Planet $planet) {
+  $defenseMultiplier = $planet->terrainType ? $planet->terrainType->defenseScore : 1.0;  
+  $planetDefense = $planet->baseDefense * $defenseMultiplier;  
+  $planet->defenseScore = $planetDefense;
+  $planet->save();
+}
+
 
   public function currentBalance($p1, $type) {
     # secounds in hour

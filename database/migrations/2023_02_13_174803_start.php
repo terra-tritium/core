@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -14,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        
+
         Schema::create('aliances', function (Blueprint $table) {
             $table->id()->index();
             $table->string("description")->nullable();
@@ -29,7 +28,7 @@ return new class extends Migration
             $table->bigInteger("defenseScore")->default(0);
             $table->bigInteger("warScore")->default(0);
             $table->integer('founder')->constrained("players");
-            $table->char('status',1)->default('F');
+            $table->char('status', 1)->default('F');
 
             // $table->bigInteger("type")->default(0)->comment('0 - Aberta , 1 - Fechada')->change();
         });
@@ -47,10 +46,10 @@ return new class extends Migration
             $table->bigInteger("warScore");
         });
 
-        Schema::create('rank_member', function(Blueprint $table){
+        Schema::create('rank_member', function (Blueprint $table) {
             $table->id();
             $table->integer('level');
-            $table->string('rankName','100');
+            $table->string('rankName', '100');
             $table->integer('limit')->nullable();
             $table->string('description');
             $table->boolean('visible')->default(true);
@@ -60,8 +59,8 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('player_id')->constrained("players");
             $table->unsignedBigInteger('idAliance');
-            $table->char('status',1)->default('A');
-            $table->string('role',20)->default('member');
+            $table->char('status', 1)->default('A');
+            $table->string('role', 20)->default('member');
             $table->timestamp('createdAt')->useCurrent();
             $table->timestamp('dateAdmission')->nullable();
             $table->timestamp('dateOf')->nullable();
@@ -74,49 +73,50 @@ return new class extends Migration
         Schema::create('aliances_requests', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('player_id')->constrained("players");
-            $table->bigInteger('founder_id')->constrained("players");;
+            $table->bigInteger('founder_id')->constrained("players");
+            ;
             $table->text('message');
             $table->boolean('status')->default(0);
             $table->timestamps();
         });
 
-        Schema::create('logo', function(Blueprint $table){
+        Schema::create('logo', function (Blueprint $table) {
             $table->id();
-            $table->string('name','100')->unique();
-            $table->string('alt',100)->nullable();
+            $table->string('name', '100')->unique();
+            $table->string('alt', 100)->nullable();
             $table->boolean('available')->default(true);
         });
 
-        Schema::create('chat_group', function(Blueprint $table){
+        Schema::create('chat_group', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('idAliance');
-            $table->string('groupName','255')->nullabe();
+            $table->string('groupName', '255')->nullabe();
             $table->timestamp('createdAt')->useCurrent();
             $table->boolean('status')->default(0);
             $table->foreign('idAliance')->references('id')->on('aliances');
 
         });
-/**
- * Chat entre duas alianças
- */
-        Schema::create('chat_aliance', function(Blueprint $table){
+        /**
+         * Chat entre duas alianças
+         */
+        Schema::create('chat_aliance', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('idOrigem');
             $table->unsignedBigInteger('idDestino');
             $table->timestamp('createdAt')->useCurrent();
-            $table->char('status','1')->default('A');
-            $table->string('message','255')->nullabe();
+            $table->char('status', '1')->default('A');
+            $table->string('message', '255')->nullabe();
             $table->unsignedBigInteger('player');
             $table->foreign('idOrigem')->references('id')->on('aliances');
             $table->foreign('idDestino')->references('id')->on('aliances');
 
         });
 
-        Schema::create('message_group', function(Blueprint $table){
+        Schema::create('message_group', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('idChatGroup');
             $table->unsignedBigInteger('remetenteId');
-            $table->string('message','255')->nullabe();
+            $table->string('message', '255')->nullabe();
             $table->timestamp('createdAt')->useCurrent();
             $table->boolean('status')->default(0);
 
@@ -124,10 +124,20 @@ return new class extends Migration
             // $table->foreign('remetenteId')->references('id')->on('players');
 
         });
-        
+
 
 
         //fim aliança
+
+        //Terrain Type
+        Schema::create('terrain_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('terrainType')->unique();
+            $table->float('energy');
+            $table->float('defenseScore');
+        });
+        //Fim Terrain Type
+
 
         Schema::create('planets', function (Blueprint $table) {
             $table->id()->index();
@@ -253,7 +263,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('senderId');
             $table->unsignedBigInteger('recipientId');
-            $table->string('content',1000);
+            $table->string('content', 1000);
             $table->timestamp('createdAt')->useCurrent();
             $table->timestamp('readAt')->nullable();
             $table->boolean('status');
@@ -431,14 +441,14 @@ return new class extends Migration
             $table->string("y");
         });
 
-       
+
 
         /**
          *INICIO DAS TABELAS REFERENTE AO MERCADO
          */
         Schema::create('market', function (Blueprint $table) {
             $table->id();
-            $table->char("region",1);
+            $table->char("region", 1);
             // $table->string("quadrant");
             $table->boolean('status')->default(true);
             $table->string("name");
@@ -455,19 +465,20 @@ return new class extends Migration
         Schema::create('trading', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('idPlanetCreator');
-            $table->unsignedBigInteger('idPlanetInterested')->nullable();;
+            $table->unsignedBigInteger('idPlanetInterested')->nullable();
+            ;
             // $table->unsignedBigInteger('idResource');
             $table->unsignedBigInteger('idMarket');
-            $table->string('resource',20);
-            $table->string('currency',20)->default('energy');
-            $table->char('type',1);//
-            $table->unsignedBigInteger('quantity');//
-            $table->double('price',8,3);//
-            $table->double('total',10,3);//
+            $table->string('resource', 20);
+            $table->string('currency', 20)->default('energy');
+            $table->char('type', 1); //
+            $table->unsignedBigInteger('quantity'); //
+            $table->double('price', 8, 3); //
+            $table->double('total', 10, 3); //
             $table->boolean('status')->default(true);
             $table->timestamp('createdAt')->useCurrent();
             $table->timestamp('updatedAt')->nullable();
-            
+
 
             $table->foreign('idPlanetCreator')->references('id')->on('planets');
             // $table->foreign('idResource')->references('id')->on('Resource');
@@ -480,19 +491,19 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('idPlanetCreator')->nullable();
             $table->unsignedBigInteger('idPlanetInterested')->nullable();
-            $table->unsignedBigInteger('quantity');//
-            $table->double('price',8,3);//
-            $table->double('distance',11,3);//
-            $table->unsignedBigInteger('deliveryTime');//
+            $table->unsignedBigInteger('quantity'); //
+            $table->double('price', 8, 3); //
+            $table->double('distance', 11, 3); //
+            $table->unsignedBigInteger('deliveryTime'); //
             $table->unsignedBigInteger('idTrading')->nullable();
             $table->boolean('status')->default(true);
-            $table->timestamp('createdAt');//
-            $table->timestamp('finishedAt')->useCurrent();//
-            $table->string('resource',20);
-            $table->string('currency',20);
+            $table->timestamp('createdAt'); //
+            $table->timestamp('finishedAt')->useCurrent(); //
+            $table->string('resource', 20);
+            $table->string('currency', 20);
             $table->unsignedBigInteger('idMarket')->nullable();
             $table->unsignedInteger('transportShips');
-            $table->char('type',1);//
+            $table->char('type', 1); //
 
             $table->foreign('idPlanetCreator')->references('id')->on('planets');
             $table->foreign('idPlanetInterested')->references('id')->on('planets');
@@ -512,24 +523,25 @@ return new class extends Migration
 
             $table->unsignedBigInteger('idPlanetSale')->nullable();
             $table->unsignedBigInteger('idPlanetPurch')->nullable();
-            $table->unsignedBigInteger('idTrading')->nullable();;
+            $table->unsignedBigInteger('idTrading')->nullable();
+            ;
             $table->unsignedBigInteger('idMarket')->nullable();
-            $table->unsignedBigInteger('quantity');//
+            $table->unsignedBigInteger('quantity'); //
             $table->boolean('loaded')->default(true);
 
 
-            $table->double('price',8,3);//
-            $table->double('total',8,3);//
-            $table->double('distance',11,3);//
-            $table->unsignedBigInteger('deliveryTime');//
-           
+            $table->double('price', 8, 3); //
+            $table->double('total', 8, 3); //
+            $table->double('distance', 11, 3); //
+            $table->unsignedBigInteger('deliveryTime'); //
+
             $table->boolean('status')->default(true);
-            $table->char('type',1);//
+            $table->char('type', 1); //
             $table->timestamp('createdAt')->useCurrent();
             $table->timestamp('updatedAt')->nullable();
-            $table->string('resource',20);
-            $table->string('currency',20);
-            $table->char('step',1)->default('I');//
+            $table->string('resource', 20);
+            $table->string('currency', 20);
+            $table->char('step', 1)->default('I'); //
 
 
             $table->unsignedInteger('transportShips')->default(0);
@@ -540,7 +552,7 @@ return new class extends Migration
             $table->foreign('idMarket')->references('id')->on('market');
 
         });
-        
+
 
         /**
          *FIM DAS TABELAS REFERENTE AO MERCADO
@@ -587,8 +599,8 @@ return new class extends Migration
                     RETURN distancia;
                 END
         ');
-        
-        
+
+
     }
 
 
