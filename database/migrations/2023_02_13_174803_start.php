@@ -36,6 +36,8 @@ return new class extends Migration {
         Schema::create('aliances_ranking', function (Blueprint $table) {
             $table->id();
             $table->integer('aliance')->constrained("aliances");
+            $table->string("name");
+            $table->bigInteger("position");
             $table->bigInteger("energy");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
