@@ -13,6 +13,7 @@ class AlianceRanking extends Model
 
     protected $fillable = [
         'name',
+        'position',
         'aliance',
         'description',
         'energy',

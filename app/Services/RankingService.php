@@ -9,6 +9,7 @@ use App\Models\Player;
 use App\Models\Ranking;
 use App\ValueObjects\RankingCategory;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\DB;
 
 class RankingService
 {
@@ -97,21 +98,46 @@ class RankingService
     {
         $aliances = new Aliance();
         $sumScoreMembers = $aliances->getSumScoresMembers();
-        AlianceRanking::truncate();
+        $sumScoreMembersArray = $sumScoreMembers->toArray();
+        usort($sumScoreMembersArray, function ($a, $b) {
+            return $b['score'] - $a['score'];
+        });
 
-        foreach ($sumScoreMembers as $scores) {
-            $aliance = Aliance::find($scores->id);
-            $aliance->score = $scores->score;
-            $aliance->buildScore = $scores->buildScore;
-            $aliance->defenseScore = $scores->defenseScore;
-            // $aliance->militaryScore = $scores->militaryScore;
-            // $aliance->researchScore = $scores->researchScore;
-            $aliance->attackScore = $scores->attackScore;
-            $this->atualizaRanking($aliance);
-            $aliance->save();
+            // foreach ($sumScoreMembers as $scores) {
+            //     $aliance = Aliance::find($scores->id);
+            //     $aliance->score = $scores->score;
+            //     $aliance->buildScore = $scores->buildScore;
+            //     $aliance->defenseScore = $scores->defenseScore;
+            //     // $aliance->militaryScore = $scores->militaryScore;
+            //     // $aliance->researchScore = $scores->researchScore;
+            //     $aliance->attackScore = $scores->attackScore;
+            //     $this->atualizaRanking($aliance);
+            //     $aliance->save();
+            // }
+
+        ;
+
+        AlianceRanking::truncate();
+        $count = 0;
+
+        foreach ($sumScoreMembersArray as $aliance) {
+            $count++;
+            DB::table('aliances_ranking')->insert([
+                'aliance' =>  $aliance['id'],
+                'energy' =>  -1,
+                'score' => $aliance['score'],
+                'buildScore' => $aliance['buildScore'],
+                'labScore' => -1,
+                'tradeScore' => -1,
+                'attackScore' => $aliance['attackScore'],
+                'defenseScore' => $aliance['defenseScore'],
+                'warScore' => -1,
+                'name' => $aliance['name'],
+                'position' => $count
+            ]);
         }
 
-        return $sumScoreMembers;
+        return $sumScoreMembersArray;
     }
     private function atualizaRanking($dados)
     {

@@ -56,7 +56,9 @@ class RankingController extends Controller
             return response()->json($rankings);
     }
 
-    public function aliances($type) {
+    public function aliances(Request $request) {
+        $type = $request->input('type', 'general');
+
         $player = Player::getPlayerLogged();
         switch ($type) {
             case "top":
