@@ -46,6 +46,7 @@ return new class extends Migration {
             $table->bigInteger("attackScore");
             $table->bigInteger("defenseScore");
             $table->bigInteger("warScore");
+            $table->bigInteger("countMembers");
         });
 
         Schema::create('rank_member', function (Blueprint $table) {

@@ -24,5 +24,6 @@ class AlianceRanking extends Model
         'attackScore',
         'defenseScore',
         'warScore',
+        'countMembers'
     ];
 }
