@@ -20,6 +20,7 @@ class Ranking extends Model
         'attackScore',
         'defenseScore',
         'militaryScore',
+        'alianceName',
     ];
 
     public function player()

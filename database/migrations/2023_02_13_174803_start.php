@@ -247,6 +247,7 @@ return new class extends Migration {
             $table->string("name");
             $table->integer('player')->constrained("players");
             $table->integer('aliance')->nullable()->unsigned();
+            $table->string("alianceName")->nullable();
             $table->bigInteger("energy");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");

@@ -40,8 +40,10 @@ class RotinasController extends Controller
     try {
       DB::table('ranking')->truncate();
 
-      $players = DB::table('players')
-        ->select('id', 'name', 'score', 'buildScore', 'attackScore', 'defenseScore', 'militaryScore', 'researchScore', 'aliance')
+      $players = DB::table('players as p')
+        ->select('p.id', 'p.name', 'p.score', 'p.buildScore', 'p.attackScore', 'p.defenseScore',
+         'p.militaryScore', 'p.researchScore', 'p.aliance','a.name as alianceName')
+        ->leftJoin('aliances as a','a.id','=','p.aliance')
         ->orderBy('score', 'desc')
         ->get();
 
@@ -61,12 +63,13 @@ class RotinasController extends Controller
           'militaryScore' => $player->militaryScore,
           'researchScore' => $player->researchScore,
           'aliance' => $player->aliance,
+          'alianceName' => $player->alianceName
         ]);
       }
       return "executado";
     } catch (\Exception $exception) {
       Log::error('Erro no agendamento: ' . $exception->getMessage());
-      return "Não executado";
+      return "Não executado ".$exception->getMessage();
       //    Notification::route('discord', 'terra-tritium')->notify(new ExceptionNotification($exception));
 
     }
