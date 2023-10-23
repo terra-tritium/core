@@ -166,6 +166,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('logs')->group(function () {
         Route::get('/logs', [LogController::class, 'logs']);
         Route::post('/create', [LogController::class, 'create']);
+        Route::put('/update/{id}',[LogController::class, 'update']);
     });
 
     Route::prefix('aliance')->group(function () {

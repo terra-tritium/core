@@ -261,6 +261,7 @@ return new class extends Migration {
             $table->string("text");
             $table->string("type");
             $table->timestamp("date")->useCurrent();
+            $table->boolean("read")->default(false);
             $table->foreignId('player')->constrained("players");
         });
         Schema::create('messages', function (Blueprint $table) {
