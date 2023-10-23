@@ -37,20 +37,17 @@ class ChatAlianceService
     } catch (Exception $e) {
       Log::error('error while sending a message to another alliance' . $e->getMessage());
       return response()->json(["message" => "error while sending a message to another alliance."], Response::HTTP_INTERNAL_SERVER_ERROR);
-
     }
   }
 
-  public function getMessageWithAliance($destino){
-    try{
+  public function getMessageWithAliance($destino)
+  {
+    try {
       $conversation = $this->chatAliance->getMessageAliance($destino);
-      
-      return response()->json($conversation,Response::HTTP_OK);
-    }catch(Exception $e){
+      return response()->json($conversation, Response::HTTP_OK);
+    } catch (Exception $e) {
       Log::error('error when fetching messages' . $e->getMessage());
-      return response()->json(["message" => "error when fetching messages.", "erro"=>$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-
+      return response()->json(["message" => "error when fetching messages.", "erro" => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
-
   }
 }
