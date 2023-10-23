@@ -4,59 +4,59 @@ namespace App\Services;
 
 use App\Models\GameMode;
 use App\Models\Researched;
+use App\Models\NFTConfig;
 
 class GameModeService
 {
-  public function list ($player) {
+  public function list($player)
+  {
     $isDefence = Researched::where([['player', $player->id], ['code', 800]])->first();
+    $isExpansion = Researched::where([['player', $player->id], ['code', 3400]])->first();
     $isWarCompetence = Researched::where([['player', $player->id], ['code', 900]])->first();
     $isSpaceMining = Researched::where([['player', $player->id], ['code', 2000]])->first();
     $isSpaceEngineering = Researched::where([['player', $player->id], ['code', 2800]])->first();
     $isStelarNavigator = Researched::where([['player', $player->id], ['code', 3100]])->first();
     $isWisdom = Researched::where([['player', $player->id], ['code', 3200]])->first();
+    $nftConfig = NFTConfig::where('player', $player->id)->first();
+
 
     $gameModes = GameMode::orderBy('code')->get();
-    $elegibleGameModes = [];
+    $responseGameModes = [];
 
-    foreach($gameModes as $gm) {
+    foreach ($gameModes as $gm) {
+      $requirementMet = true;
 
-      switch($gm->code) {
-        case 2 :
-          if ($isWarCompetence) {
-            array_push($elegibleGameModes, $gm);
-          }
+      switch ($gm->code) {    
+        case 2:
+          $requirementMet = $nftConfig ? true : false;
           break;
-        case 3 :
-          if ($isWisdom) {
-            array_push($elegibleGameModes, $gm);
-          }
+        case 3:
+          $requirementMet = $isWarCompetence ? true : false;
           break;
-        case 4 :
-          if ($isSpaceEngineering) {
-            array_push($elegibleGameModes, $gm);
-          }
+        case 4:
+          $requirementMet = $isWisdom ? true : false;
           break;
-        case 5 : 
-          if ($isDefence) {
-            array_push($elegibleGameModes, $gm);
-          }
+        case 5:
+          $requirementMet = $isSpaceEngineering ? true : false;
           break;
-        case 7 : 
-          if ($isStelarNavigator) {
-            array_push($elegibleGameModes, $gm);
-          }
+        case 6:
+          $requirementMet = $isDefence ? true : false;
           break;
-        case 8 :
-          if ($isSpaceMining) {
-            array_push($elegibleGameModes, $gm);
-          }
+        case 7:
+          $requirementMet = $isExpansion ? true : false;          
           break;
-        default:
-          array_push($elegibleGameModes, $gm);
+        case 8:
+          $requirementMet = $isStelarNavigator ? true : false;
+          break;
+        case 9:
+          $requirementMet = $isSpaceMining ? true : false;
           break;
       }
+
+      $gm->requirementMet = $requirementMet;
+      array_push($responseGameModes, $gm);
     }
 
-    return $elegibleGameModes;
+    return $responseGameModes;
   }
 }

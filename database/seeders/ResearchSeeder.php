@@ -451,10 +451,23 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 3400,
-            'title' => 'Alien Technology',
-            'description' => 'Alien Technology" is an enigma shrouded in mystery, an advanced manifestation of extraterrestrial intelligence that challenges our understanding. Its complex designs and extraordinary functionalities reveal knowledge beyond the limits of our own civilization, opening doors to new cosmic discoveries and possibilities.',
+            'title' => 'Expansion',
+            'description' => 'The "Technological Future" is a vibrant horizon full of promises, where imagination and innovation come together to shape a world of infinite possibilities. In this scenario, revolutionary advancements drive society forward, from artificial intelligence to biotechnology, renewable energies to space exploration, radically transforming the way we live, work, and connect. With each new breakthrough, the technological future invites us to explore new frontiers, expand the limits of knowledge, and create a smarter, more sustainable, and interconnected world.',
             'cost' => 25600,
             'dependence' => 3300,
+            'category' => 3,
+            'effectDescription' => 'Enables the utilization of the Builder Game Mode',
+            'effects' => json_encode([
+                'speedTravel' => 1,
+            ]),
+        ]);
+
+        DB::table('researchs')->insert([
+            'code' => 3500,
+            'title' => 'Alien Technology',
+            'description' => 'Alien Technology" is an enigma shrouded in mystery, an advanced manifestation of extraterrestrial intelligence that challenges our understanding. Its complex designs and extraordinary functionalities reveal knowledge beyond the limits of our own civilization, opening doors to new cosmic discoveries and possibilities.',
+            'cost' => 51200,
+            'dependence' => 3400,
             'category' => 3,
             'effectDescription' => 'Increases the speed of spaceship construction',
             'effects' => json_encode([
@@ -463,21 +476,8 @@ class ResearchSeeder extends Seeder
         ]);
 
         DB::table('researchs')->insert([
-            'code' => 3500,
-            'title' => 'Future 1 star',
-            'description' => 'The "Technological Future" is a vibrant horizon full of promises, where imagination and innovation come together to shape a world of infinite possibilities. In this scenario, revolutionary advancements drive society forward, from artificial intelligence to biotechnology, renewable energies to space exploration, radically transforming the way we live, work, and connect. With each new breakthrough, the technological future invites us to explore new frontiers, expand the limits of knowledge, and create a smarter, more sustainable, and interconnected world.',
-            'cost' => 51200,
-            'dependence' => 3400,
-            'category' => 3,
-            'effectDescription' => 'Increases research speed',
-            'effects' => json_encode([
-                'speedTravel' => 1,
-            ]),
-        ]);
-
-        DB::table('researchs')->insert([
             'code' => 3600,
-            'title' => 'Future 2 stars',
+            'title' => 'Future 1 star',
             'description' => 'The "Technological Future" is a vibrant horizon full of promises, where imagination and innovation come together to shape a world of infinite possibilities. In this scenario, revolutionary advancements drive society forward, from artificial intelligence to biotechnology, renewable energies to space exploration, radically transforming the way we live, work, and connect. With each new breakthrough, the technological future invites us to explore new frontiers, expand the limits of knowledge, and create a smarter, more sustainable, and interconnected world.',
             'cost' => 102400,
             'dependence' => 3500,
@@ -490,10 +490,23 @@ class ResearchSeeder extends Seeder
 
         DB::table('researchs')->insert([
             'code' => 3700,
-            'title' => 'Future 3 stars',
+            'title' => 'Future 2 stars',
             'description' => 'The "Technological Future" is a vibrant horizon full of promises, where imagination and innovation come together to shape a world of infinite possibilities. In this scenario, revolutionary advancements drive society forward, from artificial intelligence to biotechnology, renewable energies to space exploration, radically transforming the way we live, work, and connect. With each new breakthrough, the technological future invites us to explore new frontiers, expand the limits of knowledge, and create a smarter, more sustainable, and interconnected world.',
             'cost' => 204800,
             'dependence' => 3600,
+            'category' => 3,
+            'effectDescription' => 'Increases research speed',
+            'effects' => json_encode([
+                'speedTravel' => 1,
+            ]),
+        ]);
+
+        DB::table('researchs')->insert([
+            'code' => 3800,
+            'title' => 'Future 3 stars',
+            'description' => 'The "Technological Future" is a vibrant horizon full of promises, where imagination and innovation come together to shape a world of infinite possibilities. In this scenario, revolutionary advancements drive society forward, from artificial intelligence to biotechnology, renewable energies to space exploration, radically transforming the way we live, work, and connect. With each new breakthrough, the technological future invites us to explore new frontiers, expand the limits of knowledge, and create a smarter, more sustainable, and interconnected world.',
+            'cost' => 409600,
+            'dependence' => 3700,
             'category' => 3,
             'effectDescription' => 'Increases research speed',
             'effects' => json_encode([

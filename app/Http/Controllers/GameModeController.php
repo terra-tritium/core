@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Country;
 use App\Models\GameMode;
 use App\Models\Player;
 use App\Models\Effect;
 use App\Services\GameModeService;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class GameModeController extends Controller
@@ -39,10 +37,11 @@ class GameModeController extends Controller
      * @return mixed
      * @throws \Exception
      */
-    public function list() {
+    public function list()
+    {
         // try {
-            $player = Player::getPlayerLogged();
-            return $this->gameModeService->list($player);
+        $player = Player::getPlayerLogged();
+        return $this->gameModeService->list($player);
         // } catch (\Exception $e) {
         //     throw new \Exception('An error occurred while getting game modes.', 500);
         // }
@@ -84,7 +83,8 @@ class GameModeController extends Controller
      * @param $code
      * @return void
      */
-    public function change($code) {
+    public function change($code)
+    {
         try {
             $player = Player::getPlayerLogged();
 
@@ -95,54 +95,62 @@ class GameModeController extends Controller
 
             return response()->json(['success' => 'Modo de jogo alterado com sucesso.'], Response::HTTP_OK);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Ocorreu um erro ao alterar o modo de jogo.'],
-                Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(
+                ['error' => 'Ocorreu um erro ao alterar o modo de jogo.'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
-    private function applyEffect($player,$code) {
+    private function applyEffect($player, $code)
+    {
         $effect = GameMode::where("player", $player)->first();
 
         if (!$effect) {
-           $effect = new Effect();
-        }
+            $effect = new Effect();
+        }        
 
-        switch($code) {
-            # Titan
-            case 2 :
+        switch ($code) { 
+            #NFT     
+            case 2:
+                $effect->costBuild = -10;
+                $effect->protect = 10;                
+                break;    
+            #Space Titan 
+            case 3:
                 $effect->speedProduceUnit = 20;
                 $effect->extraAttack = 2;
                 $effect->speedResearch = -20;
                 $effect->speedMining = -20;
                 break;
             # Researcher
-            case 3 :
+            case 4:
                 $effect->speedResearch = 20;
                 $effect->costBuild = 20;
                 break;
             # Engineer
-            case 3 :
+            case 5:
                 $effect->speedProduceShip = 20;
                 $effect->speedResearch = -20;
                 break;
             # Protector
-            case 3 :
+            case 6:
                 $effect->protect = 20;
                 break;
             # Builder
-            case 3 :
+            case 7:
                 $effect->costBuild = -20;
                 $effect->speedProduceShip = -20;
                 $effect->speedProduceUnit = -20;
                 break;
             # Navigator
-            case 3 :
+            case 8:
                 $effect->speedTravel = 20;
                 $effect->speedProduceShip = -20;
                 $effect->speedProduceUnit = -20;
                 break;
             # Miner
-            case 3 :
+            case 9:
                 $effect->speedMining = 2;
                 $effect->protect = -20;
                 break;
