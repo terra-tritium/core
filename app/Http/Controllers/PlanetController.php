@@ -7,6 +7,9 @@ use App\Models\Player;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+use App\Services\PlayerService;
+
+
 /**
  *
  *     @OA\Schema(
@@ -36,6 +39,11 @@ use Illuminate\Http\Response;
  **/
 class PlanetController extends Controller
 {
+    protected $playerService;
+    public function __construct(PlayerService $playerService)
+    {
+        $this->playerService = $playerService;        
+    }
 
     /**
      *  * @OA\Get(
@@ -136,15 +144,21 @@ class PlanetController extends Controller
      * @return mixed
      */
     public function show($id)
-    {
-        try {
-            $planet = Planet::findOrFail($id);
+{
+    try {
+        $planet = Planet::findOrFail($id);
 
-            return response()->json($planet, Response::HTTP_OK);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        $playerLogged = Player::getPlayerLogged();
+
+        if (!$this->playerService->isPlayerOwnerPlanet($playerLogged->id, $id)) {
+            return response()->json(['error' => 'Unauthorized: You do not own this planet'], Response::HTTP_FORBIDDEN);
         }
+
+        return response()->json($planet, Response::HTTP_OK);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred'], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
 
     /**
      * @OA\Put(
