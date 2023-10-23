@@ -46,6 +46,7 @@ return new class extends Migration {
             $table->bigInteger("attackScore");
             $table->bigInteger("defenseScore");
             $table->bigInteger("warScore");
+            $table->bigInteger("countMembers");
         });
 
         Schema::create('rank_member', function (Blueprint $table) {
@@ -246,6 +247,7 @@ return new class extends Migration {
             $table->string("name");
             $table->integer('player')->constrained("players");
             $table->integer('aliance')->nullable()->unsigned();
+            $table->string("alianceName")->nullable();
             $table->bigInteger("energy");
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
@@ -259,6 +261,7 @@ return new class extends Migration {
             $table->string("text");
             $table->string("type");
             $table->timestamp("date")->useCurrent();
+            $table->boolean("read")->default(false);
             $table->foreignId('player')->constrained("players");
         });
         Schema::create('messages', function (Blueprint $table) {

@@ -133,7 +133,8 @@ class RankingService
                 'defenseScore' => $aliance['defenseScore'],
                 'warScore' => -1,
                 'name' => $aliance['name'],
-                'position' => $count
+                'position' => $count,
+                'countMembers' => $aliance['countMembers']
             ]);
         }
 

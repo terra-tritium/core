@@ -43,6 +43,7 @@ class Aliance extends Model
         $aliances = Aliance::select(
             'aliances.name',
             'aliances.id',
+            DB::raw('count(1) as countMembers'),
             DB::raw('SUM(players.attackScore) as attackScore'),
             DB::raw('SUM(players.score) as score'),
             DB::raw('SUM(players.buildScore) as buildScore'),
