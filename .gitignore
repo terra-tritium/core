@@ -19,3 +19,4 @@ yarn-error.log
 /storage/*
 /config/database.php
 composer.lock
+.data/

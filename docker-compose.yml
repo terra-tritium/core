@@ -26,7 +26,7 @@ services:
     ports:
       - 8000:80
   db:
-    image: mysql:5.7
+    image: mysql:10
     container_name: origin-db
     restart: unless-stopped
     environment:
@@ -37,38 +37,38 @@ services:
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
-      - app_vol:/var/lib/mysql
+      - .data/db:/var/lib/mysql
     ports:
       - 3306:3306
     networks:
       - tritiumnet
-  compose:
-    image: composer/composer 
-    container_name: compose-local    
-    command: composer install
-    working_dir: /var/www/html
-    volumes:
-      - ./:/var/www/html
-    networks: 
-      - tritiumnet
-  queue:
-    image: php:8-apache
-    command: php artisan queue:work  
-    volumes:
-      - ./:/var/www/html
-    depends_on:
-      - app
-  schedule:
-    image: php:8-apache
-    command: php artisan schedule:work  
-    volumes:
-      - ./:/var/www/html
-    depends_on:
-      - app
+#   compose:
+#     image: composer/composer
+#     container_name: compose-local
+#     command: composer install
+#     working_dir: /var/www/html
+#     volumes:
+#       - ./:/var/www/html
+#     networks:
+#       - tritiumnet
+#   queue:
+#     image: php:8-apache
+#     command: php artisan queue:work
+#     volumes:
+#       - ./:/var/www/html
+#     depends_on:
+#       - app
+#   schedule:
+#     image: php:8-apache
+#     command: php artisan schedule:work
+#     volumes:
+#       - ./:/var/www/html
+#     depends_on:
+#       - app
 
 networks:
   tritiumnet:
     driver: bridge
 
-volumes:
-  app_vol:
+# volumes:
+#   app_vol:
