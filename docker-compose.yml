@@ -1,5 +1,4 @@
 version: "3.7"
-name: core
 services:
   app:
     build:
@@ -26,7 +25,7 @@ services:
     ports:
       - 8000:80
   db:
-    image: mysql:10
+    image: mariadb:10
     container_name: origin-db
     restart: unless-stopped
     environment:
@@ -35,9 +34,9 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_USER: ${DB_USERNAME}
       SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
+      SERVICE_NAME: mariadb
     volumes:
-      - .data/db:/var/lib/mysql
+      - .data/db:/var/lib/mariadb
     ports:
       - 3306:3306
     networks:
