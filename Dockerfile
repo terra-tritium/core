@@ -1,31 +1,34 @@
-FROM php:8.2-fpm-bullseye
-LABEL MAINTAINER="Walker de Alencar<walkeralencar@gmail.com>"
+FROM php:8.2-fpm
 
+# Arguments defined in docker-compose.yml
+ARG user
+ARG uid
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip
+
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Create system user to run Composer and Artisan Commands
+RUN useradd -G www-data,root -u $uid -d /home/$user $user
+RUN mkdir -p /home/$user/.composer && \
+    chown -R $user:$user /home/$user
+
+# Set working directory
 WORKDIR /var/www
 
-ENV WORKDIR=/var/www
-ENV STORAGE_DIR=${WORKDIR}/storage
-
-RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends apt-utils supervisor && \
-    apt-get install -y zlib1g-dev libzip-dev unzip libpng-dev libpq-dev libxml2-dev \
-                       libfreetype6-dev libjpeg62-turbo-dev libonig-dev
-
-RUN docker-php-ext-install session xml zip iconv simplexml pcntl gd fileinfo mbstring \
-                        exif bcmath mysqli pdo pdo_mysql pdo_pgsql pgsql
-
-# Copying config files
-#COPY ./.docker/backend/php.ini /etc/php/8.1/cli/conf.d/php.ini
-# COPY ./.docker/supervisord.conf /etc/supervisor/supervisord.conf
-
-# Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Wait
-ENV WAIT_VERSION 2.9.0
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
-RUN chmod +x /wait
-
-EXPOSE 80
-
-#CMD ["php-fpm"]
+USER $user

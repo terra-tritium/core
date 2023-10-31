@@ -3,9 +3,9 @@
 
 ## Requirements
 
-    MariaDB 10.7.4
     Laravel 10
-    PHP 8.1.11
+    PHP 8.2
+    MariaDB 10.7.4
 
 ## Start local database
 
@@ -116,7 +116,7 @@ php artisan queue:work
 
     1 - Baixar e construir as imagens
 
-        docker-compose build 
+        docker-compose build
         
     2 - Iniciar os containers em modo background
 
@@ -126,8 +126,10 @@ php artisan queue:work
 
         docker ps 
 
-    4 - Acessar o container para executar comandos com php
+    4 - Comandos para preprar o ambiente
 
-        docker-composer exec -it app bash
-    
-    Tem uma imagem para instalar as dependências
+        docker-compose exec app composer install
+        docker-compose exec app php artisan key:generate
+        docker-compose exec app php artisan migrate
+        docker-compose exec app php artisan db:seed
+        docker-compose exec app php artisan l5-swagger:generate
