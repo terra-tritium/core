@@ -404,6 +404,10 @@ return new class extends Migration {
             $table->integer("result")->nullable();
             $table->bigInteger("start");
             $table->integer("stage");
+            $table->json('attackMembers')->nullable();
+            $table->json('defenseMembers')->nullable();
+            $table->json('attackZone')->nullable();
+            $table->json('defenseZone')->nullable();
             $table->json('resources')->nullable();
         });
         Schema::create('fighters', function (Blueprint $table) {
