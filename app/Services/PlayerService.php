@@ -95,6 +95,7 @@ class PlayerService
     $effect->speedResearch = 0;
     $effect->speedTravel = 0;
     $effect->speedMining = 0;
+    $effect->plasmaTechnology = 0;
     $effect->protect = 0;
     $effect->extraAttack = 0;
     $effect->discountEnergy = 0;

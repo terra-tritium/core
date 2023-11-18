@@ -371,6 +371,7 @@ return new class extends Migration {
             $table->integer("speedResearch");
             $table->integer("speedTravel");
             $table->integer("speedMining");
+            $table->integer("plasmaTechnology");
             $table->integer("protect");
             $table->integer("extraAttack");
             $table->integer("discountEnergy");
