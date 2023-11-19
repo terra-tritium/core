@@ -340,7 +340,29 @@ return new class extends Migration {
             $table->bigInteger("crystal");
             $table->bigInteger("time");
         });
+        Schema::create('unitsShipyard', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->string("nick");
+            $table->text("description");
+            $table->string("image");
+            $table->string("type");
+            $table->integer("defense");
+            $table->integer("attack");
+            $table->integer("life");
+            $table->bigInteger("metal");
+            $table->bigInteger("uranium");
+            $table->bigInteger("crystal");
+            $table->bigInteger("time");
+        });
         Schema::create('troop', function (Blueprint $table) {
+            $table->id();
+            $table->integer('player')->constrained("players");
+            $table->foreignId('planet')->constrained("planets");
+            $table->foreignId('unit')->constrained("units");
+            $table->bigInteger("quantity");
+        });
+        Schema::create('shipyard', function (Blueprint $table) {
             $table->id();
             $table->integer('player')->constrained("players");
             $table->foreignId('planet')->constrained("planets");
@@ -371,6 +393,7 @@ return new class extends Migration {
             $table->integer("speedResearch");
             $table->integer("speedTravel");
             $table->integer("speedMining");
+            $table->integer("plasmaTechnology");
             $table->integer("protect");
             $table->integer("extraAttack");
             $table->integer("discountEnergy");
