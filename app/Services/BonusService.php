@@ -42,6 +42,12 @@ class BonusService
     $effect->save();
   }
 
+  public function addPlasmaTechnology ($player, $value) {
+    $effect = Effect::where('player', $player->id)->firstOrFail();
+    $effect->plasmaTechnology += $value;
+    $effect->save();
+  }
+
   public function addProtect ($player, $value) {
     $effect = Effect::where('player', $player->id)->firstOrFail();
     $effect->protect += $value;

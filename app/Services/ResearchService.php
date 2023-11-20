@@ -55,6 +55,11 @@ class ResearchService
         # Already researched
         if ($existsResearch) { return false; }
 
+        # Plasma
+        if ($research->code == 500) {
+            $this->bonusService->addPlasmaTechnology($player, 1);
+        }
+
         # Hyperspeed
         if ($research->code == 600) {
             $this->bonusService->addSpeedTravel($player, 1);

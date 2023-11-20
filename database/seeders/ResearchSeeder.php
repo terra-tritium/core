@@ -79,7 +79,7 @@ class ResearchSeeder extends Seeder
             'category' => 1,
             'effectDescription' => 'Enables the development of vehicles with plasma tecnology',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'plasmaTechonology' => 1,
             ]),
         ]);
 
@@ -144,7 +144,7 @@ class ResearchSeeder extends Seeder
             'category' => 1,
             'effectDescription' => 'Increases the speed of robot construction',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'speedProduceUnit' => 1,
             ]),
         ]);
 
@@ -157,7 +157,7 @@ class ResearchSeeder extends Seeder
             'category' => 1,
             'effectDescription' => 'Increases the speed of robot construction',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'speedProduceUnit' => 1,
             ]),
         ]);
 
@@ -170,7 +170,7 @@ class ResearchSeeder extends Seeder
             'category' => 1,
             'effectDescription' => 'Increases the speed of robot construction',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'speedProduceUnit' => 1,
             ]),
         ]);
 
@@ -223,7 +223,7 @@ class ResearchSeeder extends Seeder
             'category' => 2,
             'effectDescription' => 'Increases energy efficiency',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'discountEnergy' => 1,
             ]),
         ]);
 
@@ -262,7 +262,7 @@ class ResearchSeeder extends Seeder
             'category' => 2,
             'effectDescription' => 'Increases the efficiency of humanoid robot factory',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'discountHumanoid' => 1,
             ]),
         ]);
 
@@ -288,7 +288,7 @@ class ResearchSeeder extends Seeder
             'category' => 2,
             'effectDescription' => 'Increases energy efficiency',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'discountEnergy' => 1,
             ]),
         ]);
 
@@ -314,7 +314,7 @@ class ResearchSeeder extends Seeder
             'category' => 2,
             'effectDescription' => 'Increases the speed of mining',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'speedMining' => 1,
             ]),
         ]);
 
@@ -327,7 +327,7 @@ class ResearchSeeder extends Seeder
             'category' => 2,
             'effectDescription' => 'Increases the speed of mining',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'speedMining' => 1,
             ]),
         ]);
 
@@ -340,7 +340,7 @@ class ResearchSeeder extends Seeder
             'category' => 2,
             'effectDescription' => 'Increases the speed of mining',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'speedMining' => 1,
             ]),
         ]);
 
@@ -380,7 +380,7 @@ class ResearchSeeder extends Seeder
             'category' => 3,
             'effectDescription' => 'Enables the utilization of the Engineer Game Mode',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'discountEnergy' => 1,
             ]),
         ]);
 
@@ -458,7 +458,7 @@ class ResearchSeeder extends Seeder
             'category' => 3,
             'effectDescription' => 'Enables the utilization of the Builder Game Mode',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'speedProduceShip' => 1,
             ]),
         ]);
 
@@ -484,7 +484,7 @@ class ResearchSeeder extends Seeder
             'category' => 3,
             'effectDescription' => 'Increases research speed',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'speedResearch' => 1,
             ]),
         ]);
 
@@ -497,7 +497,7 @@ class ResearchSeeder extends Seeder
             'category' => 3,
             'effectDescription' => 'Increases research speed',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'speedResearch' => 1,
             ]),
         ]);
 
@@ -510,7 +510,7 @@ class ResearchSeeder extends Seeder
             'category' => 3,
             'effectDescription' => 'Increases research speed',
             'effects' => json_encode([
-                'speedTravel' => 1,
+                'speedResearch' => 1,
             ]),
         ]);
 
