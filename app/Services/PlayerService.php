@@ -9,6 +9,7 @@ use App\Models\NFTConfig;
 use App\Models\AlianceRanking;
 use App\Models\Building;
 use App\Models\Fleet;
+use App\Models\Shipyard;
 use App\Models\Troop;
 use App\Services\PlanetService;
 
@@ -81,8 +82,8 @@ class PlayerService
     $planet->pwEnergy = 0;
     $planet->pwWorker = 0;
     $planet->transportShips = 0;
-    $planet->researchPoints = 0;
-    $planet->pwResearch = 0;
+    $planet->researchPoints = 10;
+    $planet->pwResearch = 10;
     $planet->save();
     $this->createBuildings($planet->id);
     $this->creatUnits($planet->id,$player->id);
@@ -95,6 +96,7 @@ class PlayerService
     $effect->speedResearch = 0;
     $effect->speedTravel = 0;
     $effect->speedMining = 0;
+    $effect->plasmaTechnology = 0;
     $effect->protect = 0;
     $effect->extraAttack = 0;
     $effect->discountEnergy = 0;
@@ -126,6 +128,18 @@ class PlayerService
       $fleet->unit = rand(1,12);
       $fleet->quantity = rand(1,7);
       $fleet->save();
+    }
+  }
+
+  private function creatShipyardUnits($planetId, $playerId)
+  {
+    for ($i = 0; $i <= rand(3, 8); $i++) {
+      $shipyard = new Shipyard();
+      $shipyard->player = $playerId;
+      $shipyard->planet = $planetId;
+      $shipyard->unit = rand(1, 12);
+      $shipyard->quantity = rand(1, 7);
+      $shipyard->save();     
     }
   }
   /**
