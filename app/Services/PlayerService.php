@@ -82,8 +82,8 @@ class PlayerService
     $planet->pwEnergy = 0;
     $planet->pwWorker = 0;
     $planet->transportShips = 0;
-    $planet->researchPoints = 10;
-    $planet->pwResearch = 10;
+    $planet->researchPoints = 0;
+    $planet->pwResearch = 0;
     $planet->save();
     $this->createBuildings($planet->id);
     $this->creatUnits($planet->id,$player->id);
