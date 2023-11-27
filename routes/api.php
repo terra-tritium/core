@@ -219,7 +219,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('trading')->group(function () {
-        Route::get('/all/{resource}/{type}/{orderby?}/{column?}', [TradingController::class, 'getAllTradingByMarketResource']);
+        Route::get('/all/{resource}/{type}', [TradingController::class, 'getAllTradingByMarketResource']);
         Route::get('/myresources', [TradingController::class, 'getMyResources']);
         Route::post('/new-sale', [TradingController::class, 'tradingNewSale']);
         Route::post('/new-purch',[TradingController::class, 'tradingNewPurchase']);
