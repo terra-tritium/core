@@ -34,10 +34,10 @@ class TradingService
         $player = Player::getPlayerLogged();
         return Planet::where('player', $player->id)->get();
     }
-    public function getAllTradingByMarketResource($resource, $type, $orderby, $column)
+    public function getAllTradingByMarketResource($resource, $type)
     {
         $planeta = $this->getPlanetUserLogged();
-        $trads = $this->trading->getDadosTradingByResourceAndMarket($planeta[0]->id, $resource, $planeta[0]->region, $type, $orderby, $column);
+        $trads = $this->trading->getDadosTradingByResourceAndMarket($planeta[0]->id, $resource, $planeta[0]->region, $type);
         return $trads;
     }
     public function myResources()
