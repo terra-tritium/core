@@ -26,10 +26,9 @@ class Trading extends Model
         'updatedAt',
     ];
 
-    public function getDadosTradingByResourceAndMarket($idPlanetaLogado, $resource, $region, $type, $orderby, $column)
+    public function getDadosTradingByResourceAndMarket($idPlanetaLogado, $resource, $region, $type)
     {
-        $orderByDirection = $orderby == 'A' ? 'asc' : 'desc';
-        $columnOrder = $column ? 't.createdAt' : 't.' . $column;
+      
         $trading = DB::table($this->table . ' as t')
             ->select(
                 "t.*",
@@ -44,7 +43,8 @@ class Trading extends Model
             ->where('m.region', '=', $region)
             ->where('t.resource', '=', $resource)
             ->where('t.type', '=', $type)
-            ->orderBy($columnOrder, $orderByDirection)
+            ->orderBy('distance')
+            // ->orderBy($columnOrder, $orderByDirection)
             ->get();
         return $trading;
     }

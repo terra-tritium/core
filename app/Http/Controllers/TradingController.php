@@ -74,9 +74,9 @@ class TradingController extends Controller
     }
 
 
-    public function getAllTradingByMarketResource($resource, $type, $orderby = 'A', $column = '')
+    public function getAllTradingByMarketResource($resource, $type)
     {
-        return $this->tradingService->getAllTradingByMarketResource($resource, $type, $orderby, $column);
+        return $this->tradingService->getAllTradingByMarketResource($resource, $type);
     }
 
     public function getMyResources()

@@ -140,7 +140,7 @@ class BuildSeeder extends Seeder
             "code" => 9,
             "image" => "build-10.png",
             "description" => "Fabrica de construções de naves",
-            "effect" => "A cada nível de expanção permite a colonização de um novo planeta",
+            "effect" => "",
             "metalStart" => 100,
             "uraniumStart" => 50,
             "crystalStart" => 50,
