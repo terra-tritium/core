@@ -18,6 +18,5 @@ yarn-error.log
 /.vscode
 /storage/*
 /config/database.php
-composer.lock
 .data/
 /db/*
