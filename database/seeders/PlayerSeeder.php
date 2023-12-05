@@ -33,6 +33,9 @@ class PlayerSeeder extends Seeder
            
             $PlayerService->register($player);
         });
-        DB::table('planets')->update(['name' => DB::raw("CONCAT(name, id)")]);
+        DB::table('planets')->update(['name' => DB::raw("CONCAT(name, id)")]);//defenseStrategy
+        DB::table('planets')->update(['attackStrategy' => 7, 'defenseStrategy' => 7]);
+
+
     }
 }

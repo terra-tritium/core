@@ -16,76 +16,76 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('users')->insert([
-            'id'=>1,
-            'name' => 'Admin',
-            'email' => 'admin@com.br',
-            'password' => bcrypt('123456'),
-        ]);
+        // DB::table('users')->insert([
+        //     'id'=>1,
+        //     'name' => 'Admin',
+        //     'email' => 'admin@com.br',
+        //     'password' => bcrypt('123456'),
+        // ]);
 
-        DB::table('users')->insert(['id'=>2,'name' => 'Kleiton','email' => 'kleiton@com.br','password' => bcrypt('123456'),]);
+        // DB::table('users')->insert(['id'=>2,'name' => 'Kleiton','email' => 'kleiton@com.br','password' => bcrypt('123456'),]);
 
-        DB::table('users')->insert([
-            'id'=>3,
-            'name' => 'Andry',
-            'email' => 'andry@com.br',
-            'password' => bcrypt('123456'),
-        ]);
+        // DB::table('users')->insert([
+        //     'id'=>3,
+        //     'name' => 'Andry',
+        //     'email' => 'andry@com.br',
+        //     'password' => bcrypt('123456'),
+        // ]);
 
-        DB::table('users')->insert([
-            'id'=>4,
-            'name' => 'Laris',
-            'email' => 'laris@com.br',
-            'password' => bcrypt('123456'),
-        ]);
-        DB::table('users')->insert([
-            'id'=>5,
-            'name' => 'Lais',
-            'email' => 'lais@com.br',
-            'password' => bcrypt('123456'),
-        ]);
+        // DB::table('users')->insert([
+        //     'id'=>4,
+        //     'name' => 'Laris',
+        //     'email' => 'laris@com.br',
+        //     'password' => bcrypt('123456'),
+        // ]);
+        // DB::table('users')->insert([
+        //     'id'=>5,
+        //     'name' => 'Lais',
+        //     'email' => 'lais@com.br',
+        //     'password' => bcrypt('123456'),
+        // ]);
 
-        DB::table('users')->insert([
-            'id' => 6,
-            'name' => 'Lucas',
-            'email' => 'lucas@com.br',
-            'password' => bcrypt('123456'),
-        ]);
+        // DB::table('users')->insert([
+        //     'id' => 6,
+        //     'name' => 'Lucas',
+        //     'email' => 'lucas@com.br',
+        //     'password' => bcrypt('123456'),
+        // ]);
         
-        DB::table('users')->insert([
-            'id' => 7,
-            'name' => 'Maria',
-            'email' => 'maria@com.br',
-            'password' => bcrypt('123456'),
-        ]);
+        // DB::table('users')->insert([
+        //     'id' => 7,
+        //     'name' => 'Maria',
+        //     'email' => 'maria@com.br',
+        //     'password' => bcrypt('123456'),
+        // ]);
         
-        DB::table('users')->insert([
-            'id' => 8,
-            'name' => 'Carlos',
-            'email' => 'carlos@com.br',
-            'password' => bcrypt('123456'),
-        ]);
+        // DB::table('users')->insert([
+        //     'id' => 8,
+        //     'name' => 'Carlos',
+        //     'email' => 'carlos@com.br',
+        //     'password' => bcrypt('123456'),
+        // ]);
         
-        DB::table('users')->insert([
-            'id' => 9,
-            'name' => 'Ana',
-            'email' => 'ana@com.br',
-            'password' => bcrypt('123456'),
-        ]);
+        // DB::table('users')->insert([
+        //     'id' => 9,
+        //     'name' => 'Ana',
+        //     'email' => 'ana@com.br',
+        //     'password' => bcrypt('123456'),
+        // ]);
         
-        DB::table('users')->insert([
-            'id' => 10,
-            'name' => 'Pedro',
-            'email' => 'pedro@com.br',
-            'password' => bcrypt('123456'),
-        ]);
+        // DB::table('users')->insert([
+        //     'id' => 10,
+        //     'name' => 'Pedro',
+        //     'email' => 'pedro@com.br',
+        //     'password' => bcrypt('123456'),
+        // ]);
 
-        DB::table('users')->insert([
-            'id' => 11,
-            'name' => 'Mariana',
-            'email' => 'mariana@com.br',
-            'password' => bcrypt('123456'),
-        ]);
+        // DB::table('users')->insert([
+        //     'id' => 11,
+        //     'name' => 'Mariana',
+        //     'email' => 'mariana@com.br',
+        //     'password' => bcrypt('123456'),
+        // ]);
         
         // DB::table('users')->insert([
         //     'id' => 12,
@@ -190,17 +190,17 @@ class UserSeeder extends Seeder
         //     'password' => bcrypt('123456'),
         // ]);
 
-        $faker = Faker::create();
-        for ($i = 0; $i < 150; $i++) {
-            $name = $faker->name;
-            $email = $faker->unique()->safeEmail;
+        // $faker = Faker::create();
+        // for ($i = 0; $i < 150; $i++) {
+        //     $name = $faker->name;
+        //     $email = $faker->unique()->safeEmail;
         
-            DB::table('users')->insert([
-                'name' => $name,
-                'email' => $email,
-                'password' => bcrypt('123456'),
-            ]);
-        }
+        //     DB::table('users')->insert([
+        //         'name' => $name,
+        //         'email' => $email,
+        //         'password' => bcrypt('123456'),
+        //     ]);
+        // }
 
     }
 }
