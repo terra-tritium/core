@@ -141,6 +141,17 @@ return new class extends Migration {
         });
         //Fim Terrain Type
 
+        Schema::create('strategies', function (Blueprint $table) {
+            $table->id();
+            $table->integer("code");
+            $table->string("name");
+            $table->string("image");
+            $table->string("description");
+            $table->string("bonus");
+            $table->integer("attack");
+            $table->integer("defense");
+        });
+
 
         Schema::create('planets', function (Blueprint $table) {
             $table->id()->index();
@@ -198,6 +209,14 @@ return new class extends Migration {
             $table->bigInteger("timeResearch")->nullable();
             # Spaceships Transport
             $table->bigInteger("transportShips");
+            #strategies
+            $table->unsignedBigInteger('attackStrategy')->nullable();
+            $table->foreign('attackStrategy')->references('id')->on('strategies')->onDelete('set null');
+            $table->unsignedBigInteger('defenseStrategy')->nullable();
+            $table->foreign('defenseStrategy')->references('id')->on('strategies')->onDelete('set null');
+        
+
+
         });
         Schema::create('countrys', function (Blueprint $table) {
             $table->id();
@@ -212,13 +231,7 @@ return new class extends Migration {
             $table->string("image");
             $table->string("description");
         });
-        Schema::create('strategies', function (Blueprint $table) {
-            $table->id();
-            $table->integer("code");
-            $table->string("name");
-            $table->string("image");
-            $table->string("description");
-        });
+        
         Schema::create('players', function (Blueprint $table) {
             $table->id()->index();
             $table->string("name");
@@ -427,6 +440,10 @@ return new class extends Migration {
             $table->integer("result")->nullable();
             $table->bigInteger("start");
             $table->integer("stage");
+            $table->json('attackMembers')->nullable();
+            $table->json('defenseMembers')->nullable();
+            $table->json('attackZone')->nullable();
+            $table->json('defenseZone')->nullable();
             $table->json('resources')->nullable();
         });
         Schema::create('fighters', function (Blueprint $table) {

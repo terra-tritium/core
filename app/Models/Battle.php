@@ -16,4 +16,20 @@ class Battle extends Model
     {
         return $this->belongsTo(Planet::class, 'planet');
     }
+
+    public function addAttackUnits($units)
+    {
+        $unitsArray = json_decode($this->attackUnits);
+        $unitsArray = array_push($unitsArray, $units);
+        $this->attackUnits = json_encode($unitsArray);
+        $this->save();
+    }
+
+    public function addDefenseUnits($units)
+    {
+        $unitsArray = json_decode($this->defenseUnits);
+        $unitsArray = array_push($unitsArray, $units);
+        $this->defenseUnits = json_encode($unitsArray);
+        $this->save();
+    }
 }
