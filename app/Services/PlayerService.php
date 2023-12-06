@@ -87,8 +87,8 @@ class PlayerService
     $planet->defenseStrategy = 7;
     $planet->attackStrategy = 7;
     $planet->save();
-    $this->createBuildings($planet->id);
-    $this->creatUnits($planet->id, $player->id);
+    // $this->createBuildings($planet->id);
+    // $this->creatUnits($planet->id, $player->id);
 
     $effect = new Effect();
     $effect->player = $player->id;
