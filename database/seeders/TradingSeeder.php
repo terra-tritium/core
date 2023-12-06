@@ -19,23 +19,23 @@ class TradingSeeder  extends Seeder
 
         // DB::table('users')->insert(['name' => 'Kleiton','email' => 'kleiton@com.br','password' => bcrypt('123456'),]);
         //(idPlanetCreator, idMarket, resource, `type`, quantity, price, status, createdAt, updatedAt)
-        $resurce = ['Crystal','Uranium','Metal'];
-        for ($i = 1; $i <= 150; $i++) {
-            $quantidade = rand(1,20);
-            $precoUnitario =  rand(1, 100);
-            DB::table('trading')->insert(
-                [
-                    'idPlanetCreator' => $i,
-                    'idMarket' => 1,
-                    'resource' =>$resurce[array_rand($resurce)],
-                    'type' => $i % 2 ? 'P' : 'S',
-                    'quantity' => $quantidade,
-                    'price' => $precoUnitario,
-                    'total' => ($quantidade * $precoUnitario),
-                    'status' => true
-                ]
-            );
-        }
+        // $resurce = ['Crystal','Uranium','Metal'];
+        // for ($i = 1; $i <= 150; $i++) {
+        //     $quantidade = rand(1,20);
+        //     $precoUnitario =  rand(1, 100);
+        //     DB::table('trading')->insert(
+        //         [
+        //             'idPlanetCreator' => $i,
+        //             'idMarket' => 1,
+        //             'resource' =>$resurce[array_rand($resurce)],
+        //             'type' => $i % 2 ? 'P' : 'S',
+        //             'quantity' => $quantidade,
+        //             'price' => $precoUnitario,
+        //             'total' => ($quantidade * $precoUnitario),
+        //             'status' => true
+        //         ]
+        //     );
+        // }
 
         /*
         $faker = Faker::create();
