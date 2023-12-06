@@ -198,7 +198,7 @@ class BuildSeeder extends Seeder
         DB::table('builds')->insert([
             "name" => "Market",
             "code" => 13,
-            "image" => "build-14.png",
+            "image" => "build-18.png",
             "description" => "Resource trades between players",   
             "effect" => "A cada nível de expanção reduz a taxa de fee e aumenta alcance de trocas",
             "metalStart" => 100,
