@@ -27,7 +27,7 @@ class PlanetSeeder extends Seeder
         $numPlanetasPorRegiao = 15;
         for ($regiao = 'A'; $regiao <= 'P'; $regiao++) {
             for ($quadrant = 0; $quadrant < $numQuadrante; $quadrant++) {
-                for ($i = 1; $i <= $numPlanetasPorRegiao; $i++) {
+                for ($i = 0; $i <= $numPlanetasPorRegiao; $i++) {
                     $planet = new Planet();
                     $planet->level = 1;
                     $planet->name = "Colony ".$regiao."".str_pad($quadrant, 3, '0', STR_PAD_LEFT).".".$i;
