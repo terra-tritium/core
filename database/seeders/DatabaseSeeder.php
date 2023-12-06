@@ -24,13 +24,13 @@ class DatabaseSeeder extends Seeder
             UnitSeeder::class,
             UnitShipyardSeeder::class,
             TerrainTypeSeeder::class,
-            MessagesSeeder::class,
+            // MessagesSeeder::class,
             // ResourcesSeeder::class,
             MarketSeeder::class,
-            PlayerSeeder::class,
-            TradingSeeder::class,
+            // PlayerSeeder::class,
+            // TradingSeeder::class,
             LogoSeeder::class,
-            //AlianceSeeder::class,
+            // AlianceSeeder::class,
             RankMemberSeeder::class,
         ]);
     }
