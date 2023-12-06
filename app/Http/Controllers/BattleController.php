@@ -8,22 +8,29 @@ use App\Models\Player;
 use App\Models\Battle;
 use App\Models\Fighters;
 use App\Models\BattleStage;
+use App\Models\Planet;
+use App\Models\Strategy;
 use App\Services\BattleService;
 use App\Services\PlayerService;
+use App\Services\StrategyService;
 use App\Services\TravelService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class BattleController extends Controller
 {
     protected $battleService;
     protected $playerService;
     protected $travelService;
+    protected $strategyService;
 
-    public function __construct(BattleService $battleService, PlayerService $playerService, TravelService $travelService) {
+    public function __construct(BattleService $battleService, PlayerService $playerService, TravelService $travelService, StrategyService $strategyService)
+    {
         $this->battleService = $battleService;
         $this->playerService = $playerService;
         $this->travelService = $travelService;
+        $this->strategyService = $strategyService;
     }
 
     // public function attackModeList() {
@@ -34,25 +41,29 @@ class BattleController extends Controller
     //     return DefenseMode::orderBy("code")->get();
     // }
 
-    public function changeAttackMode($option) {
+    public function changeAttackMode($option)
+    {
         $user = auth()->user()->id;
         $player = Player::where("user", $user)->firstOrFail();
         $player->attackMode = $option;
         $player->save();
     }
 
-    public function changeDefenseMode($option) {
+    public function changeDefenseMode($option)
+    {
         $user = auth()->user()->id;
         $player = Player::where("user", $user)->firstOrFail();
         $player->defenseMode = $option;
         $player->save();
     }
 
-    public function view ($id) {
+    public function view($id)
+    {
         return Battle::find($id);
     }
 
-    public function list () {
+    public function list()
+    {
         $player = Player::getPlayerLogged();
 
         if (!$player) {
@@ -64,14 +75,51 @@ class BattleController extends Controller
         return response()->json($battles);
     }
 
-    public function stages ($id) {
+
+    public function listStrategy()
+    {
+        $player = Player::getPlayerLogged();
+
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
+        $strategies = Strategy::all();
+        return response()->json($strategies);
+    }
+    public function strategiesSelectedPlanet($planet)
+    {
+        $player = Player::getPlayerLogged();
+
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
+        $planet = Planet::select('id', 'attackStrategy', 'defenseStrategy')->find($planet);
+        return response()->json($planet);
+    }
+    public function changeStrategy($planet, $type, $newStrategy)
+    {
+        $player = Player::getPlayerLogged();
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
+        if($type == 'attack'){
+            Planet::where('id', $planet)->update(['attackStrategy' => $newStrategy]);
+        }else{
+            Planet::where('id', $planet)->update(['defenseStrategy' => $newStrategy]);
+        }
+        return response()->json([], Response::HTTP_ACCEPTED);
+    }
+
+    public function stages($id)
+    {
         return BattleStage::where('battle', $id)->get();
     }
 
-    public function start($defense,$planet,$travel) {
-        $playerOwnerPlatet = $this->playerService->iSplayerOwnerPlanet($defense,$planet);
+    public function start($defense, $planet, $travel)
+    {
+        $playerOwnerPlatet = $this->playerService->iSplayerOwnerPlanet($defense, $planet);
 
-        if($playerOwnerPlatet){
+        if ($playerOwnerPlatet) {
 
             $attack  = Player::getPlayerLogged();
             $defense = Player::find($defense);
@@ -82,7 +130,7 @@ class BattleController extends Controller
             $aStrategy = $attack->attackStrategy;
             $dStrategy = $defense->defenseStrategy;
 
-            return $this->battleService->startNewBattle (
+            return $this->battleService->startNewBattle(
                 $attack->id,
                 $defense->id,
                 $aUnits,
@@ -91,8 +139,7 @@ class BattleController extends Controller
                 $dStrategy,
                 $planet
             );
-        }
-        else{
+        } else {
             return response()->json([
                 'message' => 'The player is not the owner of the planet'
             ], Response::HTTP_FORBIDDEN);
