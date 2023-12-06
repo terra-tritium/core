@@ -43,6 +43,16 @@ class PlayerService
 
     $player->save();
 
+    $lastPlanet = Planet::orderByDesc('id')->first();
+
+    if($lastPlanet){
+      $lastPlanet->player = $player->id;
+      $lastPlanet->defenseStrategy = 7;
+      $lastPlanet->attackStrategy = 7;
+      $lastPlanet->save();
+      return ;
+    }
+
     $newAlocation = $this->startAlocation();
 
     $planet = new Planet();
