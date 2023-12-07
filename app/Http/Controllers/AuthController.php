@@ -125,7 +125,7 @@ class AuthController extends Controller
 
         $success =  $status === Password::PASSWORD_RESET ? true : false;
 
-        return response(['success' => $success  ,'message' => $status ]);
+        return response(['success' => $success  ,'message' => trans($status) ]);
     }
 
     /**

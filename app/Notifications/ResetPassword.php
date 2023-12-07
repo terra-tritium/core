@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 class ResetPassword extends Notification
 {
     use Queueable;
-
+    protected $token;
     /**
      * Create a new notification instance.
      *
@@ -43,9 +43,9 @@ class ResetPassword extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject("Redefinir Senha")
+            ->subject("Reset Password")
             ->line('You are receiving this email because we received a password reset request for your account.')
-            ->action('Redefinir Senha',config('api.url_site').'/reset-password/'.$this->token.'/'.urlencode($notifiable->email))
+            ->action('Reset Password',config('api.url_site').'/reset-password/'.$this->token.'/'.urlencode($notifiable->email))
             ->line('This password reset link will expire in 60 minutes.')
             ->line('If you did not request a password reset, no further action is required.')
             ->markdown('vendor.notifications.email');
