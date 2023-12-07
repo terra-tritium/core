@@ -9,6 +9,7 @@ use App\Services\UserService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * @OA\Schema(
@@ -176,6 +177,17 @@ class PlayerController extends Controller
      * @return Response
      */
     public function register(Request $request) {
+
+        $validator =Validator::make($request->all(), [
+            'name' => 'required',
+            'country' => 'required',
+            'email' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response(['message' => $validator->messages()->first(),'success'=>false], 
+            Response::HTTP_OK);
+        }
 
         $userExist   =  User::where('email',$request->input("email"))->first();
         $playedExist =  Player::where('name',$request->input("name"))->first();
