@@ -44,18 +44,22 @@ class PlayerService
 
     $player->save();
 
-    $lastPlanet = Planet::whereNull('player')->orderBy('id')->first();
-
+    // $lastPlanet = Planet::whereNull('player')->orderBy('id')->first();
+    /**Pega o primeiro registro nulo que seja diferente de 1, o que esta na posição 1 é a estrela */
+    $lastPlanet = Planet::whereNull('player')
+      ->where('position', '<>', 1)
+      ->orderBy('id')
+      ->first();
     // $lastPlanet = Planet::orderByDesc('id')->first();
 
-    if($lastPlanet){
+    if ($lastPlanet) {
       $lastPlanet->player = $player->id;
       $lastPlanet->defenseStrategy = 7;
       $lastPlanet->attackStrategy = 7;
       $lastPlanet->save();
-      return ;
-    }else{
-      return Response()->json(['message'=>'No available planet'], Response::HTTP_INTERNAL_SERVER_ERROR);
+      return;
+    } else {
+      return Response()->json(['message' => 'No available planet'], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     return;
