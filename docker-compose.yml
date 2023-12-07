@@ -31,6 +31,8 @@ services:
       - ./.data/db:/docker-entrypoint-initdb.d
     networks:
       - tritium
+    ports: 
+      - '3306:3306'
 
   nginx:
     image: nginx:alpine
