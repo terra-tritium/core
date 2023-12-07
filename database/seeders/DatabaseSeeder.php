@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             LogoSeeder::class,
             // AlianceSeeder::class,
             RankMemberSeeder::class,
+            PlanetSeeder::class,
         ]);
     }
 }

@@ -155,7 +155,7 @@ return new class extends Migration {
 
         Schema::create('planets', function (Blueprint $table) {
             $table->id()->index();
-            $table->integer('player')->constrained("players")->index();
+            $table->integer('player')->nullable()->constrained("players")->index();
             $table->string("name");
             $table->string('resource');
             $table->integer("level");
@@ -500,13 +500,7 @@ return new class extends Migration {
             $table->timestamp('createdAt')->useCurrent();
             $table->timestamp('updatedAt')->nullable();
         });
-        // Schema::create('resource', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string("nameResource");
-        //     $table->boolean('status')->default(true);
-        //     $table->timestamp('createdAt')->useCurrent();
-        //     $table->timestamp('updatedAt')->nullable();
-        // });
+  
         Schema::create('trading', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('idPlanetCreator');
@@ -613,6 +607,12 @@ return new class extends Migration {
             # Slot commandant colonizer
             $table->integer("slot5");
         });
+
+  
+        /**
+         *FIM DAS TABELAS REFERENTE AO MERCADO
+         */
+    
 
         DB::unprepared('
                 CREATE FUNCTION calc_distancia(idPlaneta1 INT, idPlaneta2 INT)

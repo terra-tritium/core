@@ -12,6 +12,7 @@ use App\Models\Fleet;
 use App\Models\Shipyard;
 use App\Models\Troop;
 use App\Services\PlanetService;
+use Illuminate\Http\Response;
 
 class PlayerService
 {
@@ -43,6 +44,21 @@ class PlayerService
 
     $player->save();
 
+    $lastPlanet = Planet::whereNull('player')->orderBy('id')->first();
+
+    // $lastPlanet = Planet::orderByDesc('id')->first();
+
+    if($lastPlanet){
+      $lastPlanet->player = $player->id;
+      $lastPlanet->defenseStrategy = 7;
+      $lastPlanet->attackStrategy = 7;
+      $lastPlanet->save();
+      return ;
+    }else{
+      return Response()->json(['message'=>'No available planet'], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    return;
     $newAlocation = $this->startAlocation();
 
     $planet = new Planet();
