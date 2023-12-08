@@ -57,11 +57,29 @@ class PlayerService
       $lastPlanet->defenseStrategy = 7;
       $lastPlanet->attackStrategy = 7;
       $lastPlanet->save();
-      return;
+
+      $effect = new Effect();
+      $effect->player = $player->id;
+      $effect->speedProduceUnit = 0;
+      $effect->speedProduceShip = 0;
+      $effect->speedBuild = 0;
+      $effect->speedResearch = 0;
+      $effect->speedTravel = 0;
+      $effect->speedMining = 0;
+      $effect->plasmaTechnology = 0;
+      $effect->protect = 0;
+      $effect->extraAttack = 0;
+      $effect->discountEnergy = 0;
+      $effect->discountBuild = 0;
+      $effect->discountHumanoid = 0;
+      $effect->save();
+
+      return Response()->json(['message'=>'created'], Response::HTTP_CREATED);
     } else {
       return Response()->json(['message' => 'No available planet'], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
+    /**Antigo trecho */
     return;
     $newAlocation = $this->startAlocation();
 
