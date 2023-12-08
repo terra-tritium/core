@@ -13,22 +13,22 @@ services:
     working_dir: /var/www/
     volumes:
       - ./:/var/www
+      - ./docker-compose/docker-entrypoint.sh:/docker-entrypoint.sh
+    depends_on:
+      - db
     networks:
       - tritium
 
   db:
-    image: mariadb:10
+    image: mysql:8.0.35
     container_name: tritium-core-db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: origin
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: secret
       MYSQL_PASSWORD: secret
-      MYSQL_USER: root
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mariadb
     volumes:
-      - ./.data/db:/docker-entrypoint-initdb.d
+      - .data/db:/var/lib/mysql
     networks:
       - tritium
     ports: 
