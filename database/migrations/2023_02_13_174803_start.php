@@ -612,11 +612,13 @@ return new class extends Migration {
         /**
          *FIM DAS TABELAS REFERENTE AO MERCADO
          */
-    
+        
 
         DB::unprepared('
                 CREATE FUNCTION calc_distancia(idPlaneta1 INT, idPlaneta2 INT)
                 RETURNS INT
+                DETERMINISTIC
+                READS SQL DATA
                 BEGIN
                     DECLARE regiao1 INT;
                     DECLARE regiao2 INT;
