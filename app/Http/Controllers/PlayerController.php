@@ -213,8 +213,9 @@ class PlayerController extends Controller
         $player->country = $request->input("country");
         $player->name = $request->input("name");
         $player->user = $user->id;
+        $player->tritium = 0;
         $this->playerService->register($player);
-//subir
+
         return response(['message' => 'Player created success!','success'=>true],Response::HTTP_OK);
 
     }
@@ -351,14 +352,4 @@ class PlayerController extends Controller
         }
 
     }
-
-    /**
-     * @todo retirar ao subir para produção
-     */
-    public function showAll(){
-        $player = new Player();
-        $players = $player::all();
-        return response()->json(["Count" => count($players), "Players" => $players], Response::HTTP_OK);
-    }
-
 }

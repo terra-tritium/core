@@ -246,6 +246,7 @@ return new class extends Migration {
             $table->dateTime('leave_aliance_date')->nullable();
             $table->bigInteger("ready")->nullable();
             $table->bigInteger("researchPoints");
+            $table->bigInteger("tritium");
             # Score rankings
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
