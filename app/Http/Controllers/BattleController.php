@@ -23,14 +23,12 @@ class BattleController extends Controller
     protected $battleService;
     protected $playerService;
     protected $travelService;
-    protected $strategyService;
 
-    public function __construct(BattleService $battleService, PlayerService $playerService, TravelService $travelService, StrategyService $strategyService)
+    public function __construct(BattleService $battleService, PlayerService $playerService, TravelService $travelService)
     {
         $this->battleService = $battleService;
         $this->playerService = $playerService;
         $this->travelService = $travelService;
-        $this->strategyService = $strategyService;
     }
 
     // public function attackModeList() {
@@ -102,12 +100,42 @@ class BattleController extends Controller
         if (!$player) {
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
-        if($type == 'attack'){
+        if ($type == 'attack') {
             Planet::where('id', $planet)->update(['attackStrategy' => $newStrategy]);
-        }else{
+        } else {
             Planet::where('id', $planet)->update(['defenseStrategy' => $newStrategy]);
         }
         return response()->json([], Response::HTTP_ACCEPTED);
+    }
+    /**
+     * Verifica se o jogador possui a capacidade máxima de planetas
+     */
+    public function checkNumberOfPlanets()
+    {
+        $player = Player::getPlayerLogged();
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
+        $planets = Planet::where('player', $player->id)->get();
+        $count = count($planets);
+        return response()->json(['count' => $count, "allowed" => $count < env("MAX_PLANET_PLAYER")], Response::HTTP_OK);
+    }
+    /**
+     * Atribuir novo planeta ao jogador
+     */
+    public function colonizePlanet($planet){
+
+        $player = Player::getPlayerLogged();
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
+        $planets = Planet::where('player', $player->id)->get();
+        if(count($planets) > env("MAX_PLANET_PLAYER")){
+            return response()->json(['error' => 'planet limit exceeded.'], Response::HTTP_NOT_FOUND);
+        }
+        Planet::where('id', $planet)->update(['player' => $player->id]);
+        return response()->json([], Response::HTTP_OK);
+
     }
 
     public function stages($id)
