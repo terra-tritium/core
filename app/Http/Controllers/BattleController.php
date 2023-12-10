@@ -123,18 +123,70 @@ class BattleController extends Controller
     /**
      * Atribuir novo planeta ao jogador
      */
-    public function colonizePlanet($planet){
+    public function colonizePlanet($planet)
+    {
 
         $player = Player::getPlayerLogged();
         if (!$player) {
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
         $planets = Planet::where('player', $player->id)->get();
-        if(count($planets) > env("MAX_PLANET_PLAYER")){
+        if (count($planets) > env("MAX_PLANET_PLAYER")) {
             return response()->json(['error' => 'planet limit exceeded.'], Response::HTTP_NOT_FOUND);
         }
         Planet::where('id', $planet)->update(['player' => $player->id]);
         return response()->json([], Response::HTTP_OK);
+    }
+    /**
+     * Verifica se tem nave disponível
+     */
+    public function availableShip()
+    {
+        $player = Player::getPlayerLogged();
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
+        $ships = 0;
+        return response()->json(["ships" => $ships], Response::HTTP_OK);
+    }
+    public function availableResources($planet){
+        $planet = Planet::findOrFail($planet);
+        return response()->json($planet, Response::HTTP_OK);
+    }
+    /**
+     * Action mode
+     * -attack
+     * -defense
+     * -resource
+     */
+    public function actionMode(Request $request)
+    {
+        $mode = $request->input("mode");
+        switch ($mode) {
+            case "attack":
+                $this->start(null,null,null);
+                break;
+            case "defense":
+                $this->defense();
+                break;
+            case "resource":
+                $this->sendResource();
+                break;
+            default:
+                return response()->json(["error" => "mode not found"], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /*
+        Defender
+    */
+    public function defense(){
+
+    }
+    /**
+     * enviar recurso
+     */
+    public function sendResource(){
 
     }
 

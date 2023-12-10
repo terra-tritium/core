@@ -47,7 +47,7 @@ class StrategySeeder extends Seeder
             'name' => "Diamond",
             'code' => 4,
             'description' => 'description',
-            'image' => 'strategy0.png',
+            'image' => 'strategy04.png',
             'bonus' => 'Droides soma +2D',
             'attack' => 20,
             'defense' => 5
