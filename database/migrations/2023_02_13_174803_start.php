@@ -246,6 +246,7 @@ return new class extends Migration {
             $table->dateTime('leave_aliance_date')->nullable();
             $table->bigInteger("ready")->nullable();
             $table->bigInteger("researchPoints");
+            $table->bigInteger("tritium");
             # Score rankings
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
@@ -612,11 +613,13 @@ return new class extends Migration {
         /**
          *FIM DAS TABELAS REFERENTE AO MERCADO
          */
-    
+        
 
         DB::unprepared('
                 CREATE FUNCTION calc_distancia(idPlaneta1 INT, idPlaneta2 INT)
                 RETURNS INT
+                DETERMINISTIC
+                READS SQL DATA
                 BEGIN
                     DECLARE regiao1 INT;
                     DECLARE regiao2 INT;

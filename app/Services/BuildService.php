@@ -149,6 +149,13 @@ class BuildService
             if ($building->slot != 4) {
                 return false;
             }
+        
+            if ($this->planetService->enoughBalance($p1, $require->metal, 1)) {
+                $p1 = $this->planetService->removeMetal($p1, $require->metal);
+                $player = $this->playerService->addBuildScore($player, $require->metal * $this->basicScoreFator);
+            } else {
+                return false;
+            }
         }
 
         // Market
@@ -188,7 +195,13 @@ class BuildService
 
         // Laboratory
         if ($building->build == Build::LABORATORY) {
-            $p1->pwEnergy = 1;
+            if ($this->planetService->enoughBalance($p1, $require->metal, 1)) {
+                $p1 = $this->planetService->removeMetal($p1, $require->metal);
+                $player = $this->playerService->addBuildScore($player, $require->metal * $this->basicScoreFator);
+                $p1->pwEnergy = 1;
+            } else {
+                return false;
+            }
         }
 
         $player = $this->playerService->addBuildScore($player, $this->levelFactor);
