@@ -150,6 +150,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/available-ship",[BattleController::class, "availableShip"]);
         Route::post("/actionmode",[BattleController::class, "actionMode"]);
         Route::get("/available-resources/{planet}",[BattleController::class, "availableResources"]);
+
+        //sendresource
+        Route::post('/sendresource', [BattleController::class, 'sendResource']);
+
     });
 
     Route::prefix('quadrant')->group(function () {
