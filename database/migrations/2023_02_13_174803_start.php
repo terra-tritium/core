@@ -296,7 +296,7 @@ return new class extends Migration {
             $table->integer("code");
             $table->string("image");
             $table->text("description");
-            $table->string("effect");
+            $table->string("effect");            
             // initial cost
             $table->integer("metalStart");
             $table->integer("uraniumStart");
@@ -315,6 +315,7 @@ return new class extends Migration {
             $table->integer("level");
             $table->integer("slot");
             $table->integer("workers");
+            $table->integer("max_humanoids")->default(0);
             $table->bigInteger("ready")->nullable();
         });
         Schema::create('travels', function (Blueprint $table) {

@@ -19,6 +19,7 @@ class Building extends Model
     use HasFactory;
     protected $table = 'buildings';
     public $timestamps = false;
+    protected $fillable = ['max_humanoids'];
 
     public function build()
     {
