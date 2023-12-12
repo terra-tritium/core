@@ -89,6 +89,12 @@ class BuildService
             $this->starNewMining($p1, $building, 0, 1, $require->metal);
         }
 
+        // Humanoid Factory
+        if ($building->build == 3) {
+            $this->starNewMining($p1, $building, 0, 1, $require->metal);
+            $building->max_humanoids = 10;
+        }
+
         // Metal Mining
         if ($building->build == 4) {
             $this->starNewMining($p1, $building, 1, 1, $require->metal);
@@ -289,6 +295,11 @@ class BuildService
         // Energy
         if ($building->build == Build::ENERGYCOLLECTOR) {
             $planet->pwEnergy = $building->level;
+        }
+
+        // Humanoid Factory
+        if ($building->build == Build::HUMANOIDFACTORY) {
+            $building->max_humanoids = $building->level * 10;
         }
 
         // Warehouse
