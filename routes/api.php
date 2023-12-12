@@ -147,6 +147,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/strategy/{planet}/{type}/{newStrategy}',[BattleController::class, 'changeStrategy']);
         Route::get("/check-number-planets",[BattleController::class, 'checkNumberOfPlanets']);
         Route::put("/colonizer/{planet}",[BattleController::class, "colonizePlanet"]);
+        Route::get("/available-ship",[BattleController::class, "availableShip"]);
+        Route::post("/actionmode",[BattleController::class, "actionMode"]);
+        Route::get("/available-resources/{planet}",[BattleController::class, "availableResources"]);
+
+        //sendresource
+        Route::post('/sendresource', [BattleController::class, 'sendResource']);
+
     });
 
     Route::prefix('quadrant')->group(function () {
