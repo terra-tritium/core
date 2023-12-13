@@ -43,7 +43,7 @@ class ResetPassword extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject("Reset Password")
+            ->subject("Terra Tritum - Reset Password")
             ->line('You are receiving this email because we received a password reset request for your account.')
             ->action('Reset Password',config('api.url_site').'/reset-password/'.$this->token.'/'.urlencode($notifiable->email))
             ->line('This password reset link will expire in 60 minutes.')
