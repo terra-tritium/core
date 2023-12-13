@@ -133,3 +133,10 @@ php artisan queue:work
         docker-compose exec app php artisan migrate
         docker-compose exec app php artisan db:seed
         docker-compose exec app php artisan l5-swagger:generate
+    
+    5 - Para docker-compose no wsl configurar o volume no próprio docker
+            volumes:
+            - db_data:/var/lib/mysql
+        volumes:
+            db_data:
+                driver: local 

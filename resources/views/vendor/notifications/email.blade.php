@@ -9,7 +9,7 @@
 # @lang('Hello!')
 @endif
 @endif
-
+<hr>
 {{-- Intro Lines --}}
 @foreach ($introLines as $line)
 {{ $line }}
@@ -35,13 +35,10 @@
 
 @endforeach
 
-{{-- Salutation --}}
-@if (! empty($salutation))
-{{ $salutation }}
-@else
-@lang('Regards'),<br>
-{{ config('app.name') }}
-@endif
+<p>
+    Att,<br>
+    Team Tritium<br>
+</p>
 
 {{-- Subcopy --}}
 @isset($actionText)
