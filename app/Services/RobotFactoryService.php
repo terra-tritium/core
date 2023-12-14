@@ -26,12 +26,11 @@ class RobotFactoryService
     $user = auth()->user()->id;
     $player = Player::where("user", $user)->firstOrFail();
     $planet = Planet::where("id", $planetId)->where("player", $player->id)->firstOrFail();
-    $humanoidFactoryBuilding = Building::where('planet_id', $planetId)
-                                        ->where('type', 3) 
-                                        ->first();
-                                        
-
-    if (!$humanoidFactoryBuilding || $qtd > $humanoidFactoryBuilding->max_humanoids) {
+    $humanoidFactoryBuilding = Building::where('planet', $planetId)
+                                        ->where('build', 3) 
+                                        ->get();                                        
+    
+    if (count($humanoidFactoryBuilding) == 0 || $qtd > $humanoidFactoryBuilding[0]->max_humanoids) {
         return false; 
     }
 
@@ -39,7 +38,7 @@ class RobotFactoryService
 
     $energyCost = $qtd * env('TRITIUM_HUMANOID_PRICE');
     $metalCost = $qtd * env('TRITIUM_HUMANOID_PRICE');
-
+    
     # enough energy and metal?
     if ($planet->energy < $energyCost || $planet->metal < $metalCost) {
       return false;
