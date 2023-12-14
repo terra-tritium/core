@@ -314,8 +314,7 @@ return new class extends Migration {
             $table->foreignId('planet')->constrained("planets");
             $table->integer("level");
             $table->integer("slot");
-            $table->integer("workers");
-            $table->integer("max_humanoids")->default(0);
+            $table->integer("workers");           
             $table->bigInteger("ready")->nullable();
         });
         Schema::create('travels', function (Blueprint $table) {
