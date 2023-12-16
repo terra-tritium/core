@@ -6,6 +6,9 @@ use App\Models\Battle;
 use App\Models\BattleStage;
 use App\Models\Fighters;
 use App\Jobs\BattleJob;
+use App\Models\Building;
+use App\Models\Travel;
+use App\Models\Troop;
 
 class BattleService
 {
@@ -574,5 +577,49 @@ class BattleService
         }
 
         return  $quantityTroop;
+    }
+
+    public function travelsData($from)
+    {
+        $travel = new Travel();
+        return $travel->getTravelsData($from);
+    }
+    public function travelsFinished($travels){
+        $finished = [];
+        foreach($travels as $travel){
+            if($travel->chegou == 1){
+                array_push($finished, $travel);
+            }
+        }
+        return $finished;
+    }
+    /**
+     * @todo verificar no banco se possui nave
+     */
+    public function targetHasShip($target){
+        return false;        
+    }
+
+    public function targetHasShield($target){
+        $build = Building::where(['planet'=>$target, 'build'=>12])->first();
+        return $build;
+    }
+    public function targetHasTroop($target){
+        $troops = Troop::where('planet',$target)->get();
+        return $troops;
+    }
+    public function capturarRecurso($travelId,$target, $from){
+        $now = time();
+
+        $travel = Travel::findOrFail($travelId);
+        $travel->metal = 100;
+        $travel->crystal = 100;
+        $travel->uranium = 100;
+        $travel->action = 2;
+        $travel->status = 2;
+        $travel->start = $now;
+        $travel->arrival = $now + 600 ;
+        $travel->save();
+        return "capturar recurso do " . $target . " e voltar para " . $from;
     }
 }
