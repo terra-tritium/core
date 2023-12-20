@@ -180,4 +180,33 @@ public function syncronizeDefenseScore(Planet $planet) {
     return $p1;
   }
 
+  public function calculeDistance($origin, $destiny) {
+
+    $arrayRegion = ['A'=>0,'B'=>1,'C'=>2,'D'=>3,'E'=>4,'F'=>5,'G'=>6,'H'=>7,'I'=>8,'J'=>9,'K'=>10,'L'=>11,'M'=>12,'N'=>13,'O'=>14,'P'=>15];
+    $result       = 0.5;
+    $qtdQuadrante = 100;
+    $wight_time_secund = env('WEIGHT_TIME_SECOND'); 
+
+    $originModel     = Planet::findOrFail($origin);
+    $destinyModel    = Planet::findOrFail($destiny);
+
+    $regionOrigin  = $originModel->region ;
+    $regionDestiny =  $destinyModel->region ;
+
+    $quatrandOrigin  =  $originModel->quadrant ;
+    $quatrandDestiny =  $destinyModel->quadrant ;
+
+    if( $regionOrigin != $regionDestiny){
+      $regionsDistance =  abs($arrayRegion[$regionOrigin] - $arrayRegion[$regionDestiny]) ;
+      $result  = ($regionsDistance  *  $qtdQuadrante); 
+    }else{
+      if($quatrandOrigin != $quatrandDestiny){
+        $q1 = substr($quatrandOrigin,1);
+        $q2 =  substr( $quatrandDestiny,1);
+        $result = abs($q1 - $q2 );
+      } 
+    }
+    return ($wight_time_secund *  $result);
+  }
+  
 }

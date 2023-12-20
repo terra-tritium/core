@@ -89,6 +89,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/show/{id}', [PlanetController::class, 'show']);
         Route::get('/{quadrant}/{position}', [PlanetController::class, 'find']);
         Route::put('/edit/{planet}', [PlanetController::class, 'update']);
+        Route::get('/calcule-distance/{origin}/{destiny}', [PlanetController::class, 'calculeDistance']);
     });
 
     Route::prefix('unit')->group(function () {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Planet;
 use App\Models\Player;
+use App\Services\PlanetService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -40,9 +41,13 @@ use App\Services\PlayerService;
 class PlanetController extends Controller
 {
     protected $playerService;
-    public function __construct(PlayerService $playerService)
+    protected $planetService;
+
+    public function __construct(PlayerService $playerService, PlanetService $planetService,)
     {
-        $this->playerService = $playerService;        
+        $this->playerService = $playerService;     
+        $this->planetService = $planetService;        
+
     }
 
     /**
@@ -144,21 +149,21 @@ class PlanetController extends Controller
      * @return mixed
      */
     public function show($id)
-{
-    try {
-        $planet = Planet::findOrFail($id);
+    {
+        try {
+            $planet = Planet::findOrFail($id);
 
-        $playerLogged = Player::getPlayerLogged();
+            $playerLogged = Player::getPlayerLogged();
 
-        if (!$this->playerService->isPlayerOwnerPlanet($playerLogged->id, $id)) {
-            return response()->json(['error' => 'Unauthorized: You do not own this planet'], Response::HTTP_FORBIDDEN);
+            if (!$this->playerService->isPlayerOwnerPlanet($playerLogged->id, $id)) {
+                return response()->json(['error' => 'Unauthorized: You do not own this planet'], Response::HTTP_FORBIDDEN);
+            }
+
+            return response()->json($planet, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        return response()->json($planet, Response::HTTP_OK);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'An error occurred'], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
-}
 
     /**
      * @OA\Put(
@@ -265,5 +270,64 @@ class PlanetController extends Controller
         $planets = Planet::where('player', $player->id)->get();
 
         return response()->json($planets, Response::HTTP_OK);
+    }
+
+/**
+     *  * @OA\Get(
+     *     path="/planet/calcule-distance/{origin}/{destiny}",
+     *     operationId="calculeDistancePlanet",
+     *     tags={"Planet"},
+     *     summary="Calculate distance between planets",
+     *     @OA\Parameter(
+     *         name="origin",
+     *         in="path",
+     *         description="Planet of origin",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="destiny",
+     *         in="path",
+     *         description="Destination  planet",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="name",
+     *                 type="int64",
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No result"
+     *     )
+     * )
+     * @param $quadrant
+     * @param $position
+     * @return string
+     */
+    public function calculeDistance(Request $request){
+        try {
+
+            $origin = $request->origin;
+            $destiny = $request->destiny;
+
+           $time = $this->planetService->calculeDistance($origin,$destiny);
+
+            return response()->json(['origin'=> $origin, 'destiny'=>  $destiny, 'distance' => $time], Response::HTTP_OK);
+        } catch (\Exception $e) {
+             return response()->json(['error' => 'An error occurred'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
