@@ -169,12 +169,16 @@ class BattleController extends Controller
         return $resourceService->sendResources($request);
     }
 
+    public function calculateStage($battleId){
+        $stage = $this->battleService->calculateStage($battleId);
+        return response()->json($stage, Response::HTTP_OK);    
+    }
+
     public function arrivalPlanet($from)
     {
         $log = '';
         $travels = $this->battleService->travelsData($from);
         $finished = $this->battleService->travelsFinished($travels);
-
 
         if (count($finished) > 0) {
             $dPlanetId = $finished[0]->to;
@@ -189,10 +193,11 @@ class BattleController extends Controller
                 if ($targetHasShield) {
                     if (count($targetHasTroop) > 0) {
                         $log = "O alvo tem escudo, tem tropa, inicio de uma batalha ";
-                        $attack = Planet::find($from)->first();
-                        $defense = Planet::find($dPlanetId)->first();
+                        $attack = Planet::find($from);
+                        $defense = Planet::find($dPlanetId);
                     
-                        // $log .= $this->battleService->startNewBattle($attack->player, $defense->player,'{}', '{}',$attack->attackStrategy, $defense->defenseStrategy,$dPlanetId);
+                        $log .= $this->battleService->startNewBattle($attack->player, $defense->player,
+                            json_decode($finished[0]->troop), $targetHasTroop,$attack->attackStrategy, $defense->defenseStrategy,$dPlanetId);
 
                     } else {
                         $log = "tem escudo, mas nao tem tropa, capturar recurso ";

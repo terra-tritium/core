@@ -27,6 +27,7 @@ class Travel extends Model
             'id',
             'start',
             'to',
+            'troop',
             DB::raw("DATE_FORMAT(FROM_UNIXTIME(start), '%d/%m/%Y %H:%i:%s') AS start_date"),
             DB::raw("DATE_FORMAT(FROM_UNIXTIME(arrival), '%d/%m/%Y %H:%i:%s') AS arrival_date"),
             DB::raw("TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(start), FROM_UNIXTIME(arrival)) AS time_difference_seconds"),

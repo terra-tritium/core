@@ -152,6 +152,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/available-resources/{planet}",[BattleController::class, "availableResources"]);
 
         Route::get("/arrival-planet/{from}",[BattleController::class, "arrivalPlanet"]);
+        Route::get("/stage/{battleId}",[BattleController::class,"calculateStage"]);
         //sendresource
         Route::post('/sendresource', [BattleController::class, 'sendResource']);
 
