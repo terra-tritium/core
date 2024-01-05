@@ -32,14 +32,13 @@ public function syncronizeDefenseScore(Planet $planet) {
 
 
 public function currentBalance($p1, $type) {
-  $sInHour = 3600;
-  $divisor = 8; 
+  $sInHour = 3600;  
 
-  $activeEnergyMining = (($this->timeNow - $p1->timeEnergy) / $sInHour) / $divisor;
-  $activeMetalMining = (($this->timeNow - $p1->timeMetal) / $sInHour) / $divisor;
-  $activeUraniumMining = (($this->timeNow - $p1->timeUranium) / $sInHour) / $divisor;
-  $activeCrystalMining = (($this->timeNow - $p1->timeCrystal) / $sInHour) / $divisor;
-  $activeLaboratory = (($this->timeNow - $p1->timeResearch) / $sInHour) / $divisor;
+  $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $sInHour;
+  $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $sInHour;
+  $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $sInHour;
+  $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $sInHour;
+  $activeLaboratory = ($this->timeNow - $p1->timeResearch) / $sInHour;
 
     switch ($type) {
       case 0:
