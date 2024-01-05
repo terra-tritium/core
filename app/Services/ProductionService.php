@@ -9,7 +9,7 @@ use App\Models\Unit;
 use App\Jobs\TroopJob;
 use App\Jobs\FleetJob;
 use App\Models\Planet;
-use App\Models\UnitShipyard;
+use App\Models\Ship;
 use App\Services\PlanetService;
 
 class ProductionService
@@ -30,6 +30,7 @@ class ProductionService
   
       $timeConstruction = ($unitModel->time *  $unit['quantity'] * env("TRITIUM_PRODUCTION_SPEED") );
       $newUnit[] = $unit;
+      $newUnit['type'] = $type ;
       
       $production->ready = time() + $timeConstruction;
       $production->objects = json_encode($newUnit);
@@ -59,39 +60,9 @@ class ProductionService
     }
     
   }
-  public function addShipyard ($player, $planet, $unitShipyard, $type) {
-    $unitModel = UnitShipyard::findOrFail($unitShipyard['id']);
-    if($unitModel){
-      $production = new Production();
-      $production->player = $player;
-      $production->planet = $planet;
-  
-      $timeConstruction = ($unitModel->time *  $unitShipyard['quantity'] * env("TRITIUM_PRODUCTION_SPEED") );
-      $newUnit[] = $unitShipyard;
-      
-      $production->ready = time() + $timeConstruction;
-      $production->objects = json_encode($newUnit);
-      $production->executed = false;
-      $production->save();
-  
-      if ($type == "shipyard") {
-        ShipyardJob::dispatch(
-          $planet,
-          $player,
-          $newUnit,
-          $production->id
-        )->delay(now()->addSeconds($timeConstruction));
-      }
 
-    }else{
-      return false;
-    }
-    
-  }  
-
-  public function hasFunds($unit, $unitShipyard, $planet) {
+  public function hasFunds($unit, $planet) {
     $unitModel = Unit::findOrFail($unit["id"]);
-    $unitModelShipyard = UnitShipyard::findOrFail($unitShipyard["id"]);
 
     if (isset($unit["quantity"])) {
       $p1 = Planet::findOrFail($planet);
@@ -104,22 +75,11 @@ class ProductionService
         if (!$this->planetService->enoughBalance($p1, ($unitModel->crystal * $unit["quantity"]), 3)){
             return false;
         }
-    } else if (isset($unitShipyard["quantity"])) {
-      $p1 = Planet::findOrFail($planet);
-      if (!$this->planetService->enoughBalance($p1, ($unitModelShipyard->metal * $unitShipyard["quantity"]), 1)){
-            return false;
-        }
-        if (!$this->planetService->enoughBalance($p1, ($unitModelShipyard->uranium * $unitShipyard["quantity"]), 2)){
-            return false;
-        }
-        if (!$this->planetService->enoughBalance($p1, ($unitModelShipyard->crystal * $unitShipyard["quantity"]), 3)){
-            return false;
-        }
-    }
+    } 
     return true;
   }
 
-  public function spendFunds($planet, $unit, $unitShipyard) {
+  public function spendFunds($planet, $unit) {
     $metal = 0;
     $uranium = 0;
     $crystal = 0;
@@ -129,11 +89,6 @@ class ProductionService
     $uranium += $unitModel->uranium;
     $crystal += $unitModel->crystal;
 
-    $unitModelShipyard = UnitShipyard::findOrFail($unitShipyard["id"]);
-    $metal += $unitModelShipyard->metal;
-    $uranium += $unitModelShipyard->uranium;
-    $crystal += $unitModelShipyard->crystal;
-
     $p1 = Planet::findOrFail($planet);
     $p1 = $this->planetService->removeMetal($p1, $metal);
     $p1 = $this->planetService->removeUranium($p1, $uranium);
@@ -141,7 +96,7 @@ class ProductionService
     $p1->save();
   }
 
-  public function productionPlayer($player,$planet,$executed = false){
+  public function productionPlayer($player,$planet, $type ,$executed = false){
     
     $filter = ['player'=> $player->id,'executed'=> $executed];
     if(!is_null($planet) && !empty($planet))
@@ -150,29 +105,27 @@ class ProductionService
     }
     $productionModel =  Production::where($filter)->orderBy("ready")->get();
     $units = [];
-    $unitShipyard = [];
 
     foreach($productionModel as $key => $production){
       $unitObj = json_decode($production->objects);
       
       foreach($unitObj as $key => $unit){
-        $unitModel = Unit::find($unit->id);
-
-        $unitModel->ready =  $production->ready;
-        $unitModel->planet =  $production->planet;
-        $unitModel->quantity =  $unit->quantity;
-
-        $units[] =  $unitModel ;
+        if(isset($unit->id)){
+          if($type == 'troop'){
+            $unitModel = Unit::find($unit->id);
+          }else{ 
+            $unitModel = Ship::find($unit->id);
+          }
+  
+          $unitModel->ready =  $production->ready;
+          $unitModel->planet =  $production->planet;
+          $unitModel->quantity =  $unit->quantity;
+  
+          $units[] =  $unitModel ;
+        }
+       
       }
-      foreach($unitObj as $key => $unitShipyard){
-        $unitModelShipyard = UnitShipyard::find($unit->id);
 
-        $unitModelShipyard->ready =  $production->ready;
-        $unitModelShipyard->planet =  $production->planet;
-        $unitModelShipyard->quantity =  $unit->quantity;
-
-        $unitShipyard[] =  $unitModelShipyard ;
-      }
     }
     return  $units;
   }

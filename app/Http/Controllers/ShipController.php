@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UnitShipyard;
+use App\Models\Ship;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
-class UnitShipyardController extends Controller
+class ShipController extends Controller
 {
 
     /**
      *
      * * @OA\Get(
-     *     path="/unitShipyard/list",
-     *     tags={"UnitShipyard"},
-     *     summary="List units",
+     *     path="/ship/list",
+     *     tags={"Ship"},
+     *     summary="List units of the ships",
      *     @OA\Response(
      *         response=200,
      *         description="Units retrieved successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="data", type="array",
-     *                 @OA\Items(ref="#/components/schemas/UnitShipyard")
+     *                 @OA\Items(ref="#/components/schemas/Ship")
      *             )
      *         )
      *     ),
@@ -37,7 +37,7 @@ class UnitShipyardController extends Controller
      */
     public function list() {
         try {
-            return UnitShipyard::orderBy('name')->get();
+            return Ship::orderBy('name')->get();
         } catch (\Exception $exception) {
             Log::error($exception);
             return response()->json(['message' => 'Error retrieving units'],

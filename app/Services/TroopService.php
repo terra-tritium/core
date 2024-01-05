@@ -24,7 +24,7 @@ class TroopService
     }
 
     public function productionTroop($player,$planet){
-        return $this->productionService->productionPlayer($player,$planet);
+        return $this->productionService->productionPlayer($player,$planet,'troop');
     }
 
     public function troops($player,$planet){

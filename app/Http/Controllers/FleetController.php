@@ -2,24 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Shipyard;
 use App\Models\Player;
-use App\Models\Production;
-use App\Services\ShipyardService;
+use App\Services\FleetService;
 use Illuminate\Http\Request;
 use App\Services\PlayerService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
-class ShipyardController extends Controller
+class FleetController extends Controller
 {
 
-    protected $shipyardService;
+    protected $fleetService;
     protected $playerService;
 
-    public function __construct(ShipyardService $shipyardService, PlayerService $playerService)
+    public function __construct(FleetService $fleetService, PlayerService $playerService)
     {
-        $this->shipyardService = $shipyardService;
+        $this->fleetService = $fleetService;
         $this->playerService = $playerService;
     }
 
@@ -30,11 +28,11 @@ class ShipyardController extends Controller
      * @return \Illuminate\Http\Response
      *
      * @OA\Post (
-     *     path="/api/shipyard/production/{planet}",
-     *     tags={"Shipyard"},
-     *     summary="Produce Shipyard",
+     *     path="/api/fleet/production/{planet}",
+     *     tags={"Fleet"},
+     *     summary="Produce Fleets",
      *     security={
-     *         {"bearerAuthShipyardP": {}}
+     *         {"bearerAuthFleetP": {}}
      *     },
      *     @OA\RequestBody(
      *         @OA\JsonContent(),
@@ -62,7 +60,7 @@ class ShipyardController extends Controller
      *  @OA\SecurityScheme(
      *     type="http",
      *     scheme="bearer",
-     *     securityScheme="bearerAuthShipyardP"
+     *     securityScheme="bearerAuthFleetP"
      * )
      *
      */
@@ -74,14 +72,14 @@ class ShipyardController extends Controller
             $player = Player::getPlayerLogged();
 
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
-                return $this->shipyardService->production($player->id, $planet, $request->all());
+                return $this->fleetService->production($player->id, $planet, $request->all());
             } else {
                 return response()->json(['message' => 'You are not authorized to perform this action.'],
                     Response::HTTP_FORBIDDEN);
             }
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'An error occurred during troop production.'],
+            return response()->json(['message' => 'An error occurred during Fleet production.'],
                 Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -93,18 +91,18 @@ class ShipyardController extends Controller
      * @return \Illuminate\Http\Response
      *
      * @OA\Get (
-     *     path="/api/shipyard/production/{planet?}",
-     *     tags={"Shipyard},
-     *     summary="List Shipyards in Producions",
+     *     path="/api/fleet/production/{planet?}",
+     *     tags={"Fleet"},
+     *     summary="List Fleets in Producions",
      *     security={
-     *         {"bearerAuthShipyard": {}}
+     *         {"bearerAuthFleet": {}}
      *     },
      *     @OA\Response(response="200", description="Resposta bem-sucedida")
      * )
      *  @OA\SecurityScheme(
      *     type="http",
      *     scheme="bearer",
-     *     securityScheme="bearerAuthShipyard"
+     *     securityScheme="bearerAuthFleet"
      * )
      *
      */
@@ -114,14 +112,14 @@ class ShipyardController extends Controller
             $player = Player::getPlayerLogged();
             $planet = $request->planet;
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
-                return $this->shipyardService->productionShipyard($player, $planet);
+                return $this->fleetService->productionFleet($player, $planet);
             } else {
                 return response()->json(['message' => 'You are not authorized to perform this action.'],
                     Response::HTTP_FORBIDDEN);
             }
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'An error occurred during troop production.'],
+            return response()->json(['message' => 'An error occurred during Fleet production.'],
                 Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -129,22 +127,22 @@ class ShipyardController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Shipyard  $player
+     * @param  \App\Models\Fleet  $player
      * @return \Illuminate\Http\Response
      *
      * @OA\Get (
-     *     path="/api/shipyard/{planet}",
-     *     tags={"Shipyard"},
-     *     summary="List Shipyards of planet",
+     *     path="/api/Fleet/{planet}",
+     *     tags={"Fleet"},
+     *     summary="List Fleets of planet",
      *     security={
-     *         {"bearerAuthShipyardList": {}}
+     *         {"bearerAuthFleetList": {}}
      *     },
      *     @OA\Response(response="200", description="Resposta bem-sucedida")
      * )
      *  @OA\SecurityScheme(
      *     type="http",
      *     scheme="bearer",
-     *     securityScheme="bearerAuthShipyardList"
+     *     securityScheme="bearerAuthFleetList"
      * )
      *
      */
@@ -154,14 +152,14 @@ class ShipyardController extends Controller
             $player = Player::getPlayerLogged();
 
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
-                return $this->shipyardService->shipyards($player->id, $planet);
+                return $this->fleetService->fleets($player->id, $planet);
             } else {
                 return response()->json(['message' => 'You are not authorized to perform this action.'],
                     Response::HTTP_FORBIDDEN);
             }
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'An error occurred during list troops.'],
+            return response()->json(['message' => 'An error occurred during list Fleets.'],
                 Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

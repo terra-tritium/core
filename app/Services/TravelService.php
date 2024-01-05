@@ -194,9 +194,9 @@ class TravelService
         foreach($troops as $key => $troop)
         {  
             $troopm = Troop::where([
-                ['unit', $troop->unit],
-                ['player', $player],
-                ['planet', $planet]
+                'unit'      => $troop->unit,
+                'player'    => $player,
+                'planet'    => $planet
             ])->first();
 
             $troopm->quantity = ($troopm->quantity -  $troop->quantity);

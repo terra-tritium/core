@@ -14,8 +14,7 @@ class TravelControllerTest extends TestCase
     # php artisan test --filter=TravelControllerTest::test_travel
     public function test_travel()
     {
-
-        $loginData = ['email' => 'nicplayer@gmail.com', 'password' => '123'];
+        $loginData = ['email' => 'ronielvb@gmail.com', 'password' => '123'];
 
         $response = $this->json('POST', 'api/user/login', $loginData, ['Accept' => 'application/json']);
         
@@ -23,11 +22,11 @@ class TravelControllerTest extends TestCase
         $token = $content['token'];
 
         $data = [
-                    'action'    => 1,
-                    'from'      => 'A010:1',
-                    'to'        => 'A010:2',
+                    'action'    => 1, // 1 = Attack
+                    'from'      => 2, // Planet
+                    'to'        => 3, // Planet
                     'troop' =>[
-                        ['unit' => 1, 'quantity' => 28],
+                        ['unit' => 1, 'quantity' => 20],
                         ['unit' => 2, 'quantity' => 30],
                     ] 
                 ];
