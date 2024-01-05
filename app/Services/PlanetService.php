@@ -31,15 +31,15 @@ public function syncronizeDefenseScore(Planet $planet) {
 }
 
 
-  public function currentBalance($p1, $type) {
-    # secounds in hour
-    $sInHour = 3600;
+public function currentBalance($p1, $type) {
+  $sInHour = 3600;
+  $divisor = 8; 
 
-    $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $sInHour;
-    $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $sInHour;
-    $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $sInHour;
-    $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $sInHour;
-    $activeLaboratory = ($this->timeNow - $p1->timeResearch) / $sInHour;
+  $activeEnergyMining = (($this->timeNow - $p1->timeEnergy) / $sInHour) / $divisor;
+  $activeMetalMining = (($this->timeNow - $p1->timeMetal) / $sInHour) / $divisor;
+  $activeUraniumMining = (($this->timeNow - $p1->timeUranium) / $sInHour) / $divisor;
+  $activeCrystalMining = (($this->timeNow - $p1->timeCrystal) / $sInHour) / $divisor;
+  $activeLaboratory = (($this->timeNow - $p1->timeResearch) / $sInHour) / $divisor;
 
     switch ($type) {
       case 0:
@@ -159,7 +159,7 @@ public function syncronizeDefenseScore(Planet $planet) {
   }
 
   public function addCrystal($p1, $units) {
-    $p1->uranium = $this->currentBalance($p1, 2);
+    $p1->uranium = $this->currentBalance($p1, 3);
     $p1->timeUranium = $this->timeNow;
     $p1->uranium += $units;
     return $p1;
@@ -167,7 +167,7 @@ public function syncronizeDefenseScore(Planet $planet) {
 
   public function removeCrystal($p1, $units) {
     if ($this->currentBalance($p1, 2) > $units) {
-      $p1->crystal = $this->currentBalance($p1, 2);
+      $p1->crystal = $this->currentBalance($p1, 3);
       $p1->timeCrystal = $this->timeNow;
       $p1->crystal -= $units;
       $this->rankingService->addPoints($units / 20);
