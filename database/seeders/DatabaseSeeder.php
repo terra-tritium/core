@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             ResearchSeeder::class,
             StrategySeeder::class,
             UnitSeeder::class,
-            UnitShipyardSeeder::class,
+            ShipSeeder::class,
             TerrainTypeSeeder::class,
             // MessagesSeeder::class,
             // ResourcesSeeder::class,

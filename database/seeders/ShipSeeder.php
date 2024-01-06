@@ -6,7 +6,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class UnitShipyardSeeder extends Seeder
+class ShipSeeder extends Seeder
 {
     /**
      * Seed the application's database.

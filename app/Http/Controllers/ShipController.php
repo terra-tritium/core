@@ -18,7 +18,7 @@ class ShipController extends Controller
      *     summary="List units of the ships",
      *     @OA\Response(
      *         response=200,
-     *         description="Units retrieved successfully",
+     *         description="Ships retrieved successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="data", type="array",
      *                 @OA\Items(ref="#/components/schemas/Ship")
@@ -27,7 +27,7 @@ class ShipController extends Controller
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Error retrieving units",
+     *         description="Error retrieving ships",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="Error retrieving units")
      *         )
