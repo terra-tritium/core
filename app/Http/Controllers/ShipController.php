@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ship;
+use App\Models\UnitShipyard;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -37,7 +38,7 @@ class ShipController extends Controller
      */
     public function list() {
         try {
-            return Ship::orderBy('name')->get();
+            return UnitShipyard::orderBy('name')->get();
         } catch (\Exception $exception) {
             Log::error($exception);
             return response()->json(['message' => 'Error retrieving units'],
