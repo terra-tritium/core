@@ -79,7 +79,7 @@ class FleetController extends Controller
             }
         } catch (\Exception $exception) {
             Log::error($exception);
-            return response()->json(['message' => 'An error occurred during Fleet production.'],
+            return response()->json(['message' => 'An error occurred during Fleet production.', 'err' => $exception->getMessage()],
                 Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

@@ -10,6 +10,8 @@ use App\Jobs\TroopJob;
 use App\Jobs\FleetJob;
 use App\Models\Planet;
 use App\Models\Ship;
+use App\Models\Shipyard;
+use App\Models\UnitShipyard;
 use App\Services\PlanetService;
 
 class ProductionService
@@ -22,7 +24,11 @@ class ProductionService
   }
 
   public function add ($player, $planet, $unit, $type) {
-    $unitModel = Unit::findOrFail($unit['id']);
+    if($type == "troop"){
+      $unitModel = Unit::findOrFail($unit['id']);
+    }else{
+      $unitModel = UnitShipyard::findOrFail($unit['id']);
+    }
     if($unitModel){
       $production = new Production();
       $production->player = $player;
@@ -61,8 +67,12 @@ class ProductionService
     
   }
 
-  public function hasFunds($unit, $planet) {
-    $unitModel = Unit::findOrFail($unit["id"]);
+  public function hasFunds($unit, $planet, $type) {
+    if($type == "troop"){
+      $unitModel = Unit::findOrFail($unit['id']);
+    }else{
+      $unitModel = UnitShipyard::findOrFail($unit['id']);
+    }
 
     if (isset($unit["quantity"])) {
       $p1 = Planet::findOrFail($planet);
@@ -79,12 +89,16 @@ class ProductionService
     return true;
   }
 
-  public function spendFunds($planet, $unit) {
+  public function spendFunds($planet, $unit, $type) {
     $metal = 0;
     $uranium = 0;
     $crystal = 0;
 
-    $unitModel = Unit::findOrFail($unit["id"]);
+    if($type == "troop"){
+      $unitModel = Unit::findOrFail($unit['id']);
+    }else{
+      $unitModel = UnitShipyard::findOrFail($unit['id']);
+    }
     $metal += $unitModel->metal;
     $uranium += $unitModel->uranium;
     $crystal += $unitModel->crystal;
