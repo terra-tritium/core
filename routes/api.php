@@ -82,6 +82,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::group(['prefix' => 'factory'], function () {
         Route::post('/humanoid/create/{planet}/{qtd}', [FactoryController::class, 'createHumanoid']);
+        Route::post('/transportship/create/{planet}/{qtd}', [FactoryController::class, 'createTransportShip']);
+
     });
 
     Route::prefix('planet')->group(function () {

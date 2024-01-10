@@ -7,7 +7,7 @@ use App\Models\Planet;
 use App\Models\Player;
 use App\Services\WorkerService;
 
-class RobotFactoryService
+class TransportShipsFactoryService
 {
 
   private $workerService;
@@ -17,40 +17,35 @@ class RobotFactoryService
   }
 
   /**
-   * Create a new humanoid
+   * Create a new transportship
    *
    * @param int $planetId
    * @param int $qtd
    * @return void
    */
-  public function createHumanoid($planetId, $qtd) {
+  public function createTransportShip($planetId, $qtd) {
     $user = auth()->user()->id;
     $player = Player::where("user", $user)->firstOrFail();
     $planet = Planet::where("id", $planetId)->where("player", $player->id)->firstOrFail();
-    $humanoidFactoryBuilding = Building::where('planet', $planetId)
-                                        ->where('build', 3) 
-                                        ->get();                                        
-    
-    if (count($humanoidFactoryBuilding) == 0 || $qtd > $humanoidFactoryBuilding[0]->max_humanoids) {
-        return false; 
-    }
+  
 
     $this->workerService->syncronizeEnergy($planet);
 
-    $energyCost = $qtd * env('TRITIUM_HUMANOID_PRICE');
-    $metalCost = $qtd * env('TRITIUM_HUMANOID_PRICE');
+    $energyCost = $qtd * env('TRITIUM_TRANSPORTSHIP_PRICE');
+    $metalCost = $qtd * env('TRITIUM_TRANSPORTSHIP_PRICE');
     
     # enough energy and metal?
     if ($planet->energy < $energyCost || $planet->metal < $metalCost) {
       return false;
     }
 
-    $player->score += $qtd * env('TRITIUM_HUMANOID_POINTS');
+    $player->score += $qtd * env('TRITIUM_TRANSPORTSHIP_POINTS');
 
     $planet->energy -= $energyCost;
     $planet->metal -= $metalCost;
     $planet->workers += $qtd;
     $planet->workersWaiting += $qtd;
+    $planet->transportShips += $qtd;
 
     $player->save();
     $planet->save();
