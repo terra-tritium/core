@@ -13,6 +13,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+    
+        
         DB::table('unitsShipyard')->where('id', '1')->update([
             'image' => 'ship-01.png',
         ]);
