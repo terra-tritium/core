@@ -10,8 +10,6 @@ use App\Jobs\TroopJob;
 use App\Jobs\FleetJob;
 use App\Models\Planet;
 use App\Models\Ship;
-use App\Models\Shipyard;
-use App\Models\UnitShipyard;
 use App\Services\PlanetService;
 
 class ProductionService
@@ -27,7 +25,7 @@ class ProductionService
     if($type == "troop"){
       $unitModel = Unit::findOrFail($unit['id']);
     }else{
-      $unitModel = UnitShipyard::findOrFail($unit['id']);
+      $unitModel = Ship::findOrFail($unit['id']);
     }
     if($unitModel){
       $production = new Production();
@@ -71,7 +69,7 @@ class ProductionService
     if($type == "troop"){
       $unitModel = Unit::findOrFail($unit['id']);
     }else{
-      $unitModel = UnitShipyard::findOrFail($unit['id']);
+      $unitModel = Ship::findOrFail($unit['id']);
     }
 
     if (isset($unit["quantity"])) {
@@ -97,7 +95,7 @@ class ProductionService
     if($type == "troop"){
       $unitModel = Unit::findOrFail($unit['id']);
     }else{
-      $unitModel = UnitShipyard::findOrFail($unit['id']);
+      $unitModel = Ship::findOrFail($unit['id']);
     }
     $metal += $unitModel->metal;
     $uranium += $unitModel->uranium;
