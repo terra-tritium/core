@@ -316,6 +316,7 @@ class PlayerController extends Controller
      *     summary="Change name player",
      *     @OA\Parameter(
      *         name="name",
+     *         in="path",
      *         required=true,
      *         description="Player's name",
      *         @OA\Schema(
@@ -333,8 +334,8 @@ class PlayerController extends Controller
      *     )
      * )
      *
-     * @param $id
-     * @return array
+     * @param Request $request
+     * @return Response
      */
     public function changeName(Request $request)
     {

@@ -13,10 +13,10 @@ class FleetService
         $this->productionService = new ProductionService();
     }
 
-    public function production ($player, $planet, $unit) {
-        if ($this->productionService->hasFunds($unit, $planet)) {
-            $this->productionService->add($player, $planet, $unit, "fleet");
-            $this->productionService->spendFunds($planet, $unit);
+    public function production ($player, $planet, $ship) {
+        if ($this->productionService->hasFunds($ship, $planet, "fleet")) {
+            $this->productionService->add($player, $planet, $ship, "fleet");
+            $this->productionService->spendFunds($planet, $ship, "fleet");
         } else {
             return "No suficients Funds";
         }
@@ -24,6 +24,15 @@ class FleetService
     public function getFleetPlayer($player){
         $fleet = new Fleet();
         $fleets = $fleet->getFleetPlayer($player);
+        return $fleets;
+    }
+
+    public function productionFleet($player,$planet){
+        return $this->productionService->productionPlayer($player,$planet,'fleet');
+    }
+
+    public function fleets($player,$planet){
+        $fleets = Fleet::with('ship')->where(['player' => $player, 'planet' => $planet])->get();
         return $fleets;
     }
 }

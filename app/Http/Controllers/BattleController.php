@@ -169,6 +169,62 @@ class BattleController extends Controller
         return $resourceService->sendResources($request);
     }
 
+    public function calculateStage($battleId){
+        $stage = $this->battleService->calculateStage($battleId);
+        return response()->json($stage, Response::HTTP_OK);    
+    }
+
+    public function arrivalPlanet($from)
+    {
+        $log = '';
+        $travels = $this->battleService->travelsData($from);
+        $finished = $this->battleService->travelsFinished($travels);
+
+        if (count($finished) > 0) {
+            $dPlanetId = $finished[0]->to;
+            $targetHasShip = $this->battleService->targetHasShip($dPlanetId);
+            $targetHasShield = $this->battleService->targetHasShield($dPlanetId);
+            $targetHasTroop = $this->battleService->targetHasTroop($dPlanetId);
+            if ($targetHasShip) {
+                //inicio da batalha espacial
+                $log = " Inicio da batalha espacial ";
+               
+            } else {
+                if ($targetHasShield) {
+                    if (count($targetHasTroop) > 0) {
+                        $log = "O alvo tem escudo, tem tropa, inicio de uma batalha ";
+                        $attack = Planet::find($from);
+                        $defense = Planet::find($dPlanetId);
+                    
+                        $log .= $this->battleService->startNewBattle($attack->player, $defense->player,
+                            json_decode($finished[0]->troop), $targetHasTroop,$attack->attackStrategy, $defense->defenseStrategy,$dPlanetId);
+
+                    } else {
+                        $log = "tem escudo, mas nao tem tropa, capturar recurso ";
+                        $log .= $this->battleService->capturarRecurso($finished[0]->id,$dPlanetId, $from);
+                    }
+                } else {
+                    $log = "O alvo não tem escudo, capturar recurs o";
+                    $log .= $this->battleService->capturarRecurso($finished[0]->id,$dPlanetId, $from);
+                }
+            }
+
+            return response()->json([
+                'origem' => $from,
+                'alvo' => $dPlanetId,
+                'log' =>  $log,
+                "finished" => $finished,
+                'targetHasShip' => $targetHasShip,
+                'orbita' => $targetHasShip == false ? 'Orbita dominada' : 'inicio a batalha espacial',
+                'shield' => $targetHasShield,
+                'targetTroops' => $targetHasTroop,
+                "verificar chegada ao planeta"
+            ], Response::HTTP_OK);
+        } else {
+            return response()->json([],Response::HTTP_OK);
+        }
+    }
+
     /**
      * Action mode
      * -attack

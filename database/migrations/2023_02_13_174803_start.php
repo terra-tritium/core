@@ -354,7 +354,7 @@ return new class extends Migration {
             $table->bigInteger("crystal");
             $table->bigInteger("time");
         });
-        Schema::create('unitsShipyard', function (Blueprint $table) {
+        Schema::create('ships', function (Blueprint $table) {
             $table->id();
             $table->string("name");
             $table->string("nick");
@@ -376,18 +376,11 @@ return new class extends Migration {
             $table->foreignId('unit')->constrained("units");
             $table->bigInteger("quantity");
         });
-        Schema::create('shipyard', function (Blueprint $table) {
-            $table->id();
-            $table->integer('player')->constrained("players");
-            $table->foreignId('planet')->constrained("planets");
-            $table->foreignId('unit')->constrained("units");
-            $table->bigInteger("quantity");
-        });
         Schema::create('fleet', function (Blueprint $table) {
             $table->id();
             $table->integer('player')->constrained("players");
             $table->foreignId('planet')->constrained("planets");
-            $table->foreignId('unit')->constrained("units");
+            $table->foreignId('unit')->constrained("ships");
             $table->bigInteger("quantity");
         });
         Schema::create('production', function (Blueprint $table) {
@@ -452,7 +445,7 @@ return new class extends Migration {
             $table->integer('side');
             $table->integer('strategy');
             $table->integer('player')->constrained("players");
-            $table->integer("battle")->constrained("battles");
+            $table->bigInteger("battle")->constrained("battles");
             $table->foreignId('planet')->constrained("planets");
             $table->string("demage")->nullable();
             $table->bigInteger("start");

@@ -15,16 +15,16 @@ class TroopService
     }
 
     public function production ($player, $planet, $unit) {
-        if ($this->productionService->hasFunds($unit, $planet)) {
+        if ($this->productionService->hasFunds($unit, $planet, "troop")) {
             $this->productionService->add($player, $planet, $unit, "troop");
-            $this->productionService->spendFunds($planet, $unit);
+            $this->productionService->spendFunds($planet, $unit, "troop");
         } else {
             return "No suficients Funds";
         }
     }
 
     public function productionTroop($player,$planet){
-        return $this->productionService->productionPlayer($player,$planet);
+        return $this->productionService->productionPlayer($player,$planet,'troop');
     }
 
     public function troops($player,$planet){

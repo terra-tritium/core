@@ -5,16 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Services\RobotFactoryService;
+use App\Services\TransportShipsFactoryService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
 class FactoryController extends Controller
 {
     protected $robotFactoryService;
+    protected $transportShipFactoryService;
 
-    public function __construct(RobotFactoryService $robotFactoryService)
+    public function __construct(RobotFactoryService $robotFactoryService, TransportShipsFactoryService $transportShipFactoryService)
     {
         $this->robotFactoryService = $robotFactoryService;
+        $this->transportShipFactoryService = $transportShipFactoryService;
     }
 
     /**
@@ -88,6 +91,23 @@ class FactoryController extends Controller
         } catch (\Exception $exception) {
             Log::error($exception);
             return response()->json(['message' => 'Error on create humanoid'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function createTransportShip($planet, $qtd)
+    {
+        try {
+            $resp = $this->transportShipFactoryService->createTransportShip($planet,$qtd);
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'qtd' => $resp
+                ]
+            ]);
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'Error on create transport ship'],
                 Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

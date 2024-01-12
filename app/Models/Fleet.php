@@ -24,10 +24,15 @@ class Fleet extends Model
                 'u.image',
                 'u.type'
             )
-            ->join('units as u', 'u.id', '=', 'f.unit')
+            ->join('ships as u', 'u.id', '=', 'f.unit')
             ->where('f.player', $playerId)
             ->groupBy('f.player', 'u.name','u.nick', 'u.description', 'u.image', 'u.type')
             ->get();
         return $fleets;
+    }
+
+    public function ship()
+    {
+        return $this->belongsTo(Ship::class,'unit');
     }
 }

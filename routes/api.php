@@ -4,7 +4,6 @@ use App\Http\Controllers\BuildController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\PlanetController;
 use App\Http\Controllers\PlayerController;
-use App\Http\Controllers\ShipyardController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\TroopController;
 use App\Http\Controllers\RankingController;
@@ -22,7 +21,8 @@ use App\Http\Controllers\TradingController;
 use App\Http\Controllers\NFTController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\RotinasController;
-use App\Http\Controllers\UnitShipyardController;
+use App\Http\Controllers\ShipController;
+use App\Http\Controllers\FleetController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -82,6 +82,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::group(['prefix' => 'factory'], function () {
         Route::post('/humanoid/create/{planet}/{qtd}', [FactoryController::class, 'createHumanoid']);
+        Route::post('/transportship/create/{planet}/{qtd}', [FactoryController::class, 'createTransportShip']);
+
     });
 
     Route::prefix('planet')->group(function () {
@@ -95,8 +97,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('unit')->group(function () {
         Route::get('/list', [UnitController::class, 'list']);
     });
-    Route::prefix('unitShipyard')->group(function () {
-        Route::get('/list', [UnitShipyardController::class, 'list']);
+    Route::prefix('ship')->group(function () {
+        Route::get('/list', [ShipController::class, 'list']);
     });
 
     Route::prefix('troop')->group(function () {
@@ -104,10 +106,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/production/{planet?}', [TroopController::class, 'producing']);
         Route::get('/{planet}', [TroopController::class, 'list']);
     });
-    Route::prefix('shipyard')->group(function () {
-        Route::post('/production/{planet}', [ShipyardController::class, 'production']);
-        Route::get('/production/{planet?}', [ShipyardController::class, 'producing']);
-        Route::get('/{planet}', [ShipyardController::class, 'list']);
+
+    Route::prefix('fleet')->group(function () {
+        Route::post('/production/{planet}', [FleetController::class, 'production']);
+        Route::get('/production/{planet?}', [FleetController::class, 'producing']);
+        Route::get('/{planet}', [FleetController::class, 'list']);
     });
 
     Route::prefix('ranking')->group(function () {
@@ -152,6 +155,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post("/actionmode",[BattleController::class, "actionMode"]);
         Route::get("/available-resources/{planet}",[BattleController::class, "availableResources"]);
 
+        Route::get("/arrival-planet/{from}",[BattleController::class, "arrivalPlanet"]);
+        Route::get("/stage/{battleId}",[BattleController::class,"calculateStage"]);
         //sendresource
         Route::post('/sendresource', [BattleController::class, 'sendResource']);
 
