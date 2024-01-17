@@ -44,8 +44,8 @@ class TransportShipsFactoryService
     $planet->energy -= $energyCost;
     $planet->metal -= $metalCost;
     $planet->workers += $qtd;
-    $planet->workersWaiting += $qtd;
-    $planet->transportShips += $qtd;
+    // $planet->workersWaiting += $qtd;
+    // $planet->transportShips += $qtd;
 
     $player->save();
     $planet->save();
