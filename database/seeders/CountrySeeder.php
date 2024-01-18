@@ -164,6 +164,12 @@ class CountrySeeder extends Seeder
             "code" => "SWE",
             "image" => "se.svg"
         ]);
+
+        DB::table('countrys')->insert([
+            "name" => "Switzerland",
+            "code" => "SUI",
+            "image" => "ch.svg"
+        ]);
         
         DB::table('countrys')->insert([
             "name" => "Slovenia",
