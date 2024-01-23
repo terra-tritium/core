@@ -33,19 +33,18 @@ class ProductionService
       $production->planet = $planet;
   
       $timeConstruction = ($unitModel->time *  $unit['quantity'] * env("TRITIUM_PRODUCTION_SPEED") );
-      $newUnit[] = $unit;
-      $newUnit['type'] = $type ;
+      $unit['type'] = $type;
       
       $production->ready = time() + $timeConstruction;
-      $production->objects = json_encode($newUnit);
+      // $production->ready = time() + 1;
+      $production->objects = json_encode($unit);
       $production->executed = false;
       $production->save();
-  
       if ($type == "troop") {
         TroopJob::dispatch(
           $planet,
           $player,
-          $newUnit,
+          $unit,
           $production->id
         )->delay(now()->addSeconds($timeConstruction));
       }
@@ -54,7 +53,7 @@ class ProductionService
         FleetJob::dispatch(
           $planet,
           $player,
-          $newUnit,
+          $unit,
           $production->id
         )->delay(now()->addSeconds($timeConstruction));
       }
