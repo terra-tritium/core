@@ -113,7 +113,10 @@ class TroopController extends Controller
         try {
             $player = Player::getPlayerLogged();
             $planet = $request->planet;
+
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
+                // return ["aki"=>"aki","player"=>$player, "planet" => $planet];
+
                 return $this->troopService->productionTroop($player, $planet);
             } else {
                 return response()->json(['message' => 'You are not authorized to perform this action.'],
