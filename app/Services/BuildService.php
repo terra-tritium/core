@@ -63,6 +63,11 @@ class BuildService
         $build = Build::find($building->build);
         $playerLogged = Player::getPlayerLogged();
         $player = Player::findOrFail($playerLogged->id);
+        $buildings  =  Building::where(['planet' => $building->planet, 'build' => $building->build])->first();
+        if($buildings)
+        {
+            return false;
+        }
 
         # Yet have a building in construction on this planet
         if ($p1->ready != null && $p1->ready > time()) {
