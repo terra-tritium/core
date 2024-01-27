@@ -594,12 +594,12 @@ return new class extends Migration {
             $table->id();
             $table->integer('player')->constrained("players");
             # Slots of control panel
-            $table->integer("slot1");
-            $table->integer("slot2");
-            $table->integer("slot3");
-            $table->integer("slot4");
+            $table->integer("slot1")->nullable();;
+            $table->integer("slot2")->nullable();;
+            $table->integer("slot3")->nullable();;
+            $table->integer("slot4")->nullable();;
             # Slot commandant colonizer
-            $table->integer("slot5");
+            $table->integer("slot5")->nullable();;
         });
 
   
