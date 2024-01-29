@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BuildController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\NFTEffectsController;
 use App\Http\Controllers\PlanetController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\UnitController;
@@ -254,6 +255,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('nft')->group(function () {
         Route::post('/config/{slot}/{code}', [NFTController::class, 'config']);
         Route::get('/config/get', [NFTController::class, 'get']);
+    });
+
+    Route::prefix('nft-effect')->group(function () {
+        Route::get('/nft-effect/{id}', [NFTEffectsController::class, 'show']);
     });
 
  
