@@ -18,15 +18,10 @@ class NFTEffectsController extends Controller
      */
 
     // Método para listar todos os efeitos NFT
-    public function show($id)
-{
-    try {
-        $nftEffect = NFTEffect::findOrFail($id);
-        return response()->json($nftEffect);
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        return response()->json(['message' => 'NFT not found.'], Response::HTTP_NOT_FOUND);
-    }
-}
+    public function get() {        
+        $nftEffects = NFTEffect::all();
+        return response()->json($nftEffects);
+      }
 
     private function applyEffect($nftId)
     {

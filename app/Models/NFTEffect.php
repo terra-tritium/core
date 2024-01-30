@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class NFTEffect extends Model
 {
     use HasFactory;
-    protected $table = 'nft_effects';
+    protected $table = 'nft-effects';
 
     public $timestamps = false;    
 

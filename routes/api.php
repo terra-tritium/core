@@ -258,7 +258,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('nft-effect')->group(function () {
-        Route::get('/nft-effect/{id}', [NFTEffectsController::class, 'show']);
+        Route::get('/get', [NFTEffectsController::class, 'get']);
     });
 
  
