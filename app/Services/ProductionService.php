@@ -33,19 +33,18 @@ class ProductionService
       $production->planet = $planet;
   
       $timeConstruction = ($unitModel->time *  $unit['quantity'] * env("TRITIUM_PRODUCTION_SPEED") );
-      $newUnit[] = $unit;
-      $newUnit['type'] = $type ;
+      $unit['type'] = $type;
       
       $production->ready = time() + $timeConstruction;
-      $production->objects = json_encode($newUnit);
+      // $production->ready = time() + 1;
+      $production->objects = json_encode($unit);
       $production->executed = false;
       $production->save();
-  
       if ($type == "troop") {
         TroopJob::dispatch(
           $planet,
           $player,
-          $newUnit,
+          $unit,
           $production->id
         )->delay(now()->addSeconds($timeConstruction));
       }
@@ -54,7 +53,7 @@ class ProductionService
         FleetJob::dispatch(
           $planet,
           $player,
-          $newUnit,
+          $unit,
           $production->id
         )->delay(now()->addSeconds($timeConstruction));
       }
@@ -91,15 +90,17 @@ class ProductionService
     $metal = 0;
     $uranium = 0;
     $crystal = 0;
+    $quantity = $unit['quantity'];
 
     if($type == "troop"){
       $unitModel = Unit::findOrFail($unit['id']);
     }else{
       $unitModel = Ship::findOrFail($unit['id']);
     }
-    $metal += $unitModel->metal;
-    $uranium += $unitModel->uranium;
-    $crystal += $unitModel->crystal;
+    $metal += ($unitModel->metal * $quantity);
+    $uranium += ($unitModel->uranium * $quantity);
+    $crystal += ($unitModel->crystal * $quantity);
+
 
     $p1 = Planet::findOrFail($planet);
     $p1 = $this->planetService->removeMetal($p1, $metal);
@@ -117,29 +118,46 @@ class ProductionService
     }
     $productionModel =  Production::where($filter)->orderBy("ready")->get();
     $units = [];
-
-    foreach($productionModel as $key => $production){
-      $unitObj = json_decode($production->objects);
-      
-      foreach($unitObj as $key => $unit){
-        if(isset($unit->id)){
+    if($productionModel){
+      foreach($productionModel as $production){
+        $unitObj = json_decode($production->objects);
+        if($unitObj->type == $type){
           if($type == 'troop'){
-            $unitModel = Unit::find($unit->id);
-          }else{ 
-            $unitModel = Ship::find($unit->id);
+              $unitModel = Unit::find($unitObj->id);
+          }else{
+              $unitModel = Ship::find($unitObj->id);
           }
-  
-          $unitModel->ready =  $production->ready;
-          $unitModel->planet =  $production->planet;
-          $unitModel->quantity =  $unit->quantity;
-  
-          $units[] =  $unitModel ;
+          $unitModel['ready'] =  $production->ready;
+          $unitModel['planet'] =  $production->planet;
+          $unitModel['quantity'] = $unitObj->quantity;
+          $units[] = $unitModel;        
         }
-       
       }
-
     }
     return  $units;
+
+    // foreach($productionModel as $key => $production){
+    //   $unitObj = json_decode($production->objects);
+    //   return ['obj' => $unitObj->id];
+      
+    //   foreach($unitObj as $key => $unit){
+    //     if(isset($unit->id)){
+    //       if($type == 'troop'){
+    //         $unitModel = Unit::find($unit->id);
+    //       }else{ 
+    //         $unitModel = Ship::find($unit->id);
+    //       }
+  
+    //       $unitModel->ready =  $production->ready;
+    //       $unitModel->planet =  $production->planet;
+    //       $unitModel->quantity =  $unit->quantity;
+  
+    //       $units[] =  $unitModel ;
+    //     }
+       
+    //   }
+
+    // }
   }
   
 

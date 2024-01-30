@@ -113,6 +113,7 @@ class TroopController extends Controller
         try {
             $player = Player::getPlayerLogged();
             $planet = $request->planet;
+
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
                 return $this->troopService->productionTroop($player, $planet);
             } else {

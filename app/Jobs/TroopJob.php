@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 use App\Models\Troop;
 use App\Models\Production;
+use Illuminate\Support\Facades\Log;
 
 class TroopJob implements ShouldQueue
 {
@@ -41,23 +42,29 @@ class TroopJob implements ShouldQueue
      */
     public function handle()
     {
-        foreach ($this->units as $key => $unit) {
+    
+        // Log::info('Tipo de $this->units:', ['tipo' => $this->units['id']]);
+        // Log::info('Tipo de $this->quantidade:', ['quantidade' => $this->units['quantity']]);
+        $troop = Troop::where([["planet", $this->planet],["unit", $this->units["id"]]])->first();
+        $prod = Production::find($this->production);
 
-            $troop = Troop::where([["planet", $this->planet],["unit", $unit["id"]]])->first();
-            $prod = Production::find($this->production);
-            
-            if ($troop) {
-                $troop->quantity += $unit["quantity"];
-            } else {
-                $troop = new Troop();
-                $troop->player = $this->player;
-                $troop->planet = $this->planet;
-                $troop->unit = $unit["id"];
-                $troop->quantity = $unit["quantity"];
-            }
+        // Log::info("troop", ['troop player' => $troop->player]);
+        // Log::info('producao ',["producao"=>$prod]);
+
+        if($troop){
+            $troop->quantity += $this->units["quantity"];
+            if($troop->save())
+                $prod->delete();
+        }else{
+            $troop = new Troop();
+            $troop->player = $this->player;
+            $troop->planet = $this->planet;
+            $troop->unit = $this->units["id"];
+            $troop->quantity = $this->units["quantity"];
             if($troop->save()){
                 $prod->delete();
             }
         }
+        return;
     }
 }

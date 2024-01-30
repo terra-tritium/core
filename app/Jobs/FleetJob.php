@@ -41,23 +41,24 @@ class FleetJob implements ShouldQueue
      */
     public function handle()
     {
-        foreach ($this->units as $key => $unit) {
 
-            $fleet = Fleet::where([["planet", $this->planet],["unit", $unit["id"]]])->first();
-            $prod = Production::find($this->production);
-            $prod->executed = true;
-            
-            if ($fleet) {
-                $fleet->quantity += $unit["quantity"];
-            } else {
-                $fleet = new Fleet();
-                $fleet->player = $this->player;
-                $fleet->planet = $this->planet;
-                $fleet->unit = $unit["id"];
-                $fleet->quantity = $unit["quantity"];
+        $troop = Fleet::where([["planet", $this->planet],["unit", $this->units["id"]]])->first();
+        $prod = Production::find($this->production);
+        if($troop){
+            $troop->quantity += $this->units["quantity"];
+            if($troop->save())
+                $prod->delete();
+        }else{
+            $troop = new Fleet();
+            $troop->player = $this->player;
+            $troop->planet = $this->planet;
+            $troop->unit = $this->units["id"];
+            $troop->quantity = $this->units["quantity"];
+            if($troop->save()){
+                $prod->delete();
             }
-            $prod->save();
-            $fleet->save();
         }
+        return;
+        
     }
 }
