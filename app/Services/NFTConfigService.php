@@ -10,6 +10,10 @@ class NFTConfigService
 
     }
 
+    /**
+     * @param $player
+     * @return NFTConfig
+     */
     public function nftConfig($player): NFTConfig
     {
         return NFTConfig::firstOrCreate(['player' => $player->id]);

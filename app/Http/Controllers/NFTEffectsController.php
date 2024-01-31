@@ -5,27 +5,31 @@ namespace App\Http\Controllers;
 use App\Models\Effect;
 use App\Models\NFTEffect;
 use App\Models\Player;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class NFTEffectsController extends Controller
 {
     /**
-     * Aplica os efeitos de um NFT ao jogador com base no tipo e raridade.
-     *
-     * @param int $playerId O ID do jogador.
-     * @param int $nftId O ID do NFT.
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-
-    // Método para listar todos os efeitos NFT
-    public function get() {        
-        $nftEffects = NFTEffect::all();
+    public function getNftEffects(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $nftEffects = NFTEffect::paginate($perPage);
         return response()->json($nftEffects);
-      }
+    }
 
     private function applyEffect($nftId)
     {
-        $nft = NFTEffect::where("id", $nftId)->firstOrFail();
+        try {
+            $nft = NFTEffect::findOrFail($nftId);
+        } catch (\Throwable $e) {
+            Log::error('NFT not found' . $e->getMessage(), ['nftId' => $nftId]);
+        }
+
         $effect = new Effect();
 
         switch ($nft->type) {
@@ -43,7 +47,7 @@ class NFTEffectsController extends Controller
     }
 
 
-    private function applyColonizerEffects(Effect $effect, $rarity)
+    private function applyColonizerEffects(Effect $effect, int $rarity)
     {
         switch ($rarity) {
             case 2:
@@ -55,7 +59,7 @@ class NFTEffectsController extends Controller
         }
     }
 
-    private function applyAssetEffects(Effect $effect, $rarity)
+    private function applyAssetEffects(Effect $effect, int $rarity)
     {
         if ($rarity === 4) {
             // Aplica efeitos para Asset Epic.
@@ -64,7 +68,7 @@ class NFTEffectsController extends Controller
         }
     }
 
-    private function applyKeyEffects(Effect $effect, $rarity)
+    private function applyKeyEffects(Effect $effect, int $rarity)
     {
         if ($rarity === 5) {
             // Aplica efeitos para Key Legendary.
