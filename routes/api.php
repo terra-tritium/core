@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BuildController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\NFTEffectsController;
 use App\Http\Controllers\PlanetController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\UnitController;
@@ -207,7 +208,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/join', [AliancesController::class,'joinAliance']);
         Route::post('/request', [AliancesController::class,'handlePlayerRequest']);
         Route::post('/leave',[AliancesController::class,'leaveAliance']);
-        
+
         Route::post('/kickplayer', [AliancesController::class, 'kickPlayer']);
         Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
         Route::get('/my-aliance', [AliancesController::class,'myAliance']);
@@ -256,7 +257,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/config/get', [NFTController::class, 'get']);
     });
 
- 
+    Route::prefix('nft-effect')->group(function () {
+        Route::get('/get', [NFTEffectsController::class, 'getNftEffects']);
+    });
 });
 /**
  * @todo retirar a chamada da rotina

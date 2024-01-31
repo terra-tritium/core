@@ -114,8 +114,7 @@ class GameModeController extends Controller
             #NFT     
             case 2:
                 $effect->costBuild = -10;
-                $effect->protect = 10; 
-                $effect->speedTravel = 5;               
+                $effect->protect = 10;                               
                 break;    
             #Space Titan 
             case 3:
