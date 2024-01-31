@@ -10,34 +10,24 @@ use Exception;
 
 class NFTController extends Controller
 {
-  public function __construct(protected readonly NFTConfigService $nFTConfigService)
+  public function __construct(protected readonly NFTConfigService $nftConfigService)
   {
   }
- 
+
   public function config($slot, $code) {
-    $player = Player::getPlayerLogged();
 
-    try{ 
-      $nftUserConfig = $this->nFTConfigService->nftConfig($player);
-      switch ($slot) {
-        case 1:
-          $nftUserConfig->slot1 = $code;
-          break;
-        case 2:
-          $nftUserConfig->slot2 = $code;
-          break;
-        case 3:
-          $nftUserConfig->slot3 = $code;
-          break;
-        case 4:
-          $nftUserConfig->slot4 = $code;
-          break;
-        case 5:
-          $nftUserConfig->slot5 = $code;
-          break;
-      }
+    try{
+        $player = $this->getPlayerLogged();
 
-      $nftUserConfig->save();
+        $nftUserConfig = $this->nftConfigService->nftConfig($player);
+
+        if ($slot >= 1 && $slot <= 5) {
+            $nftUserConfig->{'slot' . $slot} = $code;
+        } else {
+            throw new Exception('Invalid slot provided.');
+        }
+
+        $nftUserConfig->save();
 
     } catch (Exception $e) {
         return response(["msg" => "error " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -47,8 +37,13 @@ class NFTController extends Controller
   }
 
   public function get() {
-    $player = Player::getPlayerLogged();
-    $nftUserConfig = NFTConfig::where('player', $player->id)->first();
-    return $nftUserConfig;
+      $player = $this->getPlayerLogged();
+      $nftUserConfig = NFTConfig::where('player', $player->id)->first();
+      return $nftUserConfig;
   }
+
+    private function getPlayerLogged()
+    {
+        return Player::getPlayerLogged();
+    }
 }
