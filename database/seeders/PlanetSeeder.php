@@ -32,7 +32,7 @@ class PlanetSeeder extends Seeder
                 for ($i = 1; $i <= $numPlanetasPorRegiao; $i++) {
                     $planet = new Planet([
                         "level" => 1,
-                        "name" => "Colony " . $regiao . "." . str_pad($quadrant, 3, '0', STR_PAD_LEFT) . "." . $i,
+                        "name" => "Colony",
                         "region" => $regiao,
                         "quadrant" => $regiao . str_pad($quadrant, 3, '0', STR_PAD_LEFT),
                         "position" => $i,
@@ -67,22 +67,35 @@ class PlanetSeeder extends Seeder
                     ]);
 
 
-                    /**Calculo type, resource e terreno */
-                    $regionIndex = (ord($regiao) - ord('A'));
-                    $terrainTypes = ["Desert", "Grass", "Ice", "Vulcan"];
-                    $terrainIndex = $regionIndex % 4;
+                    $regionIndex = ord($regiao);
 
-                    $planet->terrainType = $terrainTypes[$terrainIndex];
-                    $planet->resource = ($regionIndex % 8 < 4) ? "uranium" : "crystal";
+                    $planet->resource = ($i % 2 == 0) ? "uranium" : "crystal";
+
+                    $iQuadrant = substr($quadrant, -1);
 
                     switch (true) {
-                        case ($i > 0 && $i <= 4):
+                        case ($iQuadrant == 0 || $iQuadrant == 4 || $iQuadrant == 8):
+                            $planet->terrainType = "Desert";
+                            break;
+                        case ($iQuadrant == 1 || $iQuadrant == 5 || $iQuadrant == 9):
+                            $planet->terrainType = "Grass";
+                            break;
+                        case ($iQuadrant == 2 || $iQuadrant == 6):
+                            $planet->terrainType = "Ice";
+                            break;
+                        case ($iQuadrant == 3 || $iQuadrant == 7):
+                            $planet->terrainType = "Vulcan";
+                            break;
+                    }
+
+                    switch (true) {
+                        case ($i == 1 || $i == 5 || $i == 9 || $i == 13):
                             $planet->type = 1;
                             break;
-                        case ($i >= 5 && $i <= 8):
+                        case ($i == 2 || $i == 6 || $i == 10 || $i == 14):
                             $planet->type = 2;
                             break;
-                        case ($i >= 9 && $i <= 12):
+                        case ($i == 3 || $i == 7 || $i == 11 || $i == 15):
                             $planet->type = 3;
                             break;
                         default:
