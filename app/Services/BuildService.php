@@ -101,7 +101,7 @@ class BuildService
         }
 
         // Metal Mining
-        if ($building->build == 4) {
+        if ($building->build == 6) {
             $this->starNewMining($p1, $building, 1, 1, $require->metal);
         }
 
@@ -176,7 +176,7 @@ class BuildService
             }
         }
 
-        // Diplomacy
+        // Galatic Concil
         if ($building->build == 16) {
             if (!$this->researchService->isResearched($player, 400)) {
                 return false;
