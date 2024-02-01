@@ -80,7 +80,7 @@ class BuildService
         $p1->ready = $building->ready;
 
         // Colonization
-        if ($building->build == 1) {
+        if ($building->build == 3) {
             if ($this->planetService->enoughBalance($p1, $require->metal, 1)) {
                 $p1 = $this->planetService->removeMetal($p1, $require->metal);
                 $p1->save();
@@ -90,12 +90,12 @@ class BuildService
         }
 
         // Energy Collector
-        if ($building->build == 2) {
+        if ($building->build == 4) {
             $this->starNewMining($p1, $building, 0, 1, $require->metal);
         }
 
         // Humanoid Factory
-        if ($building->build == 3) {
+        if ($building->build == 5) {
             $this->starNewMining($p1, $building, 0, 1, $require->metal);
             $building->max_humanoids = 10;
         }
@@ -106,7 +106,7 @@ class BuildService
         }
 
         // Uranium Mining
-        if ($building->build == 5) {
+        if ($building->build == 7) {
             if ($p1->resource != "uranium") {return false;}
             if (!$this->researchService->isResearched($player, 1300)) {
                 return false;
@@ -115,7 +115,7 @@ class BuildService
         }
 
         // Crystal Mining
-        if ($building->build == 6) {
+        if ($building->build == 8) {
             if ($p1->resource != "crystal") {return false;}
             if (!$this->researchService->isResearched($player, 1300)) {
                 return false;
@@ -124,35 +124,35 @@ class BuildService
         }
 
         // Warehouse
-        if ($building->build == 8) {
+        if ($building->build == 10) {
             if (!$this->researchService->isResearched($player, 1800)) {
                 return false;
             }
         }
 
         // Shipyard
-        if ($building->build == 9) {
+        if ($building->build == 11) {
             if (!$this->researchService->isResearched($player, 300)) {
                 return false;
             }
         }
 
         // Battery House
-        if ($building->build == 10) {
+        if ($building->build == 12) {
             if (!$this->researchService->isResearched($player, 2700)) {
                 return false;
             }
         }
 
         // Military Camp
-        if ($building->build == 11) {
+        if ($building->build == 13) {
             if (!$this->researchService->isResearched($player, 200)) {
                 return false;
             }
         }
 
         // Shield
-        if ($building->build == 12) {
+        if ($building->build == 14) {
             if (!$this->researchService->isResearched($player, 100)) {
                 return false;
             }
@@ -170,14 +170,14 @@ class BuildService
         }
 
         // Market
-        if ($building->build == 13) {
+        if ($building->build == 15) {
             if (!$this->researchService->isResearched($player, 1500)) {
                 return false;
             }
         }
 
         // Diplomacy
-        if ($building->build == 14) {
+        if ($building->build == 16) {
             if (!$this->researchService->isResearched($player, 400)) {
                 return false;
             }
@@ -205,7 +205,7 @@ class BuildService
         }
 
         // Laboratory
-        if ($building->build == Build::LABORATORY) {
+        if ($building->build == 9) {
             if ($this->planetService->enoughBalance($p1, $require->metal, 1)) {
                 $p1 = $this->planetService->removeMetal($p1, $require->metal);
                 $player = $this->playerService->addBuildScore($player, $require->metal * $this->basicScoreFator);
@@ -331,7 +331,7 @@ class BuildService
         if (!$buildings->isEmpty()) {
             foreach($allBuilds as $key => $iBuild) {
                 foreach($buildings as $iBuilding) {
-                    if ($iBuilding->build == $iBuild->code) {
+                    if ($iBuilding->build == $iBuild->id) {
                         $iBuild->disable = true;
                     }
                 }
@@ -340,7 +340,13 @@ class BuildService
 
         foreach($allBuilds as $temp) {
 
+            # Disable all buildings if the planet is not colonized
             if (count($buildings) <= 0 && $temp->code != 1) {
+                $temp->disable = true;
+            }
+
+            # Disable colonizator if the planet is colonized
+            if (count($buildings) > 0 && $temp->code == 1) {
                 $temp->disable = true;
             }
 
