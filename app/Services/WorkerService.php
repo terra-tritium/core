@@ -9,7 +9,7 @@ use App\Services\PlanetService;
 class WorkerService
 {
   private $planetService;
-  private $energyCollector = 2 ;
+  private $energyCollector = 4 ;
       
   public function __construct() {
     $this->planetService = new PlanetService();
@@ -21,19 +21,19 @@ class WorkerService
 
     switch ($building->build) {
       // Metal
-      case 4 :
+      case 6 :
           $planet->workersOnMetal = 0;
           break;
       // Uranium
-      case 5 : 
+      case 7 : 
           $planet->workersOnUranium = 0;
           break;
       // Crystal
-      case 6 : 
+      case 8 : 
           $planet->workersOnCrystal = 0;
           break;
       // Laboratory
-      case 7 : 
+      case 9 : 
         $planet->workersOnLaboratory = 0;
         break;
     }
@@ -47,7 +47,7 @@ class WorkerService
     } else {    
         switch ($building->build) {
             // Metal
-            case 4 :
+            case 6 :
                 $planet->metal = $this->planetService->currentBalance($planet, 1);
                 $planet->timeMetal = time();
                 $planet->pwMetal = $workers;
@@ -57,7 +57,7 @@ class WorkerService
                 break;
 
             // Uranium
-            case 5 : 
+            case 7 : 
                 $planet->uranium = $this->planetService->currentBalance($planet, 2);
                 $planet->timeUranium = time();
                 $planet->pwUranium = $workers;
@@ -67,7 +67,7 @@ class WorkerService
                 break;
 
             // Crystal
-            case 6 : 
+            case 8 : 
                 $planet->crystal = $this->planetService->currentBalance($planet, 3);
                 $planet->timeCrystal = time();
                 $planet->pwCrystal = $workers;
@@ -77,7 +77,7 @@ class WorkerService
                 break;
 
             // Laboratory
-            case 7 : 
+            case 9 : 
               $planet->researchPoints = $this->planetService->currentBalance($planet, 4);
               $planet->timeResearch = time();
               $planet->pwResearch = $workers;
