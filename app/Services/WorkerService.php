@@ -103,17 +103,21 @@ class WorkerService
     if ($planet->timeEnergy == null) { return false; }
     if ($planet->timeEnergy == 0) { return false; }
      
-    $level = Building::where(['build' => $this->energyCollector, 'planet' => $planet->id])->first()->level;
-    
-    $fator = 0;
-    $padronizedLevel = $level * 10;
-    if ($padronizedLevel < $planet->workersWaiting) {
-      $fator = $padronizedLevel;
-    } else {
-      $fator = $planet->workersWaiting;
+    try { 
+      $level = Building::where(['build' => $this->energyCollector, 'planet' => $planet->id])->first()->level;
+
+      $fator = 0;
+      $padronizedLevel = $level * 10;
+      if ($padronizedLevel < $planet->workersWaiting) {
+        $fator = $padronizedLevel;
+      } else {
+        $fator = $planet->workersWaiting;
+      }
+      $planet->energy += ((time() - $planet->timeEnergy) / 360) * env('TRITIUM_ENERGY') * $fator;
+      $planet->timeEnergy = time();
+      $planet->save();
+    } catch (\Exception $exception) {
+      return false;
     }
-    $planet->energy += ((time() - $planet->timeEnergy) / 360) * env('TRITIUM_ENERGY') * $fator;
-    $planet->timeEnergy = time();
-    $planet->save();
   }
 }

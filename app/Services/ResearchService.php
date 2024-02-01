@@ -170,9 +170,11 @@ class ResearchService
 
     public function updateBuildPower($planet, $power)
     {
-        $building = Building::where([['planet', $planet], ['build', 7]])->firstOrFail();
-        $building->workers = $power;
-        $building->save();
+        $building = Building::where([['planet', $planet], ['build', 7]])->first();
+        if ($building) {
+            $building->workers = $power;
+            $building->save();
+        }
     }
 
     public function isResearched($player, $code)
