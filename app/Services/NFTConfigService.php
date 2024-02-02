@@ -6,17 +6,21 @@ use App\Models\NFTConfig;
 
 class NFTConfigService
 {
-    public function __construct () {
+    public function __construct()
+    {
 
     }
 
-    /**
-     * @param $player
-     * @return NFTConfig
-     */
     public function nftConfig($player): NFTConfig
     {
-        return NFTConfig::firstOrCreate(['player' => $player->id]);
+        $nftUserConfig = NFTConfig::where('player', $player->id)->first();
+
+        if (is_null($nftUserConfig)) {
+            $nftUserConfig = new NFTConfig();
+            $nftUserConfig->player = $player->id;
+            $nftUserConfig->save();
+        }
+        return $nftUserConfig;
     }
 
 }
