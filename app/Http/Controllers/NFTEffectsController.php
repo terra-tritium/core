@@ -15,21 +15,14 @@ class NFTEffectsController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getNftEffects(Request $request)
-    {
-        $perPage = $request->input('per_page', 10);
-        $nftEffects = NFTEffect::paginate($perPage);
+    public function getNftEffects() {        
+        $nftEffects = NFTEffect::all();
         return response()->json($nftEffects);
     }
 
     private function applyEffect($nftId)
     {
-        try {
-            $nft = NFTEffect::findOrFail($nftId);
-        } catch (\Throwable $e) {
-            Log::error('NFT not found' . $e->getMessage(), ['nftId' => $nftId]);
-        }
-
+        $nft = NFTEffect::where("id", $nftId)->firstOrFail();
         $effect = new Effect();
 
         switch ($nft->type) {
@@ -47,7 +40,7 @@ class NFTEffectsController extends Controller
     }
 
 
-    private function applyColonizerEffects(Effect $effect, int $rarity)
+    private function applyColonizerEffects(Effect $effect, $rarity)
     {
         switch ($rarity) {
             case 2:
@@ -59,7 +52,7 @@ class NFTEffectsController extends Controller
         }
     }
 
-    private function applyAssetEffects(Effect $effect, int $rarity)
+    private function applyAssetEffects(Effect $effect, $rarity)
     {
         if ($rarity === 4) {
             // Aplica efeitos para Asset Epic.
@@ -68,7 +61,7 @@ class NFTEffectsController extends Controller
         }
     }
 
-    private function applyKeyEffects(Effect $effect, int $rarity)
+    private function applyKeyEffects(Effect $effect, $rarity)
     {
         if ($rarity === 5) {
             // Aplica efeitos para Key Legendary.
