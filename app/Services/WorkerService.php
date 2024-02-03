@@ -4,12 +4,12 @@ namespace App\Services;
 
 use App\Models\Planet;
 use App\Models\Building;
+use App\Models\Build;
 use App\Services\PlanetService;
 
 class WorkerService
 {
   private $planetService;
-  private $energyCollector = 4 ;
       
   public function __construct() {
     $this->planetService = new PlanetService();
@@ -104,7 +104,7 @@ class WorkerService
     if ($planet->timeEnergy == 0) { return false; }
      
     try { 
-      $level = Building::where(['build' => $this->energyCollector, 'planet' => $planet->id])->first()->level;
+      $level = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $planet->id])->first()->level;
 
       $fator = 0;
       $padronizedLevel = $level * 10;
