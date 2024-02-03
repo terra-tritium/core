@@ -79,7 +79,7 @@ class AlianceService
         $alianceMember->player_id = $playerId;
         $alianceMember->idAliance = $alianceId;
         $alianceMember->role = $role;
-        // $alianceMember->idRank = env("MEMBER_FOUNDER");
+        // $alianceMember->idRank = env("TRITIUM_MEMBER_FOUNDER");
         $alianceMember->idRank = 1;
 
         $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
@@ -203,7 +203,7 @@ class AlianceService
         if ($typeAction == 'A') {
             $alianceMember->status = $typeAction;
             $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
-            $alianceMember->idRank = env("MEMBER_SOLDIER");
+            $alianceMember->idRank = env("TRITIUM_MEMBER_SOLDIER");
             $alianceMember->save();
             $player->aliance = $alianceMember->idAliance;
             $player->save();
@@ -240,7 +240,7 @@ class AlianceService
         $alianca = Aliance::findOrFail($idAliance);
         $aliance = new Aliance();
         $level = $aliance->getLevelBuildAliance($alianca->founder);
-        return $level * env("COUNT_MEMBER_LEVEL_ALIANCE");
+        return $level * env("TRITIUM_COUNT_MEMBER_LEVEL_ALIANCE");
     }
     private function availableSlot($idAliance)
     {
@@ -259,7 +259,7 @@ class AlianceService
             $level = $aliance->getLevelBuildAliance($dados->founder);
             $alianca = (array) $dados;
             $alianca['level'] = $level;
-            $alianca['totalMembers'] = $level * env("COUNT_MEMBER_LEVEL_ALIANCE");
+            $alianca['totalMembers'] = $level * env("TRITIUM_COUNT_MEMBER_LEVEL_ALIANCE");
             $aliancas[] = $alianca;
         }
         return $aliancas;
@@ -316,7 +316,7 @@ class AlianceService
                 if ($rank->idRank == $idRank) {
                     if (!$rank->roleAvailable) {
                         $membroRebaixado = AlianceMember::where([['idAliance', '=', $idAliance], ['idRank', '=', $idRank]])->first();
-                        $this->alterarPatenteMembro($membroRebaixado, env("MEMBER_SOLDIER"));
+                        $this->alterarPatenteMembro($membroRebaixado, env("TRITIUM_MEMBER_SOLDIER"));
                         /**Rebaixa */
                         $promovido = $alianceMember;
                         $this->alterarPatenteMembro($alianceMember, $idRank);
@@ -360,7 +360,7 @@ class AlianceService
         try {
             $alianceMember = AlianceMember::find($idMember);
             $aliance = Aliance::find($idAliance);
-            $alianceMember->idRank = env("MEMBER_SOLDIER");
+            $alianceMember->idRank = env("TRITIUM_MEMBER_SOLDIER");
             $alianceMember->save();
             $this->notify($alianceMember->player_id, "You relinquished your rank.", "aliance");
             $this->notify($aliance->founder, "A member relinquished their rank.", "aliance");

@@ -113,7 +113,7 @@ class WorkerService
       } else {
         $fator = $planet->workersWaiting;
       }
-      $planet->energy += ((time() - $planet->timeEnergy) / 360) * env('TRITIUM_ENERGY') * $fator;
+      $planet->energy += ((time() - $planet->timeEnergy) / 360) * env('TRITIUM_ENERGY_BASE') * $fator;
       $planet->timeEnergy = time();
       $planet->save();
     } catch (\Exception $exception) {

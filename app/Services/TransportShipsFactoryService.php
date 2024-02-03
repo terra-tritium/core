@@ -39,7 +39,7 @@ class TransportShipsFactoryService
       return false;
     }
 
-    $player->score += $qtd * env('TRITIUM_TRANSPORTSHIP_POINTS');
+    $player->score += $qtd * env('TRITIUM_TRANSPORTSHIP_BASE');
 
     $planet->energy -= $energyCost;
     $planet->metal -= $metalCost;

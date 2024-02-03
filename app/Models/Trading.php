@@ -39,7 +39,7 @@ class Trading extends Model
             ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')
             ->join('players as p', 'p.id', '=', 'planeta.id')
             ->where('m.status', true)
-            ->where('t.status', env("MARKET_STATUS_OPEN"))
+            ->where('t.status', env("TRITIUM_MARKET_STATUS_OPEN"))
             ->where('m.region', '=', $region)
             ->where('t.resource', '=', $resource)
             ->where('t.type', '=', $type)
@@ -60,7 +60,7 @@ class Trading extends Model
         $resources = DB::table('planets as p')
             ->leftJoin('trading as t', function ($join) {
                 $join->on('p.player', '=', 't.idPlanetCreator')
-                    ->where('t.status', env("MARKET_STATUS_OPEN"))
+                    ->where('t.status', env("TRITIUM_MARKET_STATUS_OPEN"))
                     ->where('t.type', 'S');
             })
             ->where('p.player', $player)
@@ -76,7 +76,7 @@ class Trading extends Model
     }
     public function getAllOrderPlayer($player, $resource)
     {
-        $status = [env("MARKET_STATUS_OPEN"), env("MARKET_STATUS_PENDING")];
+        $status = [env("TRITIUM_MARKET_STATUS_OPEN"), env("TRITIUM_MARKET_STATUS_PENDING")];
         $orders = DB::table($this->table . ' as t')
             ->select(
                 't.id',

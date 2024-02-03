@@ -42,13 +42,13 @@ public function currentBalance($p1, $type) {
 
     switch ($type) {
       case 0:
-        return $p1->energy + ($p1->workersWaiting * (env("TRITIUM_ENERGY") * $activeEnergyMining));
+        return $p1->energy + ($p1->workersWaiting * (env("TRITIUM_ENERGY_BASE") * $activeEnergyMining));
       case 1:
-        return $p1->metal + ($p1->pwMetal * (env("TRITIUM_METAL") * $activeMetalMining));
+        return $p1->metal + ($p1->pwMetal * (env("TRITIUM_METAL_BASE") * $activeMetalMining));
       case 2:
-        return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM") * $activeUraniumMining));
+        return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM_BASE") * $activeUraniumMining));
       case 3:
-        return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL") * $activeCrystalMining));
+        return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL_BASE") * $activeCrystalMining));
       case 4:
         return $p1->researchPoints + ($p1->pwResearch * (env("TRITIUM_RESEARCH_SPEED") * $activeLaboratory));
     }

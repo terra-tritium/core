@@ -119,7 +119,7 @@ class BattleController extends Controller
         }
         $planets = Planet::where('player', $player->id)->get();
         $count = count($planets);
-        return response()->json(['count' => $count, "allowed" => $count < env("MAX_PLANET_PLAYER")], Response::HTTP_OK);
+        return response()->json(['count' => $count, "allowed" => $count < env("TRITIUM_MAX_PLANET_PLAYER")], Response::HTTP_OK);
     }
     /**
      * Atribuir novo planeta ao jogador
@@ -132,7 +132,7 @@ class BattleController extends Controller
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
         $planets = Planet::where('player', $player->id)->get();
-        if (count($planets) > env("MAX_PLANET_PLAYER")) {
+        if (count($planets) > env("TRITIUM_MAX_PLANET_PLAYER")) {
             return response()->json(['error' => 'planet limit exceeded.'], Response::HTTP_NOT_FOUND);
         }
         Planet::where('id', $planet)->update(['player' => $player->id, 'defenseStrategy' => 7, 'attackStrategy' => 7]);
