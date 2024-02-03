@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Researched;
 use App\Models\Research;
 use App\Models\Building;
+use App\Models\Build;
 use App\Services\PlayerService;
 use App\Services\WorkerService;
 use App\Services\BonusService;
@@ -170,7 +171,7 @@ class ResearchService
 
     public function updateBuildPower($planet, $power)
     {
-        $building = Building::where([['planet', $planet], ['build', 9]])->first();
+        $building = Building::where([['planet', $planet], ['build', Build::LABORATORY]])->first();
         if ($building) {
             $building->workers = $power;
             $building->save();

@@ -21,19 +21,19 @@ class WorkerService
 
     switch ($building->build) {
       // Metal
-      case 6 :
+      case Build::METALMINING :
           $planet->workersOnMetal = 0;
           break;
       // Uranium
-      case 7 : 
+      case Build::URANIUMMINING : 
           $planet->workersOnUranium = 0;
           break;
       // Crystal
-      case 8 : 
+      case Build::CRYSTALMINING : 
           $planet->workersOnCrystal = 0;
           break;
       // Laboratory
-      case 9 : 
+      case Build::LABORATORY : 
         $planet->workersOnLaboratory = 0;
         break;
     }
@@ -47,7 +47,7 @@ class WorkerService
     } else {    
         switch ($building->build) {
             // Metal
-            case 6 :
+            case Build::METALMINING :
                 $planet->metal = $this->planetService->currentBalance($planet, 1);
                 $planet->timeMetal = time();
                 $planet->pwMetal = $workers;
@@ -57,7 +57,7 @@ class WorkerService
                 break;
 
             // Uranium
-            case 7 : 
+            case Build::URANIUMMINING : 
                 $planet->uranium = $this->planetService->currentBalance($planet, 2);
                 $planet->timeUranium = time();
                 $planet->pwUranium = $workers;
@@ -67,7 +67,7 @@ class WorkerService
                 break;
 
             // Crystal
-            case 8 : 
+            case Build::CRYSTALMINING : 
                 $planet->crystal = $this->planetService->currentBalance($planet, 3);
                 $planet->timeCrystal = time();
                 $planet->pwCrystal = $workers;
@@ -77,7 +77,7 @@ class WorkerService
                 break;
 
             // Laboratory
-            case 9 : 
+            case Build::LABORATORY : 
               $planet->researchPoints = $this->planetService->currentBalance($planet, 4);
               $planet->timeResearch = time();
               $planet->pwResearch = $workers;
