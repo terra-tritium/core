@@ -135,6 +135,7 @@ class BuildService
             if (!$this->researchService->isResearched($player, 300)) {
                 return false;
             }
+            $building->workers = 1;
         }
 
         // Battery House
