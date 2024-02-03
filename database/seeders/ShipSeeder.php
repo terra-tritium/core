@@ -30,8 +30,8 @@ class ShipSeeder extends Seeder
         //     'crystal' => 0,
         //     'time' => 5
         // ]);
-        DB::table('builds')->where('id','9')->update(
-            ['effect' => 'Escolha suas naves estelares sabiamente, personalize suas configurações e conduza sua facção à supremacia no sempre expansivo universo de Terra Tritium. O destino de sua facção repousa nas estrelas — comande sua frota e forje seu destino entre os cosmos!']
+        DB::table('builds')->where('name','Shipyard')->update(
+            ['effect' => 'Choose your starships wisely, customize their settings, and lead your faction to supremacy in the ever-expanding universe of Terra Tritium. The fate of your faction rests among the stars — command your fleet and forge your destiny among the cosmos!']
         );
         
 
