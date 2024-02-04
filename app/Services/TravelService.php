@@ -410,11 +410,23 @@ class TravelService
             case Travel::MISSION_EXPLORER:
                 $missions = $this->getMissionsByAction(Travel::MISSION_EXPLORER);
                 break;
-            $missions = Travel::with('from', 'to')
-                ->whereIn('status', [Travel::STATUS_ON_GOING, Travel::STATUS_RETURN, Travel::STATUS_ON_LOAD])
-                ->whereIn('action', [Travel::ATTACK_FLEET, Travel::DEFENSE_FLEET, Travel::ATTACK_TROOP, Travel::DEFENSE_TROOP])
-                ->orderBy('arrival')
-                ->get();
+            case "militar":
+                $missions = Travel::with('from', 'to')
+                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_FLEET]])
+                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_FLEET]])
+                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_TROOP]])
+                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_TROOP]])
+                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::ATTACK_FLEET]])
+                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::DEFENSE_FLEET]])
+                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::ATTACK_TROOP]])
+                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::DEFENSE_TROOP]])
+                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::ATTACK_FLEET]])
+                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::DEFENSE_FLEET]])
+                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::ATTACK_TROOP]])
+                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::DEFENSE_TROOP]])
+                    ->orderBy('arrival')
+                    ->get();
+                break;
         }
 
         return $missions;
