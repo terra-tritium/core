@@ -106,8 +106,8 @@ class TravelService
 
         $this->removeFleet($player, $req->from, $req->fleet);
 
-        if (isset($travel->fleet)) {
-            $travel->fleet = $travel->fleet;
+        if (isset($req->fleet)) {
+            $travel->fleet = json_encode($req->fleet);
         } else {
             $travel->fleet = json_encode("{}");
         }
@@ -122,8 +122,8 @@ class TravelService
 
         $this->removeTroop($player, $req->from, $req->troop);
 
-        if (isset($travel->troop)) {
-            $travel->troop = json_encode($travel->troop);
+        if (isset($req->troop)) {
+            $travel->troop = json_encode($req->troop);
         } else {
             $travel->troop = json_encode("{}");
         }
@@ -254,7 +254,7 @@ class TravelService
     {
         foreach($fleets as $fleet)
         {
-            $fleetModel = Fleet::where(['unit' => $fleet->ship, 'player' => $player, 'planet' => $planet])->first();
+            $fleetModel = Fleet::where(['unit' => $fleet->unit, 'player' => $player, 'planet' => $planet])->first();
 
             if(!$fleetModel) {
                 return false;
@@ -302,7 +302,7 @@ class TravelService
         
         foreach($fleets as $fleet)
         {  
-            $fleetm = Troop::where([
+            $fleetm = Fleet::where([
                 'unit'      => $fleet->unit,
                 'player'    => $player,
                 'planet'    => $planet
