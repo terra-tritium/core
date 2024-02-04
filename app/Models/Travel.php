@@ -14,6 +14,15 @@ class Travel extends Model
     protected $table = 'travels';
     public $timestamps = false;
 
+    CONST ATTACK_FLEET = 1;
+    CONST ATTACK_TROOP = 2;
+    CONST DEFENSE_FLEET = 3;
+    CONST DEFENSE_TROOP = 4;
+    CONST TRANSPORT_RESOURCE = 5;
+    CONST TRANSPORT_BUY = 6;
+    CONST TRANSPORT_SELL = 7;
+    CONST MISSION_EXPLORER = 8;
+
     public function from(){
         return $this->belongsTo(Planet::class, 'from');
     }

@@ -326,17 +326,12 @@ return new class extends Migration {
             $table->bigInteger("arrival");
             $table->bigInteger("start");
             $table->integer('status');
-            $table->json("troop");
-            $table->json("fleet");
-            $table->integer("metal");
-            $table->integer("crystal");
-            $table->integer("uranium");
-            $table->integer("transportShips");
-            // 1 - Attack
-            // 2 - Defense
-            // 3 - Transport
-            // 4 - Colonize
-            // 5 - Explore
+            $table->json("troop")->nullable();
+            $table->json("fleet")->nullable();
+            $table->integer("metal")->nullable();
+            $table->integer("crystal")->nullable();
+            $table->integer("uranium")->nullable();
+            $table->integer("transportShips")->nullable();
             $table->integer("action");
         });
         Schema::create('units', function (Blueprint $table) {

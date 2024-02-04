@@ -7,6 +7,7 @@ use App\Jobs\TravelJob;
 use App\Models\Position;
 use App\Models\Planet;
 use App\Models\Troop;
+use App\Models\Fleet;
 use App\Models\Unit;
 use App\Models\Player;
 
@@ -23,7 +24,8 @@ class TravelService
         
         $travel =  json_decode (json_encode ($travel), FALSE);
         $newTravel = new Travel();
-        if ($travel->action < 1 || $travel->action > 5) {
+
+        if ($travel->action < 1 || $travel->action > 8) {
             return "Invalid action type";
         }
 
@@ -35,13 +37,22 @@ class TravelService
             return "Impossible travel";
         }
         
-        if ($travel->action === 1 && !isset($travel->troop))  {
+        if ($travel->action === Travel::ATTACK_TROOP && !isset($travel->troop))  {
             return "Set the troop";
-        } elseif ($travel->action === 1) {
+        } elseif ($travel->action === Travel::ATTACK_TROOP) {
             if(!$this->hasTroopsAvailable($player, $travel->from, $travel->troop)){
                 return "You don't have enough troops";
             }
         }
+
+        if ($travel->action === Travel::ATTACK_FLEET && !isset($travel->fleet))  {
+            return "Set the troop";
+        } elseif ($travel->action === Travel::ATTACK_FLEET) {
+            if(!$this->hasFleetAvailable($player, $travel->from, $travel->fleet)){
+                return "You don't have enough ships";
+            }
+        }
+
         $now = time();
         $travelTime = env("TRITIUM_TRAVEL_SPEED") * $this->calcDistance($travel->from, $travel->to);
         $newTravel->from = $travel->from;
@@ -53,36 +64,33 @@ class TravelService
         $newTravel->status = 1;
         $newTravel->receptor = $this->getReceptor($travel->to);
 
-        # Troop
-        if (isset($travel->troop)) {
-            $newTravel->troop = json_encode($travel->troop);
-        } else {
-            $newTravel->troop = json_encode("{}");
+        switch ($travel->action) {
+            case Travel::ATTACK_FLEET:
+                $newTravel = $this->startAttackFleet($newTravel, $travel, $player);
+                break;
+            case Travel::DEFENSE_FLEET:
+                $newTravel = $this->startDefenseFleet($newTravel);
+                break;
+            case Travel::ATTACK_TROOP:
+                $newTravel = $this->startAttackTroop($newTravel, $travel, $player);
+                break;
+            case Travel::DEFENSE_TROOP:
+                $newTravel = $this->startDefenseTroop($newTravel);
+                break;
+            case Travel::TRANSPORT_RESOURCE:
+                $newTravel = $this->startTransportResource($newTravel);
+                break;
+            case Travel::TRANSPORT_BUY:
+                $newTravel = $this->startTransportBuy($newTravel);
+                break;
+            case Travel::TRANSPORT_SELL:
+                $newTravel = $this->startTransportSell($newTravel);
+                break;
+            case Travel::MISSION_EXPLORER:
+                $newTravel = $this->startMissionExplorer($newTravel);
+                break;
         }
-        # Fleet
-        if (isset($travel->fleet)) {
-            $newTravel->fleet = $travel->fleet;
-        } else {
-            $newTravel->fleet = json_encode("{}");
-        }
-        # Metal
-        if (isset($travel->metal)) {
-            $newTravel->metal = $travel->metal;
-        } else {
-            $newTravel->metal = 0;
-        }
-        # Crystal
-        if (isset($travel->crystal)) {
-            $newTravel->crystal = $travel->crystal;
-        } else {
-            $newTravel->crystal = 0;
-        }
-        # Uranium
-        if (isset($travel->uranium)) {
-            $newTravel->uranium = $travel->uranium;
-        } else {
-            $newTravel->uranium = 0;
-        }
+        
         # Merchant Ships
         if (isset($travel->transportShips)) {
             $newTravel->transportShips = $travel->transportShips;
@@ -91,8 +99,73 @@ class TravelService
         }
         
         $newTravel->save();
-        $this->removeTroop($player, $travel->from, $travel->troop);
         TravelJob::dispatch($newTravel->id, $this)->delay(now()->addSeconds($travelTime));
+    }
+
+    private function startAttackFleet($travel, $req, $player) {
+
+        $this->removeFleet($player, $req->from, $req->fleet);
+
+        if (isset($travel->fleet)) {
+            $travel->fleet = $travel->fleet;
+        } else {
+            $travel->fleet = json_encode("{}");
+        }
+        return $travel;
+    }
+
+    private function startDefenseFleet($travel) {
+
+    }
+
+    private function startAttackTroop($travel, $req, $player) {
+
+        $this->removeTroop($player, $req->from, $req->troop);
+
+        if (isset($travel->troop)) {
+            $travel->troop = json_encode($travel->troop);
+        } else {
+            $travel->troop = json_encode("{}");
+        }
+        return $travel;
+    }
+
+    private function startDefenseTroop($travel) {
+
+    }
+
+    private function startTransportResource($travel) {
+        # Metal
+        if (isset($travel->metal)) {
+            $travel->metal = $travel->metal;
+        } else {
+            $travel->metal = 0;
+        }
+        # Crystal
+        if (isset($travel->crystal)) {
+            $travel->crystal = $travel->crystal;
+        } else {
+            $travel->crystal = 0;
+        }
+        # Uranium
+        if (isset($travel->uranium)) {
+            $travel->uranium = $travel->uranium;
+        } else {
+            $travel->uranium = 0;
+        }
+        return $travel;
+    }
+
+    private function startTransportBuy($travel) {
+
+    }
+
+    private function startTransportSell($travel) {
+
+    }
+
+    private function startMissionExplorer($travel) {
+
     }
 
     public function back ($travel) {
@@ -161,11 +234,32 @@ class TravelService
 
     public function hasTroopsAvailable($player, $planet, $troops)
     {
-        foreach($troops as $key => $troop)
+        foreach($troops as $troop)
         {
             $troopModel = Troop::where(['unit' => $troop->unit, 'player' => $player, 'planet' => $planet])->first();
 
+            if(!$troopModel) {
+                return false;
+            }
             if($troop->quantity > $troopModel->quantity)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function hasFleetAvailable($player, $planet, $fleets)
+    {
+        foreach($fleets as $fleet)
+        {
+            $fleetModel = Fleet::where(['unit' => $fleet->ship, 'player' => $player, 'planet' => $planet])->first();
+
+            if(!$fleetModel) {
+                return false;
+            }
+            if($fleet->quantity > $fleetModel->quantity)
             {
                 return false;
             }
@@ -191,7 +285,7 @@ class TravelService
 
     public function removeTroop($player, $planet, $troops){ 
         
-        foreach($troops as $key => $troop)
+        foreach($troops as $troop)
         {  
             $troopm = Troop::where([
                 'unit'      => $troop->unit,
@@ -201,6 +295,21 @@ class TravelService
 
             $troopm->quantity = ($troopm->quantity -  $troop->quantity);
             $troopm->save();
+        }
+    }
+
+    public function removeFleet($player, $planet, $fleets){ 
+        
+        foreach($fleets as $fleet)
+        {  
+            $fleetm = Troop::where([
+                'unit'      => $fleet->unit,
+                'player'    => $player,
+                'planet'    => $planet
+            ])->first();
+
+            $fleetm->quantity = ($fleetm->quantity -  $fleet->quantity);
+            $fleetm->save();
         }
     }
 
