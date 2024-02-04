@@ -61,7 +61,7 @@ class TravelService
         $newTravel->player = $player;
         $newTravel->start = $now;
         $newTravel->arrival = $now + $travelTime;
-        $newTravel->status = 1;
+        $newTravel->status = Travel::STATUS_CREATE;
         $newTravel->receptor = $this->getReceptor($travel->to);
 
         switch ($travel->action) {
@@ -382,8 +382,46 @@ class TravelService
      * Get all missions by type
      */
     public function getMissions($action) {
-        $missions = Travel::with('from', 'to')->where([['action', $action], ['status', 1]])->orderBy('arrival')->get();
+
+        $missions = [];
+
+        switch ($action) {
+            case Travel::ATTACK_FLEET:
+                $missions = $this->getMissionsByAction(Travel::ATTACK_FLEET);
+                break;
+            case Travel::DEFENSE_FLEET:
+                $missions = $this->getMissionsByAction(Travel::DEFENSE_FLEET);
+                break;
+            case Travel::ATTACK_TROOP:
+                $missions = $this->getMissionsByAction(Travel::ATTACK_TROOP);
+                break;
+            case Travel::DEFENSE_TROOP:
+                $missions = $this->getMissionsByAction(Travel::DEFENSE_TROOP);
+                break;
+            case Travel::TRANSPORT_RESOURCE:
+                $missions = $this->getMissionsByAction(Travel::TRANSPORT_RESOURCE);
+                break;
+            case Travel::TRANSPORT_BUY:
+                $missions = $this->getMissionsByAction(Travel::TRANSPORT_BUY);
+                break;
+            case Travel::TRANSPORT_SELL:
+                $missions = $this->getMissionsByAction(Travel::TRANSPORT_SELL);
+                break;
+            case Travel::MISSION_EXPLORER:
+                $missions = $this->getMissionsByAction(Travel::MISSION_EXPLORER);
+                break;
+            $missions = Travel::with('from', 'to')
+                ->whereIn('status', [Travel::STATUS_ON_GOING, Travel::STATUS_RETURN, Travel::STATUS_ON_LOAD])
+                ->whereIn('action', [Travel::ATTACK_FLEET, Travel::DEFENSE_FLEET, Travel::ATTACK_TROOP, Travel::DEFENSE_TROOP])
+                ->orderBy('arrival')
+                ->get();
+        }
+
         return $missions;
+    }
+
+    private function getMissionsByAction($action) {
+        return Travel::with('from', 'to')->where([['action', $action], ['status', 1]])->orderBy('arrival')->get();
     }
 
     public function starBattleTravel($travel)

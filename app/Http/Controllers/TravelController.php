@@ -88,6 +88,7 @@ class TravelController extends Controller
 
             return response()->json($missions, Response::HTTP_OK);
         } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
             return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -131,7 +132,6 @@ class TravelController extends Controller
 
             return response()->json($result, Response::HTTP_OK);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getTraceAsString()], Response::HTTP_INTERNAL_SERVER_ERROR);
             return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

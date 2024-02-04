@@ -37,11 +37,34 @@ class TravelJob implements ShouldQueue
     {
         $currentTravel = Travel::find($this->travel);
         if ($currentTravel) {
-            $currentTravel->status = 2;
+            $currentTravel->status = Travel::STATUS_ON_GOING;
             $currentTravel->save();
-            
-            if($currentTravel->action ===  1){//Action attack = 1
-                $this->travelService->starBattleTravel($this->travel);
+
+            switch ($currentTravel->action) {
+                case Travel::ATTACK_FLEET:
+                    //$this->travelService->starBattleTravel($this->travel);
+                    break;
+                case Travel::ATTACK_TROOP:
+                    //$this->travelService->starBattleTravel($this->travel);
+                    break;
+                case Travel::DEFENSE_FLEET:
+                    //$this->travelService->starBattleTravel($this->travel);
+                    break;
+                case Travel::DEFENSE_TROOP:
+                    //$this->travelService->starBattleTravel($this->travel);
+                    break;
+                case Travel::TRANSPORT_RESOURCE:
+                    //$this->travelService->starTransportResource($this->travel);
+                    break;
+                case Travel::TRANSPORT_BUY:
+                    //$this->travelService->starTransportBuy($this->travel);
+                    break;
+                case Travel::TRANSPORT_SELL:
+                    //$this->travelService->starTransportSell($this->travel);
+                    break;
+                case Travel::MISSION_EXPLORER:
+                    //$this->travelService->starMissionExplorer($this->travel);
+                    break;
             }
         }
     }

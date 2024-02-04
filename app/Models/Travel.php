@@ -22,6 +22,10 @@ class Travel extends Model
     CONST TRANSPORT_BUY = 6;
     CONST TRANSPORT_SELL = 7;
     CONST MISSION_EXPLORER = 8;
+    CONST STATUS_ON_LOAD = 1;
+    CONST STATUS_ON_GOING = 2;
+    CONST STATUS_RETURN = 3;
+    CONST STATUS_FINISHED = 4;
 
     public function from(){
         return $this->belongsTo(Planet::class, 'from');
