@@ -37,7 +37,7 @@ class TravelJob implements ShouldQueue
     {
         $currentTravel = Travel::find($this->travel);
         if ($currentTravel) {
-            $currentTravel->status = Travel::STATUS_ON_GOING;
+            $currentTravel->status = Travel::STATUS_FINISHED;
             $currentTravel->save();
 
             switch ($currentTravel->action) {
