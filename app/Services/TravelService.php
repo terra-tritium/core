@@ -61,7 +61,7 @@ class TravelService
         $newTravel->player = $player;
         $newTravel->start = $now;
         $newTravel->arrival = $now + $travelTime;
-        $newTravel->status = Travel::STATUS_CREATE;
+        $newTravel->status = Travel::STATUS_ON_LOAD;
         $newTravel->receptor = $this->getReceptor($travel->to);
 
         switch ($travel->action) {
