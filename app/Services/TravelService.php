@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Travel;
+use App\Models\Ship;
 use App\Jobs\TravelJob;
 use App\Models\Position;
 use App\Models\Planet;
@@ -107,9 +108,29 @@ class TravelService
         $this->removeFleet($player, $req->from, $req->fleet);
 
         if (isset($req->fleet)) {
-            $travel->fleet = json_encode($req->fleet);
-        } else {
-            $travel->fleet = json_encode("{}");
+            foreach ($req->fleet as $ship) {
+                switch ($ship->unit) {
+                    case Ship::SHIP_CRAFT:
+                        $travel->craft = $ship->quanity;
+                        break;
+                    case Ship::SHIP_BOMBER:
+                        $travel->bomber = $ship->quanity;
+                        break;
+                    case Ship::SHIP_CRUISER:
+                        $travel->cruiser = $ship->quanity;
+                        break;
+                    case Ship::SHIP_SCOUT:
+                        $travel->scout = $ship->quanity;
+                        break;
+                    case Ship::SHIP_STEALTH:
+                        $travel->stealth = $ship->quanity;
+                        break;
+                    case Ship::SHIP_FLAGSHIP:
+                        $travel->flagship = $ship->quanity;
+                        break;
+                }
+            }
+            
         }
         return $travel;
     }

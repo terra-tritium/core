@@ -327,12 +327,18 @@ return new class extends Migration {
             $table->bigInteger("start");
             $table->integer('status');
             $table->json("troop")->nullable();
-            $table->json("fleet")->nullable();
-            $table->integer("metal")->nullable();
-            $table->integer("crystal")->nullable();
-            $table->integer("uranium")->nullable();
-            $table->integer("transportShips")->nullable();
+            $table->integer("metal")->default(0);
+            $table->integer("crystal")->default(0);
+            $table->integer("uranium")->default(0);
+            $table->integer("transportShips")->default(0);
             $table->integer("action");
+            #ships
+            $table->integer('cruiser')->default(0);
+            $table->integer('craft')->default(0);
+            $table->integer('bomber')->default(0);
+            $table->integer('scout')->default(0);
+            $table->integer('stealth')->default(0);
+            $table->integer('flagship')->default(0);
         });
         Schema::create('units', function (Blueprint $table) {
             $table->id();
