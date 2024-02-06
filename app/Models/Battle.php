@@ -12,6 +12,14 @@ class Battle extends Model
     protected $table = 'battles';
     public $timestamps = false;
 
+    const STATUS_CREATE = 0;
+    const STATUS_RUNNING = 1;
+    const STATUS_FINISH = 2;
+    const STATUS_CANCEL = 3;
+
+    const SIDE_INVASOR = 1;
+    const SIDE_LOCAL = 2;
+
     public function planet()
     {
         return $this->belongsTo(Planet::class, 'planet');

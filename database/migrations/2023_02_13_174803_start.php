@@ -424,17 +424,17 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('planet')->constrained("planets");
             $table->integer("status");
-            $table->string("attackDemage")->nullable();
-            $table->string("defenseDemage")->nullable();
-            $table->json('attackUnits')->nullable();
-            $table->json('defenseUnits')->nullable();
+            $table->string("invasorDemage")->nullable();
+            $table->string("localDemage")->nullable();
+            $table->json('invasorUnits')->nullable();
+            $table->json('localUnits')->nullable();
             $table->integer("result")->nullable();
             $table->bigInteger("start");
             $table->integer("stage");
-            $table->json('attackMembers')->nullable();
-            $table->json('defenseMembers')->nullable();
-            $table->json('attackZone')->nullable();
-            $table->json('defenseZone')->nullable();
+            $table->json('invasorMembers')->nullable();
+            $table->json('localMembers')->nullable();
+            $table->json('invasorZone')->nullable();
+            $table->json('localZone')->nullable();
             $table->json('resources')->nullable();
         });
         Schema::create('fighters', function (Blueprint $table) {
@@ -447,8 +447,12 @@ return new class extends Migration {
             $table->string("demage")->nullable();
             $table->bigInteger("start");
             $table->integer('stage');
-            $table->json('units');
-            $table->json('reserve')->nullable();
+            $table->integer('cruiser')->default(0);
+            $table->integer('craft')->default(0);
+            $table->integer('bomber')->default(0);
+            $table->integer('scout')->default(0);
+            $table->integer('stealth')->default(0);
+            $table->integer('flagship')->default(0);
         });
         Schema::create('stages', function (Blueprint $table) {
             $table->id();
