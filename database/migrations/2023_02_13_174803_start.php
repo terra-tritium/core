@@ -356,6 +356,8 @@ return new class extends Migration {
             $table->text("description");
             $table->string("image");
             $table->string("type");
+            $table->integer("speed");
+            $table->integer("size");
             $table->integer("defense");
             $table->integer("attack");
             $table->integer("life");
