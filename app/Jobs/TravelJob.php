@@ -25,7 +25,7 @@ class TravelJob implements ShouldQueue
     public function __construct($travel,$travelService)
     {
         $this->travel = $travel;
-        $this->travelService = $travelService ;
+        $this->travelService = $travelService;
     }
 
     /**

@@ -332,6 +332,7 @@ return new class extends Migration {
             $table->integer("uranium")->default(0);
             $table->integer("transportShips")->default(0);
             $table->integer("action");
+            $table->integer('strategy')->nullable();
             #ships
             $table->integer('cruiser')->default(0);
             $table->integer('craft')->default(0);
@@ -432,13 +433,9 @@ return new class extends Migration {
             $table->integer("status");
             $table->string("invasorDemage")->nullable();
             $table->string("localDemage")->nullable();
-            $table->json('invasorUnits')->nullable();
-            $table->json('localUnits')->nullable();
             $table->integer("result")->nullable();
             $table->bigInteger("start");
             $table->integer("stage");
-            $table->json('invasorMembers')->nullable();
-            $table->json('localMembers')->nullable();
             $table->json('invasorZone')->nullable();
             $table->json('localZone')->nullable();
             $table->json('resources')->nullable();
