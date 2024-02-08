@@ -3,29 +3,27 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 use App\Models\Travel;
+use App\Services\SpaceBattleService;
 
 class TravelJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $travel;
-    private $travelService;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($travel,$travelService)
+    public function __construct($travel)
     {
         $this->travel = $travel;
-        $this->travelService = $travelService;
     }
 
     /**
@@ -42,7 +40,8 @@ class TravelJob implements ShouldQueue
 
             switch ($currentTravel->action) {
                 case Travel::ATTACK_FLEET:
-                    //$this->travelService->starBattleTravel($this->travel);
+                    $spaceBattleService = new SpaceBattleService();
+                    $spaceBattleService->createNewBattle($currentTravel);
                     break;
                 case Travel::ATTACK_TROOP:
                     //$this->travelService->starBattleTravel($this->travel);

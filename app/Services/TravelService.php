@@ -100,7 +100,7 @@ class TravelService
         }
         
         $newTravel->save();
-        TravelJob::dispatch($newTravel->id, $this)->delay(now()->addSeconds($travelTime));
+        TravelJob::dispatch($newTravel->id)->delay(now()->addSeconds($travelTime));
     }
 
     private function startAttackFleet($travel, $req, $player) {
@@ -111,22 +111,22 @@ class TravelService
             foreach ($req->fleet as $ship) {
                 switch ($ship->unit) {
                     case Ship::SHIP_CRAFT:
-                        $travel->craft = $ship->quanity;
+                        $travel->craft = $ship->quantity;
                         break;
                     case Ship::SHIP_BOMBER:
-                        $travel->bomber = $ship->quanity;
+                        $travel->bomber = $ship->quantity;
                         break;
                     case Ship::SHIP_CRUISER:
-                        $travel->cruiser = $ship->quanity;
+                        $travel->cruiser = $ship->quantity;
                         break;
                     case Ship::SHIP_SCOUT:
-                        $travel->scout = $ship->quanity;
+                        $travel->scout = $ship->quantity;
                         break;
                     case Ship::SHIP_STEALTH:
-                        $travel->stealth = $ship->quanity;
+                        $travel->stealth = $ship->quantity;
                         break;
                     case Ship::SHIP_FLAGSHIP:
-                        $travel->flagship = $ship->quanity;
+                        $travel->flagship = $ship->quantity;
                         break;
                 }
             }

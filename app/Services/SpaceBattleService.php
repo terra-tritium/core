@@ -13,7 +13,7 @@ use App\Models\Fleet;
 use App\Models\Travel;
 use App\Models\Troop;
 
-class BattleService
+class SpaceBattleService
 {
   private $frontLineSize;
   private $longRangeSize;
@@ -113,6 +113,11 @@ class BattleService
 
   public function excuteStage($battleId) {
     $battle = Battle::find($battleId);
+
+    if ($battle->status == Battle::STATUS_CREATE) {
+      $this->startBattle($battleId);
+    }
+
     $invasors = Fighters::where(['battle'=>$battleId, 'side'=>Battle::SIDE_INVASOR])->first();
     $locals = Fighters::where(['battle'=>$battleId, 'side'=>Battle::SIDE_LOCAL])->first();
   }
