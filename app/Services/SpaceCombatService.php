@@ -2,18 +2,18 @@
 
 namespace App\Services;
 
-use App\Models\Battle;
-use App\Models\BattleStage;
+use App\Models\Combat;
+use App\Models\CombatStage;
 use App\Models\Fighters;
 use App\Models\Planet;
 use App\Models\Ship;
-use App\Jobs\BattleJob;
+use App\Jobs\CombatJob;
 use App\Models\Building;
 use App\Models\Fleet;
 use App\Models\Travel;
 use App\Models\Troop;
 
-class SpaceBattleService
+class SpaceCombatService
 {
   private $frontLineSize;
   private $longRangeSize;
@@ -30,22 +30,22 @@ class SpaceBattleService
     $this->longRangeSize = 20;
     $this->specialSize = 20;
     $this->commandSize = 8;
-    $this->currentStage = new BattleStage();
+    $this->currentStage = new CombatStage();
   }
 
-  public function createNewBattle ($travel) {
+  public function createNewCombat ($travel) {
 
-    $battle = new Battle();
-    $battle->planet = $travel->to;
-    $battle->status = Battle::STATUS_CREATE;
-    $battle->start = time();
-    $battle->stage = 0;
-    $battle->save();
+    $combat = new Combat();
+    $combat->planet = $travel->to;
+    $combat->status = Combat::STATUS_CREATE;
+    $combat->start = time();
+    $combat->stage = 0;
+    $combat->save();
     
     $player1 = new Fighters();
-    $player1->battle = $battle->id;
+    $player1->combat = $combat->id;
     $player1->player = $travel->player;
-    $player1->side = Battle::SIDE_INVASOR;
+    $player1->side = Combat::SIDE_INVASOR;
     $player1->strategy = $travel->strategy;
     $player1->demage = 0;
     $player1->start = time();
@@ -62,9 +62,9 @@ class SpaceBattleService
     $planet = Planet::find($travel->to);
     
     $player2 = new Fighters();
-    $player2->battle = $battle->id;
+    $player2->combat = $combat->id;
     $player2->player = $planet->player;
-    $player2->side = Battle::SIDE_LOCAL;
+    $player2->side = Combat::SIDE_LOCAL;
     $player2->strategy = $planet->defenseStrategy;
     $player2->demage = 0;
     $player2->start = time();
@@ -99,27 +99,27 @@ class SpaceBattleService
     $player2->save();
   }
 
-  public function startBattle($battleId) {
-    $battle = Battle::find($battleId);
+  public function startCombat($combatId) {
+    $combat = Combat::find($combatId);
     
-    if ($battle->status != Battle::STATUS_CREATE) {
+    if ($combat->status != Combat::STATUS_CREATE) {
       return false;
     }
 
-    $battle->status = Battle::STATUS_RUNNING;
-    $battle->stage = 1;
-    $battle->save();
+    $combat->status = Combat::STATUS_RUNNING;
+    $combat->stage = 1;
+    $combat->save();
   }
 
-  public function excuteStage($battleId) {
-    $battle = Battle::find($battleId);
+  public function excuteStage($combatId) {
+    $combat = Combat::find($combatId);
 
-    if ($battle->status == Battle::STATUS_CREATE) {
-      $this->startBattle($battleId);
+    if ($combat->status == Combat::STATUS_CREATE) {
+      $this->startCombat($combatId);
     }
 
-    $invasors = Fighters::where(['battle'=>$battleId, 'side'=>Battle::SIDE_INVASOR])->first();
-    $locals = Fighters::where(['battle'=>$battleId, 'side'=>Battle::SIDE_LOCAL])->first();
+    $invasors = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->first();
+    $locals = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_LOCAL])->first();
   }
 
   private function resolve($invasors, $locals) {

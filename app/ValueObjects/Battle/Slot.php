@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ValueObjects\Battle;
+namespace App\ValueObjects\Combat;
 
 class Slot
 {

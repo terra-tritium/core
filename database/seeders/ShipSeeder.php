@@ -74,9 +74,9 @@ class ShipSeeder extends Seeder
         ]);
 
         DB::table('ships')->insert([
-            "name" => "Battle Cruiser",
+            "name" => "Combat Cruiser",
             "nick" => "Cruiser",
-            "description" => "Medium-sized ships, battle cruisers are versatile and can be used for both defense and offense. They usually have a balanced combination of firepower and resilience.",
+            "description" => "Medium-sized ships, combat cruisers are versatile and can be used for both defense and offense. They usually have a balanced combination of firepower and resilience.",
             "image" => "ship-03.png",
             "type" => "Frontline",
             "defense" => 3,

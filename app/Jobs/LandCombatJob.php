@@ -9,25 +9,25 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-use App\Models\Battle;
-use App\Services\LandBattleService;
+use App\Models\Combat;
+use App\Services\LandCombatService;
 
-class LandBattleJob implements ShouldQueue
+class LandCombatJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $landBattleService;
-    private $battleId;
+    private $landCombatService;
+    private $combatId;
     
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($landBattleService, $battleId)
+    public function __construct($landCombatService, $combatId)
     {
-        $this->landBattleService = $landBattleService;
-        $this->battleId = $battleId;
+        $this->landCombatService = $landCombatService;
+        $this->combatId = $combatId;
     }
 
     /**
@@ -37,7 +37,7 @@ class LandBattleJob implements ShouldQueue
      */
     public function handle()
     {
-        $this->landBattleService->runStage($this->battleId, 'attack');
-        $this->landBattleService->runStage($this->battleId, 'defense');
+        $this->landCombatService->runStage($this->combatId, 'attack');
+        $this->landCombatService->runStage($this->combatId, 'defense');
     }
 }

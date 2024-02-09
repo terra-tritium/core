@@ -9,7 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 use App\Models\Travel;
-use App\Services\SpaceBattleService;
+use App\Services\SpaceCombatService;
 
 class TravelJob implements ShouldQueue
 {
@@ -40,17 +40,17 @@ class TravelJob implements ShouldQueue
 
             switch ($currentTravel->action) {
                 case Travel::ATTACK_FLEET:
-                    $spaceBattleService = new SpaceBattleService();
-                    $spaceBattleService->createNewBattle($currentTravel);
+                    $spaceCombatService = new SpaceCombatService();
+                    $spaceCombatService->createNewCombat($currentTravel);
                     break;
                 case Travel::ATTACK_TROOP:
-                    //$this->travelService->starBattleTravel($this->travel);
+                    //$this->travelService->starCombatTravel($this->travel);
                     break;
                 case Travel::DEFENSE_FLEET:
-                    //$this->travelService->starBattleTravel($this->travel);
+                    //$this->travelService->starCombatTravel($this->travel);
                     break;
                 case Travel::DEFENSE_TROOP:
-                    //$this->travelService->starBattleTravel($this->travel);
+                    //$this->travelService->starCombatTravel($this->travel);
                     break;
                 case Travel::TRANSPORT_RESOURCE:
                     //$this->travelService->starTransportResource($this->travel);

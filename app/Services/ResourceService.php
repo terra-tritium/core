@@ -33,7 +33,7 @@ class ResourceService
         $planetOrigin->save();
         $planetTarget->save();
 
-        $this->notify($planetTarget->player, "You received a resource", "Battle");
+        $this->notify($planetTarget->player, "You received a resource", "Combat");
         
         return response()->json(["message" => "atualizados"], Response::HTTP_OK);
     }

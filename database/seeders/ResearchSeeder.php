@@ -99,7 +99,7 @@ class ResearchSeeder extends Seeder
         DB::table('researchs')->insert([
             'code' => 700,
             'title' => 'Destroyer',
-            'description' => 'Destroyer is an imposing stellar war technology, a colossal metal behemoth designed to sow chaos and destruction in the depths of space. With its imposing structure and sharp lines, it inspires fear and respect from its possessor. In a universe in conflict, its presence on the battlefield signals the inevitability of ruin for those who dare to challenge it.',
+            'description' => 'Destroyer is an imposing stellar war technology, a colossal metal behemoth designed to sow chaos and destruction in the depths of space. With its imposing structure and sharp lines, it inspires fear and respect from its possessor. In a universe in conflict, its presence on the combatfield signals the inevitability of ruin for those who dare to challenge it.',
             'cost' => 6400,
             'dependence' => 600,
             'category' => 1,
@@ -125,7 +125,7 @@ class ResearchSeeder extends Seeder
         DB::table('researchs')->insert([
             'code' => 900,
             'title' => 'War Competence',
-            'description' => 'War Competence, a lethal skill honed through arduous training and relentless experience, unleashes the raw power necessary to dominate the battlefield and ensure survival amidst chaos. Like a deadly symphony, battle prowess is the perfect harmony between strategy and dexterity, allowing skilled warriors to challenge adversity with mastery, transforming violence into art and victory into triumph',
+            'description' => 'War Competence, a lethal skill honed through arduous training and relentless experience, unleashes the raw power necessary to dominate the combatfield and ensure survival amidst chaos. Like a deadly symphony, combat prowess is the perfect harmony between strategy and dexterity, allowing skilled warriors to challenge adversity with mastery, transforming violence into art and victory into triumph',
             'cost' => 25600,
             'dependence' => 800,
             'category' => 1,
@@ -138,7 +138,7 @@ class ResearchSeeder extends Seeder
         DB::table('researchs')->insert([
             'code' => 1000,
             'title' => 'Future 1 star',
-            'description' => 'The "Future of War" is a dark and challenging horizon where technology and strategy intertwine in a scenario of increasingly sophisticated and devastating conflicts. In this context, advanced weapons such as autonomous drones, anti-missile defense systems, and military artificial intelligence shape the battlefield, redefining the tactics and challenges faced by armed forces. As the boundaries between the physical and digital blur, the military future is permeated by cyber attacks, electronic warfare, and information manipulation, increasing the complexity of conflicts and the ethical dilemmas associated with them. In this uncertain future, the pursuit of security and peace becomes a constant struggle against emerging threats and a call for the development of effective defense and diplomatic strategies',
+            'description' => 'The "Future of War" is a dark and challenging horizon where technology and strategy intertwine in a scenario of increasingly sophisticated and devastating conflicts. In this context, advanced weapons such as autonomous drones, anti-missile defense systems, and military artificial intelligence shape the combatfield, redefining the tactics and challenges faced by armed forces. As the boundaries between the physical and digital blur, the military future is permeated by cyber attacks, electronic warfare, and information manipulation, increasing the complexity of conflicts and the ethical dilemmas associated with them. In this uncertain future, the pursuit of security and peace becomes a constant struggle against emerging threats and a call for the development of effective defense and diplomatic strategies',
             'cost' => 51200,
             'dependence' => 900,
             'category' => 1,
@@ -151,7 +151,7 @@ class ResearchSeeder extends Seeder
         DB::table('researchs')->insert([
             'code' => 1100,
             'title' => 'Future 2 stars',
-            'description' => 'The "Future of War" is a dark and challenging horizon where technology and strategy intertwine in a scenario of increasingly sophisticated and devastating conflicts. In this context, advanced weapons such as autonomous drones, anti-missile defense systems, and military artificial intelligence shape the battlefield, redefining the tactics and challenges faced by armed forces. As the boundaries between the physical and digital blur, the military future is permeated by cyber attacks, electronic warfare, and information manipulation, increasing the complexity of conflicts and the ethical dilemmas associated with them. In this uncertain future, the pursuit of security and peace becomes a constant struggle against emerging threats and a call for the development of effective defense and diplomatic strategies',
+            'description' => 'The "Future of War" is a dark and challenging horizon where technology and strategy intertwine in a scenario of increasingly sophisticated and devastating conflicts. In this context, advanced weapons such as autonomous drones, anti-missile defense systems, and military artificial intelligence shape the combatfield, redefining the tactics and challenges faced by armed forces. As the boundaries between the physical and digital blur, the military future is permeated by cyber attacks, electronic warfare, and information manipulation, increasing the complexity of conflicts and the ethical dilemmas associated with them. In this uncertain future, the pursuit of security and peace becomes a constant struggle against emerging threats and a call for the development of effective defense and diplomatic strategies',
             'cost' => 102400,
             'dependence' => 1000,
             'category' => 1,
@@ -164,7 +164,7 @@ class ResearchSeeder extends Seeder
         DB::table('researchs')->insert([
             'code' => 1200,
             'title' => 'Future 3 stars',
-            'description' => 'The "Future of War" is a dark and challenging horizon where technology and strategy intertwine in a scenario of increasingly sophisticated and devastating conflicts. In this context, advanced weapons such as autonomous drones, anti-missile defense systems, and military artificial intelligence shape the battlefield, redefining the tactics and challenges faced by armed forces. As the boundaries between the physical and digital blur, the military future is permeated by cyber attacks, electronic warfare, and information manipulation, increasing the complexity of conflicts and the ethical dilemmas associated with them. In this uncertain future, the pursuit of security and peace becomes a constant struggle against emerging threats and a call for the development of effective defense and diplomatic strategies',
+            'description' => 'The "Future of War" is a dark and challenging horizon where technology and strategy intertwine in a scenario of increasingly sophisticated and devastating conflicts. In this context, advanced weapons such as autonomous drones, anti-missile defense systems, and military artificial intelligence shape the combatfield, redefining the tactics and challenges faced by armed forces. As the boundaries between the physical and digital blur, the military future is permeated by cyber attacks, electronic warfare, and information manipulation, increasing the complexity of conflicts and the ethical dilemmas associated with them. In this uncertain future, the pursuit of security and peace becomes a constant struggle against emerging threats and a call for the development of effective defense and diplomatic strategies',
             'cost' => 240800,
             'dependence' => 1100,
             'category' => 1,

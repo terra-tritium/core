@@ -9,25 +9,25 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-use App\Models\Battle;
-use App\Services\BattleService;
+use App\Models\Combat;
+use App\Services\CombatService;
 
-class BattleJob implements ShouldQueue
+class CombatJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $battleService;
-    private $battleId;
+    private $combatService;
+    private $combatId;
     
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($battleService, $battleId)
+    public function __construct($combatService, $combatId)
     {
-        $this->battleService = $battleService;
-        $this->battleId = $battleId;
+        $this->combatService = $combatService;
+        $this->combatId = $combatId;
     }
 
     /**
@@ -37,6 +37,6 @@ class BattleJob implements ShouldQueue
      */
     public function handle()
     {
-        $this->battleService->calculateStage($this->battleId);
+        $this->combatService->calculateStage($this->combatId);
     }
 }

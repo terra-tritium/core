@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Battle;
+use App\Models\Combat;
 use App\Models\Planet;
 
 class Fighters extends Model
@@ -13,9 +13,9 @@ class Fighters extends Model
     protected $table = 'fighters';
     public $timestamps = false;
 
-    public function battle()
+    public function combat()
     {
-        return $this->belongsTo(Battle::class, 'battle');
+        return $this->belongsTo(Combat::class, 'combat');
     }
 
     public function planet()

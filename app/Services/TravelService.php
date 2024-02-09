@@ -14,10 +14,10 @@ use App\Models\Player;
 
 class TravelService
 {
-    private  $battleService;
+    private  $combatService;
 
-    public function __construct(BattleService $battleService) {
-        $this->battleService = $battleService;
+    public function __construct(CombatService $combatService) {
+        $this->combatService = $combatService;
         
     }
 
@@ -457,7 +457,7 @@ class TravelService
         return Travel::with('from', 'to')->where([['action', $action], ['status', 1]])->orderBy('arrival')->get();
     }
 
-    public function starBattleTravel($travel)
+    public function starCombatTravel($travel)
     {
         $travelModel = Travel::find($travel);
         
@@ -472,7 +472,7 @@ class TravelService
         $dStrategy = $defense->defenseStrategy;
         $dPlanet = $travelModel->receptor;
 
-        $this->battleService->startNewBattle($attack->id,  $defense->id, $aUnits, $dUnits, $aStrategy, $dStrategy, $dPlanet);
+        $this->combatService->startNewCombat($attack->id,  $defense->id, $aUnits, $dUnits, $aStrategy, $dStrategy, $dPlanet);
     }
 
 }

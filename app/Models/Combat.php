@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Planet;
 
-class Battle extends Model
+class Combat extends Model
 {
     use HasFactory;
-    protected $table = 'battles';
+    protected $table = 'combats';
     public $timestamps = false;
 
     const STATUS_CREATE = 0;

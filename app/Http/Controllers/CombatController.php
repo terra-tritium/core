@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 //use App\Models\AttackMode;
 //use App\Models\DefenseMode;
 use App\Models\Player;
-use App\Models\Battle;
+use App\Models\Combat;
 use App\Models\Fighters;
-use App\Models\BattleStage;
+use App\Models\CombatStage;
 use App\Models\Planet;
 use App\Models\Strategy;
-use App\Services\BattleService;
+use App\Services\CombatService;
 use App\Services\PlayerService;
 use App\Services\ResourceService;
 use App\Services\StrategyService;
@@ -19,15 +19,15 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
-class BattleController extends Controller
+class CombatController extends Controller
 {
-    protected $battleService;
+    protected $combatService;
     protected $playerService;
     protected $travelService;
 
-    public function __construct(BattleService $battleService, PlayerService $playerService, TravelService $travelService)
+    public function __construct(CombatService $combatService, PlayerService $playerService, TravelService $travelService)
     {
-        $this->battleService = $battleService;
+        $this->combatService = $combatService;
         $this->playerService = $playerService;
         $this->travelService = $travelService;
     }
@@ -58,7 +58,7 @@ class BattleController extends Controller
 
     public function view($id)
     {
-        return Battle::find($id);
+        return Combat::find($id);
     }
 
     public function list()
@@ -69,9 +69,9 @@ class BattleController extends Controller
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $battles = Fighters::with('battle', 'planet')->where('player', $player->id)->orderBy('start', 'desc')->limit(12)->get();
+        $combats = Fighters::with('combat', 'planet')->where('player', $player->id)->orderBy('start', 'desc')->limit(12)->get();
 
-        return response()->json($battles);
+        return response()->json($combats);
     }
 
 
@@ -169,22 +169,22 @@ class BattleController extends Controller
         return $resourceService->sendResources($request);
     }
 
-    public function calculateStage($battleId){
-        $stage = $this->battleService->calculateStage($battleId);
+    public function calculateStage($combatId){
+        $stage = $this->combatService->calculateStage($combatId);
         return response()->json($stage, Response::HTTP_OK);    
     }
 
     public function arrivalPlanet($from)
     {
         $log = '';
-        $travels = $this->battleService->travelsData($from);
-        $finished = $this->battleService->travelsFinished($travels);
+        $travels = $this->combatService->travelsData($from);
+        $finished = $this->combatService->travelsFinished($travels);
 
         if (count($finished) > 0) {
             $dPlanetId = $finished[0]->to;
-            $targetHasShip = $this->battleService->targetHasShip($dPlanetId);
-            $targetHasShield = $this->battleService->targetHasShield($dPlanetId);
-            $targetHasTroop = $this->battleService->targetHasTroop($dPlanetId);
+            $targetHasShip = $this->combatService->targetHasShip($dPlanetId);
+            $targetHasShield = $this->combatService->targetHasShield($dPlanetId);
+            $targetHasTroop = $this->combatService->targetHasTroop($dPlanetId);
             if ($targetHasShip) {
                 //inicio da batalha espacial
                 $log = " Inicio da batalha espacial ";
@@ -196,16 +196,16 @@ class BattleController extends Controller
                         $attack = Planet::find($from);
                         $defense = Planet::find($dPlanetId);
                     
-                        $log .= $this->battleService->startNewBattle($attack->player, $defense->player,
+                        $log .= $this->combatService->startNewCombat($attack->player, $defense->player,
                             json_decode($finished[0]->troop), $targetHasTroop,$attack->attackStrategy, $defense->defenseStrategy,$dPlanetId);
 
                     } else {
                         $log = "tem escudo, mas nao tem tropa, capturar recurso ";
-                        $log .= $this->battleService->capturarRecurso($finished[0]->id,$dPlanetId, $from);
+                        $log .= $this->combatService->capturarRecurso($finished[0]->id,$dPlanetId, $from);
                     }
                 } else {
                     $log = "O alvo não tem escudo, capturar recurs o";
-                    $log .= $this->battleService->capturarRecurso($finished[0]->id,$dPlanetId, $from);
+                    $log .= $this->combatService->capturarRecurso($finished[0]->id,$dPlanetId, $from);
                 }
             }
 
@@ -259,7 +259,7 @@ class BattleController extends Controller
 
     public function stages($id)
     {
-        return BattleStage::where('battle', $id)->get();
+        return CombatStage::where('combat', $id)->get();
     }
 
     public function start($defense, $planet, $travel)
@@ -277,7 +277,7 @@ class BattleController extends Controller
             $aStrategy = $attack->attackStrategy;
             $dStrategy = $defense->defenseStrategy;
 
-            return $this->battleService->startNewBattle(
+            return $this->combatService->startNewCombat(
                 $attack->id,
                 $defense->id,
                 $aUnits,

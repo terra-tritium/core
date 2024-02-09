@@ -5,15 +5,15 @@ namespace Tests\App\Http\Controllers;
 use App\Http\Controllers\BuildController;
 use Tests\TestCase;
 use App\Models\User;
-use App\Services\BattleService;
+use App\Services\CombatService;
 use App\Services\TravelService;
 use App\Services\UserService;
 
 
-# php artisan test --filter=BattleControllerTest
-class BattleControllerTest extends TestCase
+# php artisan test --filter=CombatControllerTest
+class CombatControllerTest extends TestCase
 {
-    # php artisan test --filter=BattleControllerTest::test_build
+    # php artisan test --filter=CombatControllerTest::test_build
     public function test_build()
     {
         $loginData = ['email' => 'nicplayer2@gmail.com', 'password' => '123'];
@@ -34,23 +34,23 @@ class BattleControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    # php artisan test --filter=BattleControllerTest::test_battle_start
-    public function test_battle_start()
+    # php artisan test --filter=CombatControllerTest::test_combat_start
+    public function test_combat_start()
     {
 
-        $battleService = new BattleService();
-        $travelService = new TravelService($battleService);   
-        $response = $travelService->starBattleTravel(1);
+        $combatService = new CombatService();
+        $travelService = new TravelService($combatService);   
+        $response = $travelService->starCombatTravel(1);
         
         dd('Test end');
     }
     
-    # php artisan test --filter=BattleControllerTest::test_create_state
+    # php artisan test --filter=CombatControllerTest::test_create_state
     public function test_create_state()
     {
-        $battleService = new BattleService();   
-        $battle = \App\Models\Battle::select()->first();
-        $response = $battleService->calculateStage($battle->id);
+        $combatService = new CombatService();   
+        $combat = \App\Models\Combat::select()->first();
+        $response = $combatService->calculateStage($combat->id);
         dd('Test end');
         
     }

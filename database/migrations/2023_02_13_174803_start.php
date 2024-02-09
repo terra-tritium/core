@@ -427,7 +427,7 @@ return new class extends Migration {
             $table->integer('player')->constrained("players");
             $table->integer("code");
         });
-        Schema::create('battles', function (Blueprint $table) {
+        Schema::create('combats', function (Blueprint $table) {
             $table->id();
             $table->foreignId('planet')->constrained("planets");
             $table->integer("status");
@@ -445,7 +445,7 @@ return new class extends Migration {
             $table->integer('side');
             $table->integer('strategy');
             $table->integer('player')->constrained("players");
-            $table->bigInteger("battle")->constrained("battles");
+            $table->bigInteger("combat")->constrained("combats");
             $table->foreignId('planet')->constrained("planets");
             $table->string("demage")->nullable();
             $table->bigInteger("start");
@@ -460,7 +460,7 @@ return new class extends Migration {
         Schema::create('stages', function (Blueprint $table) {
             $table->id();
             $table->integer("number");
-            $table->foreignId('battle')->constrained("battles");
+            $table->foreignId('combat')->constrained("combats");
             $table->string("attackDemage");
             $table->string("defenseDemage");
             $table->integer("attackStrategy");

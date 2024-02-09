@@ -2,15 +2,15 @@
 
 namespace App\Services;
 
-use App\Jobs\LandBattleJob;
-use App\Models\Battle;
+use App\Jobs\LandCombatJob;
+use App\Models\Combat;
 use App\Models\Travel;
 use App\Models\Planet;
 
-class LandBattleService
+class LandCombatService
 {
   public function start ($planetId, $travelId) {
-    $battle = new Battle([
+    $combat = new Combat([
       'planet' => $planetId,
       'status' => 1,
       'attackDemage' => null,
@@ -22,46 +22,46 @@ class LandBattleService
       'stage' => 1,
       'resources' => null
     ]);
-    $battle->save();
+    $combat->save();
     $travel = Travel::find($travelId);
     $planet = Planet::find($planetId);
-    $this->loadAttackTroops($travel, $battle);
-    $this->loadDefenseTroops(null, $battle);
-    $this->startStage($battle);
+    $this->loadAttackTroops($travel, $combat);
+    $this->loadDefenseTroops(null, $combat);
+    $this->startStage($combat);
   }
 
-  public function join ($side, $battle, $travler) {
+  public function join ($side, $combat, $travler) {
     if ($side == 'attack') {
-      $this->loadAttackTroops($travler, $battle);
+      $this->loadAttackTroops($travler, $combat);
     } else {
-      $this->loadDefenseTroops($travler, $battle);
+      $this->loadDefenseTroops($travler, $combat);
     }
   }
 
-  public function loadAttackTroops ($travel, $battle) {
-    $battle->addAttackUnits($travel->troop);
-    $battle->save();
+  public function loadAttackTroops ($travel, $combat) {
+    $combat->addAttackUnits($travel->troop);
+    $combat->save();
   }
 
-  public function loadDefenseTroops ($travel, $battle) {
+  public function loadDefenseTroops ($travel, $combat) {
     if ($travel == null) {
-      $planet = Planet::find($battle->planet);
-      $battle->addDefenseUnits($planet->troops);
+      $planet = Planet::find($combat->planet);
+      $combat->addDefenseUnits($planet->troops);
     } else {
-      $battle->addDefenseUnits($travel->troop);
+      $combat->addDefenseUnits($travel->troop);
     }
-    $battle->save();
+    $combat->save();
   }
 
-  public function startStage ($battle) {
-    LandBattleJob::dispatch(
+  public function startStage ($combat) {
+    LandCombatJob::dispatch(
       $this,
-      $battle
+      $combat
     )->delay(now()->addSeconds(5));
   }
 
-  public function runStage($battleId, $side) {
-    $battle = Battle::find($battleId);
+  public function runStage($combatId, $side) {
+    $combat = Combat::find($combatId);
     $aForce = $this->calcAttackForce($side);
     $aForce += $this->applyAttackEffects($side);
 
@@ -75,36 +75,36 @@ class LandBattleService
 
     $shielAffected = $this->hitShield($demage);
     $demage = $demage - $shielAffected;
-    $this->hitTroops($battle, $side, $demage);
+    $this->hitTroops($combat, $side, $demage);
 
     if ($side == 'defense' && !$this->checkEnd()) {
-      LandBattleJob::dispatch(
+      LandCombatJob::dispatch(
           $this,
-          $battleId
+          $combatId
       )->delay(now()->addSeconds(env("TRITIUM_STAGE_SPEED")));
     }
 
     # recebe novos viajantes que chegaram ao planeta
-    $travels = $this->getTravelers($side, $battle->planet);
+    $travels = $this->getTravelers($side, $combat->planet);
     if ($travels) {
       foreach ($travels as $member) {
-        $this->join($side, $battle, $member);
+        $this->join($side, $combat, $member);
       }
     }
   }
 
-  public function calcAttackForce ($battle) {
+  public function calcAttackForce ($combat) {
     $force = 0;
-    $aZone = $this->loadFigthZone($battle, 'attack');
+    $aZone = $this->loadFigthZone($combat, 'attack');
     foreach ($aZone as $unit) {
       $force += $unit->attack;
     }
     return $force;
   }
 
-  public function calcDefenseForce ($battle) {
+  public function calcDefenseForce ($combat) {
     $force = 0;
-    $aZone = $this->loadFigthZone($battle, 'defense');
+    $aZone = $this->loadFigthZone($combat, 'defense');
     foreach ($aZone as $unit) {
       $force += $unit->defense;
     }
@@ -159,15 +159,15 @@ class LandBattleService
     return [];
   }
 
-  public function loadFigthZone ($battle, $side) {
+  public function loadFigthZone ($combat, $side) {
     $zone = [];
     $sizeUnits = 0;
-    $sizeZone = $this->calcSizeFigthZone($battle);
+    $sizeZone = $this->calcSizeFigthZone($combat);
 
     if ($side == 'attack') {
-      $units = $this->getAttackTroops($battle);
+      $units = $this->getAttackTroops($combat);
     } else {
-      $units = $this->getDefenseTroops($battle);
+      $units = $this->getDefenseTroops($combat);
     }
     
     foreach ($units as $unit) {
@@ -178,16 +178,16 @@ class LandBattleService
     }
 
     if ($side == 'attack') {
-      $battle->attackZone = $zone;
+      $combat->attackZone = $zone;
     } else {
-      $battle->defenseZone = $zone;
+      $combat->defenseZone = $zone;
     }
 
-    $battle->save();
+    $combat->save();
     return $zone;
   }
 
-  public function calcSizeFigthZone ($battle) {
+  public function calcSizeFigthZone ($combat) {
 
   }
 

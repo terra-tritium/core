@@ -11,7 +11,7 @@ use App\Http\Controllers\RankingController;
 use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\GameModeController;
 use App\Http\Controllers\TravelController;
-use App\Http\Controllers\BattleController;
+use App\Http\Controllers\CombatController;
 use App\Http\Controllers\QuadrantController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\API\ResetarSenhaController;
@@ -140,26 +140,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/back', [TravelController::class, 'back']);
     });
 
-    Route::prefix('battle')->group(function () {
-        Route::post('/attackmode/{option}', [BattleController::class, 'changeAttackMode']);
-        Route::post('/defensemode/{option}', [BattleController::class, 'changeDefenseMode']);
-        Route::get('/start/{defense}/{planet}', [BattleController::class, 'start']);
-        Route::get('/view/{id}', [BattleController::class, 'view']);
-        Route::get('/stages/{id}', [BattleController::class, 'stages']);
-        Route::get('/list', [BattleController::class, 'list']);
-        Route::get('/strategy/list/', [BattleController::class, 'listStrategy']);
-        Route::get('/strategy/selected/{planet}',[BattleController::class, 'strategiesSelectedPlanet']);
-        Route::put('/strategy/{planet}/{type}/{newStrategy}',[BattleController::class, 'changeStrategy']);
-        Route::get("/check-number-planets",[BattleController::class, 'checkNumberOfPlanets']);
-        Route::put("/colonizer/{planet}",[BattleController::class, "colonizePlanet"]);
-        Route::get("/available-ship",[BattleController::class, "availableShip"]);
-        Route::post("/actionmode",[BattleController::class, "actionMode"]);
-        Route::get("/available-resources/{planet}",[BattleController::class, "availableResources"]);
+    Route::prefix('combat')->group(function () {
+        Route::post('/attackmode/{option}', [CombatController::class, 'changeAttackMode']);
+        Route::post('/defensemode/{option}', [CombatController::class, 'changeDefenseMode']);
+        Route::get('/start/{defense}/{planet}', [CombatController::class, 'start']);
+        Route::get('/view/{id}', [CombatController::class, 'view']);
+        Route::get('/stages/{id}', [CombatController::class, 'stages']);
+        Route::get('/list', [CombatController::class, 'list']);
+        Route::get('/strategy/list/', [CombatController::class, 'listStrategy']);
+        Route::get('/strategy/selected/{planet}',[CombatController::class, 'strategiesSelectedPlanet']);
+        Route::put('/strategy/{planet}/{type}/{newStrategy}',[CombatController::class, 'changeStrategy']);
+        Route::get("/check-number-planets",[CombatController::class, 'checkNumberOfPlanets']);
+        Route::put("/colonizer/{planet}",[CombatController::class, "colonizePlanet"]);
+        Route::get("/available-ship",[CombatController::class, "availableShip"]);
+        Route::post("/actionmode",[CombatController::class, "actionMode"]);
+        Route::get("/available-resources/{planet}",[CombatController::class, "availableResources"]);
 
-        Route::get("/arrival-planet/{from}",[BattleController::class, "arrivalPlanet"]);
-        Route::get("/stage/{battleId}",[BattleController::class,"calculateStage"]);
+        Route::get("/arrival-planet/{from}",[CombatController::class, "arrivalPlanet"]);
+        Route::get("/stage/{combatId}",[CombatController::class,"calculateStage"]);
         //sendresource
-        Route::post('/sendresource', [BattleController::class, 'sendResource']);
+        Route::post('/sendresource', [CombatController::class, 'sendResource']);
 
     });
 

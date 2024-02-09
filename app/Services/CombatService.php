@@ -2,15 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\Battle;
-use App\Models\BattleStage;
+use App\Models\Combat;
+use App\Models\CombatStage;
 use App\Models\Fighters;
-use App\Jobs\BattleJob;
+use App\Jobs\CombatJob;
 use App\Models\Building;
 use App\Models\Travel;
 use App\Models\Troop;
 
-class BattleService
+class CombatService
 {
     private $sizeFator1;
     private $sizeFator2;
@@ -39,24 +39,24 @@ class BattleService
         $this->rangeLimit1 = 1000;
         $this->rangeLimit2 = 5000;
         $this->rangeLimit3 = -1;
-        $this->currentStage = new BattleStage();
+        $this->currentStage = new CombatStage();
     }
 
-    public function startNewBattle ($attack, $defense, $aUnits, $dUnits, $aStrategy, $dStrategy, $dPlanet) {
+    public function startNewCombat ($attack, $defense, $aUnits, $dUnits, $aStrategy, $dStrategy, $dPlanet) {
 
-        $battle = new Battle();
-        $battle->planet = $dPlanet;
-        $battle->status = 0;
-        $battle->start = time();
-        $battle->stage = 0;
-        $battle->attackUnits   = json_encode($aUnits);
-        $battle->defenseUnits  = json_encode($dUnits);
-        $battle->attackSlots = json_encode("{}");
-        $battle->defenseSlots = json_encode("{}");
-        $battle->save();
+        $combat = new Combat();
+        $combat->planet = $dPlanet;
+        $combat->status = 0;
+        $combat->start = time();
+        $combat->stage = 0;
+        $combat->attackUnits   = json_encode($aUnits);
+        $combat->defenseUnits  = json_encode($dUnits);
+        $combat->attackSlots = json_encode("{}");
+        $combat->defenseSlots = json_encode("{}");
+        $combat->save();
        
         $player1 = new Fighters();
-        $player1->battle = $battle->id;
+        $player1->combat = $combat->id;
         $player1->player = $attack;
         $player1->side = 1;
         $player1->strategy = $aStrategy;
@@ -68,7 +68,7 @@ class BattleService
         $player1->save();
 
         $player2 = new Fighters();
-        $player2->battle = $battle->id;
+        $player2->combat = $combat->id;
         $player2->player = $defense;
         $player2->side = 2;
         $player2->strategy = $dStrategy;
@@ -79,61 +79,61 @@ class BattleService
         $player2->units = json_encode($dUnits);
         $player2->save();
 
-        // $battle = $this->calculateStage($battle->id);
+        // $combat = $this->calculateStage($combat->id);
     }
     
     # Job call
-    public function calculateStage($battleId) {
+    public function calculateStage($combatId) {
         
-        $battle = Battle::find($battleId);
+        $combat = Combat::find($combatId);
 
-        $this->loadReserve($battle);
+        $this->loadReserve($combat);
 
-        $battle = $this->fillSlots($battle);
+        $combat = $this->fillSlots($combat);
 
-        $battle->stage += 1;
+        $combat->stage += 1;
 
-        $battle->save();
+        $combat->save();
 
-        $stage = $this->createNewStage($battle);
+        $stage = $this->createNewStage($combat);
         # Start job for new stage if no end
       
         if (!$this->isEnd()) {
-            BattleJob::dispatch(
+            CombatJob::dispatch(
                 $this,
-                $battle->id
+                $combat->id
             )->delay(now()->addSeconds(env("TRITIUM_STAGE_SPEED")));
         } else {
             $attackSize     = $this->getSizeTroop($this->attackReserve);
             $defenseSize    = $this->getSizeTroop($this->defenseReserve);
 
             if ($attackSize == 0 || $this->currentStage->attackGaveUp == true) {
-                $battle->result = 2;
+                $combat->result = 2;
             }
             if ($defenseSize == 0 || $this->currentStage->defenseGaveUp == true) {
-                $battle->result = 1;
+                $combat->result = 1;
             }
-            $battle->save();
+            $combat->save();
         }
     }
 
-    private function createNewStage($battle) {
+    private function createNewStage($combat) {
 
-        $stage = new BattleStage();
-        $stage->number = $battle->stage;
-        $stage->battle = $battle->id;
+        $stage = new CombatStage();
+        $stage->number = $combat->stage;
+        $stage->combat = $combat->id;
         $stage->attackDemage = 0;
         $stage->defenseDemage = 0;
-        $stage->attackStrategy = $battle->attackStrategy;
-        $stage->defenseStrategy = $battle->defenseStrategy;
-        $stage->attackUnits = $battle->attackUnits;
-        $stage->defenseUnits = $battle->defenseUnits;
+        $stage->attackStrategy = $combat->attackStrategy;
+        $stage->defenseStrategy = $combat->defenseStrategy;
+        $stage->attackUnits = $combat->attackUnits;
+        $stage->defenseUnits = $combat->defenseUnits;
         $stage->attackKills = json_encode("{}");
         $stage->defenseKills = json_encode("{}");
         $stage->attackGaveUp = false;
         $stage->defenseGaveUp = false;
         
-        $stage = $this->resolveConfrontation($battle, $stage);
+        $stage = $this->resolveConfrontation($combat, $stage);
        
         $stage->save();
         $this->currentStage = $stage;
@@ -142,13 +142,13 @@ class BattleService
         return $stage;
     }
 
-    private function resolveConfrontation($battle, $stage) { 
+    private function resolveConfrontation($combat, $stage) { 
         
-        $aSlots =  $battle->attackSlots;
-        $dSlots =  $battle->defenseSlots;
+        $aSlots =  $combat->attackSlots;
+        $dSlots =  $combat->defenseSlots;
 
-        $stage->attackSlots = json_encode($battle->attackSlots);
-        $stage->defenseSlots = json_encode($battle->defenseSlots);
+        $stage->attackSlots = json_encode($combat->attackSlots);
+        $stage->defenseSlots = json_encode($combat->defenseSlots);
        
         # execute attack
         foreach($aSlots as $aSlot) {
@@ -226,10 +226,10 @@ class BattleService
         $stage->attackReserve = json_encode($this->attackReserve);
         $stage->defenseReserve = json_encode($this->defenseReserve);
 
-        $battle->attackReserve = json_encode($this->attackReserve);
-        $battle->defenseReserve = json_encode($this->defenseReserve);
+        $combat->attackReserve = json_encode($this->attackReserve);
+        $combat->defenseReserve = json_encode($this->defenseReserve);
 
-        $battle->save();
+        $combat->save();
          
         return $stage;
     }
@@ -250,10 +250,10 @@ class BattleService
         }
     }
 
-    private function calculateRangeSize($battle) {
+    private function calculateRangeSize($combat) {
         
-        $attackSize     = $this->getSizeTroop(json_decode($battle->attackUnits));
-        $defenseSize    = $this->getSizeTroop(json_decode($battle->defenseUnits));
+        $attackSize     = $this->getSizeTroop(json_decode($combat->attackUnits));
+        $defenseSize    = $this->getSizeTroop(json_decode($combat->defenseUnits));
        
         $smallerUnitsSize = 0;
 
@@ -274,9 +274,9 @@ class BattleService
         return 3;
     }
 
-    private function fillSlots($battle) {
+    private function fillSlots($combat) {
       
-        $range = $this->calculateRangeSize($battle);
+        $range = $this->calculateRangeSize($combat);
         switch ($range) {
             case 1: 
                 $this->droidSlotSize = $this->droidSlotSize * $this->sizeFator1;
@@ -298,32 +298,32 @@ class BattleService
                 break;
         }
         
-        $battle->attackSlots = json_encode($this->createSlots(
-            $battle->attackStrategy,
+        $combat->attackSlots = json_encode($this->createSlots(
+            $combat->attackStrategy,
             $this->droidSlotSize,
             $this->vehicleSlotSize,
             $this->launchersSlotSize,
             $this->specialSlotSize
         ));
        
-        $battle->defenseSlots = json_encode($this->createSlots(
-            $battle->defenseStrategy,
+        $combat->defenseSlots = json_encode($this->createSlots(
+            $combat->defenseStrategy,
             $this->droidSlotSize,
             $this->vehicleSlotSize,
             $this->launchersSlotSize,
             $this->specialSlotSize
         ));
      
-        $battle = $this->loadSlots($battle, 'attack');
-        $battle = $this->loadSlots($battle, 'defense');
+        $combat = $this->loadSlots($combat, 'attack');
+        $combat = $this->loadSlots($combat, 'defense');
 
-        return $battle;
+        return $combat;
     }
 
-    private function loadSlots($battle, $side) {
+    private function loadSlots($combat, $side) {
         $slot = [];
        
-        $slot = ($side == "attack") ? $battle->attackSlots : $battle->defenseSlots;
+        $slot = ($side == "attack") ? $combat->attackSlots : $combat->defenseSlots;
         
         $slot = json_decode($slot); 
         $slot = $this->selectUnits('r1c1', $slot, $side);
@@ -353,9 +353,9 @@ class BattleService
         $slot = $this->selectUnits('r5c5', $slot, $side);
         $slot = $this->selectUnits('r1e1', $slot, $side);
 
-        $battle->{$side.'Slots'} = $slot;
+        $combat->{$side.'Slots'} = $slot;
         
-        return $battle;
+        return $combat;
     }
 
     private function selectUnits($position, $slot, $side) {
@@ -435,13 +435,13 @@ class BattleService
         return $slot;
     }
 
-    private function loadReserve($battle) {
-        if($battle->stage == 0){
-            $this->attackReserve = json_decode($battle->attackUnits);
-            $this->defenseReserve = json_decode($battle->defenseUnits);
+    private function loadReserve($combat) {
+        if($combat->stage == 0){
+            $this->attackReserve = json_decode($combat->attackUnits);
+            $this->defenseReserve = json_decode($combat->defenseUnits);
         }else{
-            $this->attackReserve = json_decode($battle->attackReserve);
-            $this->defenseReserve = json_decode($battle->defenseReserve);
+            $this->attackReserve = json_decode($combat->attackReserve);
+            $this->defenseReserve = json_decode($combat->defenseReserve);
         }
     }
 
