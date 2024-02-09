@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 //use App\Models\DefenseMode;
 use App\Models\Player;
 use App\Models\Combat;
-use App\Models\Fighters;
 use App\Models\CombatStage;
 use App\Models\Planet;
 use App\Models\Strategy;
@@ -69,7 +68,7 @@ class CombatController extends Controller
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $combats = Fighters::with('combat', 'planet')->where('player', $player->id)->orderBy('start', 'desc')->limit(12)->get();
+        $combats = Combat::where('player', $player->id)->orderBy('start', 'desc')->limit(12)->get();
 
         return response()->json($combats);
     }
