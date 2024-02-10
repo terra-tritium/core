@@ -60,6 +60,18 @@ class CombatController extends Controller
         return Combat::find($id);
     }
 
+    public function current($combat) {
+        $player = Player::getPlayerLogged();
+
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $combat = Combat::where('id', $combat)->firstOrFail();
+
+        return response()->json($combat);
+    }
+
     public function list()
     {
         $player = Player::getPlayerLogged();

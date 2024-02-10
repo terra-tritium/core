@@ -156,7 +156,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post("/actionmode",[CombatController::class, "actionMode"]);
         Route::get("/available-resources/{planet}",[CombatController::class, "availableResources"]);
         Route::get("/figthers/{combat}",[CombatController::class, "figthers"]);
-
+        Route::get("/current/{combat}",[CombatController::class, "current"]);
         Route::get("/arrival-planet/{from}",[CombatController::class, "arrivalPlanet"]);
         Route::get("/stage/{combatId}",[CombatController::class,"calculateStage"]);
         //sendresource
