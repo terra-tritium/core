@@ -6,14 +6,14 @@ use App\Models\ChatGroup;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\Player;
-use DateTime;
+use App\Models\Logbook;
+use Carbon\Carbon;
 use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Log;
-use Throwable;
+
+use function PHPUnit\Framework\isNull;
 
 class MessageService
 {
@@ -101,5 +101,28 @@ class MessageService
             $result = $message->searchUserByName($loggedPlayer->id, $string);
         }
         return response()->json($result, Response::HTTP_OK);
+    }
+
+    public function newMessage(Request $request,int $recipientId)
+    {
+        $player = Player::getPlayerLogged();
+        $msg = app(Message::class);
+        $msg->senderId = $player->user;
+        $msg->recipientId = $recipientId;
+        $msg->content = $request->input("content");
+        $msg->status = true;
+        $msg->read = false;
+        $msg->save();
+
+        $log = Logbook::where(['player' => $recipientId, 'type' => 'message', 'read' => false])->first();
+
+        $log = isNull($log) ? new Logbook(): $log ;
+
+        $log->player = $request->input("recipientId");
+        $log->text = "New message for you";
+        $log->type ="Message";
+        $log->read = false;
+        $log->save();
+      
     }
 }

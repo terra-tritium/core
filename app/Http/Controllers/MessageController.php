@@ -16,6 +16,9 @@ use Illuminate\Http\Response;
 class MessageController extends Controller
 {
 
+    public function __construct(protected readonly MessageService $messageService) 
+    {
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -143,10 +146,12 @@ class MessageController extends Controller
         $msg = app(Message::class);
         return $msg->getAllByUserRecipient($player->user);
     }
+
     public function getCountMessageNotRead(){
         $naoLidas = $this->getAllMessageNotRead();
         return $naoLidas;
     }
+
     private function messageForSender($messages)
     {
         $trocas = array();
@@ -168,6 +173,7 @@ class MessageController extends Controller
         $messages = app(Message::class)->getAllMessageSenderForRecipient($senderid, $player->user);
         return $messages;
     }
+
     public function getAllMessageNotRead()
     {
         $player = Player::getPlayerLogged();
@@ -175,22 +181,18 @@ class MessageController extends Controller
         return  $messages;
 
     }
+
     public function newMessage(Request $request)
     {
         try {
-            $player = Player::getPlayerLogged();
-            $msg = app(Message::class);
-            $msg->senderId = $player->user;
-            $msg->recipientId = $request->input("recipientId");
-            $msg->content = $request->input("content");
-            $msg->status = true;
-            $msg->read = false;
-            $msg->save();
+            $recipientId = $request->input("recipientId") ;
+            $this->messageService->newMessage($request, $recipientId);
         } catch (Exception $e) {
             return response(["msg" => "error " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         return response(['message' => 'message send success!', 'success' => true], Response::HTTP_CREATED);
     }
+
     public function readMessage(Request $request)
     {
         $player = Player::getPlayerLogged();
@@ -210,15 +212,16 @@ class MessageController extends Controller
         $messages = app(Message::class)->getConversation($player->user, $senderId);
         return $messages;
     }
+
     public function getLastMessageNotReadBySender($senderid){
         $message = app(Message::class);
         $player = Player::getPlayerLogged();
         $msg = $message->getLastMessageNotReadBySender($player->user,$senderid);
         return $msg;
     }
+
     public function searchUser($string){
-        $messageService = new MessageService();
-        return $messageService->searchUser($string);
+        return  $this->messageService->searchUser($string);
     }
     
 }
