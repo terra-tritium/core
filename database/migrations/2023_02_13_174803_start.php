@@ -450,6 +450,7 @@ return new class extends Migration {
             $table->string("demage")->nullable();
             $table->bigInteger("start");
             $table->integer('stage');
+            $table->integer("transportShips")->default(0);
             $table->integer('cruiser')->default(0);
             $table->integer('craft')->default(0);
             $table->integer('bomber')->default(0);
