@@ -70,32 +70,46 @@ class SpaceCombatService
     $player2->start = time();
     $player2->stage = 0;
     $player2->planet = $travel->to;
-    $player2->cruiser = $planet->cruiser;
+    $player2->cruiser = 0;
+    $player2->craft = 0;
+    $player2->bomber = 0;
+    $player2->scout = 0;
+    $player2->stealth = 0;
+    $player2->flagship = 0;
 
     $fleet = Fleet::where('planet', $travel->to)->first();
-    foreach ($fleet->ships as $ship) {
-      switch ($ship->unit) {
-        case Ship::SHIP_CRAFT:
-          $player2->craft = $ship->quantity;
-          break;
-        case Ship::SHIP_BOMBER:
-          $player2->bomber = $ship->quantity;
-          break;
-        case Ship::SHIP_CRUISER:
-          $player2->cruiser = $ship->quantity;
-          break;
-        case Ship::SHIP_SCOUT:
-          $player2->scout = $ship->quantity;
-          break;
-        case Ship::SHIP_STEALTH:
-          $player2->stealth = $ship->quantity;
-          break;
-        case Ship::SHIP_FLAGSHIP:
-          $player2->flagship = $ship->quantity;
-          break;
-      }
-    }
 
+    if ($fleet) {
+      foreach ($fleet as $ship) {
+        switch ($ship->unit) {
+          case Ship::SHIP_CRUISER:
+            $player2->cruiser = $fleet->cruiser;
+            break;
+          case Ship::SHIP_CRAFT:
+            $player2->craft = $fleet->craft;
+            break;
+          case Ship::SHIP_BOMBER:
+            $player2->bomber = $fleet->bomber;
+            break;
+          case Ship::SHIP_SCOUT:
+            $player2->scout = $fleet->scout;
+            break;
+          case Ship::SHIP_STEALTH:
+            $player2->stealth = $fleet->stealth;
+            break;
+          case Ship::SHIP_FLAGSHIP:
+            $player2->flagship = $fleet->flagship;
+            break;
+        }
+      }
+      $player2->cruiser = $fleet->cruiser;
+      $player2->craft = $fleet->craft;
+      $player2->bomber = $fleet->bomber;
+      $player2->scout = $fleet->scout;
+      $player2->stealth = $fleet->stealth;
+      $player2->flagship = $fleet->flagship;
+    }
+    
     $player2->save();
   }
 
