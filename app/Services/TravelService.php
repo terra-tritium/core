@@ -64,6 +64,7 @@ class TravelService
         $newTravel->arrival = $now + $travelTime;
         $newTravel->status = Travel::STATUS_ON_LOAD;
         $newTravel->receptor = $this->getReceptor($travel->to);
+        $newTravel->strategy = $travel->strategy;
 
         switch ($travel->action) {
             case Travel::ATTACK_FLEET:
