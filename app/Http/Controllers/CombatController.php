@@ -70,8 +70,10 @@ class CombatController extends Controller
 
         $combats = DB::table('combats as c')
             ->join('fighters as f', 'c.id', '=', 'f.combat')
+            ->join('planets as p', 'c.planet', '=', 'p.id')
+            ->join('players as u', 'p.player', '=', 'u.id')
             ->where('f.player', $player->id)
-            ->select('c.*')
+            ->select('c.*', 'p.name as planetName', 'p.quadrant as quadrant', 'p.position as position', 'p.region as region', 'u.name as player')
             ->get();
 
         return response()->json($combats);
