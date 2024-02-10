@@ -84,7 +84,7 @@ class CombatController extends Controller
         $fighters = DB::table('fighters as f')
             ->join('players as p', 'f.player', '=', 'p.id')
             ->where('f.combat', $combatId)
-            ->select('f.*', 'p.name as player')
+            ->select('f.*', 'p.name as player', 'p.id as playerId')
             ->get();
 
         return response()->json($fighters);
