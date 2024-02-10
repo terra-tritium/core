@@ -79,6 +79,16 @@ class CombatController extends Controller
         return response()->json($combats);
     }
 
+    public function figthers($combatId)
+    {
+        $fighters = DB::table('fighters as f')
+            ->join('players as p', 'f.player', '=', 'p.id')
+            ->where('f.combat', $combatId)
+            ->select('f.*', 'p.name as player')
+            ->get();
+
+        return response()->json($fighters);
+    }
 
     public function listStrategy()
     {
