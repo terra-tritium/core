@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -155,7 +156,7 @@ class Message extends Model
             ->where([['read', '=', false], ['senderId', '=', $senderId], ['recipientId', '=', $currentUser]])
             ->update([
                 'read' => true,
-                'readAt' => time()
+                'readAt' => Carbon::now()
             ]);
     }
     public function searchUserByName($id, $search)
