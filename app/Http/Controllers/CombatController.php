@@ -68,7 +68,11 @@ class CombatController extends Controller
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $combats = Combat::where('player', $player->id)->orderBy('start', 'desc')->limit(12)->get();
+        $combats = DB::table('combats as c')
+            ->join('fighters as f', 'c.id', '=', 'f.combat')
+            ->where('f.player', $player->id)
+            ->select('c.*')
+            ->get();
 
         return response()->json($combats);
     }
