@@ -77,37 +77,31 @@ class SpaceCombatService
     $player2->stealth = 0;
     $player2->flagship = 0;
 
-    $fleet = Fleet::where('planet', $travel->to)->first();
+    $fleet = Fleet::where('planet', $travel->to)->get();
 
     if ($fleet) {
       foreach ($fleet as $ship) {
         switch ($ship->unit) {
           case Ship::SHIP_CRUISER:
-            $player2->cruiser = $fleet->cruiser;
+            $player2->cruiser = $ship->quantity;
             break;
           case Ship::SHIP_CRAFT:
-            $player2->craft = $fleet->craft;
+            $player2->craft = $ship->quantity;
             break;
           case Ship::SHIP_BOMBER:
-            $player2->bomber = $fleet->bomber;
+            $player2->bomber = $ship->quantity;
             break;
           case Ship::SHIP_SCOUT:
-            $player2->scout = $fleet->scout;
+            $player2->scout = $ship->quantity;
             break;
           case Ship::SHIP_STEALTH:
-            $player2->stealth = $fleet->stealth;
+            $player2->stealth = $ship->quantity;
             break;
           case Ship::SHIP_FLAGSHIP:
-            $player2->flagship = $fleet->flagship;
+            $player2->flagship = $ship->quantity;
             break;
         }
       }
-      $player2->cruiser = $fleet->cruiser;
-      $player2->craft = $fleet->craft;
-      $player2->bomber = $fleet->bomber;
-      $player2->scout = $fleet->scout;
-      $player2->stealth = $fleet->stealth;
-      $player2->flagship = $fleet->flagship;
     }
     
     $player2->save();
