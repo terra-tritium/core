@@ -15,21 +15,12 @@ use App\Models\Troop;
 
 class SpaceCombatService
 {
-  private $frontLineSize;
-  private $longRangeSize;
-  private $specialSize;
-  private $commandSize;
-  
+  private $battleFieldSize;
   private $currentStage;
-  private $attackReserve;
-  private $defenseReserve;
-  private $travelService;
+
 
   public function __construct() {
-    $this->frontLineSize = 50;
-    $this->longRangeSize = 20;
-    $this->specialSize = 20;
-    $this->commandSize = 8;
+    $this->battleFieldSize = 50;
     $this->currentStage = new CombatStage();
   }
 
@@ -126,13 +117,211 @@ class SpaceCombatService
       $this->startCombat($combatId);
     }
 
-    $invasors = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->first();
-    $locals = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_LOCAL])->first();
+    $invasors = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
+    $locals = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_LOCAL])->get();
+
+    $this->resolve($invasors, $locals);
   }
 
   private function resolve($invasors, $locals) {
+
+    $invasorCraftAttack = 0;
+    $localCraftAttack = 0;
+    $invasorCraftDefense = 0;
+    $localCraftDefense = 0;
+
+    $invasorBomberAttack = 0;
+    $localBomberAttack = 0;
+    $invasorBomberDefense = 0;
+    $localBomberDefense = 0;
+
+    $invasorCruiserAttack = 0;
+    $localCruiserAttack = 0;
+    $invasorCruiserDefense = 0;
+    $localCruiserDefense = 0;
+
+    $invasorScoutAttack = 0;
+    $localScoutAttack = 0;
+    $invasorScoutDefense = 0;
+    $localScoutDefense = 0;
+
+    $invasorStealthAttack = 0;
+    $localStealthAttack = 0;
+    $invasorStealthDefense = 0;
+    $localStealthDefense = 0;
+
+    $invasorFlagshipAttack = 0;
+    $localFlagshipAttack = 0;
+    $invasorFlagshipDefense = 0;
+    $localFlagshipDefense = 0;
+
+    
+
     foreach ($invasors as $invasor) {
-      $invasor->demage = 0;
+      if ($invasor->craft > 0) {
+        $invasorCraftInBattle = $invasor->craft > $this->battleFieldSize ? $this->battleFieldSize : $invasor->craft;
+        $invasorBomberInBattle = $invasor->bomber > $this->battleFieldSize ? $this->battleFieldSize : $invasor->bomber;
+
+        $invasorCraftAttack += $invasorCraftInBattle * Ship::SHIP_CRAFT_ATTACK;
+        $invasorCraftDefense += $invasorBomberInBattle * Ship::SHIP_CRAFT_DEFENSE;
+        $invasorBomberAttack += $invasor->bomber * Ship::SHIP_BOMBER_ATTACK;
+        $invasorBomberDefense += $invasor->bomber * Ship::SHIP_BOMBER_DEFENSE;
+        $invasorCruiserAttack += $invasor->cruiser * Ship::SHIP_CRUISER_ATTACK;
+        $invasorCruiserDefense += $invasor->cruiser * Ship::SHIP_CRUISER_DEFENSE;
+        $invasorScoutAttack += $invasor->scout * Ship::SHIP_SCOUT_ATTACK;
+        $invasorScoutDefense += $invasor->scout * Ship::SHIP_SCOUT_DEFENSE;
+        $invasorStealthAttack += $invasor->stealth * Ship::SHIP_STEALTH_ATTACK;
+        $invasorStealthDefense += $invasor->stealth * Ship::SHIP_STEALTH_DEFENSE;
+        $invasorFlagshipAttack += $invasor->flagship * Ship::SHIP_FLAGSHIP_ATTACK;
+        $invasorFlagshipDefense += $invasor->flagship * Ship::SHIP_FLAGSHIP_DEFENSE;
+      }
+    }
+
+    foreach ($locals as $local) {
+      if ($local->craft > 0) {
+        $localCraftAttack += $local->craft * Ship::SHIP_CRAFT_ATTACK;
+        $localCraftDefense += $local->craft * Ship::SHIP_CRAFT_DEFENSE;
+        $localBomberAttack += $local->bomber * Ship::SHIP_BOMBER_ATTACK;
+        $localBomberDefense += $local->bomber * Ship::SHIP_BOMBER_DEFENSE;
+        $localCruiserAttack += $local->cruiser * Ship::SHIP_CRUISER_ATTACK;
+        $localCruiserDefense += $local->cruiser * Ship::SHIP_CRUISER_DEFENSE;
+        $localScoutAttack += $local->scout * Ship::SHIP_SCOUT_ATTACK;
+        $localScoutDefense += $local->scout * Ship::SHIP_SCOUT_DEFENSE;
+        $localStealthAttack += $local->stealth * Ship::SHIP_STEALTH_ATTACK;
+        $localStealthDefense += $local->stealth * Ship::SHIP_STEALTH_DEFENSE;
+        $localFlagshipAttack += $local->flagship * Ship::SHIP_FLAGSHIP_ATTACK;
+        $localFlagshipDefense += $local->flagship * Ship::SHIP_FLAGSHIP_DEFENSE;
+      }
+    }
+
+    $invasorCraftDemage = $invasorCraftAttack - $localCraftDefense;
+    $localCraftDemage = $localCraftAttack - $invasorCraftDefense;
+    $invasorBomberDemage = $invasorBomberAttack - $localBomberDefense;
+    $localBomberDemage = $localBomberAttack - $invasorBomberDefense;
+    $invasorCruiserDemage = $invasorCruiserAttack - $localCruiserDefense;
+    $localCruiserDemage = $localCruiserAttack - $invasorCruiserDefense;
+    $invasorScoutDemage = $invasorScoutAttack - $localScoutDefense;
+    $localScoutDemage = $localScoutAttack - $invasorScoutDefense;
+    $invasorStealthDemage = $invasorStealthAttack - $localStealthDefense;
+    $localStealthDemage = $localStealthAttack - $invasorStealthDefense;
+    $invasorFlagshipDemage = $invasorFlagshipAttack - $localFlagshipDefense;
+    $localFlagshipDemage = $localFlagshipAttack - $invasorFlagshipDefense;
+
+    foreach ($locals as $local) {
+      if ($localCraftDemage > 0) {
+        $kills = $invasorCraftDemage / Ship::SHIP_CRAFT_HP;
+        $kills = ceil($kills / count($locals));
+        if ($local->craft > 0) {
+          $local->craft -= $kills;
+          if ($local->craft < 0) {
+            $local->craft = 0;
+          }
+        }
+      }
+      if ($localBomberDemage > 0) {
+        $kills = $invasorBomberDemage / Ship::SHIP_BOMBER_HP;
+        $kills = ceil($kills / count($locals));
+        if ($local->bomber > 0) {
+          $local->bomber -= $kills;
+          if ($local->bomber < 0) {
+            $local->bomber = 0;
+          }
+        }
+      }
+      if ($localCruiserDemage > 0) {
+        $kills = $invasorCruiserDemage / Ship::SHIP_CRUISER_HP;
+        $kills = ceil($kills / count($locals));
+        if ($local->cruiser > 0) {
+          $local->cruiser -= $kills;
+          if ($local->cruiser < 0) {
+            $local->cruiser = 0;
+          }
+        }
+      }
+      if ($localScoutDemage > 0) {
+        $kills = $invasorScoutDemage / Ship::SHIP_SCOUT_HP;
+        $kills = ceil($kills / count($locals));
+        if ($local->scout > 0) {
+          $local->scout -= $kills;
+          if ($local->scout < 0) {
+            $local->scout = 0;
+          }
+        }
+      }
+      if ($localStealthDemage > 0) {
+        $kills = $invasorStealthDemage / Ship::SHIP_STEALTH_HP;
+        $kills = ceil($kills / count($locals));
+        if ($local->stealth > 0) {
+          $local->stealth -= $kills;
+          if ($local->stealth < 0) {
+            $local->stealth = 0;
+          }
+        }
+      }
+      if ($localFlagshipDemage > 0) {
+        $kills = $invasorFlagshipDemage / Ship::SHIP_FLAGSHIP_HP;
+        $kills = ceil($kills / count($locals));
+        if ($local->flagship > 0) {
+          $local->flagship -= $kills;
+          if ($local->flagship < 0) {
+            $local->flagship = 0;
+          }
+        }
+      }
+      $local->save();
+    }
+
+    foreach ($invasors as $invasor) {
+      if ($invasorCraftDemage > 0) {
+        $kills = $localCraftDemage / Ship::SHIP_CRAFT_HP;
+        $kills = ceil($kills / count($invasors));
+        if ($invasor->craft > 0) {
+          $invasor->craft -= $kills;
+          if ($invasor->craft < 0) {
+            $invasor->craft = 0;
+          }
+        }
+      }
+      if ($invasorBomberDemage > 0) {
+        $kills = $localBomberDemage / Ship::SHIP_BOMBER_HP;
+        $kills = ceil($kills / count($invasors));
+        if ($invasor->bomber > 0) {
+          $invasor->bomber -= $kills;
+          if ($invasor->bomber < 0) {
+            $invasor->bomber = 0;
+          }
+        }
+      }
+      if ($invasorCruiserDemage > 0) {
+        $kills = $localCruiserDemage / Ship::SHIP_CRUISER_HP;
+        $kills = ceil($kills / count($invasors));
+        if ($invasor->cruiser > 0) {
+          $invasor->cruiser -= $kills;
+          if ($invasor->cruiser < 0) {
+            $invasor->cruiser = 0;
+          }
+        }
+      }
+      if ($invasorScoutDemage > 0) {
+        $kills = $localScoutDemage / Ship::SHIP_SCOUT_HP;
+        $kills = ceil($kills / count($invasors));
+        if ($invasor->scout > 0) {
+          $invasor->scout -= $kills;
+          if ($invasor->scout < 0) {
+            $invasor->scout = 0;
+          }
+        }
+      }
+      if ($invasorStealthDemage > 0) {
+        $kills = $localStealthDemage / Ship::SHIP_STEALTH_HP;
+        $kills = ceil($kills / count($invasors));
+        if ($invasor->stealth > 0) {
+          $invasor->stealth -= $kills;
+          if ($invasor->stealth < 0) {
+            $invasor->stealth = 0;
+          }
+        }
+      }
       $invasor->save();
     }
   }

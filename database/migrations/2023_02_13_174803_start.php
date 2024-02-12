@@ -335,9 +335,9 @@ return new class extends Migration {
             $table->integer("action");
             $table->integer('strategy')->nullable();
             #ships
-            $table->integer('cruiser')->default(0);
             $table->integer('craft')->default(0);
             $table->integer('bomber')->default(0);
+            $table->integer('cruiser')->default(0);
             $table->integer('scout')->default(0);
             $table->integer('stealth')->default(0);
             $table->integer('flagship')->default(0);
@@ -452,9 +452,9 @@ return new class extends Migration {
             $table->bigInteger("start");
             $table->integer('stage');
             $table->integer("transportShips")->default(0);
-            $table->integer('cruiser')->default(0);
             $table->integer('craft')->default(0);
             $table->integer('bomber')->default(0);
+            $table->integer('cruiser')->default(0);
             $table->integer('scout')->default(0);
             $table->integer('stealth')->default(0);
             $table->integer('flagship')->default(0);
