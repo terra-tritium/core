@@ -434,7 +434,7 @@ return new class extends Migration {
             $table->integer("status");
             $table->string("invasorDemage")->nullable();
             $table->string("localDemage")->nullable();
-            $table->integer("result")->nullable();
+            $table->integer("winner")->nullable();
             $table->bigInteger("start");
             $table->integer("stage");
             $table->json('invasorZone')->nullable();
@@ -458,6 +458,12 @@ return new class extends Migration {
             $table->integer('scout')->default(0);
             $table->integer('stealth')->default(0);
             $table->integer('flagship')->default(0);
+            $table->integer('craft-kill')->default(0);
+            $table->integer('bomber-kill')->default(0);
+            $table->integer('cruiser-kill')->default(0);
+            $table->integer('scout-kill')->default(0);
+            $table->integer('stealth-kill')->default(0);
+            $table->integer('flagship-kill')->default(0);
         });
         Schema::create('stages', function (Blueprint $table) {
             $table->id();
@@ -485,8 +491,6 @@ return new class extends Migration {
             $table->string("x");
             $table->string("y");
         });
-
-
 
         /**
          *INICIO DAS TABELAS REFERENTE AO MERCADO

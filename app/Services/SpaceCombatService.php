@@ -7,11 +7,8 @@ use App\Models\CombatStage;
 use App\Models\Fighters;
 use App\Models\Planet;
 use App\Models\Ship;
-use App\Jobs\CombatJob;
-use App\Models\Building;
 use App\Models\Fleet;
-use App\Models\Travel;
-use App\Models\Troop;
+use App\Jobs\SpaceCombatJob;
 
 class SpaceCombatService
 {
@@ -120,7 +117,54 @@ class SpaceCombatService
     $invasors = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
     $locals = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_LOCAL])->get();
 
-    $this->resolve($invasors, $locals);
+    # Locals no more players
+    if ($locals->count() == 0) {
+      $this->finishCombat($combatId, Combat::SIDE_INVASOR);
+      return true;
+    }
+
+    # Invasors no more players
+    if ($invasors->count() == 0) {
+      $this->finishCombat($combatId, Combat::SIDE_LOCAL);
+      return true;
+    }
+
+    # Invasors win
+    if ($this->haveLocals($locals)) {
+      $this->resolve($invasors, $locals);
+    } else {
+      $this->finishCombat($combatId, Combat::SIDE_INVASOR);
+      return true;
+    }
+
+    # Locals win
+    if ($this->haveLocals($invasors)) {
+      $this->resolve($locals, $invasors);
+    } else {
+      $this->finishCombat($combatId, Combat::SIDE_LOCAL);
+      return true;
+    }
+
+    $combat->stage++;
+    $combat->save();
+
+    # Queue next stage
+    SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds(env('TRITIUM_COMBAT_STAGE_TIME')));
+  }
+
+  private function finishCombat($combatId, $winner) {
+    $combat = Combat::find($combatId);
+    $combat->status = Combat::STATUS_FINISH;
+    $combat->winner = $winner;
+    $combat->save();
+  }
+
+  private function haveLocals($locals) {
+    $ships = 0;
+    foreach ($locals as $local) {
+      $ships += $local->cruiser + $local->craft + $local->bomber + $local->scout + $local->stealth + $local->flagship;
+    }
+    return $ships > 0;
   }
 
   private function resolve($invasors, $locals) {
@@ -154,8 +198,6 @@ class SpaceCombatService
     $localFlagshipAttack = 0;
     $invasorFlagshipDefense = 0;
     $localFlagshipDefense = 0;
-
-    
 
     foreach ($invasors as $invasor) {
       if ($invasor->craft > 0) {
