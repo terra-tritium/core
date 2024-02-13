@@ -436,6 +436,7 @@ return new class extends Migration {
             $table->string("localDemage")->nullable();
             $table->integer("winner")->nullable();
             $table->bigInteger("start");
+            $table->bigInteger("nextStage")->nullable();
             $table->integer("stage");
             $table->json('invasorZone')->nullable();
             $table->json('localZone')->nullable();

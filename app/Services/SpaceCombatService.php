@@ -93,6 +93,8 @@ class SpaceCombatService
     }
     
     $player2->save();
+
+    $this->startCombat($combat->id);
   }
 
   public function startCombat($combatId) {
@@ -104,7 +106,11 @@ class SpaceCombatService
 
     $combat->status = Combat::STATUS_RUNNING;
     $combat->stage = 1;
+    $combat->nextStage = time() + env('TRITIUM_COMBAT_STAGE_TIME');
     $combat->save();
+
+    # Queue next stage
+    SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds(env('TRITIUM_COMBAT_STAGE_TIME')));
   }
 
   public function excuteStage($combatId) {
@@ -146,6 +152,7 @@ class SpaceCombatService
     }
 
     $combat->stage++;
+    $combat->nextStage = time() + env('TRITIUM_COMBAT_STAGE_TIME');
     $combat->save();
 
     # Queue next stage
