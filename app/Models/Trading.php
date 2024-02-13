@@ -24,28 +24,28 @@ class Trading extends Model
         'total',
         'createdAt',
         'updatedAt',
+        'distance'
     ];
 
     public function getDadosTradingByResourceAndMarket($idPlanetaLogado, $resource, $region, $type)
     {
       
         $trading = DB::table($this->table . ' as t')
-            ->select(
-                "t.*",
-                "p.name",
-                DB::raw("(SELECT origin.calc_distancia(p.id, $idPlanetaLogado)) AS distance"),
-            )
-            ->join('market as m', 'm.id', '=', 't.idMarket')
-            ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')
-            ->join('players as p', 'p.id', '=', 'planeta.id')
-            ->where('m.status', true)
-            ->where('t.status', env("TRITIUM_MARKET_STATUS_OPEN"))
-            ->where('m.region', '=', $region)
-            ->where('t.resource', '=', $resource)
-            ->where('t.type', '=', $type)
-            ->orderBy('distance')
-            // ->orderBy($columnOrder, $orderByDirection)
-            ->get();
+                            ->select(
+                                "t.*",
+                                "p.name"
+                            )
+                            ->join('market as m', 'm.id', '=', 't.idMarket')
+                            ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')
+                            ->join('players as p', 'p.id', '=', 'planeta.player')
+                            ->where('m.status', true)
+                            ->where('t.status', env("TRITIUM_MARKET_STATUS_OPEN"))
+                            ->where('m.region', '=', $region)
+                            ->where('t.resource', '=', $resource)
+                            ->where('t.type', '=', $type)
+                            ->orderBy('distance')
+                            // ->orderBy($columnOrder, $orderByDirection)
+                            ->get();
         return $trading;
     }
     public function getMyResources($player)

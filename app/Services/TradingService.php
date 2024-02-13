@@ -21,14 +21,11 @@ use Illuminate\Support\Facades\Log;
 
 class TradingService
 {
-    private $trading;
-    private $logbookController;
-    public function __construct(Trading $trading, LogbookController $logbookController)
-    {
-        $this->trading = $trading;
-        $this->logbookController = $logbookController;
-        
-    }
+    public function __construct(protected readonly Trading $trading, 
+                                protected readonly LogbookController $logbookController,
+                                protected readonly PlanetService $planetService)
+    {}
+
     public function getPlanetUserLogged()
     {
         $player = Player::getPlayerLogged();
@@ -202,7 +199,7 @@ class TradingService
                     $this->logbookController->notify($planetaPassivo->player, "O vendedor não possui recurso para concluir essa transação","Market");                    
                     return response(['message' => 'O vendedor não possui recurso para concluir essa transação', 'code' => 4005, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
-                $distance = $this->calcDistance($planeta[0], $planetaPassivo);
+                $distance = $this->planetService->calculeDistance($planeta[0], $planetaPassivo);
                 // Sair para a viagem antes de salvar na safe
                 if (!$this->safe($trading, $request, $distance)) {
                     return response(['message' => 'Algum erro na hora de comprar, verificar a causa', 'code' => 4006, 'success' => false], Response::HTTP_BAD_REQUEST);

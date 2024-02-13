@@ -528,7 +528,7 @@ return new class extends Migration {
             $table->foreign('idMarket')->references('id')->on('market');
 
             $table->unsignedInteger('quantity')->default(0)->change();
-
+            $table->unsignedInteger('distance')->default(0);
         });
         Schema::create('trading_finished', function (Blueprint $table) {
             $table->id();
