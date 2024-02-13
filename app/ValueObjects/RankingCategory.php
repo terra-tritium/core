@@ -14,6 +14,7 @@ class RankingCategory
     public const RESEARCH_SCORE = 'researchScore';
     public const MILITARY_SCORE = 'militaryScore';
     public const ENERGY = 'energy';
+    public const TRITIUM = 'tritium';
 
     private string $name;
     private string $displayName;
@@ -72,6 +73,11 @@ class RankingCategory
     public static function energy(): self
     {
         return new self(self::ENERGY, 'Energy');
+    }
+
+    public static function tritium(): self
+    {
+        return new self(self::TRITIUM, 'Tritium');
     }
 
     public function getName(): string

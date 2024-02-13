@@ -264,6 +264,7 @@ return new class extends Migration {
             $table->string("alianceName")->nullable();
             $table->bigInteger("energy");
             $table->bigInteger("score");
+            $table->bigInteger("tritium");
             $table->bigInteger("buildScore");
             $table->bigInteger("attackScore");
             $table->bigInteger("defenseScore");
