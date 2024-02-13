@@ -135,18 +135,18 @@ class SpaceCombatService
       return true;
     }
 
-    # Invasors win
     if ($this->haveLocals($locals)) {
       $this->resolve($invasors, $locals);
     } else {
+      # Invasors win
       $this->finishCombat($combatId, Combat::SIDE_INVASOR);
       return true;
     }
 
-    # Locals win
     if ($this->haveLocals($invasors)) {
       $this->resolve($locals, $invasors);
     } else {
+      # Locals win
       $this->finishCombat($combatId, Combat::SIDE_LOCAL);
       return true;
     }
@@ -207,40 +207,53 @@ class SpaceCombatService
     $localFlagshipDefense = 0;
 
     foreach ($invasors as $invasor) {
-      if ($invasor->craft > 0) {
-        $invasorCraftInBattle = $invasor->craft > $this->battleFieldSize ? $this->battleFieldSize : $invasor->craft;
-        $invasorBomberInBattle = $invasor->bomber > $this->battleFieldSize ? $this->battleFieldSize : $invasor->bomber;
 
-        $invasorCraftAttack += $invasorCraftInBattle * Ship::SHIP_CRAFT_ATTACK;
-        $invasorCraftDefense += $invasorBomberInBattle * Ship::SHIP_CRAFT_DEFENSE;
-        $invasorBomberAttack += $invasor->bomber * Ship::SHIP_BOMBER_ATTACK;
-        $invasorBomberDefense += $invasor->bomber * Ship::SHIP_BOMBER_DEFENSE;
-        $invasorCruiserAttack += $invasor->cruiser * Ship::SHIP_CRUISER_ATTACK;
-        $invasorCruiserDefense += $invasor->cruiser * Ship::SHIP_CRUISER_DEFENSE;
-        $invasorScoutAttack += $invasor->scout * Ship::SHIP_SCOUT_ATTACK;
-        $invasorScoutDefense += $invasor->scout * Ship::SHIP_SCOUT_DEFENSE;
-        $invasorStealthAttack += $invasor->stealth * Ship::SHIP_STEALTH_ATTACK;
-        $invasorStealthDefense += $invasor->stealth * Ship::SHIP_STEALTH_DEFENSE;
-        $invasorFlagshipAttack += $invasor->flagship * Ship::SHIP_FLAGSHIP_ATTACK;
-        $invasorFlagshipDefense += $invasor->flagship * Ship::SHIP_FLAGSHIP_DEFENSE;
-      }
+      # Adjust ships to battle field size
+      $invasorCraftInBattle = $invasor->craft > $this->battleFieldSize ? $this->battleFieldSize : $invasor->craft;
+      $invasorBomberInBattle = $invasor->bomber > $this->battleFieldSize ? $this->battleFieldSize : $invasor->bomber;
+      $invasorCruiserInBattle = $invasor->cruiser > $this->battleFieldSize ? $this->battleFieldSize : $invasor->cruiser;
+      $invasorScoutInBattle = $invasor->scout > $this->battleFieldSize ? $this->battleFieldSize : $invasor->scout;
+      $invasorStealthInBattle = $invasor->stealth > $this->battleFieldSize ? $this->battleFieldSize : $invasor->stealth;
+      $invasorFlagshipInBattle = $invasor->flagship > $this->battleFieldSize ? $this->battleFieldSize : $invasor->flagship;
+
+      # Calculate attack and defense
+      $invasorCraftAttack += $invasorCraftInBattle * Ship::SHIP_CRAFT_ATTACK;
+      $invasorCraftDefense += $invasorCraftInBattle * Ship::SHIP_CRAFT_DEFENSE;
+      $invasorBomberAttack += $invasorBomberInBattle * Ship::SHIP_BOMBER_ATTACK;
+      $invasorBomberDefense += $invasorBomberInBattle * Ship::SHIP_BOMBER_DEFENSE;
+      $invasorCruiserAttack += $invasorCruiserInBattle * Ship::SHIP_CRUISER_ATTACK;
+      $invasorCruiserDefense += $invasorCruiserInBattle * Ship::SHIP_CRUISER_DEFENSE;
+      $invasorScoutAttack += $invasorScoutInBattle * Ship::SHIP_SCOUT_ATTACK;
+      $invasorScoutDefense += $invasorScoutInBattle * Ship::SHIP_SCOUT_DEFENSE;
+      $invasorStealthAttack += $invasorStealthInBattle * Ship::SHIP_STEALTH_ATTACK;
+      $invasorStealthDefense += $invasorStealthInBattle * Ship::SHIP_STEALTH_DEFENSE;
+      $invasorFlagshipAttack += $invasorFlagshipInBattle * Ship::SHIP_FLAGSHIP_ATTACK;
+      $invasorFlagshipDefense += $invasorFlagshipInBattle * Ship::SHIP_FLAGSHIP_DEFENSE;
     }
 
     foreach ($locals as $local) {
-      if ($local->craft > 0) {
-        $localCraftAttack += $local->craft * Ship::SHIP_CRAFT_ATTACK;
-        $localCraftDefense += $local->craft * Ship::SHIP_CRAFT_DEFENSE;
-        $localBomberAttack += $local->bomber * Ship::SHIP_BOMBER_ATTACK;
-        $localBomberDefense += $local->bomber * Ship::SHIP_BOMBER_DEFENSE;
-        $localCruiserAttack += $local->cruiser * Ship::SHIP_CRUISER_ATTACK;
-        $localCruiserDefense += $local->cruiser * Ship::SHIP_CRUISER_DEFENSE;
-        $localScoutAttack += $local->scout * Ship::SHIP_SCOUT_ATTACK;
-        $localScoutDefense += $local->scout * Ship::SHIP_SCOUT_DEFENSE;
-        $localStealthAttack += $local->stealth * Ship::SHIP_STEALTH_ATTACK;
-        $localStealthDefense += $local->stealth * Ship::SHIP_STEALTH_DEFENSE;
-        $localFlagshipAttack += $local->flagship * Ship::SHIP_FLAGSHIP_ATTACK;
-        $localFlagshipDefense += $local->flagship * Ship::SHIP_FLAGSHIP_DEFENSE;
-      }
+        
+      # Adjust ships to battle field size
+      $localCraftInBattle = $local->craft > $this->battleFieldSize ? $this->battleFieldSize : $local->craft;
+      $localBomberInBattle = $local->bomber > $this->battleFieldSize ? $this->battleFieldSize : $local->bomber;
+      $localCruiserInBattle = $local->cruiser > $this->battleFieldSize ? $this->battleFieldSize : $local->cruiser;
+      $localScoutInBattle = $local->scout > $this->battleFieldSize ? $this->battleFieldSize : $local->scout;
+      $localStealthInBattle = $local->stealth > $this->battleFieldSize ? $this->battleFieldSize : $local->stealth;
+      $localFlagshipInBattle = $local->flagship > $this->battleFieldSize ? $this->battleFieldSize : $local->flagship;
+
+      # Calculate attack and defense
+      $localCraftAttack += $localCraftInBattle * Ship::SHIP_CRAFT_ATTACK;
+      $localCraftDefense += $localCraftInBattle * Ship::SHIP_CRAFT_DEFENSE;
+      $localBomberAttack += $localBomberInBattle * Ship::SHIP_BOMBER_ATTACK;
+      $localBomberDefense += $localBomberInBattle * Ship::SHIP_BOMBER_DEFENSE;
+      $localCruiserAttack += $localCruiserInBattle * Ship::SHIP_CRUISER_ATTACK;
+      $localCruiserDefense += $localCruiserInBattle * Ship::SHIP_CRUISER_DEFENSE;
+      $localScoutAttack += $localScoutInBattle * Ship::SHIP_SCOUT_ATTACK;
+      $localScoutDefense += $localScoutInBattle * Ship::SHIP_SCOUT_DEFENSE;
+      $localStealthAttack += $localStealthInBattle * Ship::SHIP_STEALTH_ATTACK;
+      $localStealthDefense += $localStealthInBattle * Ship::SHIP_STEALTH_DEFENSE;
+      $localFlagshipAttack += $localFlagshipInBattle * Ship::SHIP_FLAGSHIP_ATTACK;
+      $localFlagshipDefense += $localFlagshipInBattle * Ship::SHIP_FLAGSHIP_DEFENSE;
     }
 
     $invasorCraftDemage = $invasorCraftAttack - $localCraftDefense;
