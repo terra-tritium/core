@@ -14,7 +14,8 @@ class SpaceCombatService
 {
   private $battleFieldSize;
   private $currentStage;
-
+  private $randStart = 0;
+  private $randEnd = 3;
 
   public function __construct() {
     $this->battleFieldSize = 50;
@@ -135,7 +136,7 @@ class SpaceCombatService
       return true;
     }
 
-    if ($this->haveLocals($locals)) {
+    if ($this->haveShips($locals)) {
       $this->resolve($invasors, $locals);
     } else {
       # Invasors win
@@ -143,7 +144,7 @@ class SpaceCombatService
       return true;
     }
 
-    if ($this->haveLocals($invasors)) {
+    if ($this->haveShips($invasors)) {
       $this->resolve($locals, $invasors);
     } else {
       # Locals win
@@ -166,10 +167,10 @@ class SpaceCombatService
     $combat->save();
   }
 
-  private function haveLocals($locals) {
+  private function haveShips($fighters) {
     $ships = 0;
-    foreach ($locals as $local) {
-      $ships += $local->cruiser + $local->craft + $local->bomber + $local->scout + $local->stealth + $local->flagship;
+    foreach ($fighters as $figther) {
+      $ships += $figther->cruiser + $figther->craft + $figther->bomber + $figther->scout + $figther->stealth + $figther->flagship;
     }
     return $ships > 0;
   }
@@ -217,18 +218,18 @@ class SpaceCombatService
       $invasorFlagshipInBattle = $invasor->flagship > $this->battleFieldSize ? $this->battleFieldSize : $invasor->flagship;
 
       # Calculate attack and defense
-      $invasorCraftAttack += $invasorCraftInBattle * Ship::SHIP_CRAFT_ATTACK;
-      $invasorCraftDefense += $invasorCraftInBattle * Ship::SHIP_CRAFT_DEFENSE;
-      $invasorBomberAttack += $invasorBomberInBattle * Ship::SHIP_BOMBER_ATTACK;
-      $invasorBomberDefense += $invasorBomberInBattle * Ship::SHIP_BOMBER_DEFENSE;
-      $invasorCruiserAttack += $invasorCruiserInBattle * Ship::SHIP_CRUISER_ATTACK;
-      $invasorCruiserDefense += $invasorCruiserInBattle * Ship::SHIP_CRUISER_DEFENSE;
-      $invasorScoutAttack += $invasorScoutInBattle * Ship::SHIP_SCOUT_ATTACK;
-      $invasorScoutDefense += $invasorScoutInBattle * Ship::SHIP_SCOUT_DEFENSE;
-      $invasorStealthAttack += $invasorStealthInBattle * Ship::SHIP_STEALTH_ATTACK;
-      $invasorStealthDefense += $invasorStealthInBattle * Ship::SHIP_STEALTH_DEFENSE;
-      $invasorFlagshipAttack += $invasorFlagshipInBattle * Ship::SHIP_FLAGSHIP_ATTACK;
-      $invasorFlagshipDefense += $invasorFlagshipInBattle * Ship::SHIP_FLAGSHIP_DEFENSE;
+      $invasorCraftAttack     += ($invasorCraftInBattle    * Ship::SHIP_CRAFT_ATTACK     ) + rand($this->randStart, $this->randEnd);
+      $invasorCraftDefense    += ($invasorCraftInBattle    * Ship::SHIP_CRAFT_DEFENSE    ) + rand($this->randStart, $this->randEnd);
+      $invasorBomberAttack    += ($invasorBomberInBattle   * Ship::SHIP_BOMBER_ATTACK    ) + rand($this->randStart, $this->randEnd);
+      $invasorBomberDefense   += ($invasorBomberInBattle   * Ship::SHIP_BOMBER_DEFENSE   ) + rand($this->randStart, $this->randEnd);
+      $invasorCruiserAttack   += ($invasorCruiserInBattle  * Ship::SHIP_CRUISER_ATTACK   ) + rand($this->randStart, $this->randEnd);
+      $invasorCruiserDefense  += ($invasorCruiserInBattle  * Ship::SHIP_CRUISER_DEFENSE  ) + rand($this->randStart, $this->randEnd);
+      $invasorScoutAttack     += ($invasorScoutInBattle    * Ship::SHIP_SCOUT_ATTACK     ) + rand($this->randStart, $this->randEnd);
+      $invasorScoutDefense    += ($invasorScoutInBattle    * Ship::SHIP_SCOUT_DEFENSE    ) + rand($this->randStart, $this->randEnd);
+      $invasorStealthAttack   += ($invasorStealthInBattle  * Ship::SHIP_STEALTH_ATTACK   ) + rand($this->randStart, $this->randEnd);
+      $invasorStealthDefense  += ($invasorStealthInBattle  * Ship::SHIP_STEALTH_DEFENSE  ) + rand($this->randStart, $this->randEnd);
+      $invasorFlagshipAttack  += ($invasorFlagshipInBattle * Ship::SHIP_FLAGSHIP_ATTACK  ) + rand($this->randStart, $this->randEnd);
+      $invasorFlagshipDefense += ($invasorFlagshipInBattle * Ship::SHIP_FLAGSHIP_DEFENSE ) + rand($this->randStart, $this->randEnd);
     }
 
     foreach ($locals as $local) {
@@ -242,18 +243,18 @@ class SpaceCombatService
       $localFlagshipInBattle = $local->flagship > $this->battleFieldSize ? $this->battleFieldSize : $local->flagship;
 
       # Calculate attack and defense
-      $localCraftAttack += $localCraftInBattle * Ship::SHIP_CRAFT_ATTACK;
-      $localCraftDefense += $localCraftInBattle * Ship::SHIP_CRAFT_DEFENSE;
-      $localBomberAttack += $localBomberInBattle * Ship::SHIP_BOMBER_ATTACK;
-      $localBomberDefense += $localBomberInBattle * Ship::SHIP_BOMBER_DEFENSE;
-      $localCruiserAttack += $localCruiserInBattle * Ship::SHIP_CRUISER_ATTACK;
-      $localCruiserDefense += $localCruiserInBattle * Ship::SHIP_CRUISER_DEFENSE;
-      $localScoutAttack += $localScoutInBattle * Ship::SHIP_SCOUT_ATTACK;
-      $localScoutDefense += $localScoutInBattle * Ship::SHIP_SCOUT_DEFENSE;
-      $localStealthAttack += $localStealthInBattle * Ship::SHIP_STEALTH_ATTACK;
-      $localStealthDefense += $localStealthInBattle * Ship::SHIP_STEALTH_DEFENSE;
-      $localFlagshipAttack += $localFlagshipInBattle * Ship::SHIP_FLAGSHIP_ATTACK;
-      $localFlagshipDefense += $localFlagshipInBattle * Ship::SHIP_FLAGSHIP_DEFENSE;
+      $localCraftAttack     += ($localCraftInBattle    * Ship::SHIP_CRAFT_ATTACK     ) + rand($this->randStart, $this->randEnd);
+      $localCraftDefense    += ($localCraftInBattle    * Ship::SHIP_CRAFT_DEFENSE    ) + rand($this->randStart, $this->randEnd);
+      $localBomberAttack    += ($localBomberInBattle   * Ship::SHIP_BOMBER_ATTACK    ) + rand($this->randStart, $this->randEnd);
+      $localBomberDefense   += ($localBomberInBattle   * Ship::SHIP_BOMBER_DEFENSE   ) + rand($this->randStart, $this->randEnd);
+      $localCruiserAttack   += ($localCruiserInBattle  * Ship::SHIP_CRUISER_ATTACK   ) + rand($this->randStart, $this->randEnd);
+      $localCruiserDefense  += ($localCruiserInBattle  * Ship::SHIP_CRUISER_DEFENSE  ) + rand($this->randStart, $this->randEnd);
+      $localScoutAttack     += ($localScoutInBattle    * Ship::SHIP_SCOUT_ATTACK     ) + rand($this->randStart, $this->randEnd);
+      $localScoutDefense    += ($localScoutInBattle    * Ship::SHIP_SCOUT_DEFENSE    ) + rand($this->randStart, $this->randEnd);
+      $localStealthAttack   += ($localStealthInBattle  * Ship::SHIP_STEALTH_ATTACK   ) + rand($this->randStart, $this->randEnd);
+      $localStealthDefense  += ($localStealthInBattle  * Ship::SHIP_STEALTH_DEFENSE  ) + rand($this->randStart, $this->randEnd);
+      $localFlagshipAttack  += ($localFlagshipInBattle * Ship::SHIP_FLAGSHIP_ATTACK  ) + rand($this->randStart, $this->randEnd);
+      $localFlagshipDefense += ($localFlagshipInBattle * Ship::SHIP_FLAGSHIP_DEFENSE ) + rand($this->randStart, $this->randEnd);
     }
 
     $invasorCraftDemage = $invasorCraftAttack - $localCraftDefense;
