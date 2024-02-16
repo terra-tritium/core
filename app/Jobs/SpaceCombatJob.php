@@ -3,14 +3,12 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-use App\Models\Combat;
-use App\Services\CombatService;
+use App\Services\SpaceCombatService;
 
 class SpaceCombatJob implements ShouldQueue
 {
@@ -24,9 +22,9 @@ class SpaceCombatJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($spaceCombatService, $combatId)
+    public function __construct($combatId)
     {
-        $this->spaceCombatService = $spaceCombatService;
+        $this->spaceCombatService = new SpaceCombatService();
         $this->combatId = $combatId;
     }
 

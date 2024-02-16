@@ -351,7 +351,7 @@ return new class extends Migration {
             $table->string("type");
             $table->integer("defense");
             $table->integer("attack");
-            $table->integer("life");
+            $table->integer("hp");
             $table->bigInteger("metal");
             $table->bigInteger("uranium");
             $table->bigInteger("crystal");
@@ -368,7 +368,7 @@ return new class extends Migration {
             $table->integer("size");
             $table->integer("defense");
             $table->integer("attack");
-            $table->integer("life");
+            $table->integer("hp");
             $table->bigInteger("metal");
             $table->bigInteger("uranium");
             $table->bigInteger("crystal");
@@ -436,6 +436,7 @@ return new class extends Migration {
             $table->string("localDemage")->nullable();
             $table->integer("winner")->nullable();
             $table->bigInteger("start");
+            $table->bigInteger("nextStage")->nullable();
             $table->integer("stage");
             $table->json('invasorZone')->nullable();
             $table->json('localZone')->nullable();

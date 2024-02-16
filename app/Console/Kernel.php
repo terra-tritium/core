@@ -41,6 +41,7 @@ class Kernel extends ConsoleKernel
                 $ranking->attackScore = $p->attackScore;
                 $ranking->defenseScore = $p->defenseScore;
                 $ranking->militaryScore = $p->militaryScore;
+                $ranking->tritium = $p->tritium;
                 $ranking->save();
             }
         })->everyThirtyMinutes();

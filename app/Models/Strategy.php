@@ -11,6 +11,7 @@ class Strategy extends Model
     use HasFactory;
     protected $table = 'strategies';
     public $timestamps = false;
+    
 
     public function getStrategies($planet)
     {

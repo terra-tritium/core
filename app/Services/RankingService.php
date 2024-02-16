@@ -46,6 +46,12 @@ class RankingService
                 case RankingCategory::BUILD_SCORE:
                     $query->orderBy(RankingCategory::BUILD_SCORE, 'desc');
                     break;
+                case RankingCategory::TRITIUM:
+                    $query->orderBy(RankingCategory::TRITIUM, 'desc');
+                    break;
+                case RankingCategory::ENERGY:
+                    $query->orderBy(RankingCategory::ENERGY, 'desc');
+                    break;
                 default:
                     $query->orderBy(RankingCategory::SCORE, 'desc');
                     break;
