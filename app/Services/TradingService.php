@@ -226,7 +226,7 @@ class TradingService
                 } else {
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
-                $distance = $this->calcDistance($planeta[0], $planetaPassivo);
+                $distance = $this->planetService->calculeDistance($planeta[0], $planetaPassivo);
                 if (!$this->safe($trading, $request, $distance)) {
                     return response(['message' => 'Algum erro na hora de vender, verificar a causa', 'code' => 4009, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
