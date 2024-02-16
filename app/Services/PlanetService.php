@@ -184,7 +184,7 @@ public function currentBalance($p1, $type) {
     $arrayRegion = ['A'=>0,'B'=>1,'C'=>2,'D'=>3,'E'=>4,'F'=>5,'G'=>6,'H'=>7,'I'=>8,'J'=>9,'K'=>10,'L'=>11,'M'=>12,'N'=>13,'O'=>14,'P'=>15];
     $result       = 0.5;
     $qtdQuadrante = 100;
-    $wight_time_secund = env('WEIGHT_TIME_SECOND'); 
+    $wight_time_secund = env('TRITIUM_WEIGHT_TIME_SECOND'); 
 
     $originModel     = Planet::findOrFail($origin);
     $destinyModel    = Planet::findOrFail($destiny);

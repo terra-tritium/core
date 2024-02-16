@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\DB;
 
 class Trading extends Model
 {
+    private $tritium_market_status_canceled = 0;
+    private $tritium_market_status_open = 1 ; 
+    private $tritium_market_status_finished = 2;
+    private $tritium_market_status_pending = 3;
+
+
     use HasFactory;
     protected $table = 'trading';
     public $timestamps = false;
@@ -24,6 +30,7 @@ class Trading extends Model
         'total',
         'createdAt',
         'updatedAt',
+        'distance'
     ];
 
     public function getDadosTradingByResourceAndMarket($idPlanetaLogado, $resource, $region, $type)
@@ -37,9 +44,9 @@ class Trading extends Model
             )
             ->join('market as m', 'm.id', '=', 't.idMarket')
             ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')
-            ->join('players as p', 'p.id', '=', 'planeta.id')
+            ->join('players as p', 'p.id', '=', 'planeta.player')
             ->where('m.status', true)
-            ->where('t.status', env("TRITIUM_MARKET_STATUS_OPEN"))
+            ->where('t.status',  $this->tritium_market_status_open)
             ->where('m.region', '=', $region)
             ->where('t.resource', '=', $resource)
             ->where('t.type', '=', $type)
@@ -47,6 +54,7 @@ class Trading extends Model
             // ->orderBy($columnOrder, $orderByDirection)
             ->get();
         return $trading;
+
     }
     public function getMyResources($player)
     {
@@ -60,7 +68,7 @@ class Trading extends Model
         $resources = DB::table('planets as p')
             ->leftJoin('trading as t', function ($join) {
                 $join->on('p.player', '=', 't.idPlanetCreator')
-                    ->where('t.status', env("TRITIUM_MARKET_STATUS_OPEN"))
+                    ->where('t.status', $this->tritium_market_status_open)
                     ->where('t.type', 'S');
             })
             ->where('p.player', $player)
@@ -76,7 +84,7 @@ class Trading extends Model
     }
     public function getAllOrderPlayer($player, $resource)
     {
-        $status = [env("TRITIUM_MARKET_STATUS_OPEN"), env("TRITIUM_MARKET_STATUS_PENDING")];
+        $status = [$this->tritium_market_status_open, $this->tritium_market_status_pending];
         $orders = DB::table($this->table . ' as t')
             ->select(
                 't.id',

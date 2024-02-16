@@ -529,7 +529,7 @@ return new class extends Migration {
             $table->foreign('idMarket')->references('id')->on('market');
 
             $table->unsignedInteger('quantity')->default(0)->change();
-
+            $table->unsignedInteger('distance')->default(0);
         });
         Schema::create('trading_finished', function (Blueprint $table) {
             $table->id();
@@ -619,38 +619,85 @@ return new class extends Migration {
          */
         
 
-        DB::unprepared('
-                CREATE FUNCTION calc_distancia(idPlaneta1 INT, idPlaneta2 INT)
-                RETURNS INT
-                DETERMINISTIC
-                READS SQL DATA
-                BEGIN
-                    DECLARE regiao1 INT;
-                    DECLARE regiao2 INT;
-                    DECLARE quadrant1 INT;
-                    DECLARE quadrant2 INT;
-                    DECLARE position1 INT;
-                    DECLARE position2 INT;
-                    DECLARE diffRegiao INT;
-                    DECLARE diffQuadrant INT;
-                    DECLARE diffPosition INT;
-                    DECLARE distancia INT;
-
-                    SELECT ASCII(region) INTO regiao1 FROM planets WHERE id = idPlaneta1;
-                    SELECT ASCII(region) INTO regiao2 FROM planets WHERE id = idPlaneta2;
-                    SELECT CAST(SUBSTRING(quadrant, 2, 4) AS SIGNED) INTO quadrant1 FROM planets WHERE id = idPlaneta1;
-                    SELECT CAST(SUBSTRING(quadrant, 2, 4) AS SIGNED) INTO quadrant2 FROM planets WHERE id = idPlaneta2;
-                    SELECT `position` INTO position1 FROM planets WHERE id = idPlaneta1;
-                    SELECT `position` INTO position2 FROM planets WHERE id = idPlaneta2;
-
-                    SET diffRegiao = ABS(regiao1 - regiao2);
-                    SET diffQuadrant = ABS(quadrant1 - quadrant2);
-                    SET diffPosition = ABS(position1 - position2);
-                    SET distancia = (diffRegiao * 100) + (diffQuadrant * 10) + diffPosition;
-
-                    RETURN distancia;
-                END
-        ');
+        DB::unprepared("
+                        CREATE FUNCTION calc_distancia(idPlaneta1 INT, idPlaneta2 INT, wight_time_secund INT)
+                        RETURNS INT
+                        DETERMINISTIC
+                        READS SQL DATA
+                        BEGIN
+                            
+                            DECLARE qtdQuadrante INT;
+                            
+                            DECLARE regionOrigin VARCHAR(2);
+                            DECLARE regionDestiny VARCHAR(2);
+                            
+                            DECLARE quatrandOrigin INT;
+                            DECLARE quatrandDestiny INT;
+                            
+                            DECLARE quatrandOriginLimit INT;
+                            DECLARE quatrandDestinyLimit INT;
+                            
+                            DECLARE distancia FLOAT;
+                        
+                            SELECT  region INTO regionOrigin FROM planets WHERE id = idPlaneta1;
+                            SELECT  region INTO regionDestiny FROM planets WHERE id = idPlaneta2;
+                            SET qtdQuadrante =  100;
+                            set distancia = 0.5;
+                        
+                            SELECT  	
+                                case 
+                                    when substr(quadrant,1,1) = 'A' then 0
+                                    when substr(quadrant,1,1) = 'B' then 1
+                                    when substr(quadrant,1,1) = 'C' then 2
+                                    when substr(quadrant,1,1) = 'D' then 3
+                                    when substr(quadrant,1,1) = 'E' then 4
+                                    when substr(quadrant,1,1) = 'F' then 5
+                                    when substr(quadrant,1,1) = 'G' then 6
+                                    when substr(quadrant,1,1) = 'H' then 7
+                                    when substr(quadrant,1,1) = 'I' then 8
+                                    when substr(quadrant,1,1) = 'J' then 9
+                                    when substr(quadrant,1,1) = 'K' then 10
+                                    when substr(quadrant,1,1) = 'L' then 11
+                                    when substr(quadrant,1,1) = 'M' then 12
+                                    when substr(quadrant,1,1) = 'N' then 13
+                                    when substr(quadrant,1,1) = 'O' then 14
+                                    when substr(quadrant,1,1) = 'P' then 15
+                                end,SUBSTR(quadrant,2,3)  INTO quatrandOriginLimit,quatrandOrigin
+                            FROM planets WHERE id = idPlaneta1;
+                            
+                            SELECT   
+                                case 
+                                    when substr(quadrant,1,1) = 'A' then 0
+                                    when substr(quadrant,1,1) = 'B' then 1
+                                    when substr(quadrant,1,1) = 'C' then 2
+                                    when substr(quadrant,1,1) = 'D' then 3
+                                    when substr(quadrant,1,1) = 'E' then 4
+                                    when substr(quadrant,1,1) = 'F' then 5
+                                    when substr(quadrant,1,1) = 'G' then 6
+                                    when substr(quadrant,1,1) = 'H' then 7
+                                    when substr(quadrant,1,1) = 'I' then 8
+                                    when substr(quadrant,1,1) = 'J' then 9
+                                    when substr(quadrant,1,1) = 'K' then 10
+                                    when substr(quadrant,1,1) = 'L' then 11
+                                    when substr(quadrant,1,1) = 'M' then 12
+                                    when substr(quadrant,1,1) = 'N' then 13
+                                    when substr(quadrant,1,1) = 'O' then 14
+                                    when substr(quadrant,1,1) = 'P' then 15
+                                end,SUBSTR(quadrant,2,3) INTO quatrandDestinyLimit,quatrandDestiny
+                            FROM planets WHERE id = idPlaneta2;
+                            
+                            IF regionOrigin <>  regionDestiny then 
+                                SET distancia = abs(quatrandOriginLimit - quatrandDestinyLimit) ;
+                                SET distancia = distancia * qtdQuadrante ;
+                            END IF;
+                            
+                            IF quatrandDestiny  <>  quatrandOrigin  AND regionOrigin  =  regionDestiny then 
+                                SET distancia = ABS(ABS(quatrandOrigin ) - ABS(quatrandDestiny * 1)); 
+                            END IF;
+                            
+                            RETURN (distancia * wight_time_secund);
+                        END
+        ");
 
 
     }
