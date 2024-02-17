@@ -620,7 +620,7 @@ return new class extends Migration {
         
 
         DB::unprepared("
-                        CREATE FUNCTION calc_distancia(idPlaneta1 INT, idPlaneta2 INT, wight_time_secund INT)
+                        CREATE FUNCTION calc_distancia(idPlaneta1 INT, idPlaneta2 INT)
                         RETURNS INT
                         DETERMINISTIC
                         READS SQL DATA
@@ -695,7 +695,7 @@ return new class extends Migration {
                                 SET distancia = ABS(ABS(quatrandOrigin ) - ABS(quatrandDestiny * 1)); 
                             END IF;
                             
-                            RETURN (distancia * wight_time_secund);
+                            RETURN distancia;
                         END
         ");
 

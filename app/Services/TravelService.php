@@ -458,7 +458,9 @@ class TravelService
     }
 
     private function getMissionsByAction($action) {
-        return Travel::with('from', 'to')->where([['action', $action], ['status', 1]])->orderBy('arrival')->get();
+        return Travel::with('from', 'to')
+                                        ->where([['action', $action], ['status', Travel::STATUS_ON_LOAD]])
+                                        ->orderBy('arrival')->get();
     }
 
     public function starCombatTravel($travel)

@@ -47,7 +47,6 @@ class ResourceService
         $planetOrigin->save();
 
         #Job carregamento recursos
-        $tempo_de_carregamento_carga = 5 ;
         ResourceJob::dispatch(
             $this->travelService,
             $planetOrigin->id, 
@@ -56,7 +55,7 @@ class ResourceService
             $uranium, 
             $crystal, 
             $transportShipsInUse
-        )->delay(now()->addSeconds($tempo_de_carregamento_carga));
+        )->delay(now()->addSeconds(env("TRITIUM_CHARGING_SPEED")));
 
         return response()->json(["message" => "atualizados"], Response::HTTP_OK);
 
