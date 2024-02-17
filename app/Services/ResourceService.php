@@ -25,10 +25,9 @@ class ResourceService
         $uranium = $request->input("uranium");
         $crystal = $request->input("crystal");
 
-        if ($planetOrigin->metal < $metal && $planetOrigin->uranium < $uranium && $planetOrigin->crystal < $crystal) 
-        {
-            return response()->json(["error" => "You do not have sufficient resources to send"], Response::HTTP_BAD_REQUEST);
-        }
+        if ($planetOrigin->metal < $metal) return response()->json(["error" => "You do not have sufficient resources to send"], Response::HTTP_BAD_REQUEST);
+        if ($planetOrigin->uranium < $uranium) return response()->json(["error" => "You do not have sufficient resources to send"], Response::HTTP_BAD_REQUEST);
+        if ($planetOrigin->crystal < $crystal) return response()->json(["error" => "You do not have sufficient resources to send"], Response::HTTP_BAD_REQUEST);
         
         $capacityTransportShips =  $planetOrigin->transportShips * env("TRITIUM_TRANSPORTSHIP_CAPACITY");
         $totalRecursos  = $metal + $uranium + $crystal ;
