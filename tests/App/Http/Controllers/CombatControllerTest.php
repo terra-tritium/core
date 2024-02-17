@@ -37,9 +37,7 @@ class CombatControllerTest extends TestCase
     # php artisan test --filter=CombatControllerTest::test_combat_start
     public function test_combat_start()
     {
-
-        $combatService = new CombatService();
-        $travelService = new TravelService($combatService);   
+        $travelService = new TravelService();   
         $response = $travelService->starCombatTravel(1);
         
         dd('Test end');

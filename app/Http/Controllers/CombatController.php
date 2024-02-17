@@ -20,16 +20,14 @@ use Illuminate\Support\Facades\DB;
 
 class CombatController extends Controller
 {
-    protected $combatService;
-    protected $playerService;
-    protected $travelService;
 
-    public function __construct(CombatService $combatService, PlayerService $playerService, TravelService $travelService)
-    {
-        $this->combatService = $combatService;
-        $this->playerService = $playerService;
-        $this->travelService = $travelService;
-    }
+    public function __construct(
+        protected readonly CombatService $combatService, 
+        protected readonly PlayerService $playerService, 
+        protected readonly TravelService $travelService,
+        protected readonly ResourceService $resourceService
+        )
+    {}
 
     // public function attackModeList() {
     //     return AttackMode::orderBy("code")->get();
@@ -192,8 +190,7 @@ class CombatController extends Controller
         if (!$player) {
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
-        $resourceService = new ResourceService();
-        return $resourceService->sendResources($request);
+        return $this->resourceService->sendResources($request);
     }
 
     public function calculateStage($combatId){
