@@ -10,20 +10,25 @@ use Illuminate\Queue\SerializesModels;
 
 use App\Models\Travel;
 use App\Services\SpaceCombatService;
+use App\Services\TravelService;
 
 class TravelJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $travel;
+    private $travelService;
+    private $back;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($travel)
+    public function __construct($travelService, $travel,$back)
     {
         $this->travel = $travel;
+        $this->travelService  = $travelService;
+        $this->back = $back;
     }
 
     /**
@@ -53,7 +58,7 @@ class TravelJob implements ShouldQueue
                     //$this->travelService->starCombatTravel($this->travel);
                     break;
                 case Travel::TRANSPORT_RESOURCE:
-                    //$this->travelService->starTransportResource($this->travel);
+                    $this->travelService->arrivedTransportResource($this->travel,$this->back);
                     break;
                 case Travel::TRANSPORT_BUY:
                     //$this->travelService->starTransportBuy($this->travel);

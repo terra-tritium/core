@@ -35,12 +35,12 @@ class Trading extends Model
 
     public function getDadosTradingByResourceAndMarket($idPlanetaLogado, $resource, $region, $type)
     {
-      
+        $tritium_weight_time_second = env("TRITIUM_WEIGHT_TIME_SECOND") ;
         $trading = DB::table($this->table . ' as t')
             ->select(
                 "t.*",
                 "p.name",
-                DB::raw("(SELECT origin.calc_distancia(p.id, $idPlanetaLogado)) AS distance"),
+                DB::raw("(SELECT origin.calc_distancia(p.id, $idPlanetaLogado, $tritium_weight_time_second)) AS distance"),
             )
             ->join('market as m', 'm.id', '=', 't.idMarket')
             ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')

@@ -11,14 +11,17 @@ use App\Models\Troop;
 use App\Models\Fleet;
 use App\Models\Unit;
 use App\Models\Player;
+use App\Http\Controllers\LogbookController;
 
 class TravelService
 {
-    private  $combatService;
+    public $planetService;
+    public $combatService;
 
-    public function __construct(CombatService $combatService) {
-        $this->combatService = $combatService;
-        
+    public function __construct( CombatService $combatService, PlanetService $planetService) 
+    {
+        $this->planetService =  $planetService ;
+        $this->combatService =  $combatService  ;
     }
 
     public function start ($player, $travel) {
@@ -55,7 +58,7 @@ class TravelService
         }
 
         $now = time();
-        $travelTime = env("TRITIUM_TRAVEL_SPEED") * $this->calcDistance($travel->from, $travel->to);
+        $travelTime = env("TRITIUM_TRAVEL_SPEED") * $this->planetService->calculeDistance($travel->from, $travel->to);
         $newTravel->from = $travel->from;
         $newTravel->to = $travel->to;
         $newTravel->action = $travel->action;
@@ -80,7 +83,7 @@ class TravelService
                 $newTravel = $this->startDefenseTroop($newTravel);
                 break;
             case Travel::TRANSPORT_RESOURCE:
-                $newTravel = $this->startTransportResource($newTravel);
+                $newTravel = $this->startTransportResource($newTravel, $travel);
                 break;
             case Travel::TRANSPORT_BUY:
                 $newTravel = $this->startTransportBuy($newTravel);
@@ -101,7 +104,7 @@ class TravelService
         }
         
         $newTravel->save();
-        TravelJob::dispatch($newTravel->id)->delay(now()->addSeconds($travelTime));
+        TravelJob::dispatch($this,$newTravel->id, back: false)->delay(now()->addSeconds($travelTime));
     }
 
     private function startAttackFleet($travel, $req, $player) {
@@ -156,26 +159,26 @@ class TravelService
 
     }
 
-    private function startTransportResource($travel) {
+    private function startTransportResource($newTravel,$travel) {
         # Metal
         if (isset($travel->metal)) {
-            $travel->metal = $travel->metal;
+            $newTravel->metal = $travel->metal;
         } else {
-            $travel->metal = 0;
+            $newTravel->metal = 0;
         }
         # Crystal
         if (isset($travel->crystal)) {
-            $travel->crystal = $travel->crystal;
+            $newTravel->crystal = $travel->crystal;
         } else {
-            $travel->crystal = 0;
+            $newTravel->crystal = 0;
         }
         # Uranium
         if (isset($travel->uranium)) {
-            $travel->uranium = $travel->uranium;
+            $newTravel->uranium = $travel->uranium;
         } else {
-            $travel->uranium = 0;
+            $newTravel->uranium = 0;
         }
-        return $travel;
+        return $newTravel;
     }
 
     private function startTransportBuy($travel) {
@@ -202,7 +205,7 @@ class TravelService
         $currentTravel->delete();
         $newTravel->save();
 
-        TravelJob::dispatch($newTravel->id)->delay(now()->addSeconds($travelTime / 1000));
+        TravelJob::dispatch($this,$newTravel->id,back: true)->delay(now()->addSeconds($travelTime / 1000));
     }
 
     public function calcDistance($from, $to) {
@@ -476,4 +479,27 @@ class TravelService
         $this->combatService->startNewCombat($attack->id,  $defense->id, $aUnits, $dUnits, $aStrategy, $dStrategy, $dPlanet);
     }
 
+    public function arrivedTransportResource($travel,$back)
+    {
+        $travelModel = Travel::findOrFail($travel);
+
+        if($back)
+        {
+            $planetOrige = Planet::findOrFail($travelModel->from);
+            $planetOrige->transportShips += $travelModel->transportShips ;
+            $planetOrige->save();
+        }else{
+            $planetTarget = Planet::findOrFail($travelModel->to);
+          
+            $planetTarget->metal += $travelModel->metal;
+            $planetTarget->uranium += $travelModel->uranium;
+            $planetTarget->crystal += $travelModel->crystal;
+            $planetTarget->save();
+    
+            $controller = new LogbookController();
+            $controller->notify($planetTarget->player, "You received a resource", "Combat");
+        }
+       
+        
+    }
 }
