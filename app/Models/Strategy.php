@@ -12,6 +12,17 @@ class Strategy extends Model
     protected $table = 'strategies';
     public $timestamps = false;
     
+    const LINE = 1;
+    const SNIPER = 2;
+    const GUERRILHA = 3;
+    const DIAMOND = 4;
+    const WEDGE = 5;
+    const STAR = 6;
+    const DELTA = 7;
+    const DIAGONAL = 8;
+    const COLUMN = 9;
+    const DUAL_COLUMN = 10;
+    const FLANKS = 11;
 
     public function getStrategies($planet)
     {
