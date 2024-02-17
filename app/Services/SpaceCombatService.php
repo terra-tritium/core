@@ -3,23 +3,21 @@
 namespace App\Services;
 
 use App\Models\Combat;
-use App\Models\CombatStage;
 use App\Models\Fighters;
 use App\Models\Planet;
 use App\Models\Ship;
 use App\Models\Fleet;
+use App\Models\Strategy;
 use App\Jobs\SpaceCombatJob;
 
 class SpaceCombatService
 {
   private $battleFieldSize;
-  private $currentStage;
   private $randStart = 0;
-  private $randEnd = 3;
+  private $randEnd = 5;
 
   public function __construct() {
     $this->battleFieldSize = 50;
-    $this->currentStage = new CombatStage();
   }
 
   public function createNewCombat ($travel) {
@@ -175,6 +173,30 @@ class SpaceCombatService
     return $ships > 0;
   }
 
+  private function getDemageEffects($p1StrategyId, $p2StrategyId) {
+    $p1Strategy = Strategy::find($p1StrategyId);
+    $p2Strategy = Strategy::find($p2StrategyId);
+
+    if ($p1Strategy && $p2Strategy) {
+      $effects = $p1Strategy->attack - $p2Strategy->defense;
+    }
+
+    return $effects;
+  }
+
+  private function applyDemage($demage, $figther, $hp, $qtdPlayers, $effects, $ship) {
+    $demage = $demage + $effects;
+    $kills = $demage / $hp;
+    $kills = ceil($kills / $qtdPlayers);
+    if ($figther->$$ship > 0) {
+      $figther->$$ship -= $kills;
+      if ($figther->$$ship < 0) {
+        $figther->$$ship = 0;
+      }
+    }
+    return $figther;
+  }
+
   private function resolve($invasors, $locals) {
 
     $invasorCraftAttack = 0;
@@ -257,6 +279,7 @@ class SpaceCombatService
       $localFlagshipDefense += ($localFlagshipInBattle * Ship::SHIP_FLAGSHIP_DEFENSE ) + rand($this->randStart, $this->randEnd);
     }
 
+    # Calculate demage
     $invasorCraftDemage = $invasorCraftAttack - $localCraftDefense;
     $localCraftDemage = $localCraftAttack - $invasorCraftDefense;
     $invasorBomberDemage = $invasorBomberAttack - $localBomberDefense;
@@ -270,163 +293,109 @@ class SpaceCombatService
     $invasorFlagshipDemage = $invasorFlagshipAttack - $localFlagshipDefense;
     $localFlagshipDemage = $localFlagshipAttack - $invasorFlagshipDefense;
 
+    # get effect locals
+    $effects = $this->getDemageEffects($locals[0]->strategy, $invasors[0]->strategy);
+
+    # Apply demage
     foreach ($locals as $local) {
       if ($invasorCraftDemage > 0) {
-        $kills = $invasorCraftDemage / Ship::SHIP_CRAFT_HP;
-        $kills = ceil($kills / count($locals));
         if ($local->craft > 0) {
-          $local->craft -= $kills;
+          $local = $this->applyDemage($invasorCraftDemage, $local, Ship::SHIP_CRAFT_HP, count($locals), $effects, 'craft');
           $invasorCraftDemage = 0;
-          if ($local->craft < 0) {
-            $local->craft = 0;
-          }
         }
       }
       $invasorBomberDemage += $invasorCraftDemage;
 
       if ($invasorBomberDemage > 0) {
-        $kills = $invasorBomberDemage / Ship::SHIP_BOMBER_HP;
-        $kills = ceil($kills / count($locals));
         if ($local->bomber > 0) {
-          $local->bomber -= $kills;
+          $local = $this->applyDemage($invasorBomberDemage, $local, Ship::SHIP_BOMBER_HP, count($locals), $effects, 'bomber');
           $invasorBomberDemage = 0;
-          if ($local->bomber < 0) {
-            $local->bomber = 0;
-          }
-        } else {
-          $invasorCruiserDemage += $invasorBomberDemage;
         }
       }
       $invasorCruiserDemage += $invasorBomberDemage;
 
       if ($invasorCruiserDemage > 0) {
-        $kills = $invasorCruiserDemage / Ship::SHIP_CRUISER_HP;
-        $kills = ceil($kills / count($locals));
         if ($local->cruiser > 0) {
-          $local->cruiser -= $kills;
+          $local = $this->applyDemage($invasorCruiserDemage, $local, Ship::SHIP_CRUISER_HP, count($locals), $effects, 'cruiser');
           $invasorCruiserDemage = 0;
-          if ($local->cruiser < 0) {
-            $local->cruiser = 0;
-          }
         }
       }
       $invasorScoutDemage += $invasorCruiserDemage;
 
       if ($invasorScoutDemage > 0) {
-        $kills = $invasorScoutDemage / Ship::SHIP_SCOUT_HP;
-        $kills = ceil($kills / count($locals));
         if ($local->scout > 0) {
-          $local->scout -= $kills;
+          $local = $this->applyDemage($invasorScoutDemage, $local, Ship::SHIP_SCOUT_HP, count($locals), $effects, 'scout');
           $invasorScoutDemage = 0;
-          if ($local->scout < 0) {
-            $local->scout = 0;
-          }
         }
       }
       $invasorStealthDemage += $invasorScoutDemage;
 
       if ($invasorStealthDemage > 0) {
-        $kills = $invasorStealthDemage / Ship::SHIP_STEALTH_HP;
-        $kills = ceil($kills / count($locals));
         if ($local->stealth > 0) {
-          $local->stealth -= $kills;
+          $local = $this->applyDemage($invasorStealthDemage, $local, Ship::SHIP_STEALTH_HP, count($locals), $effects, 'stealth');
           $invasorStealthDemage = 0;
-          if ($local->stealth < 0) {
-            $local->stealth = 0;
-          }
         }
       }
       $invasorFlagshipDemage += $invasorStealthDemage;
 
       if ($localFlagshipDemage > 0) {
-        $kills = $invasorFlagshipDemage / Ship::SHIP_FLAGSHIP_HP;
-        $kills = ceil($kills / count($locals));
         if ($local->flagship > 0) {
-          $local->flagship -= $kills;
+          $local = $this->applyDemage($invasorFlagshipDemage, $local, Ship::SHIP_FLAGSHIP_HP, count($locals), $effects, 'flagship');
           $invasorFlagshipDemage = 0;
-          if ($local->flagship < 0) {
-            $local->flagship = 0;
-          }
         }
       }
+
       $local->save();
     }
 
+    # get effect invasors
+    $effects = $this->getDemageEffects($invasors[0]->strategy, $locals[0]->strategy);
+
     foreach ($invasors as $invasor) {
       if ($localCraftDemage > 0) {
-        $kills = $localCraftDemage / Ship::SHIP_CRAFT_HP;
-        $kills = ceil($kills / count($invasors));
         if ($invasor->craft > 0) {
-          $invasor->craft -= $kills;
+          $invasor = $this->applyDemage($localCraftDemage, $invasor, Ship::SHIP_CRAFT_HP, count($invasors), $effects, 'craft');
           $localCraftDemage = 0;
-          if ($invasor->craft < 0) {
-            $invasor->craft = 0;
-          }
         }
       }
       $localBomberDemage += $localCraftDemage;
 
       if ($localBomberDemage > 0) {
-        $kills = $localBomberDemage / Ship::SHIP_BOMBER_HP;
-        $kills = ceil($kills / count($invasors));
         if ($invasor->bomber > 0) {
-          $invasor->bomber -= $kills;
+          $invasor = $this->applyDemage($localBomberDemage, $invasor, Ship::SHIP_BOMBER_HP, count($invasors), $effects, 'bomber');
           $localBomberDemage = 0;
-          if ($invasor->bomber < 0) {
-            $invasor->bomber = 0;
-          }
         }
       }
       $localCruiserDemage += $localBomberDemage;
 
       if ($localCruiserDemage > 0) {
-        $kills = $localCruiserDemage / Ship::SHIP_CRUISER_HP;
-        $kills = ceil($kills / count($invasors));
         if ($invasor->cruiser > 0) {
-          $invasor->cruiser -= $kills;
+          $invasor = $this->applyDemage($localCruiserDemage, $invasor, Ship::SHIP_CRUISER_HP, count($invasors), $effects, 'cruiser');
           $localCruiserDemage = 0;
-          if ($invasor->cruiser < 0) {
-            $invasor->cruiser = 0;
-          }
         }
       }
       $localScoutDemage += $localCruiserDemage;
 
       if ($localScoutDemage > 0) {
-        $kills = $localScoutDemage / Ship::SHIP_SCOUT_HP;
-        $kills = ceil($kills / count($invasors));
         if ($invasor->scout > 0) {
-          $invasor->scout -= $kills;
+          $invasor = $this->applyDemage($localScoutDemage, $invasor, Ship::SHIP_SCOUT_HP, count($invasors), $effects, 'scout');
           $localScoutDemage = 0;
-          if ($invasor->scout < 0) {
-            $invasor->scout = 0;
-          }
         }
       }
       $localStealthDemage += $localScoutDemage;
 
       if ($localStealthDemage > 0) {
-        $kills = $localStealthDemage / Ship::SHIP_STEALTH_HP;
-        $kills = ceil($kills / count($invasors));
         if ($invasor->stealth > 0) {
-          $invasor->stealth -= $kills;
+          $invasor = $this->applyDemage($localStealthDemage, $invasor, Ship::SHIP_STEALTH_HP, count($invasors), $effects, 'stealth');
           $localStealthDemage = 0;
-          if ($invasor->stealth < 0) {
-            $invasor->stealth = 0;
-          }
         }
       }
       $localFlagshipDemage += $localStealthDemage;
 
       if ($localFlagshipDemage > 0) {
-        $kills = $localFlagshipDemage / Ship::SHIP_FLAGSHIP_HP;
-        $kills = ceil($kills / count($invasors));
         if ($invasor->flagship > 0) {
-          $invasor->flagship -= $kills;
+          $invasor = $this->applyDemage($localFlagshipDemage, $invasor, Ship::SHIP_FLAGSHIP_HP, count($invasors), $effects, 'flagship');
           $localFlagshipDemage = 0;
-          if ($invasor->flagship < 0) {
-            $invasor->flagship = 0;
-          }
         }
       }
 
