@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Logbook;
 use App\Models\Player;
+use App\Models\ProcessJob;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -46,5 +47,13 @@ class LogController extends Controller
         $log->save();
 
         return response()->json($log);
+    }
+
+    public function jobSleep( $type)
+    {
+        $player = Player::getPlayerLogged();
+
+        $jobs = ProcessJob::where(['type' => $type,'finished' => time(),'player' => $player->id  ])->get();
+        return response()->json($jobs);
     }
 }

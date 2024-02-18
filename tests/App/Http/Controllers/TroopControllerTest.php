@@ -6,7 +6,7 @@ use App\Http\Controllers\BuildController;
 use Tests\TestCase;
 use App\Models\User;
 use App\Services\UserService;
-use App\Services\ProductionService;
+use App\Services\PlanetService;
 
 # php artisan test --filter=TroopControllerTest
 class TroopControllerTest extends TestCase
@@ -31,9 +31,9 @@ class TroopControllerTest extends TestCase
     # php artisan test --filter=TroopControllerTest::test_funcionalidade
     public function test_funcionalidade()
     {
-        $prodSrv = new ProductionService();
-        dd($prodSrv->hasFunds(3,['id'=>2,'quantity'=>15]));
-
+        $prodSrv = new PlanetService();
+        $tempo =  $prodSrv->calculeDistance(3,11);
+        var_dump(now()->addSeconds(59));
     }
 
 }

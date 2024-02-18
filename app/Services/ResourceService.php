@@ -7,6 +7,8 @@ use App\Models\Planet;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Jobs\ResourceJob;
+use App\Models\ProcessJob;
+use Carbon\Carbon;
 
 class ResourceService
 {
@@ -46,6 +48,17 @@ class ResourceService
 
         $planetOrigin->save();
 
+
+        $timeLoad = $transportShipsInUse * env("TRITIUM_CHARGING_SPEED"); 
+
+        #Salva o job para acompanhamento até a execução
+        $processJob = new ProcessJob();
+        $processJob->player = $planetOrigin->player;
+        $processJob->planet = $planetOrigin->id;
+        $processJob->finished =  Carbon::now()->addSeconds($timeLoad);
+        $processJob->type = ProcessJob::TYPE_CARRYING;
+        $processJob->save();
+
         #Job carregamento recursos
         ResourceJob::dispatch(
             $this->travelService,
@@ -55,7 +68,7 @@ class ResourceService
             $uranium, 
             $crystal, 
             $transportShipsInUse
-        )->delay(now()->addSeconds(env("TRITIUM_CHARGING_SPEED")));
+        )->delay(now()->addSeconds($timeLoad));
 
         return response()->json(["message" => "atualizados"], Response::HTTP_OK);
 

@@ -2,15 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Models\Planet;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 use App\Models\Travel;
-use App\Models\Logbook;
+use App\Models\ProcessJob;
 
 class ResourceJob implements ShouldQueue
 {
@@ -57,6 +57,7 @@ class ResourceJob implements ShouldQueue
         $travel->to = $this->target; 
         $travel->strategy = 1; 
 
+        ProcessJob::where(['planet' => $this->origin,'type' => ProcessJob::TYPE_CARRYING])->delete();
         $this->travelService->start($this->origin,$travel);
     }
 }

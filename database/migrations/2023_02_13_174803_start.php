@@ -613,6 +613,14 @@ return new class extends Migration {
             $table->integer("slot5")->nullable();;
         });
 
+        Schema::create('process_job', function (Blueprint $table) {
+            $table->id();
+            $table->integer('player')->constrained("players");
+            $table->foreignId('planet')->constrained("planets");
+            $table->integer("type");
+            $table->timestamp("finished"); 
+            $table->timestamp('created_at')->useCurrent();
+        });
   
         /**
          *FIM DAS TABELAS REFERENTE AO MERCADO

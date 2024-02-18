@@ -11,7 +11,7 @@ use App\Models\Troop;
 use App\Models\Fleet;
 use App\Models\Unit;
 use App\Models\Player;
-use App\Http\Controllers\LogbookController;
+use App\Services\LogService;
 
 class TravelService
 {
@@ -104,7 +104,7 @@ class TravelService
         }
         
         $newTravel->save();
-        TravelJob::dispatch($this,$newTravel->id, back: false)->delay(now()->addSeconds($travelTime));
+        TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
     }
 
     private function startAttackFleet($travel, $req, $player) {
@@ -205,7 +205,7 @@ class TravelService
         $currentTravel->delete();
         $newTravel->save();
 
-        TravelJob::dispatch($this,$newTravel->id,back: true)->delay(now()->addSeconds($travelTime / 1000));
+        TravelJob::dispatch($this,$newTravel->id,true)->delay(now()->addSeconds($travelTime / 1000));
     }
 
     public function calcDistance($from, $to) {
@@ -484,12 +484,14 @@ class TravelService
     public function arrivedTransportResource($travel,$back)
     {
         $travelModel = Travel::findOrFail($travel);
+        $logService = new LogService();
 
         if($back)
         {
             $planetOrige = Planet::findOrFail($travelModel->from);
             $planetOrige->transportShips += $travelModel->transportShips ;
             $planetOrige->save();
+            $logService->notify($planetOrige->player, "Your freighter has returned from its trip", "Combat");
         }else{
             $planetTarget = Planet::findOrFail($travelModel->to);
           
@@ -497,11 +499,9 @@ class TravelService
             $planetTarget->uranium += $travelModel->uranium;
             $planetTarget->crystal += $travelModel->crystal;
             $planetTarget->save();
-    
-            $controller = new LogbookController();
-            $controller->notify($planetTarget->player, "You received a resource", "Combat");
+            $logService->notify($planetTarget->player, "You received a resource", "Combat");
+
+            $this->back($travel);
         }
-       
-        
     }
 }

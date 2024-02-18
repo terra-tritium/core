@@ -10,7 +10,6 @@ use Illuminate\Queue\SerializesModels;
 
 use App\Models\Travel;
 use App\Services\SpaceCombatService;
-use App\Services\TravelService;
 
 class TravelJob implements ShouldQueue
 {
