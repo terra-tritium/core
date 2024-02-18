@@ -55,7 +55,7 @@ class ResourceService
         $processJob = new ProcessJob();
         $processJob->player = $planetOrigin->player;
         $processJob->planet = $planetOrigin->id;
-        $processJob->finished =  Carbon::now()->addSeconds($timeLoad);
+        $processJob->finished =  Carbon::now()->addSeconds($timeLoad)->getTimestamp();
         $processJob->type = ProcessJob::TYPE_CARRYING;
         $processJob->save();
 

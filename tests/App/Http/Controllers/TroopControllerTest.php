@@ -7,6 +7,7 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Services\UserService;
 use App\Services\PlanetService;
+use Carbon\Carbon;
 
 # php artisan test --filter=TroopControllerTest
 class TroopControllerTest extends TestCase
@@ -31,9 +32,10 @@ class TroopControllerTest extends TestCase
     # php artisan test --filter=TroopControllerTest::test_funcionalidade
     public function test_funcionalidade()
     {
-        $prodSrv = new PlanetService();
-        $tempo =  $prodSrv->calculeDistance(3,11);
-        var_dump(now()->addSeconds(59));
+        $timeLoad = 120 ; 
+        $tempo = Carbon::now()->addSeconds($timeLoad)->getTimestamp();
+
+        var_dump($tempo );
     }
 
 }

@@ -53,7 +53,7 @@ class LogController extends Controller
     {
         $player = Player::getPlayerLogged();
 
-        $jobs = ProcessJob::where(['type' => $type,'finished' => time(),'player' => $player->id  ])->get();
+        $jobs = ProcessJob::where(['type' => $type,'player' => $player->id  ])->get();
         return response()->json($jobs);
     }
 }

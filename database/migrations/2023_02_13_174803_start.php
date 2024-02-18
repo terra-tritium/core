@@ -618,7 +618,7 @@ return new class extends Migration {
             $table->integer('player')->constrained("players");
             $table->foreignId('planet')->constrained("planets");
             $table->integer("type");
-            $table->timestamp("finished"); 
+            $table->unsignedBigInteger("finished"); 
             $table->timestamp('created_at')->useCurrent();
         });
   
