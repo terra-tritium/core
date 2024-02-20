@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Services;
 
 use App\Models\Logbook;
 
-class LogbookController extends Controller
+class LogService
 {
-
     public function notify($playerId, $text, $type)
     {
         $log = new Logbook();
@@ -15,4 +14,5 @@ class LogbookController extends Controller
         $log->type = $type;
         $log->save();
     }
+
 }

@@ -613,6 +613,14 @@ return new class extends Migration {
             $table->integer("slot5")->nullable();;
         });
 
+        Schema::create('process_job', function (Blueprint $table) {
+            $table->id();
+            $table->integer('player')->constrained("players");
+            $table->foreignId('planet')->constrained("planets");
+            $table->integer("type");
+            $table->unsignedBigInteger("finished"); 
+            $table->timestamp('created_at')->useCurrent();
+        });
   
         /**
          *FIM DAS TABELAS REFERENTE AO MERCADO
@@ -620,7 +628,7 @@ return new class extends Migration {
         
 
         DB::unprepared("
-                        CREATE FUNCTION calc_distancia(idPlaneta1 INT, idPlaneta2 INT, wight_time_secund INT)
+                        CREATE FUNCTION calc_distancia(idPlaneta1 INT, idPlaneta2 INT)
                         RETURNS INT
                         DETERMINISTIC
                         READS SQL DATA
@@ -695,7 +703,7 @@ return new class extends Migration {
                                 SET distancia = ABS(ABS(quatrandOrigin ) - ABS(quatrandDestiny * 1)); 
                             END IF;
                             
-                            RETURN (distancia * wight_time_secund);
+                            RETURN distancia;
                         END
         ");
 

@@ -161,7 +161,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/stage/{combatId}",[CombatController::class,"calculateStage"]);
         //sendresource
         Route::post('/sendresource', [CombatController::class, 'sendResource']);
-
     });
 
     Route::prefix('quadrant')->group(function () {
@@ -197,6 +196,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/logs', [LogController::class, 'logs']);
         Route::post('/create', [LogController::class, 'create']);
         Route::put('/update/{id}',[LogController::class, 'update']);
+        Route::get('/processjob/{type}', [LogController::class, 'jobSleep']);
     });
 
     Route::prefix('aliance')->group(function () {

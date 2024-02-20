@@ -11,21 +11,25 @@ use App\Models\Troop;
 use App\Models\Fleet;
 use App\Models\Unit;
 use App\Models\Player;
-use App\Http\Controllers\LogbookController;
+use App\Services\LogService;
+use Carbon\Carbon;
+
 
 class TravelService
 {
-    public $planetService;
-    public $combatService;
+    protected $planetService;
+    protected $combatService;
+    protected $logService;
 
-    public function __construct( CombatService $combatService, PlanetService $planetService) 
+    public function __construct( CombatService $combatService, PlanetService $planetService, LogService $logService)
     {
         $this->planetService =  $planetService ;
         $this->combatService =  $combatService  ;
+        $this->logService =  $logService  ;
     }
 
     public function start ($player, $travel) {
-        
+
         $travel =  json_decode (json_encode ($travel), FALSE);
         $newTravel = new Travel();
 
@@ -40,7 +44,7 @@ class TravelService
         if ($travel->from == $travel->to) {
             return "Impossible travel";
         }
-        
+
         if ($travel->action === Travel::ATTACK_TROOP && !isset($travel->troop))  {
             return "Set the troop";
         } elseif ($travel->action === Travel::ATTACK_TROOP) {
@@ -95,16 +99,16 @@ class TravelService
                 $newTravel = $this->startMissionExplorer($newTravel);
                 break;
         }
-        
+
         # Merchant Ships
         if (isset($travel->transportShips)) {
             $newTravel->transportShips = $travel->transportShips;
         } else {
             $newTravel->transportShips = 0;
         }
-        
+
         $newTravel->save();
-        TravelJob::dispatch($this,$newTravel->id, back: false)->delay(now()->addSeconds($travelTime));
+        TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
     }
 
     private function startAttackFleet($travel, $req, $player) {
@@ -134,7 +138,7 @@ class TravelService
                         break;
                 }
             }
-            
+
         }
         return $travel;
     }
@@ -198,14 +202,14 @@ class TravelService
 
         $currentTravel = Travel::find($travel);
         $travelTime = $now - $currentTravel->start;
-        $currentTravel->arrival = $travelTime;
-        $currentTravel->status = 0;
+        $currentTravel->arrival = Carbon::now()->addSeconds($travelTime)->getTimestamp();
+        $currentTravel->status = 1;
 
         $newTravel = $currentTravel;
         $currentTravel->delete();
         $newTravel->save();
 
-        TravelJob::dispatch($this,$newTravel->id,back: true)->delay(now()->addSeconds($travelTime / 1000));
+        TravelJob::dispatch($this,$newTravel->id,true)->delay(now()->addSeconds($travelTime));
     }
 
     public function calcDistance($from, $to) {
@@ -300,7 +304,7 @@ class TravelService
             ["position", $position->position],
             ["region", $position->region]
         ])->first();
-        
+
         if ($planet) {
             return $planet->id;
         } else {
@@ -308,10 +312,10 @@ class TravelService
         }
     }
 
-    public function removeTroop($player, $planet, $troops){ 
-        
+    public function removeTroop($player, $planet, $troops){
+
         foreach($troops as $troop)
-        {  
+        {
             $troopm = Troop::where([
                 'unit'      => $troop->unit,
                 'player'    => $player,
@@ -323,10 +327,10 @@ class TravelService
         }
     }
 
-    public function removeFleet($player, $planet, $fleets){ 
-        
+    public function removeFleet($player, $planet, $fleets){
+
         foreach($fleets as $fleet)
-        {  
+        {
             $fleetm = Fleet::where([
                 'unit'      => $fleet->unit,
                 'player'    => $player,
@@ -364,7 +368,7 @@ class TravelService
     public function getTroopDefense($travel){
         $travel = Travel::find($travel);
 
-        $troops = Troop::where('planet',$travel->receptor)->get();    
+        $troops = Troop::where('planet',$travel->receptor)->get();
         $units = [];
 
         foreach($troops as $key => $troop){
@@ -458,13 +462,15 @@ class TravelService
     }
 
     private function getMissionsByAction($action) {
-        return Travel::with('from', 'to')->where([['action', $action], ['status', 1]])->orderBy('arrival')->get();
+        return Travel::with('from', 'to')
+                                        ->where([['action', $action], ['status', Travel::STATUS_ON_LOAD]])
+                                        ->orderBy('arrival')->get();
     }
 
     public function starCombatTravel($travel)
     {
         $travelModel = Travel::find($travel);
-        
+
         $planet  = Planet::find($travelModel->receptor);
 
         $defense  = Player::find($planet->player);
@@ -479,27 +485,26 @@ class TravelService
         $this->combatService->startNewCombat($attack->id,  $defense->id, $aUnits, $dUnits, $aStrategy, $dStrategy, $dPlanet);
     }
 
-    public function arrivedTransportResource($travel,$back)
+    public function arrivedTransportResource($travel)
     {
         $travelModel = Travel::findOrFail($travel);
+        $planetTarget = Planet::findOrFail($travelModel->to);
 
-        if($back)
-        {
-            $planetOrige = Planet::findOrFail($travelModel->from);
-            $planetOrige->transportShips += $travelModel->transportShips ;
-            $planetOrige->save();
-        }else{
-            $planetTarget = Planet::findOrFail($travelModel->to);
-          
-            $planetTarget->metal += $travelModel->metal;
-            $planetTarget->uranium += $travelModel->uranium;
-            $planetTarget->crystal += $travelModel->crystal;
-            $planetTarget->save();
-    
-            $controller = new LogbookController();
-            $controller->notify($planetTarget->player, "You received a resource", "Combat");
-        }
-       
-        
+        $planetTarget->metal += $travelModel->metal;
+        $planetTarget->uranium += $travelModel->uranium;
+        $planetTarget->crystal += $travelModel->crystal;
+
+        $planetTarget->save();
+        $this->logService->notify($planetTarget->player, "You received a resource", "Combat");
+        $this->back($travel);
+    }
+
+    public function arrivedTransportOrigin($travel)
+    {
+        $travelModel = Travel::findOrFail($travel);
+        $planetOrige = Planet::findOrFail($travelModel->from);
+        $planetOrige->transportShips += $travelModel->transportShips ;
+        $planetOrige->save();
+        $this->logService->notify($planetOrige->player, "Your freighter has returned from its trip", "Combat");
     }
 }

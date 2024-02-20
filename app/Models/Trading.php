@@ -8,11 +8,10 @@ use Illuminate\Support\Facades\DB;
 
 class Trading extends Model
 {
-    private $tritium_market_status_canceled = 0;
-    private $tritium_market_status_open = 1 ; 
-    private $tritium_market_status_finished = 2;
-    private $tritium_market_status_pending = 3;
-
+    CONST TRITIUM_MARKET_STATUS_CANCELED = 0;
+    CONST TRITIUM_MARKET_STATUS_OPEN = 1 ; 
+    CONST TRITIUM_MARKET_STATUS_FINISHED = 2;
+    CONST TRITIUM_MARKET_STATUS_PENDING = 3;
 
     use HasFactory;
     protected $table = 'trading';
@@ -35,18 +34,17 @@ class Trading extends Model
 
     public function getDadosTradingByResourceAndMarket($idPlanetaLogado, $resource, $region, $type)
     {
-        $tritium_weight_time_second = env("TRITIUM_WEIGHT_TIME_SECOND") ;
         $trading = DB::table($this->table . ' as t')
             ->select(
                 "t.*",
                 "p.name",
-                DB::raw("(SELECT origin.calc_distancia(p.id, $idPlanetaLogado, $tritium_weight_time_second)) AS distance"),
+                DB::raw("(SELECT origin.calc_distancia(p.id, $idPlanetaLogado)) AS distance"),
             )
             ->join('market as m', 'm.id', '=', 't.idMarket')
             ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')
             ->join('players as p', 'p.id', '=', 'planeta.player')
             ->where('m.status', true)
-            ->where('t.status',  $this->tritium_market_status_open)
+            ->where('t.status',  Trading::TRITIUM_MARKET_STATUS_OPEN)
             ->where('m.region', '=', $region)
             ->where('t.resource', '=', $resource)
             ->where('t.type', '=', $type)
@@ -68,7 +66,7 @@ class Trading extends Model
         $resources = DB::table('planets as p')
             ->leftJoin('trading as t', function ($join) {
                 $join->on('p.player', '=', 't.idPlanetCreator')
-                    ->where('t.status', $this->tritium_market_status_open)
+                    ->where('t.status', Trading::TRITIUM_MARKET_STATUS_OPEN)
                     ->where('t.type', 'S');
             })
             ->where('p.player', $player)
@@ -84,7 +82,7 @@ class Trading extends Model
     }
     public function getAllOrderPlayer($player, $resource)
     {
-        $status = [$this->tritium_market_status_open, $this->tritium_market_status_pending];
+        $status = [Trading::TRITIUM_MARKET_STATUS_OPEN, Trading::TRITIUM_MARKET_STATUS_PENDING];
         $orders = DB::table($this->table . ' as t')
             ->select(
                 't.id',
