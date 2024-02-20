@@ -57,7 +57,11 @@ class TravelJob implements ShouldQueue
                     //$this->travelService->starCombatTravel($this->travel);
                     break;
                 case Travel::TRANSPORT_RESOURCE:
-                    $this->travelService->arrivedTransportResource($this->travel,$this->back);
+                    if($this->back){
+                        $this->travelService->arrivedTransportOrigin($this->travel);
+                    }else{
+                        $this->travelService->arrivedTransportResource($this->travel);
+                    }
                     break;
                 case Travel::TRANSPORT_BUY:
                     //$this->travelService->starTransportBuy($this->travel);
