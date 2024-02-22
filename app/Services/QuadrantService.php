@@ -2,13 +2,21 @@
 
 namespace App\Services;
 use App\Models\Planet;
+use App\Services\PlanetService;
 
 class QuadrantService{
 
+    protected $planetServico;
+
+    public function __construct(PlanetService $planetServico)
+    {
+        $this->planetServico =  $planetServico;
+    }
+
     public function calcDistanceQuadrant( $code,$planet) {
-       
+
         $planetFrom = Planet::where(['id' => $planet])->first();
-        
+
         if(!$planetFrom){
             return 0 ;
         }
@@ -26,4 +34,14 @@ class QuadrantService{
 
         return  $distante;
     }
+
+
+    public function calcDistancePlanets($player, $origin,$destiny) {
+
+        ## Fazer o calculo baseado na velocidade e/ou itens do jogo;
+        $timeTravel = $this->planetServico->calculeDistance($origin,$destiny);
+
+        return $timeTravel;
+    }
+
 }

@@ -23,14 +23,15 @@ class ResourceJob implements ShouldQueue
     private $uranium;
     private $crystal;
     private $transportShips;
-    
+    private $player;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($travelService,$origin, $target, $metal, $uranium, $crystal, $transportShips)
+    public function __construct($travelService,$player,$origin, $target, $metal, $uranium, $crystal, $transportShips)
     {
+        $this->player = $player;
         $this->origin = $origin;
         $this->target = $target;
         $this->metal = $metal;
@@ -51,13 +52,23 @@ class ResourceJob implements ShouldQueue
         $travel->metal = $this->metal;
         $travel->uranium = $this->uranium;
         $travel->crystal =$this->crystal;
-        $travel->transportShips = $this->transportShips ; 
-        $travel->action = Travel::TRANSPORT_RESOURCE; 
-        $travel->from = $this->origin; 
-        $travel->to = $this->target; 
-        $travel->strategy = 1; 
+        $travel->transportShips = $this->transportShips ;
+        $travel->action = Travel::TRANSPORT_RESOURCE;
+        $travel->from = $this->origin;
+        $travel->to = $this->target;
+        $travel->strategy = 1;
+        $travel->status = Travel::STATUS_ON_GOING;
 
         ProcessJob::where(['planet' => $this->origin,'type' => ProcessJob::TYPE_CARRYING])->delete();
-        $this->travelService->start($this->origin,$travel);
+        try{
+            $this->travelService->start($this->player,$travel);
+        } catch (\Exception $e)
+        {
+            $planetOrigim = Planet::findOrFail($this->origin);
+            $planetOrigim->metal    += $this->metal;
+            $planetOrigim->uranium  += $this->uranium;
+            $planetOrigim->crystal  += $this->crystal;
+            $planetOrigim->save();
+        }
     }
 }

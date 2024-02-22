@@ -167,6 +167,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/show/{code}/{planet?}', [QuadrantController::class, 'show']);
         Route::get('/map/{region}', [QuadrantController::class, 'map']);
         Route::get('/planets/{quadrant}', [QuadrantController::class, 'planets']);
+        Route::get('/calule-distancte/{origin}/{destiny}', [QuadrantController::class, 'calcDistancePlants']);
     });
 
     Route::prefix('message')->group(function () {
