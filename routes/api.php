@@ -138,6 +138,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/missions/{action}', [TravelController::class, 'missions']);
         Route::post('/start', [TravelController::class, 'start']);
         Route::post('/back', [TravelController::class, 'back']);
+        Route::put('/cancel/{travel}', [TravelController::class, 'cancel']);
     });
 
     Route::prefix('combat')->group(function () {

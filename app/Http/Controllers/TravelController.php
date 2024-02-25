@@ -207,4 +207,33 @@ class TravelController extends Controller
             return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+     /**
+     * @OA\Get(
+     *     path="/travel/cancel/{travel}",
+     *     operationId="cancelTravel",
+     *     tags={"Travel"},
+     *     summary="Cancel travels",
+     *     description="Get travels by status the logged-in player",
+     *     @OA\Response(response="200", description="Successful operation"),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="500", description="Internal server error"),
+     * )
+     * @return mixed
+     */
+    public function cancel($travel)
+    {
+        try {
+            $player = Player::getPlayerLogged();
+
+            $return = $this->travelService->cancel($player->id, $travel);
+            if(!$return)
+            {
+                return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            }
+            return response()->json(['message' => 'Success'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -61,10 +61,6 @@ class TravelService
             }
         }
 
-        if(is_null($travel->status) || empty($travel->status))
-        {
-            $newTravel->status = Travel::STATUS_ON_LOAD;
-        }
 
         $now = time();
         $travelTime = $this->planetService->calculeDistance($travel->from, $travel->to);
@@ -76,6 +72,7 @@ class TravelService
         $newTravel->arrival = $now + $travelTime;
         $newTravel->receptor = $this->getReceptor($travel->to);
         $newTravel->strategy = $travel->strategy;
+        $newTravel->status =  is_null($travel->status)  ? Travel::STATUS_ON_LOAD : $travel->status;
 
         switch ($travel->action) {
             case Travel::ATTACK_FLEET:
@@ -519,7 +516,32 @@ class TravelService
     {
         $currentTravel = Travel::with('from', 'to')
                                 ->where('player', $player)
-                                ->whereIn('status',[1,3])->orderBy('arrival')->get();
+                                ->whereIn('status',[2,3])->orderBy('arrival')->get();
         return  $currentTravel;
     }
+
+    public function cancel($player,$travel)
+    {
+        $travelModel = Travel::where('player', $player)
+                            ->where('id', $travel)
+                            ->where('status',Travel::STATUS_ON_GOING)
+                            ->first();
+
+        if (is_null($travelModel)) {
+            return false;
+        }
+
+        $travelModel->status = Travel::STATUS_CANCEL;
+        $travelModel->save();
+
+        $planetOrigim = Planet::findOrFail($travelModel->from);
+        $planetOrigim->metal    += $travelModel->metal;
+        $planetOrigim->uranium  += $travelModel->uranium;
+        $planetOrigim->crystal  += $travelModel->crystal;
+        $planetOrigim->transportShips += $travelModel->transportShips ;
+        $planetOrigim->save();
+
+        return true;
+    }
+
 }

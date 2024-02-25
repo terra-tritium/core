@@ -68,6 +68,7 @@ class ResourceJob implements ShouldQueue
             $planetOrigim->metal    += $this->metal;
             $planetOrigim->uranium  += $this->uranium;
             $planetOrigim->crystal  += $this->crystal;
+            $planetOrigim->transportShips += $this->transportShips ;
             $planetOrigim->save();
         }
     }
