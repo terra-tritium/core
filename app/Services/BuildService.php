@@ -6,6 +6,7 @@ use App\Models\Planet;
 use App\Models\Player;
 use App\Models\Build;
 use App\Models\Building;
+use App\Models\Effect;
 use App\Models\Requires;
 use App\Services\PlanetService;
 use App\Services\PlayerService;
@@ -64,6 +65,13 @@ class BuildService
         $playerLogged = Player::getPlayerLogged();
         $player = Player::findOrFail($playerLogged->id);
         $buildings  =  Building::where(['planet' => $building->planet, 'build' => $building->build])->first();
+
+        # efeito de desconto no custo da build para o modo de jogo que oferece desconto em construção
+        $discountBuild = 0;
+        if($player->gameMode == 2 || $player->gameMode == 7){
+            $effect = Effect::where('player',$player->id)->firstOrFail();
+            $discountBuild = $effect->discountBuild;
+        }
         if($buildings)
         {
             return false;
@@ -74,7 +82,7 @@ class BuildService
             return false;
         }
 
-        $require = $this->calcResourceRequire($building->build, 1);
+        $require = $this->calcResourceRequire($building->build, 1, $discountBuild);
 
         $building->ready = time() + ($require->time * env("TRITIUM_CONSTRUCTION_SPEED"));
         $p1->ready = $building->ready;
@@ -274,7 +282,13 @@ class BuildService
         $building = Building::find($buildingId);
         $planet = Planet::find($building->planet);
         $player = Player::findOrFail($planet->player);
-        $require = $this->calcResourceRequire($building->build, $building->level + 1);
+
+        $discountBuild = 0;
+        if($player->gameMode == 2 || $player->gameMode == 7){
+            $effect = Effect::where('player',$player->id)->firstOrFail();
+            $discountBuild = $effect->discountBuild;
+        }
+        $require = $this->calcResourceRequire($building->build, $building->level + 1, $discountBuild);
 
         # Yet have a building in construction on this planet
         if ($planet->ready != null && $planet->ready > time()) {
@@ -321,7 +335,30 @@ class BuildService
         $player->save();
         $building->save();
     }
+    /**
+     * @todo verificar a necessidade de utilizar
+     * Aplicar efeito na listagem
+     */
+    public function applyDiscountBuild($planet,$builds){
+        $planet = Planet::findOrFail($planet);
+        $player = Player::findOrFail($planet->player);
+        if($player->gameMode == 2){
+            $effect = Effect::where('player',$player->id)->first();
+            if($builds){
+                $buildsDiscount = [];
+                foreach($builds as $build){
+                    $build->metalStart = floor($build->metalStart * (1 + ($effect->discountBuild / 100)));
+                    $build->uraniumStart = floor($build->uraniumStart * (1 + ($effect->discountBuild / 100)));
+                    $build->crystalStart = floor($build->crystalStart * (1 + ($effect->discountBuild / 100)));
+                    $buildsDiscount[] = $build;
+                }
+                return $buildsDiscount;
+            }
 
+        }
+        return $builds;
+
+    }
     public function listAvailableBuilds($planet) {
 
         $allBuilds = Build::orderBy("code")->get();
@@ -361,7 +398,7 @@ class BuildService
         return Building::where("planet", $planet)->get();
     }
 
-    public function calcResourceRequire($build, $level) {
+    public function calcResourceRequire($build, $level, $discountBuild) {
         $build = Build::find($build);
         $require = new Requires();
         $metalReq = 0;
@@ -400,10 +437,11 @@ class BuildService
                 $crystalReq += $crystalReq * ($build->coefficient / 100);
             }
         }
+        $require->metal = floor( $metalReq + (($metalReq * $discountBuild) / 100));
+        $require->uranium = floor( $uraniumReq + (($uraniumReq * $discountBuild) / 100));
+        $require->crystal = floor( $crystalReq + (($crystalReq * $discountBuild) / 100));
+        // $require->uranium = $uraniumReq;
 
-        $require->metal = $metalReq;
-        $require->uranium = $uraniumReq;
-        $require->crystal = $crystalReq;
         $require->time = ($metalReq + $uraniumReq + $crystalReq) / 100;
 
         return $require;

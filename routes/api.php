@@ -130,6 +130,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('mode')->group(function () {
         Route::get('/list', [GameModeController::class, 'list']);
         Route::post('/change/{code}', [GameModeController::class, 'change']);
+        Route::get('/effect/{planet}',[GameModeController::class, 'gameModeEffect']);
     });
 
     Route::prefix('travel')->group(function () {

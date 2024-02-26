@@ -131,7 +131,7 @@ public function currentBalance($p1, $type) {
   }
 
   public function removeMetal($p1, $units) {
-    if ($this->currentBalance($p1, 1) > $units) {
+    if ($this->currentBalance($p1, 1) >= $units) {
       $p1->metal = $this->currentBalance($p1, 1);
       $p1->timeMetal = $this->timeNow;
       $p1->metal -= $units;
