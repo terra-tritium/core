@@ -26,6 +26,7 @@ class Travel extends Model
     CONST STATUS_ON_GOING = 2;
     CONST STATUS_RETURN = 3;
     CONST STATUS_FINISHED = 4;
+    CONST STATUS_CANCEL = 5;
 
     public function from(){
         return $this->belongsTo(Planet::class, 'from');

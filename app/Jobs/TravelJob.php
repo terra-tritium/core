@@ -37,7 +37,7 @@ class TravelJob implements ShouldQueue
      */
     public function handle()
     {
-        $currentTravel = Travel::find($this->travel);
+        $currentTravel = Travel::where('id',$this->travel)->whereNotIn('status',[Travel::STATUS_CANCEL])->first();
         if ($currentTravel) {
             $currentTravel->status = Travel::STATUS_FINISHED;
             $currentTravel->save();

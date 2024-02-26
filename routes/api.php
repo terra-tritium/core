@@ -138,6 +138,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/missions/{action}', [TravelController::class, 'missions']);
         Route::post('/start', [TravelController::class, 'start']);
         Route::post('/back', [TravelController::class, 'back']);
+        Route::put('/cancel/{travel}', [TravelController::class, 'cancel']);
     });
 
     Route::prefix('combat')->group(function () {
@@ -167,6 +168,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/show/{code}/{planet?}', [QuadrantController::class, 'show']);
         Route::get('/map/{region}', [QuadrantController::class, 'map']);
         Route::get('/planets/{quadrant}', [QuadrantController::class, 'planets']);
+        Route::get('/calule-distancte/{origin}/{destiny}', [QuadrantController::class, 'calcDistancePlants']);
     });
 
     Route::prefix('message')->group(function () {
