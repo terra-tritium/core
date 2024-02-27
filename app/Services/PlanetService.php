@@ -9,14 +9,16 @@ class PlanetService
 {
   protected $timeNow;
   protected $rankingService;
+  protected $pesoCaluleDistance;
 
   public function __construct () {
     $this->timeNow = time();
     $this->rankingService = new RankingService();
+    $this->pesoCaluleDistance = env("TRITIUM_TRAVEL_SPEED");
   }
 
   public function syncronizeEnergy(Planet $planet) {
-    $energyMultiplier = $planet->terrainType ? $planet->terrainType->energy : 1.0; 
+    $energyMultiplier = $planet->terrainType ? $planet->terrainType->energy : 1.0;
     $currentBalance = $this->currentBalance($planet, 0) * $energyMultiplier;
     $planet->energy = $currentBalance;
     $planet->timeEnergy = $this->timeNow;
@@ -24,15 +26,15 @@ class PlanetService
 }
 
 public function syncronizeDefenseScore(Planet $planet) {
-  $defenseMultiplier = $planet->terrainType ? $planet->terrainType->defenseScore : 1.0;  
-  $planetDefense = $planet->baseDefense * $defenseMultiplier;  
+  $defenseMultiplier = $planet->terrainType ? $planet->terrainType->defenseScore : 1.0;
+  $planetDefense = $planet->baseDefense * $defenseMultiplier;
   $planet->defenseScore = $planetDefense;
   $planet->save();
 }
 
 
 public function currentBalance($p1, $type) {
-  $sInHour = 3600;  
+  $sInHour = 3600;
 
   $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $sInHour;
   $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $sInHour;
@@ -179,7 +181,9 @@ public function currentBalance($p1, $type) {
     return $p1;
   }
 
-  public function calculeDistance($origin, $destiny) {
+  public function calculeDistance($origin, $destiny, $peso = null) {
+
+    $peso  = is_null($peso) ? $this->pesoCaluleDistance :  $peso ;
 
     $arrayRegion = ['A'=>0,'B'=>1,'C'=>2,'D'=>3,'E'=>4,'F'=>5,'G'=>6,'H'=>7,'I'=>8,'J'=>9,'K'=>10,'L'=>11,'M'=>12,'N'=>13,'O'=>14,'P'=>15];
     $result       = 0.5;
@@ -196,15 +200,15 @@ public function currentBalance($p1, $type) {
 
     if( $regionOrigin != $regionDestiny){
       $regionsDistance =  abs($arrayRegion[$regionOrigin] - $arrayRegion[$regionDestiny]) ;
-      $result  = ($regionsDistance  *  $qtdQuadrante); 
+      $result  = ($regionsDistance  *  $qtdQuadrante);
     }else{
       if($quatrandOrigin != $quatrandDestiny){
         $q1 = substr($quatrandOrigin,1);
         $q2 =  substr( $quatrandDestiny,1);
         $result = abs($q1 - $q2 );
-      } 
+      }
     }
-    return $result;
+    return $result * $peso;
   }
-  
+
 }

@@ -22,7 +22,7 @@ class ResourceService
         $planetTarget = Planet::findOrFail($request->input('target'));
         if (!$planetTarget->player) return response()->json(['error' => 'Unexplored planet'], Response::HTTP_BAD_REQUEST);
         if ($planetOrigin->transportShips === 0) return response()->json(["error" => "You do not have a sufficient quantity of cargo ships"], Response::HTTP_BAD_REQUEST);
-        
+
         $metal = $request->input("metal");
         $uranium = $request->input("uranium");
         $crystal = $request->input("crystal");
@@ -30,7 +30,7 @@ class ResourceService
         if ($planetOrigin->metal < $metal) return response()->json(["error" => "You do not have sufficient resources to send"], Response::HTTP_BAD_REQUEST);
         if ($planetOrigin->uranium < $uranium) return response()->json(["error" => "You do not have sufficient resources to send"], Response::HTTP_BAD_REQUEST);
         if ($planetOrigin->crystal < $crystal) return response()->json(["error" => "You do not have sufficient resources to send"], Response::HTTP_BAD_REQUEST);
-        
+
         $capacityTransportShips =  $planetOrigin->transportShips * env("TRITIUM_TRANSPORTSHIP_CAPACITY");
         $totalRecursos  = $metal + $uranium + $crystal ;
 
@@ -49,7 +49,7 @@ class ResourceService
         $planetOrigin->save();
 
 
-        $timeLoad = $transportShipsInUse * env("TRITIUM_CHARGING_SPEED"); 
+        $timeLoad = $transportShipsInUse * env("TRITIUM_CHARGING_SPEED");
 
         #Salva o job para acompanhamento até a execução
         $processJob = new ProcessJob();
@@ -62,16 +62,17 @@ class ResourceService
         #Job carregamento recursos
         ResourceJob::dispatch(
             $this->travelService,
-            $planetOrigin->id, 
-            $planetTarget->id, 
-            $metal, 
-            $uranium, 
-            $crystal, 
+            $planetOrigin->player,
+            $planetOrigin->id,
+            $planetTarget->id,
+            $metal,
+            $uranium,
+            $crystal,
             $transportShipsInUse
         )->delay(now()->addSeconds($timeLoad));
 
         return response()->json(["message" => "atualizados"], Response::HTTP_OK);
 
     }
-    
+
 }

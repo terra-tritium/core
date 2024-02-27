@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Quadrant;
 use App\Models\Planet;
+use App\Models\Player;
 use App\Services\QuadrantService;
 use Illuminate\Http\Request;
+use stdClass;
 
 class QuadrantController extends Controller
 {
@@ -109,5 +111,43 @@ class QuadrantController extends Controller
         }
 
         return $quadrants;
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Quadrant  $quadrant
+     * @return \Illuminate\Http\Response
+     *
+     * @OA\Get (
+     *     path="/api/quadrant/distance/{origin}/{destiny}",
+     *     tags={"Quadrant"},
+     *     summary="Get details Quadrant ",
+     *     security={
+     *         {"bearerAuthTroop": {}}
+     *     },
+     *     @OA\Response(response="200", description="Resposta bem-sucedida")
+     * )
+     *  @OA\SecurityScheme(
+     *     type="http",
+     *     scheme="bearer",
+     *     securityScheme="bearerAuthTroop"
+     * )
+     *
+     */
+    public function calcDistancePlants($origin, $destiny) {
+
+        $player = Player::getPlayerLogged();
+
+        $platet = new stdClass();
+
+        $platet->origin = $origin;
+        $platet->destiny  =  $destiny;
+
+        $distante = $this->quadrantService->calcDistancePlanets($player, $origin, $destiny);
+
+        $platet->distance = $distante;
+
+        return $platet ;
     }
 }

@@ -61,17 +61,18 @@ class TravelService
             }
         }
 
+
         $now = time();
-        $travelTime = env("TRITIUM_TRAVEL_SPEED") * $this->planetService->calculeDistance($travel->from, $travel->to);
+        $travelTime = $this->planetService->calculeDistance($travel->from, $travel->to);
         $newTravel->from = $travel->from;
         $newTravel->to = $travel->to;
         $newTravel->action = $travel->action;
         $newTravel->player = $player;
         $newTravel->start = $now;
         $newTravel->arrival = $now + $travelTime;
-        $newTravel->status = Travel::STATUS_ON_LOAD;
         $newTravel->receptor = $this->getReceptor($travel->to);
         $newTravel->strategy = $travel->strategy;
+        $newTravel->status =  is_null($travel->status)  ? Travel::STATUS_ON_LOAD : $travel->status;
 
         switch ($travel->action) {
             case Travel::ATTACK_FLEET:
@@ -201,13 +202,13 @@ class TravelService
         $now = time();
 
         $currentTravel = Travel::find($travel);
+        $newTravel = $currentTravel->replicate();
         $travelTime = $now - $currentTravel->start;
-        $currentTravel->arrival = Carbon::now()->addSeconds($travelTime)->getTimestamp();
-        $currentTravel->status = 1;
-
-        $newTravel = $currentTravel;
-        $currentTravel->delete();
-        $newTravel->save();
+        $newTravel->arrival = Carbon::now()->addSeconds($travelTime / 2 )->getTimestamp();
+        $newTravel->from  = $currentTravel->to ;
+        $newTravel->to     = $currentTravel->from ;
+        $newTravel->status = Travel::STATUS_RETURN;
+        $newTravel->push();
 
         TravelJob::dispatch($this,$newTravel->id,true)->delay(now()->addSeconds($travelTime));
     }
@@ -463,7 +464,10 @@ class TravelService
 
     private function getMissionsByAction($action) {
         return Travel::with('from', 'to')
-                                        ->where([['action', $action], ['status', Travel::STATUS_ON_LOAD]])
+                                        ->where([
+                                                    ['action', $action],
+                                                    ['status', Travel::STATUS_ON_LOAD],
+                                                ])
                                         ->orderBy('arrival')->get();
     }
 
@@ -507,4 +511,37 @@ class TravelService
         $planetOrige->save();
         $this->logService->notify($planetOrige->player, "Your freighter has returned from its trip", "Combat");
     }
+
+    public function getCurrent($player)
+    {
+        $currentTravel = Travel::with('from', 'to')
+                                ->where('player', $player)
+                                ->whereIn('status',[2,3])->orderBy('arrival')->get();
+        return  $currentTravel;
+    }
+
+    public function cancel($player,$travel)
+    {
+        $travelModel = Travel::where('player', $player)
+                            ->where('id', $travel)
+                            ->where('status',Travel::STATUS_ON_GOING)
+                            ->first();
+
+        if (is_null($travelModel)) {
+            return false;
+        }
+
+        $travelModel->status = Travel::STATUS_CANCEL;
+        $travelModel->save();
+
+        $planetOrigim = Planet::findOrFail($travelModel->from);
+        $planetOrigim->metal    += $travelModel->metal;
+        $planetOrigim->uranium  += $travelModel->uranium;
+        $planetOrigim->crystal  += $travelModel->crystal;
+        $planetOrigim->transportShips += $travelModel->transportShips ;
+        $planetOrigim->save();
+
+        return true;
+    }
+
 }
