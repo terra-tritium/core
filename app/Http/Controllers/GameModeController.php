@@ -91,11 +91,12 @@ class GameModeController extends Controller
             $loggedInPlayer = Player::where("id", $player->id)->firstOrFail();
             $loggedInPlayer->gameMode = $code;
             $this->applyEffect($player->id, $code);
+
             $loggedInPlayer->save();
             return response()->json(['success' => 'Modo de jogo alterado com sucesso.'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(
-                ['error' => 'Ocorreu um erro ao alterar o modo de jogo.'],
+                ['error' => 'Ocorreu um erro ao alterar o modo de jogo. '.$e->getMessage()],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -122,68 +123,60 @@ class GameModeController extends Controller
             $effect = new Effect();
             $effect->player = $player;
         }        
+        #zerar os atributos dos efeitos para receber os novos
+        if($code > 0 && $code <= 9){
+            $effect->zerar();
+        }
 
         switch ($code) { 
-            case 1:
-                $effect->speedProduceUnit = 0;
-                $effect->speedproduceShip = 0;
-                $effect->speedBuild = 0;
-                $effect->speedResearch = 0;
-                $effect->speedTravel = 0;
-                $effect->speedMining = 0;
-                $effect->plasmaTechnology = 0;
-                $effect->protect = 0;
-                $effect->extraAttack = 0;
-                $effect->discountEnergy = 0;
-                $effect->discountHumanoid = 0;
-                $effect->discountBuild = 0;
+            case GameMode::MODE_CONQUER:
+                $effect->zerar();
                 $effect->save();
                 break;
             #NFT     
-            case 2:
+            case GameMode::MODE_COLONIZER:
                 $effect->discountBuild = -10;
                 $effect->protect = 10;                               
                 break;    
             #Space Titan 
-            case 3:
+            case GameMode::MODE_SPACE_TITAN:
                 $effect->speedProduceUnit = 20;
                 $effect->extraAttack = 2;
                 $effect->speedResearch = -20;
                 $effect->speedMining = -20;
                 break;
             # Researcher
-            case 4:
+            case GameMode::MODE_RESEARCHER:
                 $effect->speedResearch = 20;
                 $effect->costBuild = 20;
                 break;
             # Engineer
-            case 5:
+            case GameMode::MODE_ENGINEER:
                 $effect->speedProduceShip = 20;
                 $effect->speedResearch = -20;
                 break;
             # Protector
-            case 6:
+            case GameMode::MODE_PROTECTOR:
                 $effect->protect = 20;
                 break;
             # Builder
-            case 7:
+            case GameMode::MODE_BUILDER:
                 $effect->costBuild = -20;
                 $effect->speedProduceShip = -20;
                 $effect->speedProduceUnit = -20;
                 break;
             # Navigator
-            case 8:
+            case GameMode::MODE_NAVIGATOR:
                 $effect->speedTravel = 20;
                 $effect->speedProduceShip = -20;
                 $effect->speedProduceUnit = -20;
                 break;
             # Miner
-            case 9:
+            case GameMode::MODE_MINER:
                 $effect->speedMining = 2;
                 $effect->protect = -20;
                 break;
         }
-
         $effect->save();
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Player;
 use App\Models\Build;
 use App\Models\Building;
 use App\Models\Effect;
+use App\Models\GameMode;
 use App\Models\Requires;
 use App\Services\PlanetService;
 use App\Services\PlayerService;
@@ -68,7 +69,7 @@ class BuildService
 
         # efeito de desconto no custo da build para o modo de jogo que oferece desconto em construção
         $discountBuild = 0;
-        if($player->gameMode == 2 || $player->gameMode == 7){
+        if($player->gameMode == GameMode::MODE_COLONIZER || $player->gameMode == GameMode::MODE_BUILDER){
             $effect = Effect::where('player',$player->id)->firstOrFail();
             $discountBuild = $effect->discountBuild;
         }
@@ -284,7 +285,7 @@ class BuildService
         $player = Player::findOrFail($planet->player);
 
         $discountBuild = 0;
-        if($player->gameMode == 2 || $player->gameMode == 7){
+        if($player->gameMode == GameMode::MODE_COLONIZER || $player->gameMode == GameMode::MODE_BUILDER){
             $effect = Effect::where('player',$player->id)->firstOrFail();
             $discountBuild = $effect->discountBuild;
         }
@@ -399,6 +400,8 @@ class BuildService
     }
 
     public function calcResourceRequire($build, $level, $discountBuild) {
+        // $effect = app(Effect::class);
+        $effect = new Effect();
         $build = Build::find($build);
         $require = new Requires();
         $metalReq = 0;
@@ -437,9 +440,10 @@ class BuildService
                 $crystalReq += $crystalReq * ($build->coefficient / 100);
             }
         }
-        $require->metal = floor( $metalReq + (($metalReq * $discountBuild) / 100));
-        $require->uranium = floor( $uraniumReq + (($uraniumReq * $discountBuild) / 100));
-        $require->crystal = floor( $crystalReq + (($crystalReq * $discountBuild) / 100));
+        // $require->metal = floor( $metalReq + (($metalReq * $discountBuild) / 100));
+        $require->metal = $effect->calcDiscountBuild($metalReq,$discountBuild);
+        $require->uranium = $effect->calcDiscountBuild($uraniumReq,$discountBuild);
+        $require->crystal = $effect->calcDiscountBuild($crystalReq,$discountBuild);
         // $require->uranium = $uraniumReq;
 
         $require->time = ($metalReq + $uraniumReq + $crystalReq) / 100;
