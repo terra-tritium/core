@@ -43,8 +43,6 @@ class Effect extends Model
         $this->setAttribute('discountBuild', 0);
     }
 
-    public function calcDiscountBuild($value, $discount){
-        return floor( $value + (($value * $discount) / 100));
-    }
+  
 
 }

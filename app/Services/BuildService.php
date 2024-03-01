@@ -25,7 +25,8 @@ class BuildService
         private PlayerService $playerService = new PlayerService(),
         private PlanetService $planetService = new PlanetService(),
         private WorkerService $workerService = new WorkerService(),
-        private ResearchService $researchService = new ResearchService()
+        private ResearchService $researchService = new ResearchService(),
+        private EffectService $effectService = new EffectService()
     ) {}
 
     private function starNewMining($p1, $building, $resourceMining, $resourceSpend, $require) {
@@ -67,12 +68,9 @@ class BuildService
         $player = Player::findOrFail($playerLogged->id);
         $buildings  =  Building::where(['planet' => $building->planet, 'build' => $building->build])->first();
 
-        # efeito de desconto no custo da build para o modo de jogo que oferece desconto em construção
-        $discountBuild = 0;
-        if($player->gameMode == GameMode::MODE_COLONIZER || $player->gameMode == GameMode::MODE_BUILDER){
-            $effect = Effect::where('player',$player->id)->firstOrFail();
-            $discountBuild = $effect->discountBuild;
-        }
+       
+
+
         if($buildings)
         {
             return false;
@@ -83,7 +81,7 @@ class BuildService
             return false;
         }
 
-        $require = $this->calcResourceRequire($building->build, 1, $discountBuild);
+        $require = $this->calcResourceRequire($building->build, 1, $player);
 
         $building->ready = time() + ($require->time * env("TRITIUM_CONSTRUCTION_SPEED"));
         $p1->ready = $building->ready;
@@ -284,12 +282,8 @@ class BuildService
         $planet = Planet::find($building->planet);
         $player = Player::findOrFail($planet->player);
 
-        $discountBuild = 0;
-        if($player->gameMode == GameMode::MODE_COLONIZER || $player->gameMode == GameMode::MODE_BUILDER){
-            $effect = Effect::where('player',$player->id)->firstOrFail();
-            $discountBuild = $effect->discountBuild;
-        }
-        $require = $this->calcResourceRequire($building->build, $building->level + 1, $discountBuild);
+        
+        $require = $this->calcResourceRequire($building->build, $building->level + 1, $player);
 
         # Yet have a building in construction on this planet
         if ($planet->ready != null && $planet->ready > time()) {
@@ -399,9 +393,7 @@ class BuildService
         return Building::where("planet", $planet)->get();
     }
 
-    public function calcResourceRequire($build, $level, $discountBuild) {
-        // $effect = app(Effect::class);
-        $effect = new Effect();
+    public function calcResourceRequire($build, $level, $player) {
         $build = Build::find($build);
         $require = new Requires();
         $metalReq = 0;
@@ -441,9 +433,9 @@ class BuildService
             }
         }
         // $require->metal = floor( $metalReq + (($metalReq * $discountBuild) / 100));
-        $require->metal = $effect->calcDiscountBuild($metalReq,$discountBuild);
-        $require->uranium = $effect->calcDiscountBuild($uraniumReq,$discountBuild);
-        $require->crystal = $effect->calcDiscountBuild($crystalReq,$discountBuild);
+        $require->metal = $this->effectService->calcDiscountBuild($metalReq,$player);
+        $require->uranium = $this->effectService->calcDiscountBuild($uraniumReq,$player);
+        $require->crystal = $this->effectService->calcDiscountBuild($crystalReq,$player);
         // $require->uranium = $uraniumReq;
 
         $require->time = ($metalReq + $uraniumReq + $crystalReq) / 100;
