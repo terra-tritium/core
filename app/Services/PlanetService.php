@@ -46,7 +46,9 @@ public function currentBalance($p1, $type) {
       case 0:
         return $p1->energy + ($p1->workersWaiting * (env("TRITIUM_ENERGY_BASE") * $activeEnergyMining));
       case 1:
-        return $p1->metal + ($p1->pwMetal * (env("TRITIUM_METAL_BASE") * $activeMetalMining));
+        //     return (base + (base * percent) / 100)
+
+        return $p1->metal + ($p1->pwMetal * ((env("TRITIUM_METAL_BASE") + (env("TRITIUM_METAL_BASE") * -50) / 100 ) * $activeMetalMining));
       case 2:
         return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM_BASE") * $activeUraniumMining));
       case 3:

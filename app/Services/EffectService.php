@@ -19,21 +19,48 @@ class EffectService
     return $discountBuild;
   }
 
-  public function getProtectionBonus($player){
+  public function getProtectionBonus($player)
+  {
     $protectionBonus = 0;
-    if($player->gameMode == GameMode::MODE_COLONIZER ||
-       $player->gameMode == GameMode::MODE_PROTECTOR || 
-       $player->gameMode == GameMode::MODE_MINER){
-        $effect = Effect::where('player', $player->id)->firstOrFail();
-        $protectionBonus = $effect->protect;
-      }
-      return $protectionBonus;
+    if (
+      $player->gameMode == GameMode::MODE_COLONIZER ||
+      $player->gameMode == GameMode::MODE_PROTECTOR ||
+      $player->gameMode == GameMode::MODE_MINER
+    ) {
+      $effect = Effect::where('player', $player->id)->firstOrFail();
+      $protectionBonus = $effect->protect;
+    }
+    return $protectionBonus;
+  }
+  /**
+   * @todo
+   */
+  public function calcProtection($value, $player)
+  {
+    $bonus = $this->getProtectionBonus($player);
+    return floor($value + (($value * $bonus) / 100));
   }
 
   public function calcDiscountBuild($value, $player)
   {
     $discount = $this->getDiscountBuildEffect($player);
     return floor($value + (($value * $discount) / 100));
+  }
+  public function calcMiningSpeed($value, $player)
+  {
+    return 1;
+  }
+  public function calcAttack($value, $player)
+  {
+    return 1;
+  }
+  public function calcResearchSpeed($value, $player)
+  {
+    return 1;
+  }
+  public function calcRobotConstructSpeed($value, $player)
+  {
+    return 1;
   }
 
   public function applyEffect($player, $code)
