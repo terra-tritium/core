@@ -90,6 +90,7 @@ class TravelService
                 break;
             case Travel::TRANSPORT_RESOURCE:
                 $newTravel = $this->startTransportResource($newTravel, $travel);
+                $newTravel->status = Travel::STATUS_ON_GOING;
                 break;
             case Travel::TRANSPORT_BUY:
                 $newTravel = $this->startTransportBuy($newTravel);
@@ -205,9 +206,9 @@ class TravelService
         $currentTravel = Travel::find($travel);
         $newTravel = $currentTravel->replicate();
         $travelTime = $now - $currentTravel->start;
-        $newTravel->arrival = Carbon::now()->addSeconds($travelTime / 2 )->getTimestamp();
-        $newTravel->from  = $currentTravel->to ;
-        $newTravel->to     = $currentTravel->from ;
+        $newTravel->arrival = Carbon::now()->addSeconds($travelTime)->getTimestamp();
+        //$newTravel->from  = $currentTravel->to ;
+        //$newTravel->to     = $currentTravel->from ;
         $newTravel->status = Travel::STATUS_RETURN;
         $newTravel->push();
 
@@ -500,7 +501,7 @@ class TravelService
         $planetTarget->crystal += $travelModel->crystal;
 
         $planetTarget->save();
-        $this->logService->notify($planetTarget->player, "You received a resource", "Combat");
+        $this->logService->notify($planetTarget->player, "You received a resource", "Mission");
         $this->back($travel);
     }
 
@@ -510,7 +511,7 @@ class TravelService
         $planetOrige = Planet::findOrFail($travelModel->from);
         $planetOrige->transportShips += $travelModel->transportShips ;
         $planetOrige->save();
-        $this->logService->notify($planetOrige->player, "Your freighter has returned from its trip", "Combat");
+        $this->logService->notify($planetOrige->player, "Your freighter has returned from its trip", "Mission");
     }
 
     public function getCurrent($player)

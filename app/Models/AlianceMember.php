@@ -39,7 +39,7 @@ class AlianceMember extends Model
                 'rm.rankName'
             )
             ->join('players as p', 'p.id', '=', 'am.player_id')
-            ->join('rank_member as rm', 'rm.id', '=', 'am.idRank')
+            ->leftJoin('rank_member as rm', 'rm.id', '=', 'am.idRank')
             ->where('am.status', 'A')
             ->where('am.idAliance', $alianceId)
             ->orderBy('p.name')
