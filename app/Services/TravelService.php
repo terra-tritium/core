@@ -72,11 +72,12 @@ class TravelService
         $newTravel->arrival = $now + $travelTime;
         $newTravel->receptor = $this->getReceptor($travel->to);
         $newTravel->strategy = $travel->strategy;
-        $newTravel->status =  is_null($travel->status)  ? Travel::STATUS_ON_LOAD : $travel->status;
+        $newTravel->status = Travel::STATUS_ON_LOAD;
 
         switch ($travel->action) {
             case Travel::ATTACK_FLEET:
                 $newTravel = $this->startAttackFleet($newTravel, $travel, $player);
+                $newTravel->status = Travel::STATUS_ON_GOING;
                 break;
             case Travel::DEFENSE_FLEET:
                 $newTravel = $this->startDefenseFleet($newTravel);
