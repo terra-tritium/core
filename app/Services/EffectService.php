@@ -19,6 +19,15 @@ class EffectService
     return $discountBuild;
   }
 
+  private function getSpeedMiningEffect($player)
+  {
+    $percentMining = 0;
+    if ($player->gameMode == GameMode::MODE_SPACE_TITAN || $player->gameMode == GameMode::MODE_MINER) {
+      $effect = Effect::where('player', $player->id)->firstOrFail();
+      $percentMining = $effect->speedMining;
+    }
+    return $percentMining;
+  }
   public function getProtectionBonus($player)
   {
     $protectionBonus = 0;
@@ -48,7 +57,8 @@ class EffectService
   }
   public function calcMiningSpeed($value, $player)
   {
-    return 1;
+    $percentSpeed = $this->getSpeedMiningEffect($player);
+    return $value + (($value * $percentSpeed) / 100);
   }
   public function calcAttack($value, $player)
   {
