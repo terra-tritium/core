@@ -188,10 +188,10 @@ class SpaceCombatService
     $demage = $demage + $effects;
     $kills = $demage / $hp;
     $kills = ceil($kills / $qtdPlayers);
-    if ($figther->$$ship > 0) {
-      $figther->$$ship -= $kills;
-      if ($figther->$$ship < 0) {
-        $figther->$$ship = 0;
+    if ($figther->$ship > 0) {
+      $figther->$ship -= $kills;
+      if ($figther->$ship < 0) {
+        $figther->$ship = 0;
       }
     }
     return $figther;
