@@ -18,7 +18,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('cache:prune-stale-tags')->hourly();
+        # Pruning cache tags is only necessary when using Redis.
+        //$schedule->command('cache:prune-stale-tags')->hourly();
 
         $schedule->command('rankings:update')->everyThirtyMinutes();
         $schedule->command('energy:update')->everyThirtyMinutes();
