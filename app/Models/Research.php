@@ -19,4 +19,6 @@ class Research extends Model
     use HasFactory;
     protected $table = 'researchs';
     public $timestamps = false;
+
+
 }

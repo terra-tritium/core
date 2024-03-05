@@ -441,6 +441,9 @@ class TravelService
             case Travel::MISSION_EXPLORER:
                 $missions = $this->getMissionsByAction(Travel::MISSION_EXPLORER);
                 break;
+            case Travel::MISSION_SPIONAGE:
+                $missions = $this->getMissionsByAction(Travel::MISSION_SPIONAGE);
+                break;
             case "militar":
                 $missions = Travel::with('from', 'to')
                     ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_FLEET]])
@@ -545,4 +548,17 @@ class TravelService
         return true;
     }
 
+    public function speyMission($player, $travel) {
+        $travel =  json_decode (json_encode ($travel), FALSE);
+
+
+        $travelModel = new Travel();
+        $travelModel->action = Travel::MISSION_SPIONAGE;
+        $travelModel->from =   $travel->origin;
+        $travelModel->to =   $travel->destiny;
+
+        $this->start($player,$travelModel);
+
+        $typeMission = $travel->typeMission;
+    }
 }
