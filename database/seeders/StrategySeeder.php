@@ -19,7 +19,7 @@ class StrategySeeder extends Seeder
             'name' => "Line",
             'code' => 1,
             'description' => 'description',
-            'image' => 'strategy01.png',
+            'image' => 'strategy1.png',
             'bonus' => 'Droides soma +2A',
             'attack' => 25,
             'defense' => 0
@@ -28,7 +28,7 @@ class StrategySeeder extends Seeder
             'name' => "Sniper",
             'code' => 2,
             'description' => 'description',
-            'image' => 'strategy02.png',
+            'image' => 'strategy2.png',
             'bonus' => 'Droides soma +2A',
             'attack' => 23,
             'defense' => 2
@@ -38,7 +38,7 @@ class StrategySeeder extends Seeder
             'name' => "Guerrilla",
             'code' => 3,
             'description' => 'description',
-            'image' => 'strategy03.png',
+            'image' => 'strategy3.png',
             'bonus' => 'Droides soma +2A',
             'attack' => 22,
             'defense' => 3
@@ -47,7 +47,7 @@ class StrategySeeder extends Seeder
             'name' => "Diamond",
             'code' => 4,
             'description' => 'description',
-            'image' => 'strategy04.png',
+            'image' => 'strategy4.png',
             'bonus' => 'Droides soma +2D',
             'attack' => 20,
             'defense' => 5
@@ -56,7 +56,7 @@ class StrategySeeder extends Seeder
             'name' => "Wedge",
             'code' => 5,
             'description' => 'description',
-            'image' => 'strategy05.png',
+            'image' => 'strategy5.png',
             'bonus' => 'Droides soma +2D',
             'attack' => 18,
             'defense' => 7
@@ -66,7 +66,7 @@ class StrategySeeder extends Seeder
             'name' => "Star",
             'code' => 6,
             'description' => 'description',
-            'image' => 'strategy06.png',
+            'image' => 'strategy6.png',
             'bonus' => 'Droides soma +2D',
             'attack' => 16,
             'defense' => 9
@@ -75,7 +75,7 @@ class StrategySeeder extends Seeder
             'name' => "Delta",
             'code' => 7,
             'description' => 'description',
-            'image' => 'strategy07.png',
+            'image' => 'strategy7.png',
             'bonus' => 'Veículos de Apoio soma +1A e +1D',
             'attack' => 14,
             'defense' => 11
@@ -84,7 +84,7 @@ class StrategySeeder extends Seeder
             'name' => "Diagonal",
             'code' => 8,
             'description' => 'description',
-            'image' => 'strategy08.png',
+            'image' => 'strategy8.png',
             'bonus' => 'Veículos de Apoio soma +1A e +1D',
             'attack' => 12,
             'defense' => 13
@@ -93,7 +93,7 @@ class StrategySeeder extends Seeder
             'name' => "Column",
             'code' => 9,
             'description' => 'description',
-            'image' => 'strategy09.png',
+            'image' => 'strategy9.png',
             'bonus' => 'Lançador soma +2D',
             'attack' => 10,
             'defense' => 15
