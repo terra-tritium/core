@@ -24,6 +24,7 @@ class Effect extends Model
         'discountEnergy' => 0,
         'discountHumanoid' => 0,
         'discountBuild' => 0,
+        'speedConstructionBuild' => 0
     ];
 
     
@@ -41,6 +42,7 @@ class Effect extends Model
         $this->setAttribute('discountEnergy', 0);
         $this->setAttribute('discountHumanoid', 0);
         $this->setAttribute('discountBuild', 0);
+        $this->setAttribute('speedConstructionBuild', 0);
     }
 
   

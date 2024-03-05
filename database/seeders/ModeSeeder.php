@@ -39,7 +39,7 @@ class ModeSeeder extends Seeder
         DB::table('modes')->insert([
             'name' => "Researcher",
             'code' => 4,
-            'description' => 'Research Speed +20% / Construction Cost +20%',
+            'description' => 'Research Speed +20% / Construction Speed decreases -20%',
             'image' => 'researcher.png'
         ]);
 

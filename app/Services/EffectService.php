@@ -4,12 +4,15 @@ namespace App\Services;
 
 use App\Models\Effect;
 use App\Models\GameMode;
+use App\Models\Player;
 
 class EffectService
 {
 
-
-  private function getDiscountBuildEffect($player)
+/**
+ * Recupera percentual  para desconto no valor da build
+ */
+  private function getPercentDiscountBuildEffect($player)
   {
     $discountBuild = 0;
     if ($player->gameMode == GameMode::MODE_COLONIZER || $player->gameMode == GameMode::MODE_BUILDER) {
@@ -19,7 +22,10 @@ class EffectService
     return $discountBuild;
   }
 
-  private function getSpeedMiningEffect($player)
+  /**
+   * Recupera percentual de  velocidade de mineração
+   */
+  private function getPercentSpeedMiningEffect($player)
   {
     $percentMining = 0;
     if ($player->gameMode == GameMode::MODE_SPACE_TITAN || $player->gameMode == GameMode::MODE_MINER) {
@@ -28,6 +34,41 @@ class EffectService
     }
     return $percentMining;
   }
+  /**
+   * Recupera percentual de velocidade de construção de robos
+   */
+  private function getPercentRobotConstructionSpeed($playerId){
+    $player = Player::where('id', $playerId)->firstOrFail();
+    $percentConstructionSpeed = 0;
+    if($player->gameMode == GameMode::MODE_SPACE_TITAN ||
+       $player->gameMode == GameMode::MODE_BUILDER || 
+       $player->gameMode == GameMode::MODE_NAVIGATOR
+      ){
+      
+        $effect = Effect::where('player', $player->id)->firstOrFail();
+        $percentConstructionSpeed = $effect->speedProduceUnit;
+    }
+    return $percentConstructionSpeed;
+  }
+  /**
+   * Recupera percentual de velocidade de construção de naves
+   */
+  private function getPercentShipConstructionSpeed($playerId){
+    $player = Player::where('id', $playerId)->firstOrFail();
+    $percentConstructionSpeed = 0;    
+    if($player->gameMode == GameMode::MODE_ENGINEER ||
+       $player->gameMode == GameMode::MODE_BUILDER || 
+       $player->gameMode == GameMode::MODE_NAVIGATOR
+      ){
+      
+        $effect = Effect::where('player', $player->id)->firstOrFail();
+        $percentConstructionSpeed = $effect->speedProduceShip;
+    }
+    return $percentConstructionSpeed;
+  }
+  /**
+   * Bonificação de proteção
+   */
   public function getProtectionBonus($player)
   {
     $protectionBonus = 0;
@@ -41,6 +82,8 @@ class EffectService
     }
     return $protectionBonus;
   }
+
+
   /**
    * @todo
    */
@@ -52,12 +95,12 @@ class EffectService
 
   public function calcDiscountBuild($value, $player)
   {
-    $discount = $this->getDiscountBuildEffect($player);
+    $discount = $this->getPercentDiscountBuildEffect($player);
     return floor($value + (($value * $discount) / 100));
   }
   public function calcMiningSpeed($value, $player)
   {
-    $percentSpeed = $this->getSpeedMiningEffect($player);
+    $percentSpeed = $this->getPercentSpeedMiningEffect($player);
     return $value + (($value * $percentSpeed) / 100);
   }
   public function calcAttack($value, $player)
@@ -68,9 +111,15 @@ class EffectService
   {
     return 1;
   }
+
+  public function calcShipsConstructSpeed($value, $player){
+    $percent = $this->getPercentShipConstructionSpeed($player) * -1;
+    return floor($value + (($value * $percent) / 100)); 
+  }
   public function calcRobotConstructSpeed($value, $player)
   {
-    return 1;
+    $percent = $this->getPercentRobotConstructionSpeed($player) * -1;
+    return floor($value + (($value * $percent) / 100));
   }
 
   public function applyEffect($player, $code)
@@ -105,7 +154,7 @@ class EffectService
         # Researcher
       case GameMode::MODE_RESEARCHER:
         $effect->speedResearch = 20;
-        $effect->costBuild = 20;
+        $effect->speedConstructionBuild = -20;
         break;
         # Engineer
       case GameMode::MODE_ENGINEER:

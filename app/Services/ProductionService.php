@@ -28,11 +28,17 @@ class ProductionService
       $unitModel = Ship::findOrFail($unit['id']);
     }
     if($unitModel){
+      $effectService = new EffectService();
       $production = new Production();
       $production->player = $player;
       $production->planet = $planet;
-  
+      
       $timeConstruction = ($unitModel->time *  $unit['quantity'] * env("TRITIUM_PRODUCTION_SPEED") );
+      if($type == "troop"){
+        $timeConstruction = $effectService->calcRobotConstructSpeed($timeConstruction, $player);
+      }else{
+        $timeConstruction = $effectService->calcShipsConstructSpeed($timeConstruction, $player);
+      }
       $unit['type'] = $type;
       
       $production->ready = time() + $timeConstruction;
