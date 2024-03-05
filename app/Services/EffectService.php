@@ -51,6 +51,17 @@ class EffectService
     return $percentConstructionSpeed;
   }
   /**
+   * Recupera percentual de velocidade da viagem
+   */
+  private function getPercenteTravelSpeed($player){
+    $percentTravelSpeed = 0;
+    if($player->gameMode == GameMode::MODE_NAVIGATOR){
+        $effect = Effect::where('player', $player->id)->firstOrFail();
+        $percentTravelSpeed = $effect->speedTravel;
+    }
+    return $percentTravelSpeed;
+  }
+  /**
    * Recupera percentual de velocidade de construção de naves
    */
   private function getPercentShipConstructionSpeed($playerId){
@@ -65,6 +76,28 @@ class EffectService
         $percentConstructionSpeed = $effect->speedProduceShip;
     }
     return $percentConstructionSpeed;
+  }
+  /**
+   * Recupera percentual develocidade de construção de builds
+   */
+  private function getPercentConstructionBuildSpeed($player){
+    $percentConstructionBuildSpeed = 0;    
+    if($player->gameMode == GameMode::MODE_RESEARCHER){
+        $effect = Effect::where('player', $player->id)->firstOrFail();
+        $percentConstructionBuildSpeed = $effect->speedConstructionBuild;
+    }
+    return $percentConstructionBuildSpeed;
+  }
+  private function getPercentResearcherSpeed($player){
+    $percentResearcherSpeed = 0;
+    if($player->gameMode == GameMode::MODE_RESEARCHER || 
+       $player->gameMode == GameMode::MODE_SPACE_TITAN || 
+       $player->gameMode == GameMode::MODE_ENGINEER
+      ){
+      $effect = Effect::where('player', $player->id)->firstOrFail();
+      $percentResearcherSpeed = $effect->speedResearch;
+    }
+    return $percentResearcherSpeed;
   }
   /**
    * Bonificação de proteção
@@ -109,7 +142,17 @@ class EffectService
   }
   public function calcResearchSpeed($value, $player)
   {
-    return 1;
+    $percent = $this->getPercentResearcherSpeed($player) * -1;
+    return floor($value + (($value * $percent) / 100)); 
+  }
+  public function calcTravelSpeed($value, $player){
+    $percent = $this->getPercenteTravelSpeed($player) * -1;
+    return floor($value + (($value * $percent) / 100)); 
+  }
+
+  public function calcConstructionBuildSpeed($value, $player){
+    $percent = $this->getPercentConstructionBuildSpeed($player) * -1;
+    return floor($value + (($value * $percent) / 100)); 
   }
 
   public function calcShipsConstructSpeed($value, $player){

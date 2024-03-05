@@ -82,8 +82,8 @@ class BuildService
         }
 
         $require = $this->calcResourceRequire($building->build, 1, $player);
-
-        $building->ready = time() + ($require->time * env("TRITIUM_CONSTRUCTION_SPEED"));
+        $constructionSpeed = $this->effectService->calcConstructionBuildSpeed(env("TRITIUM_CONSTRUCTION_SPEED"),$player);
+        $building->ready = time() + ($require->time * $constructionSpeed);
         $p1->ready = $building->ready;
 
         // Colonization
@@ -289,8 +289,9 @@ class BuildService
         if ($planet->ready != null && $planet->ready > time()) {
             return false;
         }
-
-        $building->ready = time() + ($require->time * env("TRITIUM_CONSTRUCTION_SPEED"));
+        
+        $constructionSpeed = $this->effectService->calcConstructionBuildSpeed(env("TRITIUM_CONSTRUCTION_SPEED"),$player);
+        $building->ready = time() + ($require->time * $constructionSpeed);
         $planet->ready = $building->ready;
 
         if ($this->suficientFunds($planet, $require)) {
