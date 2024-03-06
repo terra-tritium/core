@@ -72,6 +72,7 @@ class TravelService
         $newTravel->arrival = $now + $travelTime;
         $newTravel->receptor = $this->getReceptor($travel->to);
         $newTravel->strategy = $travel->strategy;
+        $newTravel->transportShips = $travel->transportShip;
         $newTravel->status = Travel::STATUS_ON_LOAD;
 
         switch ($travel->action) {
@@ -104,9 +105,7 @@ class TravelService
         }
 
         # Merchant Ships
-        if (isset($travel->transportShips)) {
-            $newTravel->transportShips = $travel->transportShips;
-        } else {
+        if ($newTravel->transportShips < 0) {
             $newTravel->transportShips = 0;
         }
 

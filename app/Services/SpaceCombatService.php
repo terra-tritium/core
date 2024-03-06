@@ -38,7 +38,7 @@ class SpaceCombatService
     $player1->start = time();
     $player1->stage = 0;
     $player1->planet = $travel->from;
-    $player1->transportShip = $travel->transportShip;
+    $player1->transportShips = $travel->transportShips;
     $player1->cruiser = $travel->cruiser;
     $player1->craft = $travel->craft;
     $player1->bomber = $travel->bomber;
@@ -58,7 +58,7 @@ class SpaceCombatService
     $player2->start = time();
     $player2->stage = 0;
     $player2->planet = $travel->to;
-    $player2->transportShip = $travel->transportShip;
+    $player2->transportShips = $travel->transportShips;
     $player2->cruiser = 0;
     $player2->craft = 0;
     $player2->bomber = 0;
