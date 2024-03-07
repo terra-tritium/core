@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Combat;
+use App\Models\CombatStage;
 use App\Models\Fighters;
 use App\Models\Planet;
 use App\Models\Ship;
@@ -15,6 +16,11 @@ class SpaceCombatService
   private $battleFieldSize;
   private $randStart = 0;
   private $randEnd = 5;
+  private $totalKillInvasor = 0;
+  private $totalKilllocal = 0;
+  private $totalDemageInvasor = 0;
+  private $totalDemageLocal = 0;
+  private $messages = [];
 
   public function __construct() {
     $this->battleFieldSize = 50;
@@ -138,6 +144,14 @@ class SpaceCombatService
 
     if ($this->haveShips($locals)) {
       $this->resolve($invasors, $locals);
+      $cs = new CombatStage();
+      $cs->combat = $combatId;
+      $cs->stage = $combat->stage;
+      $cs->killInvasor = $this->totalKillInvasor;
+      $cs->killLocal = $this->totalKilllocal;
+      $cs->demageInvasor = $this->totalDemageInvasor;
+      $cs->demageLocal = $this->totalDemageLocal;
+      $cs->save();
     } else {
       # Invasors win
       $this->finishCombat($combatId, Combat::SIDE_INVASOR);
@@ -190,6 +204,15 @@ class SpaceCombatService
     $demage = $demage + $effects;
     $kills = $demage / $hp;
     $kills = ceil($kills / $qtdPlayers);
+
+    if ($figther->side == Combat::SIDE_LOCAL) {
+      $this->totalDemageLocal += $demage;
+      $this->totalKilllocal += $kills;
+    } else {
+      $this->totalDemageInvasor += $demage;
+      $this->totalKillInvasor += $kills;
+    }
+
     if ($figther->$ship > 0) {
       $figther->$ship -= $kills;
       if ($figther->$ship < 0) {

@@ -470,20 +470,12 @@ return new class extends Migration {
             $table->id();
             $table->integer("number");
             $table->foreignId('combat')->constrained("combats");
-            $table->string("attackDemage");
-            $table->string("defenseDemage");
-            $table->integer("attackStrategy");
-            $table->integer("defenseStrategy");
-            $table->json('attackUnits');
-            $table->json('defenseUnits');
-            $table->json('attackKills');
-            $table->json('defenseKills');
-            $table->json('attackSlots');
-            $table->json('defenseSlots');
-            $table->json('attackReserve');
-            $table->json('defenseReserve');
-            $table->boolean('attackGaveUp');
-            $table->boolean('defenseGaveUp');
+            $table->integer('stage');
+            $table->string('message');
+            $table->integer('demageA');
+            $table->integer('demageB');
+            $table->integer('killInvasor');
+            $table->integer('killLocal');
         });
         Schema::create('qnames', function (Blueprint $table) {
             $table->id();
