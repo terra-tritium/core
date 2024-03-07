@@ -470,7 +470,7 @@ return new class extends Migration {
             $table->id();
             $table->integer("number");
             $table->foreignId('combat')->constrained("combats");
-            $table->json('message');
+            $table->string('message');
             $table->integer('demageInvasor');
             $table->integer('demageLocal');
             $table->integer('killInvasor');

@@ -20,7 +20,6 @@ class SpaceCombatService
   private $totalKilllocal = 0;
   private $totalDemageInvasor = 0;
   private $totalDemageLocal = 0;
-  private $messages = [];
 
   public function __construct() {
     $this->battleFieldSize = 50;
@@ -143,8 +142,7 @@ class SpaceCombatService
     }
 
     if ($this->haveShips($locals)) {
-      $this->resolve($invasors, $locals);
-      $this->logStage($combat, $this->totalKillInvasor, $this->totalKilllocal, $this->totalDemageInvasor, $this->totalDemageLocal);
+      $this->resolve($combat, $invasors, $locals);
     } else {
       # Invasors win
       $this->finishCombat($combatId, Combat::SIDE_INVASOR);
@@ -152,13 +150,21 @@ class SpaceCombatService
     }
 
     if ($this->haveShips($invasors)) {
-      $this->resolve($locals, $invasors);
-      $this->logStage($combat, $this->totalKillInvasor, $this->totalKilllocal, $this->totalDemageInvasor, $this->totalDemageLocal);
+      $this->resolve($combat, $locals, $invasors);
     } else {
       # Locals win
       $this->finishCombat($combatId, Combat::SIDE_LOCAL);
       return true;
     }
+
+    $this->logStage(
+      $combat,
+      "Invasor Kills: " . $this->totalKillInvasor . " Locals Kills: " . $this->totalKilllocal,
+      $this->totalKillInvasor,
+      $this->totalKilllocal,
+      $this->totalDemageInvasor,
+      $this->totalDemageLocal
+    );
 
     $combat->stage++;
     $combat->nextStage = time() + env('TRITIUM_COMBAT_STAGE_TIME');
@@ -168,10 +174,10 @@ class SpaceCombatService
     SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds(env('TRITIUM_COMBAT_STAGE_TIME')));
   }
 
-  private function logStage($combat, $killInvasor, $killLocal, $demageInvasor, $demageLocal) {
+  private function logStage($combat, $message, $killInvasor = 0, $killLocal = 0, $demageInvasor = 0, $demageLocal = 0) {
     $cs = new CombatStage();
     $cs->combat = $combat->id;
-    $cs->message = json_encode($this->messages);
+    $cs->message = $message;
     $cs->number = $combat->stage;
     $cs->killInvasor = $killInvasor;
     $cs->killLocal = $killLocal;
@@ -185,8 +191,7 @@ class SpaceCombatService
     $combat->status = Combat::STATUS_FINISH;
     $combat->winner = $winner;
     $combat->save();
-    array_push($this->messages, 'Finish - winner: ' . $winner);
-    $this->logStage($combat, 0, 0, 0, 0);
+    $this->logStage($combat, 'Combat finish, winner: ' . $winner);
   }
 
   private function haveShips($fighters) {
@@ -197,7 +202,7 @@ class SpaceCombatService
     return $ships > 0;
   }
 
-  private function getDemageEffects($p1StrategyId, $p2StrategyId) {
+  private function getDemageEffects($combat, $p1StrategyId, $p2StrategyId) {
     $p1Strategy = Strategy::find($p1StrategyId);
     $p2Strategy = Strategy::find($p2StrategyId);
 
@@ -205,7 +210,7 @@ class SpaceCombatService
       $effects = $p1Strategy->attack - $p2Strategy->defense;
     }
 
-    array_push($this->messages, $p1Strategy->name . ' effect: ' . $effects . ' demage');
+    $this->logStage($combat, $p1Strategy->name . ' effect: ' . $effects . ' demage');
 
     return $effects;
   }
@@ -232,7 +237,7 @@ class SpaceCombatService
     return $figther;
   }
 
-  private function resolve($invasors, $locals) {
+  private function resolve($combat, $invasors, $locals) {
 
     $invasorCraftAttack = 0;
     $localCraftAttack = 0;
@@ -329,7 +334,7 @@ class SpaceCombatService
     $localFlagshipDemage = $localFlagshipAttack - $invasorFlagshipDefense;
 
     # get effect locals
-    $effects = $this->getDemageEffects($locals[0]->strategy, $invasors[0]->strategy);
+    $effects = $this->getDemageEffects($combat, $locals[0]->strategy, $invasors[0]->strategy);
 
     # Apply demage
     foreach ($locals as $local) {
@@ -384,7 +389,7 @@ class SpaceCombatService
     }
 
     # get effect invasors
-    $effects = $this->getDemageEffects($invasors[0]->strategy, $locals[0]->strategy);
+    $effects = $this->getDemageEffects($combat, $invasors[0]->strategy, $locals[0]->strategy);
 
     foreach ($invasors as $invasor) {
       if ($localCraftDemage > 0) {

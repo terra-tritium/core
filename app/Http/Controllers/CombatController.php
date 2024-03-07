@@ -283,7 +283,7 @@ class CombatController extends Controller
 
     public function stages($id)
     {
-        return CombatStage::where('combat', $id)->get();
+        return CombatStage::where('combat', $id)->orderByDesc('id') ->get();
     }
 
     public function start($defense, $planet, $travel)
