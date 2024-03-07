@@ -144,14 +144,7 @@ class SpaceCombatService
 
     if ($this->haveShips($locals)) {
       $this->resolve($invasors, $locals);
-      $cs = new CombatStage();
-      $cs->combat = $combatId;
-      $cs->stage = $combat->stage;
-      $cs->killInvasor = $this->totalKillInvasor;
-      $cs->killLocal = $this->totalKilllocal;
-      $cs->demageInvasor = $this->totalDemageInvasor;
-      $cs->demageLocal = $this->totalDemageLocal;
-      $cs->save();
+      $this->logStage($combatId, $this->totalKillInvasor, $this->totalKilllocal, $this->totalDemageInvasor, $this->totalDemageLocal);
     } else {
       # Invasors win
       $this->finishCombat($combatId, Combat::SIDE_INVASOR);
@@ -160,6 +153,7 @@ class SpaceCombatService
 
     if ($this->haveShips($invasors)) {
       $this->resolve($locals, $invasors);
+      $this->logStage($combat, $this->totalKillInvasor, $this->totalKilllocal, $this->totalDemageInvasor, $this->totalDemageLocal);
     } else {
       # Locals win
       $this->finishCombat($combatId, Combat::SIDE_LOCAL);
@@ -174,11 +168,25 @@ class SpaceCombatService
     SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds(env('TRITIUM_COMBAT_STAGE_TIME')));
   }
 
+  private function logStage($combat, $killInvasor, $killLocal, $demageInvasor, $demageLocal) {
+    $cs = new CombatStage();
+    $cs->combat = $combat;
+    $cs->message = $this->messages;
+    $cs->stage = $combat->stage + 1;
+    $cs->killInvasor = $killInvasor;
+    $cs->killLocal = $killLocal;
+    $cs->demageInvasor = $demageInvasor;
+    $cs->demageLocal = $demageLocal;
+    $cs->save();
+  }
+
   private function finishCombat($combatId, $winner) {
     $combat = Combat::find($combatId);
     $combat->status = Combat::STATUS_FINISH;
     $combat->winner = $winner;
     $combat->save();
+    array_push($this->messages, 'Finish - winner: ' . $winner);
+    $this->logStage($combat, 0, 0, 0, 0);
   }
 
   private function haveShips($fighters) {
@@ -196,6 +204,8 @@ class SpaceCombatService
     if ($p1Strategy && $p2Strategy) {
       $effects = $p1Strategy->attack - $p2Strategy->defense;
     }
+
+    array_push($this->messages, $p1Strategy->name . ' effect: ' . $effects . ' demage');
 
     return $effects;
   }
