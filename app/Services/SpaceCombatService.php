@@ -144,7 +144,7 @@ class SpaceCombatService
 
     if ($this->haveShips($locals)) {
       $this->resolve($invasors, $locals);
-      $this->logStage($combatId, $this->totalKillInvasor, $this->totalKilllocal, $this->totalDemageInvasor, $this->totalDemageLocal);
+      $this->logStage($combat, $this->totalKillInvasor, $this->totalKilllocal, $this->totalDemageInvasor, $this->totalDemageLocal);
     } else {
       # Invasors win
       $this->finishCombat($combatId, Combat::SIDE_INVASOR);
@@ -170,9 +170,9 @@ class SpaceCombatService
 
   private function logStage($combat, $killInvasor, $killLocal, $demageInvasor, $demageLocal) {
     $cs = new CombatStage();
-    $cs->combat = $combat;
-    $cs->message = $this->messages;
-    $cs->stage = $combat->stage + 1;
+    $cs->combat = $combat->id;
+    $cs->message = json_encode($this->messages);
+    $cs->number = $combat->stage;
     $cs->killInvasor = $killInvasor;
     $cs->killLocal = $killLocal;
     $cs->demageInvasor = $demageInvasor;
