@@ -151,7 +151,7 @@ class ResearchService
         return $researched;
     }
     public function planetSincronize($planet) {
-        $planet->researchPoints = $planet->pwResearch * ((time() - $planet->timeResearch)/100) * env('TRITIUM_RESEARCH_SPEED');
+        $planet->researchPoints = $planet->pwResearch * ((time() - $planet->timeResearch)/1000) * env('TRITIUM_RESEARCH_SPEED');
         $planet->timeResearch = time();
         $planet->save();
         return $planet;
