@@ -30,7 +30,10 @@ class TravelService
 
     public function start ($player, $travel) {
 
-        $travel =  json_decode (json_encode ($travel), FALSE);
+        if (!is_object($travel)) {
+            $travel =  json_decode (json_encode ($travel), FALSE);
+        }
+        
         $newTravel = new Travel();
 
         if ($travel->action < 1 || $travel->action > 8) {
@@ -102,6 +105,9 @@ class TravelService
             case Travel::MISSION_EXPLORER:
                 $newTravel = $this->startMissionExplorer($newTravel);
                 break;
+            case Travel::RETURN_FLEET:
+                $newTravel = $this->startReturnFleet($newTravel, $travel, $player);
+                break;
         }
 
         # Merchant Ships
@@ -111,6 +117,11 @@ class TravelService
 
         $newTravel->save();
         TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
+    }
+
+    public function startReturnFleet($travel, $req, $player) {
+        //$this->addFleet($player, $req->from, $req->fleet);
+        return $travel;
     }
 
     private function startAttackFleet($travel, $req, $player) {
@@ -344,6 +355,21 @@ class TravelService
         }
     }
 
+    public function addFleet($player, $planet, $fleets){
+
+        foreach($fleets as $fleet)
+        {
+            $fleetm = Fleet::where([
+                'unit'      => $fleet->unit,
+                'player'    => $player,
+                'planet'    => $planet
+            ])->first();
+
+            $fleetm->quantity = ($fleetm->quantity +  $fleet->quantity);
+            $fleetm->save();
+        }
+    }
+
     public function getTroopAttack($travel){
 
         $travel = Travel::find($travel);
@@ -447,14 +473,14 @@ class TravelService
                     ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_FLEET]])
                     ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_TROOP]])
                     ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_TROOP]])
-                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::ATTACK_FLEET]])
-                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::DEFENSE_FLEET]])
-                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::ATTACK_TROOP]])
-                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::DEFENSE_TROOP]])
+                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_FLEET]])
+                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_TROOP]])
                     ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::ATTACK_FLEET]])
                     ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::DEFENSE_FLEET]])
                     ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::ATTACK_TROOP]])
                     ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::DEFENSE_TROOP]])
+                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::RETURN_FLEET]])
+                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::RETURN_TROOP]])
                     ->orderBy('arrival')
                     ->get();
                 break;

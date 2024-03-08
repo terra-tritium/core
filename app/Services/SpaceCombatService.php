@@ -9,7 +9,10 @@ use App\Models\Planet;
 use App\Models\Ship;
 use App\Models\Fleet;
 use App\Models\Strategy;
+use App\Models\Travel;
+use App\Services\PlanetService;
 use App\Jobs\SpaceCombatJob;
+use App\Jobs\TravelJob;
 
 class SpaceCombatService
 {
@@ -184,6 +187,38 @@ class SpaceCombatService
     $cs->demageInvasor = $demageInvasor;
     $cs->demageLocal = $demageLocal;
     $cs->save();
+  }
+
+  public function leave($combatId, $player) {
+    $combat = Combat::find($combatId);
+    $planetService = new PlanetService();
+    $now = time();
+    $figther = Fighters::where(['combat'=>$combatId, 'player'=>$player->id])->first();
+
+    $travel = new Travel();
+    $travel->player = $player->id;
+    $travel->receptor = $player->id;
+    $travel->from = $combat->planet;
+    $travel->to = $figther->planet;
+    $travel->action = Travel::RETURN_FLEET;
+    $travel->transportShips = $figther->transportShips;
+    $travel->cruiser = $figther->cruiser;
+    $travel->craft = $figther->craft;
+    $travel->bomber = $figther->bomber;
+    $travel->scout = $figther->scout;
+    $travel->stealth = $figther->stealth;
+    $travel->flagship = $figther->flagship;
+    $travel->start = $now;
+    $travelTime = $planetService->calculeDistance($travel->from, $travel->to);
+    $travel->arrival = $now + $travelTime;
+    $travel->status = Travel::STATUS_ON_GOING;
+    $travel->save();
+
+    TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
+
+    if ($figther) {
+      $figther->delete();
+    }
   }
 
   private function finishCombat($combatId, $winner) {

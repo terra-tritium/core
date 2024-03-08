@@ -23,7 +23,7 @@ class TravelJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($travelService, $travel,$back)
+    public function __construct($travelService, $travel, $back)
     {
         $this->travel = $travel;
         $this->travelService  = $travelService;
@@ -71,6 +71,9 @@ class TravelJob implements ShouldQueue
                     break;
                 case Travel::MISSION_EXPLORER:
                     //$this->travelService->starMissionExplorer($this->travel);
+                    break;
+                case Travel::RETURN_FLEET:
+                    //$this->travelService->starReturnFleet($this->travel);
                     break;
             }
         }
