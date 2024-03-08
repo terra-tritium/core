@@ -246,7 +246,7 @@ return new class extends Migration {
             $table->dateTime('leave_aliance_date')->nullable();
             $table->bigInteger("ready")->nullable();
             $table->bigInteger("researchPoints");
-            $table->bigInteger("tritium");
+            $table->bigInteger("tritium")->default(0);
             # Score rankings
             $table->bigInteger("score");
             $table->bigInteger("buildScore");
@@ -264,7 +264,7 @@ return new class extends Migration {
             $table->string("alianceName")->nullable();
             $table->bigInteger("energy");
             $table->bigInteger("score");
-            $table->bigInteger("tritium");
+            $table->bigInteger("tritium")->default(0);
             $table->bigInteger("buildScore");
             $table->bigInteger("attackScore");
             $table->bigInteger("defenseScore");
