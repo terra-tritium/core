@@ -227,6 +227,12 @@ class SpaceCombatService
     $combat->winner = $winner;
     $combat->save();
     $this->logStage($combat, 'Combat finish, winner: ' . $winner);
+
+    if ($winner == Combat::SIDE_INVASOR) {
+      $stolen = $this->pillage($combat, Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get());
+      $this->logStage($combat, 'Total stolen: ' . $stolen . ' resources');
+    }
+
   }
 
   private function haveShips($fighters) {
@@ -270,6 +276,112 @@ class SpaceCombatService
       }
     }
     return $figther;
+  }
+
+  private function pillage($combat, $invasors) {
+    $planet = Planet::find($combat->planet);
+    $planetService = new PlanetService();
+    $stolen = 0;
+    foreach ($invasors as $invasor) {
+      $capacity = $invasor->transportShips * env("TRITIUM_TRANSPORTSHIP_CAPACITY");
+      $metal = 0;
+      $crystal = 0;
+      $uranium = 0;
+
+      if ($planet->metal >= $capacity) {
+        $planet->metal -= $capacity;
+        $stolen += $capacity;
+        $metal = $capacity;
+        $capacity = 0;
+      } else {
+        $stolen += $planet->metal;
+        $metal = $planet->metal;
+        $capacity -= $planet->metal;
+        $planet->metal = 0;
+      }
+
+      if ($planet->crystal >= $capacity) {
+        $planet->crystal -= $capacity;
+        $stolen += $capacity;
+        $crystal = $capacity;
+        $capacity = 0;
+      } else {
+        $stolen += $planet->crystal;
+        $crystal = $planet->crystal;
+        $capacity -= $planet->crystal;
+        $planet->crystal = 0;
+      }
+
+      if ($planet->uranium >= $capacity) {
+        $planet->uranium -= $capacity;
+        $stolen += $capacity;
+        $uranium = $capacity;
+        $capacity = 0;
+      } else {
+        $stolen += $planet->uranium;
+        $uranium = $planet->uranium;
+        $capacity -= $planet->uranium;
+        $planet->uranium = 0;
+        return $stolen;
+      }
+
+      $now = time();
+      $travel = new Travel();
+      $travel->player = $invasor->player;
+      $travel->receptor = $invasor->player;
+      $travel->from = $combat->planet;
+      $travel->to = $invasor->planet;
+      $travel->action = Travel::RETURN_FLEET;
+      $travel->transportShips = $invasor->transportShips;
+      $travel->cruiser = $invasor->cruiser;
+      $travel->craft = $invasor->craft;
+      $travel->bomber = $invasor->bomber;
+      $travel->scout = $invasor->scout;
+      $travel->stealth = $invasor->stealth;
+      $travel->flagship = $invasor->flagship;
+      $travel->start = $now;
+      $travelTime = $planetService->calculeDistance($travel->from, $travel->to);
+      $travel->arrival = $now + $travelTime;
+      $travel->status = Travel::STATUS_ON_GOING;
+      $travel->metal = $metal;
+      $travel->crystal = $crystal;
+      $travel->uranium = $uranium;
+      $travel->save();
+
+      TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
+    }
+
+    $planet->save();
+
+    return $stolen;
+  }
+
+  private function sincronizeFleet($planet, $fighter) {
+    $fleet = Fleet::where('planet', $planet->id)->get();
+
+    foreach ($fleet as $ship) {
+      switch ($ship->unit) {
+        case Ship::SHIP_CRUISER:
+          $ship->quantity = $fighter->cruiser;
+          break;
+        case Ship::SHIP_CRAFT:
+          $ship->quantity = $fighter->craft;
+          break;
+        case Ship::SHIP_BOMBER:
+          $ship->quantity = $fighter->bomber;
+          break;
+        case Ship::SHIP_SCOUT:
+          $ship->quantity = $fighter->scout;
+          break;
+        case Ship::SHIP_STEALTH:
+          $ship->quantity = $fighter->stealth;
+          break;
+        case Ship::SHIP_FLAGSHIP:
+          $ship->quantity = $fighter->flagship;
+          break;
+      }
+      $ship->save();
+    }
   }
 
   private function resolve($combat, $invasors, $locals) {
@@ -418,6 +530,12 @@ class SpaceCombatService
           $local = $this->applyDemage($invasorFlagshipDemage, $local, Ship::SHIP_FLAGSHIP_HP, count($locals), $effects, 'flagship');
           $invasorFlagshipDemage = 0;
         }
+      }
+
+      // Sincroniza a frota de naves do dono do planeta
+      if ($combat->planet == $local->planet) {
+        $planet = Planet::find($combat->planet);
+        $this->sincronizeFleet($planet, $local);
       }
 
       $local->save();
