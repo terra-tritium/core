@@ -14,6 +14,7 @@ class Travel extends Model
     protected $table = 'travels';
     public $timestamps = false;
 
+    /* ACTION */
     CONST ATTACK_FLEET = 1;
     CONST ATTACK_TROOP = 2;
     CONST DEFENSE_FLEET = 3;
@@ -24,7 +25,8 @@ class Travel extends Model
     CONST MISSION_EXPLORER = 8;
     CONST RETURN_FLEET = 9;
     CONST RETURN_TROOP = 10;
-
+    CONST MISSION_SPIONAGE = 9;
+    /* STATUS */
     CONST STATUS_ON_LOAD = 1;
     CONST STATUS_ON_GOING = 2;
     CONST STATUS_RETURN = 3;
