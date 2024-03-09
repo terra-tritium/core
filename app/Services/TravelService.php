@@ -551,11 +551,10 @@ class TravelService
     public function speyMission($player, $travel) {
         $travel =  json_decode (json_encode ($travel), FALSE);
 
-
         $travelModel = new Travel();
         $travelModel->action = Travel::MISSION_SPIONAGE;
-        $travelModel->from =   $travel->origin;
-        $travelModel->to =   $travel->destiny;
+        $travelModel->from = $travel->origin;
+        $travelModel->to = $travel->destiny;
 
         $this->start($player,$travelModel);
 
