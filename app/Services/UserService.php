@@ -15,6 +15,11 @@ class UserService
     {
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
             $user   = Auth::user();
+
+            if(!$user->hasVerifiedEmail())
+            {
+                return false;
+            }
             $planets = Player::getMyPlanets();
 
             $success['token']   =  $user->createToken('AppCoreTritium')->plainTextToken;
