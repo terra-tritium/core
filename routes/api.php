@@ -162,6 +162,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/current/{combat}",[CombatController::class, "current"]);
         Route::get("/arrival-planet/{from}",[CombatController::class, "arrivalPlanet"]);
         Route::get("/stage/{combatId}",[CombatController::class,"calculateStage"]);
+        Route::post("/space-leave/{combatId}", [CombatController::class, "spaceLeave"]);
         //sendresource
         Route::post('/sendresource', [CombatController::class, 'sendResource']);
     });

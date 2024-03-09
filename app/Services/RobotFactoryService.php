@@ -37,8 +37,8 @@ class RobotFactoryService
 
     $this->workerService->syncronizeEnergy($planet);
 
-    $energyCost = $qtd * env('TRITIUM_HUMANOID_BASE');
-    $metalCost = $qtd * env('TRITIUM_HUMANOID_BASE');
+    $energyCost = $qtd * env('TRITIUM_HUMANOID_PRICE');
+    $metalCost = $qtd * env('TRITIUM_HUMANOID_PRICE');
     
     # enough energy and metal?
     if ($planet->energy < $energyCost || $planet->metal < $metalCost) {

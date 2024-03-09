@@ -3,18 +3,26 @@
 namespace App\Services;
 
 use App\Models\Combat;
+use App\Models\CombatStage;
 use App\Models\Fighters;
 use App\Models\Planet;
 use App\Models\Ship;
 use App\Models\Fleet;
 use App\Models\Strategy;
+use App\Models\Travel;
+use App\Services\PlanetService;
 use App\Jobs\SpaceCombatJob;
+use App\Jobs\TravelJob;
 
 class SpaceCombatService
 {
   private $battleFieldSize;
   private $randStart = 0;
   private $randEnd = 5;
+  private $totalKillInvasor = 0;
+  private $totalKilllocal = 0;
+  private $totalDemageInvasor = 0;
+  private $totalDemageLocal = 0;
 
   public function __construct() {
     $this->battleFieldSize = 50;
@@ -38,6 +46,7 @@ class SpaceCombatService
     $player1->start = time();
     $player1->stage = 0;
     $player1->planet = $travel->from;
+    $player1->transportShips = $travel->transportShips;
     $player1->cruiser = $travel->cruiser;
     $player1->craft = $travel->craft;
     $player1->bomber = $travel->bomber;
@@ -57,6 +66,7 @@ class SpaceCombatService
     $player2->start = time();
     $player2->stage = 0;
     $player2->planet = $travel->to;
+    $player2->transportShips = $travel->transportShips;
     $player2->cruiser = 0;
     $player2->craft = 0;
     $player2->bomber = 0;
@@ -135,7 +145,7 @@ class SpaceCombatService
     }
 
     if ($this->haveShips($locals)) {
-      $this->resolve($invasors, $locals);
+      $this->resolve($combat, $invasors, $locals);
     } else {
       # Invasors win
       $this->finishCombat($combatId, Combat::SIDE_INVASOR);
@@ -143,12 +153,21 @@ class SpaceCombatService
     }
 
     if ($this->haveShips($invasors)) {
-      $this->resolve($locals, $invasors);
+      $this->resolve($combat, $locals, $invasors);
     } else {
       # Locals win
       $this->finishCombat($combatId, Combat::SIDE_LOCAL);
       return true;
     }
+
+    $this->logStage(
+      $combat,
+      "Invasor Kills: " . $this->totalKillInvasor . " Locals Kills: " . $this->totalKilllocal,
+      $this->totalKillInvasor,
+      $this->totalKilllocal,
+      $this->totalDemageInvasor,
+      $this->totalDemageLocal
+    );
 
     $combat->stage++;
     $combat->nextStage = time() + env('TRITIUM_COMBAT_STAGE_TIME');
@@ -158,11 +177,62 @@ class SpaceCombatService
     SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds(env('TRITIUM_COMBAT_STAGE_TIME')));
   }
 
+  private function logStage($combat, $message, $killInvasor = 0, $killLocal = 0, $demageInvasor = 0, $demageLocal = 0) {
+    $cs = new CombatStage();
+    $cs->combat = $combat->id;
+    $cs->message = $message;
+    $cs->number = $combat->stage;
+    $cs->killInvasor = $killInvasor;
+    $cs->killLocal = $killLocal;
+    $cs->demageInvasor = $demageInvasor;
+    $cs->demageLocal = $demageLocal;
+    $cs->save();
+  }
+
+  public function leave($combatId, $player) {
+    $combat = Combat::find($combatId);
+    $planetService = new PlanetService();
+    $now = time();
+    $figther = Fighters::where(['combat'=>$combatId, 'player'=>$player->id])->first();
+
+    $travel = new Travel();
+    $travel->player = $player->id;
+    $travel->receptor = $player->id;
+    $travel->from = $combat->planet;
+    $travel->to = $figther->planet;
+    $travel->action = Travel::RETURN_FLEET;
+    $travel->transportShips = $figther->transportShips;
+    $travel->cruiser = $figther->cruiser;
+    $travel->craft = $figther->craft;
+    $travel->bomber = $figther->bomber;
+    $travel->scout = $figther->scout;
+    $travel->stealth = $figther->stealth;
+    $travel->flagship = $figther->flagship;
+    $travel->start = $now;
+    $travelTime = $planetService->calculeDistance($travel->from, $travel->to);
+    $travel->arrival = $now + $travelTime;
+    $travel->status = Travel::STATUS_ON_GOING;
+    $travel->save();
+
+    TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
+
+    if ($figther) {
+      $figther->delete();
+    }
+  }
+
   private function finishCombat($combatId, $winner) {
     $combat = Combat::find($combatId);
     $combat->status = Combat::STATUS_FINISH;
     $combat->winner = $winner;
     $combat->save();
+    $this->logStage($combat, 'Combat finish, winner: ' . $winner);
+
+    if ($winner == Combat::SIDE_INVASOR) {
+      $stolen = $this->pillage($combat, Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get());
+      $this->logStage($combat, 'Total stolen: ' . $stolen . ' resources');
+    }
+
   }
 
   private function haveShips($fighters) {
@@ -173,13 +243,15 @@ class SpaceCombatService
     return $ships > 0;
   }
 
-  private function getDemageEffects($p1StrategyId, $p2StrategyId) {
+  private function getDemageEffects($combat, $p1StrategyId, $p2StrategyId) {
     $p1Strategy = Strategy::find($p1StrategyId);
     $p2Strategy = Strategy::find($p2StrategyId);
 
     if ($p1Strategy && $p2Strategy) {
       $effects = $p1Strategy->attack - $p2Strategy->defense;
     }
+
+    $this->logStage($combat, $p1Strategy->name . ' effect: ' . $effects . ' demage');
 
     return $effects;
   }
@@ -188,16 +260,131 @@ class SpaceCombatService
     $demage = $demage + $effects;
     $kills = $demage / $hp;
     $kills = ceil($kills / $qtdPlayers);
-    if ($figther->$$ship > 0) {
-      $figther->$$ship -= $kills;
-      if ($figther->$$ship < 0) {
-        $figther->$$ship = 0;
+
+    if ($figther->side == Combat::SIDE_LOCAL) {
+      $this->totalDemageLocal += $demage;
+      $this->totalKilllocal += $kills;
+    } else {
+      $this->totalDemageInvasor += $demage;
+      $this->totalKillInvasor += $kills;
+    }
+
+    if ($figther->$ship > 0) {
+      $figther->$ship -= $kills;
+      if ($figther->$ship < 0) {
+        $figther->$ship = 0;
       }
     }
     return $figther;
   }
 
-  private function resolve($invasors, $locals) {
+  private function pillage($combat, $invasors) {
+    $planet = Planet::find($combat->planet);
+    $planetService = new PlanetService();
+    $stolen = 0;
+    foreach ($invasors as $invasor) {
+      $capacity = $invasor->transportShips * env("TRITIUM_TRANSPORTSHIP_CAPACITY");
+      $metal = 0;
+      $crystal = 0;
+      $uranium = 0;
+
+      if ($planet->metal >= $capacity) {
+        $planet->metal -= $capacity;
+        $stolen += $capacity;
+        $metal = $capacity;
+        $capacity = 0;
+      } else {
+        $stolen += $planet->metal;
+        $metal = $planet->metal;
+        $capacity -= $planet->metal;
+        $planet->metal = 0;
+      }
+
+      if ($planet->crystal >= $capacity) {
+        $planet->crystal -= $capacity;
+        $stolen += $capacity;
+        $crystal = $capacity;
+        $capacity = 0;
+      } else {
+        $stolen += $planet->crystal;
+        $crystal = $planet->crystal;
+        $capacity -= $planet->crystal;
+        $planet->crystal = 0;
+      }
+
+      if ($planet->uranium >= $capacity) {
+        $planet->uranium -= $capacity;
+        $stolen += $capacity;
+        $uranium = $capacity;
+        $capacity = 0;
+      } else {
+        $stolen += $planet->uranium;
+        $uranium = $planet->uranium;
+        $capacity -= $planet->uranium;
+        $planet->uranium = 0;
+        return $stolen;
+      }
+
+      $now = time();
+      $travel = new Travel();
+      $travel->player = $invasor->player;
+      $travel->receptor = $invasor->player;
+      $travel->from = $combat->planet;
+      $travel->to = $invasor->planet;
+      $travel->action = Travel::RETURN_FLEET;
+      $travel->transportShips = $invasor->transportShips;
+      $travel->cruiser = $invasor->cruiser;
+      $travel->craft = $invasor->craft;
+      $travel->bomber = $invasor->bomber;
+      $travel->scout = $invasor->scout;
+      $travel->stealth = $invasor->stealth;
+      $travel->flagship = $invasor->flagship;
+      $travel->start = $now;
+      $travelTime = $planetService->calculeDistance($travel->from, $travel->to);
+      $travel->arrival = $now + $travelTime;
+      $travel->status = Travel::STATUS_ON_GOING;
+      $travel->metal = $metal;
+      $travel->crystal = $crystal;
+      $travel->uranium = $uranium;
+      $travel->save();
+
+      TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
+    }
+
+    $planet->save();
+
+    return $stolen;
+  }
+
+  private function sincronizeFleet($planet, $fighter) {
+    $fleet = Fleet::where('planet', $planet->id)->get();
+
+    foreach ($fleet as $ship) {
+      switch ($ship->unit) {
+        case Ship::SHIP_CRUISER:
+          $ship->quantity = $fighter->cruiser;
+          break;
+        case Ship::SHIP_CRAFT:
+          $ship->quantity = $fighter->craft;
+          break;
+        case Ship::SHIP_BOMBER:
+          $ship->quantity = $fighter->bomber;
+          break;
+        case Ship::SHIP_SCOUT:
+          $ship->quantity = $fighter->scout;
+          break;
+        case Ship::SHIP_STEALTH:
+          $ship->quantity = $fighter->stealth;
+          break;
+        case Ship::SHIP_FLAGSHIP:
+          $ship->quantity = $fighter->flagship;
+          break;
+      }
+      $ship->save();
+    }
+  }
+
+  private function resolve($combat, $invasors, $locals) {
 
     $invasorCraftAttack = 0;
     $localCraftAttack = 0;
@@ -294,7 +481,7 @@ class SpaceCombatService
     $localFlagshipDemage = $localFlagshipAttack - $invasorFlagshipDefense;
 
     # get effect locals
-    $effects = $this->getDemageEffects($locals[0]->strategy, $invasors[0]->strategy);
+    $effects = $this->getDemageEffects($combat, $locals[0]->strategy, $invasors[0]->strategy);
 
     # Apply demage
     foreach ($locals as $local) {
@@ -345,11 +532,17 @@ class SpaceCombatService
         }
       }
 
+      // Sincroniza a frota de naves do dono do planeta
+      if ($combat->planet == $local->planet) {
+        $planet = Planet::find($combat->planet);
+        $this->sincronizeFleet($planet, $local);
+      }
+
       $local->save();
     }
 
     # get effect invasors
-    $effects = $this->getDemageEffects($invasors[0]->strategy, $locals[0]->strategy);
+    $effects = $this->getDemageEffects($combat, $invasors[0]->strategy, $locals[0]->strategy);
 
     foreach ($invasors as $invasor) {
       if ($localCraftDemage > 0) {

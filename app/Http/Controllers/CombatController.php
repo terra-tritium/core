@@ -10,9 +10,9 @@ use App\Models\CombatStage;
 use App\Models\Planet;
 use App\Models\Strategy;
 use App\Services\CombatService;
+use App\Services\SpaceCombatService;
 use App\Services\PlayerService;
 use App\Services\ResourceService;
-use App\Services\StrategyService;
 use App\Services\TravelService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -24,7 +24,8 @@ class CombatController extends Controller
 
     public function __construct(
         protected readonly CombatService $combatService,
-        protected readonly PlayerService $playerService,
+        protected readonly SpaceCombatService $spaceCombatService,
+        protected readonly PlayerService $playerService, 
         protected readonly TravelService $travelService,
         protected readonly ResourceService $resourceService
         )
@@ -289,10 +290,22 @@ class CombatController extends Controller
     {
     }
 
+    /**
+     * Executa ação de abandonar o combate
+     */
+    public function spaceLeave($combatId) {
+        $player = Player::getPlayerLogged();
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
+        $this->spaceCombatService->leave($combatId, $player);
+        return response()->json([], Response::HTTP_OK);
+    }
+
 
     public function stages($id)
     {
-        return CombatStage::where('combat', $id)->get();
+        return CombatStage::where('combat', $id)->orderByDesc('id') ->get();
     }
 
     public function start($defense, $planet, $travel)
