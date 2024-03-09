@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Effect;
 use App\Models\GameMode;
+use App\Models\Planet;
 use App\Models\Player;
 
 class EffectService
@@ -167,14 +168,23 @@ class EffectService
 
   public function applyEffect($player, $code)
   {
-    $effect = Effect::where("player", $player)->first();
+    $effect = Effect::where("player", $player->id)->first();
+    $planet = Planet::where("player",$player->id)->first();
+    $researchService = new ResearchService();
+    $planetService = new PlanetService();
     if (!$effect) {
       $effect = new Effect();
-      $effect->player = $player;
+      $effect->player = $player->id;
     }
     #zerar os atributos dos efeitos para receber os novos
+    #Salva os valores de metal, cristal, uranium e pesquisa, salva o novo tempo de contagem
     if ($code > 0 && $code <= 9) {
       $effect->zerar();
+      $planet = $planetService->addMetal($planet, 0);
+      $planet = $planetService->addCrystal($planet,0);
+      $planet = $planetService->addUranium($planet,0);
+      $researchService->playerSincronize($player);
+      $planet->save(); 
     }
 
     switch ($code) {

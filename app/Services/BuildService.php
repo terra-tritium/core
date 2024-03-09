@@ -80,9 +80,11 @@ class BuildService
         if ($p1->ready != null && $p1->ready > time()) {
             return false;
         }
+ 
 
         $require = $this->calcResourceRequire($building->build, 1, $player);
         $constructionSpeed = $this->effectService->calcConstructionBuildSpeed(env("TRITIUM_CONSTRUCTION_SPEED"),$player);
+        
         $building->ready = time() + ($require->time * $constructionSpeed);
         $p1->ready = $building->ready;
 

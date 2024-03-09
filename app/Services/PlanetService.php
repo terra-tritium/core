@@ -55,9 +55,10 @@ public function currentBalance($p1, $type) {
         return $p1->crystal + ($p1->pwCrystal * ($effectService->calcMiningSpeed(env("TRITIUM_METAL_BASE"), $p1) * $activeCrystalMining));
 //        return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL_BASE") * $activeCrystalMining));
       case 4:
-        return $p1->researchPoints + ($p1->pwResearch * (env("TRITIUM_RESEARCH_SPEED") * $activeLaboratory));
+        return $p1->researchPoints + ($p1->pwResearch * ($effectService->calcResearchSpeed(env("TRITIUM_RESEARCH_SPEED"),$p1) * $activeLaboratory));
     }
 
+    
     return 0;
   }
 
