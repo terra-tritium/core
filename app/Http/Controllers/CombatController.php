@@ -17,6 +17,7 @@ use App\Services\TravelService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\Planet\PlanetResource;
 
 class CombatController extends Controller
 {
@@ -178,8 +179,16 @@ class CombatController extends Controller
     }
     public function availableResources($planet)
     {
-        $planet = Planet::findOrFail($planet);
-        return response()->json($planet, Response::HTTP_OK);
+        $player = Player::getPlayerLogged();
+
+        $planetModel = Planet::where(['id' => $planet,'player' => $player->id])->first();
+
+       if(is_null($planetModel))
+       {
+            $planetModel =  PlanetResource::make(Planet::findOrFail($planet));
+       }
+
+        return response()->json($planetModel, Response::HTTP_OK);
     }
     /**
      * enviar recurso
@@ -196,7 +205,7 @@ class CombatController extends Controller
 
     public function calculateStage($combatId){
         $stage = $this->combatService->calculateStage($combatId);
-        return response()->json($stage, Response::HTTP_OK);    
+        return response()->json($stage, Response::HTTP_OK);
     }
 
     public function arrivalPlanet($from)
@@ -213,14 +222,14 @@ class CombatController extends Controller
             if ($targetHasShip) {
                 //inicio da batalha espacial
                 $log = " Inicio da batalha espacial ";
-               
+
             } else {
                 if ($targetHasShield) {
                     if (count($targetHasTroop) > 0) {
                         $log = "O alvo tem escudo, tem tropa, inicio de uma batalha ";
                         $attack = Planet::find($from);
                         $defense = Planet::find($dPlanetId);
-                    
+
                         $log .= $this->combatService->startNewCombat($attack->player, $defense->player,
                             json_decode($finished[0]->troop), $targetHasTroop,$attack->attackStrategy, $defense->defenseStrategy,$dPlanetId);
 
