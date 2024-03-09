@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Building;
+use App\Models\Build;
 use App\Models\Combat;
 use App\Models\CombatStage;
 use App\Models\Fighters;
@@ -25,7 +27,7 @@ class SpaceCombatService
   private $totalDemageLocal = 0;
 
   public function __construct() {
-    $this->battleFieldSize = 50;
+    $this->battleFieldSize = 10;
   }
 
   public function createNewCombat ($travel) {
@@ -243,12 +245,19 @@ class SpaceCombatService
     return $ships > 0;
   }
 
-  private function getDemageEffects($combat, $p1StrategyId, $p2StrategyId) {
+  private function getDemageEffects($combat, $p1StrategyId, $p2StrategyId, $planetOwnner = false) {
     $p1Strategy = Strategy::find($p1StrategyId);
     $p2Strategy = Strategy::find($p2StrategyId);
 
+    if ($planetOwnner) {
+      $shieldForce = $this->getShieldForce($combat->planet);
+      $this->logStage($combat, 'Shield activate: ' . $shieldForce . ' force');
+    } else {
+      $shieldForce = 0;
+    }
+
     if ($p1Strategy && $p2Strategy) {
-      $effects = $p1Strategy->attack - $p2Strategy->defense;
+      $effects = $p1Strategy->attack - ($p2Strategy->defense + $shieldForce);
     }
 
     $this->logStage($combat, $p1Strategy->name . ' effect: ' . $effects . ' demage');
@@ -384,6 +393,14 @@ class SpaceCombatService
     }
   }
 
+  private function getShieldForce($planetId) {
+    $shieldBuild = Building::where([['build', Build::SHIELD],['planet', $planetId]])->first();
+    if ($shieldBuild) {
+      return $shieldBuild->level * env('TRITIUM_SHIELD_FORCE');
+    }
+    return 0;
+  }
+
   private function resolve($combat, $invasors, $locals) {
 
     $invasorCraftAttack = 0;
@@ -481,7 +498,11 @@ class SpaceCombatService
     $localFlagshipDemage = $localFlagshipAttack - $invasorFlagshipDefense;
 
     # get effect locals
-    $effects = $this->getDemageEffects($combat, $locals[0]->strategy, $invasors[0]->strategy);
+    if ($combat->planet == $local->planet) {
+      $effects = $this->getDemageEffects($combat, $invasors[0]->strategy, $locals[0]->strategy, true);
+    } else {
+      $effects = $this->getDemageEffects($combat, $locals[0]->strategy, $invasors[0]->strategy);
+    }
 
     # Apply demage
     foreach ($locals as $local) {
