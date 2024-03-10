@@ -131,6 +131,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/list', [GameModeController::class, 'list']);
         Route::post('/change/{code}', [GameModeController::class, 'change']);
         Route::get('/effect/{planet}',[GameModeController::class, 'gameModeEffect']);
+        Route::get('/effect-player/{player}',[GameModeController::class, 'gameModeEffectPlayer']);
+
     });
 
     Route::prefix('travel')->group(function () {
