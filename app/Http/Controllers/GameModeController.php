@@ -103,6 +103,21 @@ class GameModeController extends Controller
             );
         }
     }
+
+    public function gameModeEffectPlayer($player){
+        try {
+            $player = Player::findOrFail($player);
+            $effect = Effect::where("player",$player->id)->firstOrFail();
+            $effect->gameMode = $player->gameMode;
+            return response()->json($effect, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(
+                ['error' => 'Ocorreu um erro ao recuperar effeito do tipo de jogo.'.$e->getMessage()],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     public function gameModeEffect($planet){
         try {
             $planet = Planet::findOrFail($planet);
