@@ -117,7 +117,7 @@ class EffectService
     return $protectionBonus;
   }
 
-
+ 
   /**
    * @todo
    */
@@ -178,12 +178,14 @@ class EffectService
     }
     #zerar os atributos dos efeitos para receber os novos
     #Salva os valores de metal, cristal, uranium e pesquisa, salva o novo tempo de contagem
+    #Como a mineração tem como base o tempo inicial, salva o novo momento pois cada modo de jogo 
+    #pode alterar a contagem 
     if ($code > 0 && $code <= 9) {
       $effect->zerar();
       $planet = $planetService->addMetal($planet, 0);
       $planet = $planetService->addCrystal($planet,0);
       $planet = $planetService->addUranium($planet,0);
-      $researchService->playerSincronize($player);
+      // $researchService->playerSincronize($player);
       $planet->save(); 
     }
 
