@@ -27,7 +27,7 @@ class BuildSeeder extends Seeder
             "metalLevel" => 1,
             "uraniumLevel" => 2,
             "crystalLevel" => 3,
-            "coefficient" => 50
+            "coefficient" => 1000
         ]);
 
         DB::table('builds')->insert([
@@ -57,7 +57,7 @@ class BuildSeeder extends Seeder
             "metalLevel" => 1,
             "uraniumLevel" => 10,
             "crystalLevel" => 20,
-            "coefficient" => 50
+            "coefficient" => 200
         ]);
 
         DB::table('builds')->insert([
@@ -87,7 +87,7 @@ class BuildSeeder extends Seeder
             "metalLevel" => 1,
             "uraniumLevel" => 10,
             "crystalLevel" => 20,
-            "coefficient" => 50
+            "coefficient" => 100
         ]);
 
         DB::table('builds')->insert([
@@ -102,7 +102,7 @@ class BuildSeeder extends Seeder
             "metalLevel" => 1,
             "uraniumLevel" => 10,
             "crystalLevel" => 20,
-            "coefficient" => 50
+            "coefficient" => 150
         ]);
 
         DB::table('builds')->insert([
@@ -132,7 +132,7 @@ class BuildSeeder extends Seeder
             "metalLevel" => 1,
             "uraniumLevel" => 10,
             "crystalLevel" => 20,
-            "coefficient" => 50
+            "coefficient" => 100
         ]);
 
         DB::table('builds')->insert([
@@ -147,7 +147,7 @@ class BuildSeeder extends Seeder
             "metalLevel" => 1,
             "uraniumLevel" => 10,
             "crystalLevel" => 20,
-            "coefficient" => 50
+            "coefficient" => 100
         ]);
 
         DB::table('builds')->insert([
@@ -162,7 +162,7 @@ class BuildSeeder extends Seeder
             "metalLevel" => 1,
             "uraniumLevel" => 10,
             "crystalLevel" => 20,
-            "coefficient" => 50
+            "coefficient" => 100
         ]);
 
         DB::table('builds')->insert([
@@ -177,7 +177,7 @@ class BuildSeeder extends Seeder
             "metalLevel" => 1,
             "uraniumLevel" => 10,
             "crystalLevel" => 20,
-            "coefficient" => 50
+            "coefficient" => 100
         ]);
 
         DB::table('builds')->insert([
@@ -192,7 +192,7 @@ class BuildSeeder extends Seeder
             "metalLevel" => 1,
             "uraniumLevel" => 10,
             "crystalLevel" => 20,
-            "coefficient" => 50
+            "coefficient" => 100
         ]);
 
         DB::table('builds')->insert([
