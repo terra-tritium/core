@@ -84,7 +84,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        auth('sanctum')->user()->tokens()->delete();
+        auth('sanctum')->user()->current->delete();
 
         return response(['message' => 'Tokens Revoked','success'=>true],Response::HTTP_OK);
     }
