@@ -236,4 +236,49 @@ class TravelController extends Controller
             return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+     /**
+     *
+     * @OA\Post(
+     *     path="/travel/spey",
+     *     operationId="startTravel",
+     *     tags={"TravelSpey"},
+     *     summary="Start travel spionage",
+     *     description="Start a new travel  mission spionage",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="property1", type="string", example="value1"),
+     *                 @OA\Property(property="property2", type="integer", example=123)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Successful operation"),
+     *     @OA\Response(response="401", description="Unauthorized"),
+     *     @OA\Response(response="500", description="Internal server error"),
+     * )
+     * @param Request $request
+     * @return string|null
+     */
+    public function speyMission (Request $request) {
+
+        try {
+            $player = Player::getPlayerLogged();
+            if (!$player) {
+                return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $requestData = $request->all();
+            $result = $this->travelService->speyMission($player->id, $requestData);
+
+            return response()->json($result, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => $e->getTraceAsString()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

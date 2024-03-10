@@ -30,7 +30,10 @@ class TravelService
 
     public function start ($player, $travel) {
 
-        $travel =  json_decode (json_encode ($travel), FALSE);
+        if (!is_object($travel)) {
+            $travel =  json_decode (json_encode ($travel), FALSE);
+        }
+        
         $newTravel = new Travel();
 
         if ($travel->action < 1 || $travel->action > 8) {
@@ -72,11 +75,13 @@ class TravelService
         $newTravel->arrival = $now + $travelTime;
         $newTravel->receptor = $this->getReceptor($travel->to);
         $newTravel->strategy = $travel->strategy;
-        $newTravel->status =  is_null($travel->status)  ? Travel::STATUS_ON_LOAD : $travel->status;
+        $newTravel->transportShips = $travel->transportShip;
+        $newTravel->status = Travel::STATUS_ON_LOAD;
 
         switch ($travel->action) {
             case Travel::ATTACK_FLEET:
                 $newTravel = $this->startAttackFleet($newTravel, $travel, $player);
+                $newTravel->status = Travel::STATUS_ON_GOING;
                 break;
             case Travel::DEFENSE_FLEET:
                 $newTravel = $this->startDefenseFleet($newTravel);
@@ -89,6 +94,7 @@ class TravelService
                 break;
             case Travel::TRANSPORT_RESOURCE:
                 $newTravel = $this->startTransportResource($newTravel, $travel);
+                $newTravel->status = Travel::STATUS_ON_GOING;
                 break;
             case Travel::TRANSPORT_BUY:
                 $newTravel = $this->startTransportBuy($newTravel);
@@ -99,17 +105,23 @@ class TravelService
             case Travel::MISSION_EXPLORER:
                 $newTravel = $this->startMissionExplorer($newTravel);
                 break;
+            case Travel::RETURN_FLEET:
+                $newTravel = $this->startReturnFleet($newTravel, $travel, $player);
+                break;
         }
 
         # Merchant Ships
-        if (isset($travel->transportShips)) {
-            $newTravel->transportShips = $travel->transportShips;
-        } else {
+        if ($newTravel->transportShips < 0) {
             $newTravel->transportShips = 0;
         }
 
         $newTravel->save();
         TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
+    }
+
+    public function startReturnFleet($travel, $req, $player) {
+        //$this->addFleet($player, $req->from, $req->fleet);
+        return $travel;
     }
 
     private function startAttackFleet($travel, $req, $player) {
@@ -204,9 +216,9 @@ class TravelService
         $currentTravel = Travel::find($travel);
         $newTravel = $currentTravel->replicate();
         $travelTime = $now - $currentTravel->start;
-        $newTravel->arrival = Carbon::now()->addSeconds($travelTime / 2 )->getTimestamp();
-        $newTravel->from  = $currentTravel->to ;
-        $newTravel->to     = $currentTravel->from ;
+        $newTravel->arrival = Carbon::now()->addSeconds($travelTime)->getTimestamp();
+        //$newTravel->from  = $currentTravel->to ;
+        //$newTravel->to     = $currentTravel->from ;
         $newTravel->status = Travel::STATUS_RETURN;
         $newTravel->push();
 
@@ -343,6 +355,21 @@ class TravelService
         }
     }
 
+    public function addFleet($player, $planet, $fleets){
+
+        foreach($fleets as $fleet)
+        {
+            $fleetm = Fleet::where([
+                'unit'      => $fleet->unit,
+                'player'    => $player,
+                'planet'    => $planet
+            ])->first();
+
+            $fleetm->quantity = ($fleetm->quantity +  $fleet->quantity);
+            $fleetm->save();
+        }
+    }
+
     public function getTroopAttack($travel){
 
         $travel = Travel::find($travel);
@@ -440,20 +467,23 @@ class TravelService
             case Travel::MISSION_EXPLORER:
                 $missions = $this->getMissionsByAction(Travel::MISSION_EXPLORER);
                 break;
+            case Travel::MISSION_SPIONAGE:
+                $missions = $this->getMissionsByAction(Travel::MISSION_SPIONAGE);
+                break;
             case "militar":
                 $missions = Travel::with('from', 'to')
                     ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_FLEET]])
                     ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_FLEET]])
                     ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_TROOP]])
                     ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_TROOP]])
-                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::ATTACK_FLEET]])
-                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::DEFENSE_FLEET]])
-                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::ATTACK_TROOP]])
-                    ->orWhere([['status', Travel::STATUS_RETURN], ['action', Travel::DEFENSE_TROOP]])
+                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_FLEET]])
+                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_TROOP]])
                     ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::ATTACK_FLEET]])
                     ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::DEFENSE_FLEET]])
                     ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::ATTACK_TROOP]])
                     ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::DEFENSE_TROOP]])
+                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::RETURN_FLEET]])
+                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::RETURN_TROOP]])
                     ->orderBy('arrival')
                     ->get();
                 break;
@@ -499,7 +529,7 @@ class TravelService
         $planetTarget->crystal += $travelModel->crystal;
 
         $planetTarget->save();
-        $this->logService->notify($planetTarget->player, "You received a resource", "Combat");
+        $this->logService->notify($planetTarget->player, "You received a resource", "Mission");
         $this->back($travel);
     }
 
@@ -509,7 +539,7 @@ class TravelService
         $planetOrige = Planet::findOrFail($travelModel->from);
         $planetOrige->transportShips += $travelModel->transportShips ;
         $planetOrige->save();
-        $this->logService->notify($planetOrige->player, "Your freighter has returned from its trip", "Combat");
+        $this->logService->notify($planetOrige->player, "Your freighter has returned from its trip", "Mission");
     }
 
     public function getCurrent($player)
@@ -544,4 +574,16 @@ class TravelService
         return true;
     }
 
+    public function speyMission($player, $travel) {
+        $travel =  json_decode (json_encode ($travel), FALSE);
+
+        $travelModel = new Travel();
+        $travelModel->action = Travel::MISSION_SPIONAGE;
+        $travelModel->from = $travel->origin;
+        $travelModel->to = $travel->destiny;
+
+        $this->start($player,$travelModel);
+
+        $typeMission = $travel->typeMission;
+    }
 }

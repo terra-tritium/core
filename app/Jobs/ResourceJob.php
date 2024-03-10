@@ -57,7 +57,6 @@ class ResourceJob implements ShouldQueue
         $travel->from = $this->origin;
         $travel->to = $this->target;
         $travel->strategy = 1;
-        $travel->status = Travel::STATUS_ON_GOING;
 
         ProcessJob::where(['planet' => $this->origin,'type' => ProcessJob::TYPE_CARRYING])->delete();
         try{
