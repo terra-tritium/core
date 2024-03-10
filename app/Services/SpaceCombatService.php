@@ -25,6 +25,8 @@ class SpaceCombatService
   private $totalKilllocal = 0;
   private $totalDemageInvasor = 0;
   private $totalDemageLocal = 0;
+  private $totalLocalShips = 0;
+  private $totalInvasorShips = 0;
 
   public function __construct() {
     $this->battleFieldSize = 10;
@@ -105,7 +107,44 @@ class SpaceCombatService
     
     $player2->save();
 
+    $this->totalLocalShips = $player2->cruiser + $player2->craft + $player2->bomber + $player2->scout + $player2->stealth + $player2->flagship;
+    $this->totalInvasorShips = $player1->cruiser + $player1->craft + $player1->bomber + $player1->scout + $player1->stealth + $player1->flagship;
+
+    $this->ajustBatleField();
+
     $this->startCombat($combat->id);
+  }
+
+  private function ajustBatleField() {
+    $minorShips = 0;
+    if ($this->totalLocalShips < $this->totalInvasorShips) {
+      $minorShips = $this->totalLocalShips;
+    } else {
+      $minorShips = $this->totalInvasorShips;
+    }
+    switch ($minorShips) {
+      case $minorShips < 50;
+        $this->battleFieldSize = 10;
+        break;
+      case $minorShips < 100;
+        $this->battleFieldSize = 20;
+        break;
+      case $minorShips < 200;
+        $this->battleFieldSize = 30;
+        break;
+      case $minorShips < 300;
+        $this->battleFieldSize = 40;
+        break;
+      case $minorShips < 400;
+        $this->battleFieldSize = 50;
+        break;
+      case $minorShips < 1000;
+        $this->battleFieldSize = 60;
+        break;
+      case $minorShips > 2000;
+        $this->battleFieldSize = 100;
+        break;
+    }
   }
 
   public function startCombat($combatId) {
