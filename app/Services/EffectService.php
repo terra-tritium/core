@@ -137,15 +137,20 @@ class EffectService
     $percentSpeed = $this->getPercentSpeedMiningEffect($player);
     return $value + (($value * $percentSpeed) / 100);
   }
+  /**
+   * @todo
+   */
   public function calcAttack($value, $player)
   {
     return 1;
   }
+
   public function calcResearchSpeed($value, $player)
   {
     $percent = $this->getPercentResearcherSpeed($player) * -1;
     return floor($value + (($value * $percent) / 100)); 
   }
+
   public function calcTravelSpeed($value, $player){
     $percent = $this->getPercenteTravelSpeed($player) * -1;
     return floor($value + (($value * $percent) / 100)); 
@@ -160,17 +165,21 @@ class EffectService
     $percent = $this->getPercentShipConstructionSpeed($player) * -1;
     return floor($value + (($value * $percent) / 100)); 
   }
+
   public function calcRobotConstructSpeed($value, $player)
   {
     $percent = $this->getPercentRobotConstructionSpeed($player) * -1;
     return floor($value + (($value * $percent) / 100));
   }
 
+  /**
+   * Soma os atributos de efeito de cada game mode, soma aos efeitos ja existente 
+   */
   public function applyEffect($player, $code)
   {
     $effect = Effect::where("player", $player->id)->first();
     $planet = Planet::where("player",$player->id)->first();
-    $researchService = new ResearchService();
+    // $researchService = new ResearchService();
     $planetService = new PlanetService();
     if (!$effect) {
       $effect = new Effect();
@@ -181,61 +190,124 @@ class EffectService
     #Como a mineração tem como base o tempo inicial, salva o novo momento pois cada modo de jogo 
     #pode alterar a contagem 
     if ($code > 0 && $code <= 9) {
-      $effect->zerar();
       $planet = $planetService->addMetal($planet, 0);
       $planet = $planetService->addCrystal($planet,0);
       $planet = $planetService->addUranium($planet,0);
       // $researchService->playerSincronize($player);
+      $this->removeEffect($player, $player->gameMode);
       $planet->save(); 
     }
 
     switch ($code) {
       case GameMode::MODE_CONQUER:
-        $effect->zerar();
         $effect->save();
         break;
         #NFT     
       case GameMode::MODE_COLONIZER:
-        $effect->discountBuild = -10;
-        $effect->protect = 10;
+        $effect->discountBuild += -10;
+        $effect->protect += 10;
         break;
         #Space Titan 
       case GameMode::MODE_SPACE_TITAN:
-        $effect->speedProduceUnit = 20;
-        $effect->extraAttack = 2;
-        $effect->speedResearch = -20;
-        $effect->speedMining = -5;
+        $effect->speedProduceUnit += 20;
+        $effect->extraAttack += 2;
+        $effect->speedResearch += -20;
+        $effect->speedMining += -5;
         break;
         # Researcher
       case GameMode::MODE_RESEARCHER:
-        $effect->speedResearch = 20;
-        $effect->speedConstructionBuild = -20;
+        $effect->speedResearch += 20;
+        $effect->speedConstructionBuild += -20;
         break;
         # Engineer
       case GameMode::MODE_ENGINEER:
-        $effect->speedProduceShip = 20;
-        $effect->speedResearch = -20;
+        $effect->speedProduceShip += 20;
+        $effect->speedResearch += -20;
         break;
         # Protector
       case GameMode::MODE_PROTECTOR:
-        $effect->protect = 20;
+        $effect->protect += 20;
         break;
         # Builder
       case GameMode::MODE_BUILDER:
-        $effect->costBuild = -20;
-        $effect->speedProduceShip = -20;
-        $effect->speedProduceUnit = -20;
+        $effect->costBuild += -20;
+        $effect->speedProduceShip += -20;
+        $effect->speedProduceUnit += -20;
         break;
         # Navigator
       case GameMode::MODE_NAVIGATOR:
-        $effect->speedTravel = 20;
-        $effect->speedProduceShip = -20;
-        $effect->speedProduceUnit = -20;
+        $effect->speedTravel += 20;
+        $effect->speedProduceShip += -20;
+        $effect->speedProduceUnit += -20;
         break;
         # Miner
       case GameMode::MODE_MINER:
-        $effect->speedMining = 2;
-        $effect->protect = -20;
+        $effect->speedMining += 2;
+        $effect->protect += -20;
+        break;
+    }
+    $player->gameMode = $code;
+    $player->Save();
+    $effect->save();
+  }
+
+  /**
+   * Remover apenas os atributo ganho pelo efeito do game mode
+   * presernvando qualquer atribudo ganho em altuma outra bonificação
+   * disponível no jogo
+   */
+  public function removeEffect($player, $codeAntigo)
+  {
+    $effect = Effect::where("player", $player->id)->first();
+
+    if (!$effect) {
+     return ;
+    }
+    switch ($codeAntigo) {
+      case GameMode::MODE_CONQUER:
+        break;
+        #NFT     
+      case GameMode::MODE_COLONIZER:
+        $effect->discountBuild += 10;
+        $effect->protect += -10;
+        break;
+        #Space Titan 
+      case GameMode::MODE_SPACE_TITAN:
+        $effect->speedProduceUnit += -20;
+        $effect->extraAttack += -2;
+        $effect->speedResearch += 20;
+        $effect->speedMining += 5;
+        break;
+        # Researcher
+      case GameMode::MODE_RESEARCHER:
+        $effect->speedResearch += -20;
+        $effect->speedConstructionBuild += 20;
+        break;
+        # Engineer
+      case GameMode::MODE_ENGINEER:
+        $effect->speedProduceShip += -20;
+        $effect->speedResearch += 20;
+        break;
+        # Protector
+      case GameMode::MODE_PROTECTOR:
+        $effect->protect += -20;
+        break;
+        # Builder
+      case GameMode::MODE_BUILDER:
+        $effect->costBuild += 20;
+        $effect->speedProduceShip += 20;
+        $effect->speedProduceUnit += 20;
+        break;
+        # Navigator
+      case GameMode::MODE_NAVIGATOR:
+        $effect->speedTravel += -20;
+        $effect->speedProduceShip += 20;
+        $effect->speedProduceUnit += 20;
+        break;
+        # Miner
+      case GameMode::MODE_MINER:
+        $effect->speedMining += -2;
+        $effect->protect += 20;
         break;
     }
     $effect->save();

@@ -90,11 +90,10 @@ class GameModeController extends Controller
         try {
             $player = Player::getPlayerLogged();
             $loggedInPlayer = Player::where("id", $player->id)->firstOrFail();
-            $loggedInPlayer->gameMode = $code;
             $effectService = app(EffectService::class);
-            $effectService->applyEffect($loggedInPlayer, $code);
+            return $effectService->applyEffect($loggedInPlayer, $code);
 
-            $loggedInPlayer->save();
+            // $loggedInPlayer->save();
             return response()->json(['success' => 'Modo de jogo alterado com sucesso.'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(
