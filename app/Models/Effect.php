@@ -13,7 +13,7 @@ class Effect extends Model
 
     protected $attributes = [
         'speedProduceUnit' => 0,
-        'speedproduceShip' => 0,
+        'speedProduceShip' => 0,
         'speedBuild' => 0,
         'speedResearch' => 0,
         'speedTravel' => 0,
@@ -31,7 +31,7 @@ class Effect extends Model
     public function zerar()
     {
         $this->setAttribute('speedProduceUnit', 0);
-        $this->setAttribute('speedproduceShip', 0);
+        $this->setAttribute('speedProduceShip', 0);
         $this->setAttribute('speedBuild', 0);
         $this->setAttribute('speedResearch', 0);
         $this->setAttribute('speedTravel', 0);
