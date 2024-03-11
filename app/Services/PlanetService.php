@@ -34,6 +34,7 @@ public function syncronizeDefenseScore(Planet $planet) {
 
 
 public function currentBalance($p1, $type) {
+  $effectService = new EffectService();
   $sInHour = 3600;
 
   $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $sInHour;
@@ -46,15 +47,18 @@ public function currentBalance($p1, $type) {
       case 0:
         return $p1->energy + ($p1->workersWaiting * (env("TRITIUM_ENERGY_BASE") * $activeEnergyMining));
       case 1:
-        return $p1->metal + ($p1->pwMetal * (env("TRITIUM_METAL_BASE") * $activeMetalMining));
+        return $p1->metal + ($p1->pwMetal * ($effectService->calcMiningSpeed(env("TRITIUM_METAL_BASE"), $p1)  * $activeMetalMining));
       case 2:
-        return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM_BASE") * $activeUraniumMining));
+        // return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM_BASE") * $activeUraniumMining));
+        return $p1->uranium + ($p1->pwUranium * ($effectService->calcMiningSpeed(env("TRITIUM_METAL_BASE"), $p1) * $activeUraniumMining));
       case 3:
-        return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL_BASE") * $activeCrystalMining));
+        return $p1->crystal + ($p1->pwCrystal * ($effectService->calcMiningSpeed(env("TRITIUM_METAL_BASE"), $p1) * $activeCrystalMining));
+//        return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL_BASE") * $activeCrystalMining));
       case 4:
-        return $p1->researchPoints + ($p1->pwResearch * (env("TRITIUM_RESEARCH_SPEED") * $activeLaboratory));
+        return $p1->researchPoints + ($p1->pwResearch * ($effectService->calcResearchSpeed(env("TRITIUM_RESEARCH_SPEED"),$p1) * $activeLaboratory));
     }
 
+    
     return 0;
   }
 
