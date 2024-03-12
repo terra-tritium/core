@@ -45,7 +45,7 @@ Route::prefix('user')->group(function () {
     Route::post('/forgot-password', [AuthController::class, 'sendLink']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
     Route::get('/email-verify/{id}/{hash}', [AuthController::class,'verifyEmail'])->name('verification.verify');
-    Route::post('/verification-notification',[AuthController::class,'sendLinkVerifyEmailRestister'])->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+    Route::post('/verification-notification/{email}',[AuthController::class,'sendLinkVerifyEmailRestister'])->middleware(['throttle:6,1'])->name('verification.send');
 });
 Route::post('/gerar',[AuthController::class, 'gerar']); // @todo Geracao de posicao dos quadrantes (remover antes de ir para producao)
 
