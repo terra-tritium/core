@@ -35,7 +35,7 @@ class EmailVerificationNotification extends VerifyEmail
     {
         $verificationUrl = $this->verificationUrl($notifiable);
 
-        $verificationUrl = str_replace(config('app.url'),config('api.url_site'),$verificationUrl);
+        $verificationUrl = str_replace( env("APP_URL"), env("API_URL"), $verificationUrl);
 
         $verificationUrl = str_replace('api/user/','',$verificationUrl);
 
