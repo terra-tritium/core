@@ -6,6 +6,7 @@ use App\Models\GameMode;
 use App\Models\Player;
 use App\Models\Effect;
 use App\Models\Planet;
+use App\Services\EffectService;
 use App\Services\GameModeService;
 use Illuminate\Http\Response;
 
@@ -89,17 +90,33 @@ class GameModeController extends Controller
         try {
             $player = Player::getPlayerLogged();
             $loggedInPlayer = Player::where("id", $player->id)->firstOrFail();
-            $loggedInPlayer->gameMode = $code;
-            $this->applyEffect($player->id, $code);
-            $loggedInPlayer->save();
+            $effectService = app(EffectService::class);
+            return $effectService->applyEffect($loggedInPlayer, $code);
+
+            // $loggedInPlayer->save();
             return response()->json(['success' => 'Modo de jogo alterado com sucesso.'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(
-                ['error' => 'Ocorreu um erro ao alterar o modo de jogo.'],
+                ['error' => 'Ocorreu um erro ao alterar o modo de jogo. '.$e->getMessage()],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
     }
+
+    public function gameModeEffectPlayer($player){
+        try {
+            $player = Player::findOrFail($player);
+            $effect = Effect::where("player",$player->id)->firstOrFail();
+            $effect->gameMode = $player->gameMode;
+            return response()->json($effect, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(
+                ['error' => 'Ocorreu um erro ao recuperar effeito do tipo de jogo.'.$e->getMessage()],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     public function gameModeEffect($planet){
         try {
             $planet = Planet::findOrFail($planet);
@@ -113,77 +130,5 @@ class GameModeController extends Controller
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
-    }
-
-    private function applyEffect($player, $code)
-    {
-        $effect = Effect::where("player", $player)->first();
-        if (!$effect) {
-            $effect = new Effect();
-            $effect->player = $player;
-        }        
-
-        switch ($code) { 
-            case 1:
-                $effect->speedProduceUnit = 0;
-                $effect->speedproduceShip = 0;
-                $effect->speedBuild = 0;
-                $effect->speedResearch = 0;
-                $effect->speedTravel = 0;
-                $effect->speedMining = 0;
-                $effect->plasmaTechnology = 0;
-                $effect->protect = 0;
-                $effect->extraAttack = 0;
-                $effect->discountEnergy = 0;
-                $effect->discountHumanoid = 0;
-                $effect->discountBuild = 0;
-                $effect->save();
-                break;
-            #NFT     
-            case 2:
-                $effect->discountBuild = -10;
-                $effect->protect = 10;                               
-                break;    
-            #Space Titan 
-            case 3:
-                $effect->speedProduceUnit = 20;
-                $effect->extraAttack = 2;
-                $effect->speedResearch = -20;
-                $effect->speedMining = -20;
-                break;
-            # Researcher
-            case 4:
-                $effect->speedResearch = 20;
-                $effect->costBuild = 20;
-                break;
-            # Engineer
-            case 5:
-                $effect->speedProduceShip = 20;
-                $effect->speedResearch = -20;
-                break;
-            # Protector
-            case 6:
-                $effect->protect = 20;
-                break;
-            # Builder
-            case 7:
-                $effect->costBuild = -20;
-                $effect->speedProduceShip = -20;
-                $effect->speedProduceUnit = -20;
-                break;
-            # Navigator
-            case 8:
-                $effect->speedTravel = 20;
-                $effect->speedProduceShip = -20;
-                $effect->speedProduceUnit = -20;
-                break;
-            # Miner
-            case 9:
-                $effect->speedMining = 2;
-                $effect->protect = -20;
-                break;
-        }
-
-        $effect->save();
     }
 }
