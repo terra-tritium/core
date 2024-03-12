@@ -17,6 +17,7 @@ class UserService
         $result->success = false;
         $result->message  = 'Invalid Credentials';
         $result->response = Response::HTTP_OK;
+        $result->data = ['token'=>'','name'=>'','planet'=>''];
 
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
             $user   = Auth::user();

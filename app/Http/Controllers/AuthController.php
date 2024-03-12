@@ -140,7 +140,6 @@ class AuthController extends Controller
     public function generateToken()
     {
         $user = User::first();
-        VerificationNotificationJob::dispatch($user);
         if (!$user) {
             return response(['message' => 'No user found'], Response::HTTP_NOT_FOUND);
         }
@@ -150,10 +149,13 @@ class AuthController extends Controller
         return response(['message' => 'Token generated successfully', 'token' => $token], Response::HTTP_OK);
     }
 
-    public function sendLinkVerifyEmailRestister(Request $request)
+    public function sendLinkVerifyEmailRestister($email)
     {
         try{
-            $$request->user()->sendEmailVerificationNotification();
+
+            $user = User::where('email',$email)->first();
+            VerificationNotificationJob::dispatch($user);
+
             return response(['message' => 'Another email was sent with the link to verify the email.','success'=>true],Response::HTTP_OK);
         } catch (\Exception $exception) {
             Log::error($exception);
