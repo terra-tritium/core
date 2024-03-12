@@ -66,21 +66,16 @@ class AuthController extends Controller
 
     public function createToken(Request $request)
     {
-        $success = $this->userService->createToken($request);
+        $result = $this->userService->createToken($request);
 
-        if($success)
-        {
-            return response([
-                'message' => '',
-                'success'=>true,
-                'token' => $success['token'],
-                'name' => $success['name'],
-                'planet' => $success['planet']],
-                Response::HTTP_OK);
-        }else{
-            return response(['message' => 'Invalid Credentials','success'=>false],Response::HTTP_OK);
-        }
-
+        return response([
+                            'message' => $result->message,
+                            'success'=>$result->success,
+                            'token' => $result->data['token'],
+                            'name' => $result->data['name'],
+                            'planet' => $result->data['planet']
+                        ],
+                        $result->response);
     }
 
     public function logout(Request $request)
