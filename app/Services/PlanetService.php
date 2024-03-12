@@ -215,4 +215,16 @@ public function currentBalance($p1, $type) {
     return $result * $peso;
   }
 
+  public function onFire($planetId) {
+    $planet = Planet::findOrFail($planetId);
+    $planet->onFire = true;
+    $planet->save();
+  }
+
+  public function offFire($planetId) {
+    $planet = Planet::findOrFail($planetId);
+    $planet->onFire = false;
+    $planet->save();
+  }
+
 }
