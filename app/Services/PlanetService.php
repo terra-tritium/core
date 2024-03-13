@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Planet;
+use App\Models\Building;
+use App\Models\Build;
 use App\Services\RankingService;
 
 class PlanetService
@@ -18,8 +20,10 @@ class PlanetService
   }
 
   public function syncronizeEnergy(Planet $planet) {
+    $levelEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $planet->id])->first()->level;
+
     $energyMultiplier = $planet->terrainType ? $planet->terrainType->energy : 1.0;
-    $currentBalance = $this->currentBalance($planet, 0) * $energyMultiplier;
+    $currentBalance = $this->currentBalance($planet, 0, $levelEnergy) * $energyMultiplier;
     $planet->energy = $currentBalance;
     $planet->timeEnergy = $this->timeNow;
     $planet->save();
@@ -33,7 +37,7 @@ public function syncronizeDefenseScore(Planet $planet) {
 }
 
 
-public function currentBalance($p1, $type) {
+public function currentBalance($p1, $type, $energyLevel = 1) {
   $effectService = new EffectService();
   $sInHour = 3600;
 
@@ -43,9 +47,15 @@ public function currentBalance($p1, $type) {
   $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $sInHour;
   $activeLaboratory = ($this->timeNow - $p1->timeResearch) / $sInHour;
 
+  $workersOnEnergy = $p1->workersWaiting;
+
+  if ($p1->workersWaiting > (env("TRITIUM_ENERGY_WORKERS_BY_LEVEL") * $energyLevel)) {
+    $workersOnEnergy = env("TRITIUM_ENERGY_WORKERS_BY_LEVEL") * $energyLevel;
+  }
+
     switch ($type) {
       case 0:
-        return $p1->energy + ($p1->workersWaiting * (env("TRITIUM_ENERGY_BASE") * $activeEnergyMining));
+        return $p1->energy + ($workersOnEnergy * (env("TRITIUM_ENERGY_BASE") * $activeEnergyMining));
       case 1:
         return $p1->metal + ($p1->pwMetal * ($effectService->calcMiningSpeed(env("TRITIUM_METAL_BASE"), $p1)  * $activeMetalMining));
       case 2:
@@ -62,28 +72,28 @@ public function currentBalance($p1, $type) {
     return 0;
   }
 
-  public function enoughBalance($p1, $units, $type) {
+  public function enoughBalance($p1, $units, $type, $energyLevel = 1) {
     if ($units == 0){
       return true;
     }
     switch ($type) {
       case 0:
-        if ($this->currentBalance($p1, 0) >= $units) {
+        if ($this->currentBalance($p1, 0, $energyLevel) >= $units) {
           return true;
         }
         break;
       case 1:
-        if ($this->currentBalance($p1, 1) >= $units) {
+        if ($this->currentBalance($p1, 1, $energyLevel) >= $units) {
           return true;
         }
         break;
       case 2:
-        if ($this->currentBalance($p1, 2) >= $units) {
+        if ($this->currentBalance($p1, 2, $energyLevel) >= $units) {
           return true;
         }
         break;
       case 3:
-        if ($this->currentBalance($p1, 3) >= $units) {
+        if ($this->currentBalance($p1, 3, $energyLevel) >= $units) {
           return true;
         }
         break;
