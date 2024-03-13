@@ -106,14 +106,14 @@ class WorkerService
     try { 
       $level = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $planet->id])->first()->level;
 
-      $fator = 0;
-      $padronizedLevel = $level * 10;
-      if ($padronizedLevel < $planet->workersWaiting) {
-        $fator = $padronizedLevel;
+      $workersOnEnergy = 0;
+      $workersByLevel = $level * env("TRITIUM_ENERGY_WORKERS_BY_LEVEL"); //25
+      if ($workersByLevel < $planet->workersWaiting) {
+        $workersOnEnergy = $workersByLevel;
       } else {
-        $fator = $planet->workersWaiting;
+        $workersOnEnergy = $planet->workersWaiting;
       }
-      $planet->energy += ((time() - $planet->timeEnergy) / 360) * env('TRITIUM_ENERGY_BASE') * $fator;
+      $planet->energy += ((time() - $planet->timeEnergy) / 3600) * env('TRITIUM_ENERGY_BASE') * $workersOnEnergy;
       $planet->timeEnergy = time();
       $planet->save();
     } catch (\Exception $exception) {
