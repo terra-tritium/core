@@ -31,7 +31,13 @@ class BuildService
 
     private function starNewMining($p1, $building, $resourceMining, $resourceSpend, $require) {
 
-        $levelEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $p1->id])->first()->level;
+        $buildEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $p1->id])->first();
+
+        if ($buildEnergy) {
+            $levelEnergy = $buildEnergy->level;
+        } else {
+            $levelEnergy = 0;
+        }
 
         $hasBalance = false;
 
@@ -65,7 +71,15 @@ class BuildService
         $building->workers = 0;
 
         $p1 = Planet::find($building->planet);
-        $levelEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $p1->id])->first()->level;
+
+        $buildEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $p1->id])->first();
+
+        if ($buildEnergy) {
+            $levelEnergy = $buildEnergy->level;
+        } else {
+            $levelEnergy = 0;
+        }
+
         $build = Build::find($building->build);
         $playerLogged = Player::getPlayerLogged();
         $player = Player::findOrFail($playerLogged->id);
@@ -233,7 +247,13 @@ class BuildService
     }
 
     public function suficientFunds($p1, $require) {
-        $levelEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $p1->id])->first()->level;
+        $buildEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $p1->id])->first();
+
+        if ($buildEnergy) {
+            $levelEnergy = $buildEnergy->level;
+        } else {
+            $levelEnergy = 0;
+        }
 
         if (!$this->planetService->enoughBalance($p1, $require->metal, 1, $levelEnergy)) {
             return false;
