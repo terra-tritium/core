@@ -74,8 +74,6 @@ class ProductionService
 
   public function hasFunds($unit, $planet, $type) {
 
-    $levelEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $planet->id])->first()->level;
-
     if($type == "troop"){
       $unitModel = Unit::findOrFail($unit['id']);
     }else{
@@ -84,15 +82,15 @@ class ProductionService
 
     if (isset($unit["quantity"])) {
       $p1 = Planet::findOrFail($planet);
-      if (!$this->planetService->enoughBalance($p1, ($unitModel->metal * $unit["quantity"]), 1, $levelEnergy)){
-            return false;
-        }
-        if (!$this->planetService->enoughBalance($p1, ($unitModel->uranium * $unit["quantity"]), 2, $levelEnergy)){
-            return false;
-        }
-        if (!$this->planetService->enoughBalance($p1, ($unitModel->crystal * $unit["quantity"]), 3, $levelEnergy)){
-            return false;
-        }
+      if (!$this->planetService->enoughBalance($p1, ($unitModel->metal * $unit["quantity"]), 1)){
+          return false;
+      }
+      if (!$this->planetService->enoughBalance($p1, ($unitModel->uranium * $unit["quantity"]), 2)){
+          return false;
+      }
+      if (!$this->planetService->enoughBalance($p1, ($unitModel->crystal * $unit["quantity"]), 3)){
+          return false;
+      }
     } 
     return true;
   }

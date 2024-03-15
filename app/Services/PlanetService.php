@@ -20,10 +20,17 @@ class PlanetService
   }
 
   public function syncronizeEnergy(Planet $planet) {
-    $levelEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $planet->id])->first()->level;
+
+    $level = 0;
+
+    $levelEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $planet->id])->first();
+
+    if ($levelEnergy) {
+      $level = $levelEnergy->level;
+    }
 
     $energyMultiplier = $planet->terrainType ? $planet->terrainType->energy : 1.0;
-    $currentBalance = $this->currentBalance($planet, 0, $levelEnergy) * $energyMultiplier;
+    $currentBalance = $this->currentBalance($planet, 0, $level) * $energyMultiplier;
     $planet->energy = $currentBalance;
     $planet->timeEnergy = $this->timeNow;
     $planet->save();
