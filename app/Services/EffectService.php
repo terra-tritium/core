@@ -247,6 +247,7 @@ class EffectService
         break;
     }
     $player->gameMode = $code;
+    $player->gameModeUpdated = time();
     $player->Save();
     $effect->save();
   }

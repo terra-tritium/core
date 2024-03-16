@@ -8,6 +8,7 @@ use App\Models\Effect;
 use App\Models\Planet;
 use App\Services\EffectService;
 use App\Services\GameModeService;
+use DateTime;
 use Illuminate\Http\Response;
 
 class GameModeController extends Controller
@@ -91,9 +92,14 @@ class GameModeController extends Controller
             $player = Player::getPlayerLogged();
             $loggedInPlayer = Player::where("id", $player->id)->firstOrFail();
             $effectService = app(EffectService::class);
-            return $effectService->applyEffect($loggedInPlayer, $code);
-
-            // $loggedInPlayer->save();
+            $lastChange = $loggedInPlayer->gameModeUpdated;
+            $day = 86400;
+            $availableAt = $lastChange + ($day * 2);
+            if($availableAt > time()){
+                return response()->json(['error'=>"É necessário aguardar 48h para alterar o modo de jogo"],Response::HTTP_FORBIDDEN);
+            }
+            
+            $effectService->applyEffect($loggedInPlayer, $code);
             return response()->json(['success' => 'Modo de jogo alterado com sucesso.'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(
@@ -108,6 +114,7 @@ class GameModeController extends Controller
             $player = Player::findOrFail($player);
             $effect = Effect::where("player",$player->id)->firstOrFail();
             $effect->gameMode = $player->gameMode;
+            $effect->gameModeUpdated = $player->gameModeUpdated;
             return response()->json($effect, Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(
@@ -123,6 +130,7 @@ class GameModeController extends Controller
             $player = Player::findOrFail($planet->player);
             $effect = Effect::where("player",$player->id)->firstOrFail();
             $effect->gameMode = $player->gameMode;
+            $effect->gameModeUpdated = $player->gameModeUpdated;
             return response()->json($effect, Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(
