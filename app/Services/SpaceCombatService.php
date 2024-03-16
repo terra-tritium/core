@@ -13,6 +13,7 @@ use App\Models\Fleet;
 use App\Models\Strategy;
 use App\Models\Travel;
 use App\Services\PlanetService;
+use App\Services\LogService;
 use App\Jobs\SpaceCombatJob;
 use App\Jobs\TravelJob;
 
@@ -370,7 +371,6 @@ class SpaceCombatService
         $uranium = $planet->uranium;
         $capacity -= $planet->uranium;
         $planet->uranium = 0;
-        return $stolen;
       }
 
       $now = time();
@@ -402,6 +402,53 @@ class SpaceCombatService
     $planet->save();
 
     return $stolen;
+  }
+
+  public function landingOfShips($travel) {
+    $planetService = new PlanetService();
+    $planetService->offFire($travel->to);
+    $this->addFleet($travel);
+    $this->depositeResource($travel);
+  }
+
+  public function addFleet($travel){
+    $this->addShip($travel, Ship::SHIP_CRAFT);
+    $this->addShip($travel, Ship::SHIP_BOMBER);
+    $this->addShip($travel, Ship::SHIP_CRUISER);
+    $this->addShip($travel, Ship::SHIP_SCOUT);
+    $this->addShip($travel, Ship::SHIP_STEALTH);
+    $this->addShip($travel, Ship::SHIP_FLAGSHIP);
+  }
+
+  private function addShip($travel, $shipCode) {
+      $fleet = Fleet::where([
+          'unit'      => $shipCode,
+          'player'    => $travel->player,
+          'planet'    => $travel->to
+      ])->first();
+
+      if ($fleet && $travel->craft > 0) {
+          $fleet->quantity = ($fleet->quantity +  $travel->craft);
+          $fleet->save();
+      }
+  }
+
+  private function depositeResource ($travel) {
+      $planet = Planet::where('id', $travel->to)->first();
+      $planet->metal += $travel->metal;
+      $planet->crystal += $travel->crystal;
+      $planet->uranium += $travel->uranium;
+      $planet->save();
+
+      $logService = new LogService();
+      $logService->notify(
+        $travel->player,
+        "His fleet returned from combat and brought, " 
+        . $travel->metal . " metal, " 
+        . $travel->crystal . " crystal and " 
+        . $travel->uranium . " uranium",
+        "Space Combat"
+      );
   }
 
   private function sincronizeFleet($planet, $fighter) {

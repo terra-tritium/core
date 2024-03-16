@@ -73,7 +73,7 @@ class TravelJob implements ShouldQueue
                     //$this->travelService->starMissionExplorer($this->travel);
                     break;
                 case Travel::RETURN_FLEET:
-                    //$this->travelService->starReturnFleet($this->travel);
+                    $this->travelService->landingOfShips($currentTravel);
                     break;
             }
         }
