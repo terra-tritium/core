@@ -211,7 +211,7 @@ class BuildController extends Controller
 
             return response()->json(['message' => 'Building planted successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

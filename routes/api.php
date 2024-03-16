@@ -26,6 +26,7 @@ use App\Http\Controllers\ShipController;
 use App\Http\Controllers\FleetController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,8 @@ Route::prefix('user')->group(function () {
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::post('/forgot-password', [AuthController::class, 'sendLink']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
+    Route::get('/email-verify/{id}/{hash}', [AuthController::class,'verifyEmail'])->name('verification.verify');
+    Route::post('/verification-notification/{email}',[AuthController::class,'sendLinkVerifyEmailRestister'])->middleware(['throttle:6,1'])->name('verification.send');
 });
 Route::post('/gerar',[AuthController::class, 'gerar']); // @todo Geracao de posicao dos quadrantes (remover antes de ir para producao)
 
@@ -58,7 +61,7 @@ Route::group(['prefix' => 'player'], function () {
 /**
  * @todo retirar o /all
  */
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::group(['prefix' => 'player'], function () {
         Route::get('/show', [PlayerController::class, 'show']);
         Route::get('/details/{id}', [PlayerController::class, 'getDetails']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\VerificationNotificationJob;
 use App\Models\Player;
 use App\Models\User;
 use App\Services\PlayerService;
@@ -185,7 +186,7 @@ class PlayerController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response(['message' => $validator->messages()->first(),'success'=>false], 
+            return response(['message' => $validator->messages()->first(),'success'=>false],
             Response::HTTP_OK);
         }
 
@@ -215,6 +216,8 @@ class PlayerController extends Controller
         $player->user = $user->id;
         $player->tritium = 0;
         $this->playerService->register($player);
+
+        VerificationNotificationJob::dispatch($user);
 
         return response(['message' => 'Player created success!','success'=>true],Response::HTTP_OK);
 

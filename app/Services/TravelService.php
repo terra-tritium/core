@@ -64,7 +64,6 @@ class TravelService
             }
         }
 
-
         $now = time();
         $travelTime = $this->planetService->calculeDistance($travel->from, $travel->to);
         $newTravel->from = $travel->from;
@@ -82,12 +81,14 @@ class TravelService
             case Travel::ATTACK_FLEET:
                 $newTravel = $this->startAttackFleet($newTravel, $travel, $player);
                 $newTravel->status = Travel::STATUS_ON_GOING;
+                $this->planetService->onFire($travel->to);
                 break;
             case Travel::DEFENSE_FLEET:
                 $newTravel = $this->startDefenseFleet($newTravel);
                 break;
             case Travel::ATTACK_TROOP:
                 $newTravel = $this->startAttackTroop($newTravel, $travel, $player);
+                $this->planetService->onFire($travel->to);
                 break;
             case Travel::DEFENSE_TROOP:
                 $newTravel = $this->startDefenseTroop($newTravel);
@@ -107,6 +108,7 @@ class TravelService
                 break;
             case Travel::RETURN_FLEET:
                 $newTravel = $this->startReturnFleet($newTravel, $travel, $player);
+                $this->planetService->offFire($travel->to);
                 break;
         }
 

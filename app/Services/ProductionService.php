@@ -6,6 +6,8 @@ use App\Jobs\ShipyardJob;
 use App\Models\Production;
 use App\Models\Player;
 use App\Models\Unit;
+use App\Models\Building;
+use App\Models\Build;
 use App\Jobs\TroopJob;
 use App\Jobs\FleetJob;
 use App\Models\Planet;
@@ -71,6 +73,7 @@ class ProductionService
   }
 
   public function hasFunds($unit, $planet, $type) {
+
     if($type == "troop"){
       $unitModel = Unit::findOrFail($unit['id']);
     }else{
@@ -80,14 +83,14 @@ class ProductionService
     if (isset($unit["quantity"])) {
       $p1 = Planet::findOrFail($planet);
       if (!$this->planetService->enoughBalance($p1, ($unitModel->metal * $unit["quantity"]), 1)){
-            return false;
-        }
-        if (!$this->planetService->enoughBalance($p1, ($unitModel->uranium * $unit["quantity"]), 2)){
-            return false;
-        }
-        if (!$this->planetService->enoughBalance($p1, ($unitModel->crystal * $unit["quantity"]), 3)){
-            return false;
-        }
+          return false;
+      }
+      if (!$this->planetService->enoughBalance($p1, ($unitModel->uranium * $unit["quantity"]), 2)){
+          return false;
+      }
+      if (!$this->planetService->enoughBalance($p1, ($unitModel->crystal * $unit["quantity"]), 3)){
+          return false;
+      }
     } 
     return true;
   }

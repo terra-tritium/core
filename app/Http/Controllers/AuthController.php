@@ -6,15 +6,16 @@ use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Jobs\VerificationNotificationJob;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use App\Notifications\SendMail;
-use App\Notifications\Message;
 use App\Models\Quadrant;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Support\Facades\Log;
+
 
 class AuthController extends Controller
 {
@@ -65,21 +66,16 @@ class AuthController extends Controller
 
     public function createToken(Request $request)
     {
-        $success = $this->userService->createToken($request);
-        
-        if($success)
-        {
-            return response([
-                'message' => '',
-                'success'=>true,
-                'token' => $success['token'],
-                'name' => $success['name'],
-                'planet' => $success['planet']],
-                Response::HTTP_OK);
-        }else{
-            return response(['message' => 'Invalid Credentials','success'=>false],Response::HTTP_OK);
-        }
+        $result = $this->userService->createToken($request);
 
+        return response([
+                            'message' => $result->message,
+                            'success'=>$result->success,
+                            'token' => $result->data['token'],
+                            'name' => $result->data['name'],
+                            'planet' => $result->data['planet']
+                        ],
+                        $result->response);
     }
 
     public function logout(Request $request)
@@ -153,4 +149,37 @@ class AuthController extends Controller
         return response(['message' => 'Token generated successfully', 'token' => $token], Response::HTTP_OK);
     }
 
+    public function sendLinkVerifyEmailRestister($email)
+    {
+        try{
+
+            $user = User::where('email',$email)->first();
+            VerificationNotificationJob::dispatch($user);
+
+            return response(['message' => 'Another email was sent with the link to verify the email.','success'=>true],Response::HTTP_OK);
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function verifyEmail($id,$hash,Request $request)
+    {
+        try{
+            if (!$request->hasValidSignature()) {
+                return response(['message' => 'Invalid/Expired url provided.','success'=>false],401);
+            }
+
+            $user = User::findOrFail($id);
+
+            if (!$user->hasVerifiedEmail()) {
+                $user->markEmailAsVerified();
+            }
+
+            return response(['message' => 'E-mail verify with success.','success'=>true],Response::HTTP_OK);
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
