@@ -24,7 +24,10 @@ class EspionadeService
             switch($spyModel->typeSpy)
             {
                 case Espionage::TYPE_SPY_FLEET:
-                    $fleets = Fleet::select('id','name','quantity')->where('planet',$spyModel->planet)->get();
+                    $fleets = Fleet::leftJoin('ships','ships.id','=','fleet.id')
+                                    ->select('fleet.*','ships.name')
+                                    ->where('planet',$spyModel->planet)
+                                    ->get();
                     $spyModel->fleet =  json_encode($fleets);
                     break;
 
@@ -42,7 +45,10 @@ class EspionadeService
                     break;
 
                 case Espionage::TYPE_SPY_TROOP:
-                    $troops = Troop::select('id','name','quantity')->where('planet',$spyModel->planet)->get();
+                    $troops = Troop::leftJoin('units','units.id','=','troop.id')
+                                    ->select('troop.*','units.name')
+                                    ->where('planet',$spyModel->planet)
+                                    ->get();
                     $spyModel->troop =  json_encode($troops);
                     break;
             }
