@@ -87,6 +87,7 @@ class CombatController extends Controller
             ->where('f.player', $player->id)
             ->select('c.*', 'p.name as planetName', 'p.quadrant as quadrant', 'p.position as position', 'p.region as region', 'u.name as player')
             ->limit(20)
+            ->orderBy('c.id', 'desc')
             ->get();
 
         return response()->json($combats);
