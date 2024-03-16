@@ -107,8 +107,8 @@ class TravelService
                 $newTravel = $this->startMissionExplorer($newTravel);
                 break;
             case Travel::RETURN_FLEET:
-                $newTravel = $this->startReturnFleet($newTravel, $travel, $player);
-                $this->planetService->offFire($travel->to);
+                // $newTravel = $this->startReturnFleet($newTravel, $travel, $player);
+                // $this->planetService->offFire($travel->to);
                 break;
         }
 
@@ -119,11 +119,6 @@ class TravelService
 
         $newTravel->save();
         TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
-    }
-
-    public function startReturnFleet($travel, $req, $player) {
-        //$this->addFleet($player, $req->from, $req->fleet);
-        return $travel;
     }
 
     private function startAttackFleet($travel, $req, $player) {
@@ -353,21 +348,6 @@ class TravelService
             ])->first();
 
             $fleetm->quantity = ($fleetm->quantity -  $fleet->quantity);
-            $fleetm->save();
-        }
-    }
-
-    public function addFleet($player, $planet, $fleets){
-
-        foreach($fleets as $fleet)
-        {
-            $fleetm = Fleet::where([
-                'unit'      => $fleet->unit,
-                'player'    => $player,
-                'planet'    => $planet
-            ])->first();
-
-            $fleetm->quantity = ($fleetm->quantity +  $fleet->quantity);
             $fleetm->save();
         }
     }

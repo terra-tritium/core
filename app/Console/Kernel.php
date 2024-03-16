@@ -28,24 +28,24 @@ class Kernel extends ConsoleKernel
 
  
         # Ranking
-        $schedule->call(function () {
+        // $schedule->call(function () {
 
-            $players = Player::all();
+        //     $players = Player::all();
 
-            foreach($players as $p) {
-                $ranking = new Ranking();
-                $ranking->name = $p->name;
-                $ranking->player = $p->player->id;
-                $ranking->energy = $p->energy;
-                $ranking->score = $p->score;
-                $ranking->buildScore = $p->buildScore;
-                $ranking->attackScore = $p->attackScore;
-                $ranking->defenseScore = $p->defenseScore;
-                $ranking->militaryScore = $p->militaryScore;
-                $ranking->tritium = $p->tritium;
-                $ranking->save();
-            }
-        })->everyThirtyMinutes();
+        //     foreach($players as $p) {
+        //         $ranking = new Ranking();
+        //         $ranking->name = $p->name;
+        //         $ranking->player = $p->player;
+        //         $ranking->energy = $p->energy;
+        //         $ranking->score = $p->score;
+        //         $ranking->buildScore = $p->buildScore;
+        //         $ranking->attackScore = $p->attackScore;
+        //         $ranking->defenseScore = $p->defenseScore;
+        //         $ranking->militaryScore = $p->militaryScore;
+        //         $ranking->tritium = $p->tritium;
+        //         $ranking->save();
+        //     }
+        // })->everyThirtyMinutes();
     }
 
     /**
