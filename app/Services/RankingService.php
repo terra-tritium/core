@@ -58,13 +58,13 @@ class RankingService
             }
         }
 
+
         return $query->get();
     }
 
     public function getAlianceRankings($orderBy = null, $filter = null)
     {
         $query = AlianceRanking::query();
-
         if ($orderBy) {
             switch ($orderBy) {
                 case RankingCategory::SCORE:
