@@ -238,6 +238,48 @@ class TravelService
         TravelJob::dispatch($this,$newTravel->id,true)->delay(now()->addSeconds($travelTime));
     }
 
+    public function colonizePlanet($planetId, $playerId) {
+        $planetColony = Planet::find($planetId);
+        $planetFrom = Planet::where(['player' => $playerId])->firstOrFail();
+        $planetFrom->metal -= 100000;
+        $planetFrom->uranium -= 50000;
+        $planetFrom->crystal -= 50000;
+
+        if ($planetFrom->metal < 0 || $planetFrom->uranium < 0 || $planetFrom->crystal < 0) { return false;  }
+
+        $planetFrom->save(); 
+
+        $travel = new Travel();
+        $travel->from = $planetFrom->id;
+        $travel->to = $planetColony->id;
+        $travel->action = Travel::MISSION_COLONIZATION;
+        $travel->player = $playerId;
+        $travel->receptor = $playerId;
+        $travel->start = time();
+        $travelTime = $this->planetService->calculeDistance($planetFrom->id, $planetColony->id);
+        $travel->arrival = time() + $travelTime;
+        $travel->status = Travel::STATUS_ON_LOAD;
+        $travel->save();
+        
+        TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
+    }
+
+    public function missionColonization ($travel) {
+        $planet = Planet::find($travel->to);
+        $planet->player = $travel->player;
+        $planet->metal = 50000;
+        $planet->uranium = 25000;
+        $planet->crystal = 25000;
+        $planet->save();
+    
+        $logService = new LogService();
+        $logService->notify(
+          $travel->player,
+          "The planet " . $travel->to . " was colonized",
+          "Colonization"
+        );
+    }
+
     public function calcDistance($from, $to) {
 
         $planetFrom = Planet::where(['id' => $from])->firstOrFail();
@@ -451,53 +493,76 @@ class TravelService
     /**
      * Get all missions by type
      */
-    public function getMissions($action) {
+    public function getMissions($action, $player) {
 
         $missions = [];
 
+        $planets = Planet::where('player', $player->id)->get();
+
         switch ($action) {
             case Travel::ATTACK_FLEET:
-                $missions = $this->getMissionsByAction(Travel::ATTACK_FLEET);
+                $missions = $this->getMissionsByAction(Travel::ATTACK_FLEET, $player->id, $planets);
                 break;
             case Travel::DEFENSE_FLEET:
-                $missions = $this->getMissionsByAction(Travel::DEFENSE_FLEET);
+                $missions = $this->getMissionsByAction(Travel::DEFENSE_FLEET, $player->id, $planets);
                 break;
             case Travel::ATTACK_TROOP:
-                $missions = $this->getMissionsByAction(Travel::ATTACK_TROOP);
+                $missions = $this->getMissionsByAction(Travel::ATTACK_TROOP, $player->id, $planets);
                 break;
             case Travel::DEFENSE_TROOP:
-                $missions = $this->getMissionsByAction(Travel::DEFENSE_TROOP);
+                $missions = $this->getMissionsByAction(Travel::DEFENSE_TROOP, $player->id, $planets);
                 break;
             case Travel::TRANSPORT_RESOURCE:
-                $missions = $this->getMissionsByAction(Travel::TRANSPORT_RESOURCE);
+                $missions = $this->getMissionsByAction(Travel::TRANSPORT_RESOURCE, $player->id, $planets);
                 break;
             case Travel::TRANSPORT_BUY:
-                $missions = $this->getMissionsByAction(Travel::TRANSPORT_BUY);
+                $missions = $this->getMissionsByAction(Travel::TRANSPORT_BUY, $player->id, $planets);
                 break;
             case Travel::TRANSPORT_SELL:
-                $missions = $this->getMissionsByAction(Travel::TRANSPORT_SELL);
+                $missions = $this->getMissionsByAction(Travel::TRANSPORT_SELL, $player->id, $planets);
                 break;
             case Travel::MISSION_EXPLORER:
-                $missions = $this->getMissionsByAction(Travel::MISSION_EXPLORER);
+                $missions = $this->getMissionsByAction(Travel::MISSION_EXPLORER, $player->id, $planets);
                 break;
             case Travel::MISSION_SPIONAGE:
-                $missions = $this->getMissionsByAction(Travel::MISSION_SPIONAGE);
+                $missions = $this->getMissionsByAction(Travel::MISSION_SPIONAGE, $player->id, $planets);
+                break;
+            case Travel::MISSION_COLONIZATION:
+                $missions = $this->getMissionsByAction(Travel::MISSION_COLONIZATION, $player->id, $planets);
                 break;
             case "militar":
                 $missions = Travel::with('from', 'to')
-                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_FLEET]])
-                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_FLEET]])
-                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_TROOP]])
-                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_TROOP]])
-                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_FLEET]])
-                    ->orWhere([['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_TROOP]])
-                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::ATTACK_FLEET]])
-                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::DEFENSE_FLEET]])
-                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::ATTACK_TROOP]])
-                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::DEFENSE_TROOP]])
-                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::RETURN_FLEET]])
-                    ->orWhere([['status', Travel::STATUS_ON_LOAD], ['action', Travel::RETURN_TROOP]])
-                    ->orderBy('arrival')
+                    ->where(function($query) use ($planets) {
+                        foreach ($planets as $planet) {
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_FLEET]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_FLEET]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_TROOP]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_TROOP]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_FLEET]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_TROOP]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_FLEET]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_FLEET]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_TROOP]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_TROOP]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::RETURN_FLEET]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::RETURN_TROOP]]);
+                            
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_FLEET]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_FLEET]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_TROOP]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_TROOP]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_FLEET]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_TROOP]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_FLEET]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_FLEET]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_TROOP]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_TROOP]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::RETURN_FLEET]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::RETURN_TROOP]]);
+                        }
+                    })
+                    ->orderBy('start', 'desc')
+                    ->limit(20)
                     ->get();
                 break;
         }
@@ -505,13 +570,18 @@ class TravelService
         return $missions;
     }
 
-    private function getMissionsByAction($action) {
+    private function getMissionsByAction($action, $playerId, $planets) {
         return Travel::with('from', 'to')
-                                        ->where([
-                                                    ['action', $action],
-                                                    ['status', Travel::STATUS_ON_LOAD],
-                                                ])
-                                        ->orderBy('arrival')->get();
+            ->where(function($query) use ($planets, $action) {
+                foreach ($planets as $planet) {
+                    $query->orWhere([['from', $planet->id], ['action', $action]]);
+                    $query->orWhere([['to', $planet->id], ['action', $action]]);
+                }
+            })
+            ->orWhere([['player', $playerId], ['action', $action]])
+            ->orderBy('start', 'desc')
+            ->limit(20)
+            ->get();
     }
 
     public function starCombatTravel($travel)
@@ -647,5 +717,5 @@ class TravelService
 
         $spyModel->save();
     }
-
 }
+
