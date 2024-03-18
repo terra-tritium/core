@@ -10,6 +10,7 @@ use Illuminate\Queue\SerializesModels;
 
 use App\Models\Travel;
 use App\Services\SpaceCombatService;
+use App\Services\EspionadeService;
 
 class TravelJob implements ShouldQueue
 {
@@ -77,6 +78,9 @@ class TravelJob implements ShouldQueue
                     break;
                 case Travel::MISSION_COLONIZATION:
                     $this->travelService->missionColonization($currentTravel);
+                case Travel::MISSION_SPIONAGE:
+                    $espitionService = new EspionadeService();
+                    $espitionService->finallySpy($currentTravel);
                     break;
             }
         }

@@ -18,12 +18,14 @@ use App\Http\Controllers\API\ResetarSenhaController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\FactoryController;
 use App\Http\Controllers\AliancesController;
+use App\Http\Controllers\EspionadeController;
 use App\Http\Controllers\TradingController;
 use App\Http\Controllers\NFTController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\RotinasController;
 use App\Http\Controllers\ShipController;
 use App\Http\Controllers\FleetController;
+use App\Models\Espionage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -271,6 +273,10 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::prefix('nft-effect')->group(function () {
         Route::get('/get', [NFTEffectsController::class, 'getNftEffects']);
     });
+    Route::prefix('espionage')->group(function () {
+        Route::get('/list', [EspionadeController::class, 'list']);
+    });
+
 });
 /**
  * @todo retirar a chamada da rotina

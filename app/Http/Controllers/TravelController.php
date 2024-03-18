@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Espionage;
 use App\Models\Travel;
 use App\Services\TravelService;
 use Illuminate\Http\Request;
@@ -271,14 +272,21 @@ class TravelController extends Controller
                 return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
             }
 
+            if ($player->tritium <  Espionage::TRITIUM_TRAVEL_MISSION_SPIONAGE_COST) {
+                return response()->json(['message' => 'No resources','success'=> false ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $espionade = Espionage::where(['spy' => $player->id,'planet'=> $request->to])->whereNull('end_date')->get();
+            if (count($espionade) > 0) {
+                return response()->json(['message' => 'You already spy on the planet!','success'=> false ], Response::HTTP_OK);
+            }
+
             $requestData = $request->all();
             $result = $this->travelService->speyMission($player->id, $requestData);
 
-            return response()->json($result, Response::HTTP_OK);
+            return response()->json([ $result , 'success'=> true], Response::HTTP_OK);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-            return response()->json(['message' => $e->getTraceAsString()], Response::HTTP_INTERNAL_SERVER_ERROR);
-            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+              return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
