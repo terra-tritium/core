@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Travel;
 use App\Models\Ship;
 use App\Jobs\TravelJob;
+use App\Models\Espionage;
 use App\Models\Position;
 use App\Models\Planet;
 use App\Models\Troop;
@@ -33,10 +34,10 @@ class TravelService
         if (!is_object($travel)) {
             $travel =  json_decode (json_encode ($travel), FALSE);
         }
-        
+
         $newTravel = new Travel();
 
-        if ($travel->action < 1 || $travel->action > 8) {
+        if ($travel->action < 1 || $travel->action > 11) {
             return "Invalid action type";
         }
 
@@ -110,15 +111,26 @@ class TravelService
                 // $newTravel = $this->startReturnFleet($newTravel, $travel, $player);
                 // $this->planetService->offFire($travel->to);
                 break;
+            case Travel::MISSION_SPIONAGE:
+                $newTravel->status = Travel::STATUS_ON_GOING;
+                break;
         }
 
         # Merchant Ships
-        if ($newTravel->transportShips < 0) {
+        if ($newTravel->transportShips < 0 || is_null($newTravel->transportShips )) {
             $newTravel->transportShips = 0;
         }
 
         $newTravel->save();
+
         TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
+
+        return $newTravel;
+    }
+
+    public function startReturnFleet($travel, $req, $player) {
+        //$this->addFleet($player, $req->from, $req->fleet);
+        return $travel;
     }
 
     private function startAttackFleet($travel, $req, $player) {
@@ -204,6 +216,10 @@ class TravelService
     }
 
     private function startMissionExplorer($travel) {
+
+    }
+
+    private function startMissionEspioned($travel) {
 
     }
 
@@ -348,6 +364,21 @@ class TravelService
             ])->first();
 
             $fleetm->quantity = ($fleetm->quantity -  $fleet->quantity);
+            $fleetm->save();
+        }
+    }
+
+    public function addFleet($player, $planet, $fleets){
+
+        foreach($fleets as $fleet)
+        {
+            $fleetm = Fleet::where([
+                'unit'      => $fleet->unit,
+                'player'    => $player,
+                'planet'    => $planet
+            ])->first();
+
+            $fleetm->quantity = ($fleetm->quantity +  $fleet->quantity);
             $fleetm->save();
         }
     }
@@ -532,6 +563,7 @@ class TravelService
         return  $currentTravel;
     }
 
+    #TODO Validar quais tipos de viages podem ser canceladas
     public function cancel($player,$travel)
     {
         $travelModel = Travel::where('player', $player)
@@ -546,12 +578,35 @@ class TravelService
         $travelModel->status = Travel::STATUS_CANCEL;
         $travelModel->save();
 
-        $planetOrigim = Planet::findOrFail($travelModel->from);
-        $planetOrigim->metal    += $travelModel->metal;
-        $planetOrigim->uranium  += $travelModel->uranium;
-        $planetOrigim->crystal  += $travelModel->crystal;
-        $planetOrigim->transportShips += $travelModel->transportShips ;
-        $planetOrigim->save();
+        switch($travel->action)
+        {
+            case Travel::TRANSPORT_RESOURCE:
+                $planetOrigim = Planet::findOrFail($travelModel->from);
+                $planetOrigim->metal    += $travelModel->metal;
+                $planetOrigim->uranium  += $travelModel->uranium;
+                $planetOrigim->crystal  += $travelModel->crystal;
+                $planetOrigim->transportShips += $travelModel->transportShips ;
+                $planetOrigim->save();
+                break;
+
+            case Travel::MISSION_SPIONAGE:
+                $spyModel = Espionage::where('travel',$travel->id)->first();
+                $spyModel->success = false;
+                $spyModel->end_date = Carbon::now();
+                $spyModel->finished = true;
+                $spyModel->save();
+                break;
+
+            case Travel::ATTACK_FLEET : break;
+            case Travel::ATTACK_TROOP : break;
+            case Travel::DEFENSE_FLEET : break;
+            case Travel::DEFENSE_TROOP : break;
+            case Travel::TRANSPORT_BUY : break;
+            case Travel::TRANSPORT_SELL : break;
+            case Travel::MISSION_EXPLORER : break;
+            case Travel::RETURN_FLEET : break;
+            case Travel::RETURN_TROOP : break;
+        }
 
         return true;
     }
@@ -561,11 +616,36 @@ class TravelService
 
         $travelModel = new Travel();
         $travelModel->action = Travel::MISSION_SPIONAGE;
-        $travelModel->from = $travel->origin;
-        $travelModel->to = $travel->destiny;
+        $travelModel->from = $travel->from;
+        $travelModel->to = $travel->to;
 
-        $this->start($player,$travelModel);
+        $travelModel =  $this->start($player,$travelModel);
 
-        $typeMission = $travel->typeMission;
+        $spyModel = new Espionage();
+        $spyModel->spy = $player;
+        $spyModel->travel = $travelModel->id;
+        $spyModel->typeSpy = $travel->type;
+        $spyModel->planet = $travel->to;
+
+        if($spyModel->typeSpy == Espionage::TYPE_SPY_TROOP){
+            $units = Unit::select('id','name')->get();
+            for($i = 0;$i < count($units);$i++)
+            {
+                 $units[$i]['quantity'] = 0;
+            }
+            $spyModel->troop =  json_encode($units);
+        }
+
+        if($spyModel->typeSpy == Espionage::TYPE_SPY_FLEET){
+            $ships = Ship::select('id','name')->get();
+            for($i = 0;$i < count($ships);$i++)
+            {
+                 $ships[$i]['quantity'] = 0;
+            }
+            $spyModel->fleet =  json_encode($ships);
+        }
+
+        $spyModel->save();
     }
+
 }
