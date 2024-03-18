@@ -101,7 +101,7 @@ class RankingController extends Controller
         $name = $request->input('name');
         $orderBy = $request->input('orderBy');
 
-        $aliances = $this->rankingService->getAlianceRankings($name, $orderBy);
+        $aliances = $this->rankingService->getAlianceRankings($orderBy,$name);
 
         return response()->json($aliances);
     }

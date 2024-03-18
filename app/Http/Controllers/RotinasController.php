@@ -49,6 +49,7 @@ class RotinasController extends Controller
 
       $count = 0;
 
+      //aki
       foreach ($players as $player) {
         $count++;
         DB::table('ranking')->insert([

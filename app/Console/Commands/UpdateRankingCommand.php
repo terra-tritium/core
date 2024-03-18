@@ -33,10 +33,13 @@ class UpdateRankingCommand extends Command
         try {
             DB::table('ranking')->truncate();
 
-            $players = DB::table('players')
-                ->select('id', 'name', 'score', 'buildScore', 'attackScore', 'defenseScore', 'militaryScore', 'researchScore', 'aliance')
+            $players = DB::table('players as p')
+                ->select('p.id', 'p.name', 'p.score', 'p.buildScore', 'p.attackScore', 'p.defenseScore', 
+                'p.militaryScore', 'p.researchScore', 'p.aliance', 'a.name as alianceName')
+                ->leftJoin('aliances as a','a.id','=','p.aliance')
                 ->orderBy('score', 'desc')
                 ->get();
+
 
             $count = 0;
 
@@ -54,6 +57,8 @@ class UpdateRankingCommand extends Command
                     'militaryScore' => $player->militaryScore,
                     'researchScore' => $player->researchScore,
                     'aliance' => $player->aliance,
+                    'alianceName' => $player->alianceName
+
                 ]);
             }
         } catch (\Exception $exception) {
