@@ -74,4 +74,22 @@ class AlianceMember extends Model
             ->get();
         return $results;
     }
+
+    public function searchUser($id, $search, $parameter = 'name')
+    {
+        $usersQuery = DB::table('users as u')
+            ->select('u.name', 'u.email', 'p.id', 'p.aliance', 'am.status', 'a.name as alianceName')
+            ->join('players as p', 'p.id', '=', 'u.id')
+            ->leftJoin('aliances_members as am', 'am.player_id', '=', 'p.id')
+            ->leftJoin('aliances as a', 'a.id', '=', 'p.aliance')
+            ->where('p.id', '!=', $id);
+
+        if ($parameter == 'name') {
+            $usersQuery->where(DB::raw('LOWER(u.name)'), 'LIKE', '%' . strtolower($search) . '%');
+        } elseif ($parameter == 'email') {
+            $usersQuery->where(DB::raw('LOWER(u.email)'), strtolower($search));
+        }
+        $users = $usersQuery->get();
+        return $users;
+    }
 }

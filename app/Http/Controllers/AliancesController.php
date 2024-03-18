@@ -785,4 +785,15 @@ class AliancesController extends Controller
         $aliances = $aliance->listAlianceForChat();
         return response()->json($aliances, Response::HTTP_OK);
     }
+
+    public function searchUser($string)
+    {
+        $result = [];
+        $loggedPlayer = Player::getPlayerLogged();
+        $aliancemember = new AlianceMember();
+        $type = strstr($string, "@") ? "email" : "name";
+        $result = $aliancemember->searchUser($loggedPlayer->id, $string, $type);
+       
+        return response()->json($result, Response::HTTP_OK);
+    }
 }
