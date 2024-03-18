@@ -76,6 +76,8 @@ class TravelJob implements ShouldQueue
                 case Travel::RETURN_FLEET:
                     $this->travelService->landingOfShips($currentTravel);
                     break;
+                case Travel::MISSION_COLONIZATION:
+                    $this->travelService->missionColonization($currentTravel);
                 case Travel::MISSION_SPIONAGE:
                     $espitionService = new EspionadeService();
                     $espitionService->finallySpy($currentTravel);

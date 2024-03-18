@@ -164,7 +164,12 @@ class CombatController extends Controller
         if (count($planets) > env("TRITIUM_MAX_PLANET_PLAYER")) {
             return response()->json(['error' => 'planet limit exceeded.'], Response::HTTP_NOT_FOUND);
         }
-        Planet::where('id', $planet)->update(['player' => $player->id, 'defenseStrategy' => 7, 'attackStrategy' => 7]);
+        // Planet::where('id', $planet)->update(['player' => $player->id, 'defenseStrategy' => 7, 'attackStrategy' => 7]);
+        try {
+            $travel = $this->travelService->colonizePlanet($planet, $player->id);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
+        }
         return response()->json([], Response::HTTP_OK);
     }
     /**

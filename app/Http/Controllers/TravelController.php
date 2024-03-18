@@ -82,7 +82,7 @@ class TravelController extends Controller
                 return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $missions = $this->travelService->getMissions($action);
+            $missions = $this->travelService->getMissions($action, $player);
 
             return response()->json($missions, Response::HTTP_OK);
         } catch (\Exception $e) {
