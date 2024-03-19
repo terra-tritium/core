@@ -78,7 +78,7 @@ class AlianceMember extends Model
     public function searchUser($id, $search, $parameter = 'name')
     {
         $usersQuery = DB::table('users as u')
-            ->select('u.name', 'u.email', 'p.id', 'p.aliance', 'am.status', 'a.name as alianceName')
+            ->select('u.name', 'u.email', 'p.id as idPlayer', 'p.aliance', 'am.status', 'a.name as alianceName')
             ->join('players as p', 'p.id', '=', 'u.id')
             ->leftJoin('aliances_members as am', 'am.player_id', '=', 'p.id')
             ->leftJoin('aliances as a', 'a.id', '=', 'p.aliance')

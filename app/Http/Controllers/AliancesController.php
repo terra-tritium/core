@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Aliance;
 use App\Models\AlianceMember;
+use App\Models\AlianceRequest;
 use App\Models\Building;
 use App\Models\Logo;
 use App\Models\Planet;
@@ -404,6 +405,7 @@ class AliancesController extends Controller
      */
     public function handlePlayerRequest(Request $request, AlianceService $alianceService)
     {
+        /** @todo aqui */
         $playerId = $request->input('player_id');
         $alianceId = $request->input('aliance_id');
         $acceptRequest = $request->input('accept_request'); // true or false
@@ -790,10 +792,47 @@ class AliancesController extends Controller
     {
         $result = [];
         $loggedPlayer = Player::getPlayerLogged();
+        if (!$loggedPlayer) {
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
         $aliancemember = new AlianceMember();
         $type = strstr($string, "@") ? "email" : "name";
         $result = $aliancemember->searchUser($loggedPlayer->id, $string, $type);
        
         return response()->json($result, Response::HTTP_OK);
     }
+    public function invite(Request $request){
+        $loggedPlayer = Player::getPlayerLogged();
+        if (!$loggedPlayer) {
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+        $alianceService = new AlianceService();
+        return $alianceService->invite($request);
+    }
+    public function receivedInvitations(){
+        try{
+            $loggedPlayer = Player::getPlayerLogged();
+            if (!$loggedPlayer) {
+                return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+            }
+            if(!$loggedPlayer->aliance){
+                $alianceRequest = AlianceRequest::where('player_id', $loggedPlayer->id)->get();
+                foreach($alianceRequest as $key=>$value){
+                    $aliance = Aliance::where('id',$value->alianceId)->first();
+                    $alianceRequest[$key]['aliance'] = $aliance;
+                    // return response()->json(['alianca'=>$key,'value'=>$value], Response::HTTP_OK);
+
+                }
+                return response()->json($alianceRequest, Response::HTTP_OK);
+            }
+            return response()->json([], Response::HTTP_OK);
+
+        }catch(Exception $e){
+            return response()->json(['message' => 'Erro ao buscar convites '.$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }      
+    }
 }
+// $aliance = new Aliance();
+// $dadosAlianca = $aliance->getAliances();
+// $dadosAlianceBuild = $this->alianceService->getDadosBuildsAliance($dadosAlianca);
+// return response()->json($dadosAlianceBuild, Response::HTTP_OK);
