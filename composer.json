@@ -8,6 +8,7 @@
     "php": "^8.2",
     "darkaonline/l5-swagger": "^8.5",
     "guzzlehttp/guzzle": "^7.2",
+    "josiasmontag/laravel-recaptchav3": "^1.0",
     "laravel-notification-channels/discord": "^1.5",
     "laravel/framework": "^10.16",
     "laravel/sanctum": "^3.2",
