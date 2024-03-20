@@ -250,6 +250,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/search-usuer/{string}',[AliancesController::class,'searchUser']);
         Route::post('/invite',[AliancesController::class, 'invite']);
         Route::get('/invite',[AliancesController::class, 'receivedInvitations']);
+        Route::post('/invite-accepted',[AliancesController::class, 'acceptInvite']);
 
         Route::get("/scores", [AliancesController::class, 'getScoresAliance']);
     });

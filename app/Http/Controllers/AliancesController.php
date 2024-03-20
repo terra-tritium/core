@@ -323,7 +323,7 @@ class AliancesController extends Controller
      */
     public function joinAliance(Request $request)
     {
-        return $this->alianceService->joinAlliance($request->input('alianca_id'));
+        return $this->alianceService->joinAlliance($request->input('alianca_id'),false);
 
 
         /* if ($player->leave_date) {
@@ -816,23 +816,27 @@ class AliancesController extends Controller
                 return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
             }
             if(!$loggedPlayer->aliance){
-                $alianceRequest = AlianceRequest::where('player_id', $loggedPlayer->id)->get();
-                foreach($alianceRequest as $key=>$value){
-                    $aliance = Aliance::where('id',$value->alianceId)->first();
-                    $alianceRequest[$key]['aliance'] = $aliance;
-                    // return response()->json(['alianca'=>$key,'value'=>$value], Response::HTTP_OK);
-
-                }
-                return response()->json($alianceRequest, Response::HTTP_OK);
+               $dados = $this->alianceService->getDataReceivedInvitationAliance($loggedPlayer);
+               return response()->json($dados,Response::HTTP_OK);
             }
             return response()->json([], Response::HTTP_OK);
-
         }catch(Exception $e){
             return response()->json(['message' => 'Erro ao buscar convites '.$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }      
     }
-}
-// $aliance = new Aliance();
-// $dadosAlianca = $aliance->getAliances();
-// $dadosAlianceBuild = $this->alianceService->getDadosBuildsAliance($dadosAlianca);
-// return response()->json($dadosAlianceBuild, Response::HTTP_OK);
+    public function acceptInvite(Request $request){
+        try{
+            $loggedPlayer = Player::getPlayerLogged();
+            if (!$loggedPlayer) {
+                return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+            }
+            $alianceRequest = AlianceRequest::where('id','=',$request->input("idInvite"))->first();
+            return $this->alianceService->joinAlliance($alianceRequest->alianceId,true);
+
+        }catch(Exception $e){
+            return response()->json(['message' => 'Erro ao aceitar convite '.$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+  
+        }
+
+    }
+} 
