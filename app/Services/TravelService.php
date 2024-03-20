@@ -75,7 +75,7 @@ class TravelService
         $newTravel->arrival = $now + $travelTime;
         $newTravel->receptor = $this->getReceptor($travel->to);
         $newTravel->strategy = $travel->strategy;
-        $newTravel->transportShips = $travel->transportShip;
+        $newTravel->transportShips = $travel->transportShips;
         $newTravel->status = Travel::STATUS_ON_LOAD;
 
         switch ($travel->action) {
