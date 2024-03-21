@@ -247,6 +247,11 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/chat-aliance',[AliancesController::class, 'newMessageAliance']);
         Route::get('/chat-with-aliance/{destino}',[AliancesController::class, 'getMessageWithAliance']);
 
+        Route::get('/search-usuer/{string}',[AliancesController::class,'searchUser']);
+        Route::post('/invite',[AliancesController::class, 'invite']);
+        Route::get('/invite',[AliancesController::class, 'receivedInvitations']);
+        Route::post('/invite-accepted',[AliancesController::class, 'acceptInvite']);
+
         Route::get("/scores", [AliancesController::class, 'getScoresAliance']);
     });
 

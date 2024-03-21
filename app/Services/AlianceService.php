@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Aliance;
 use App\Models\AlianceMember;
+use App\Models\AlianceRequest;
 use App\Models\Logbook;
 use App\Models\Player;
 use App\Models\RankMember;
@@ -85,28 +86,38 @@ class AlianceService
         $alianceMember->dateAdmission = (new DateTime())->format('Y-m-d H:i:s');
         return $alianceMember->save();
     }
-    public function joinAlliance($aliancaId)
+    public function joinAlliance($aliancaId, $acceptdInvite = false)
     {
         $aliance = Aliance::findOrFail($aliancaId);
 
         $player = Player::getPlayerLogged();
         $player->aliance = $aliancaId;
-        if ($aliance->status === 'A') {
+        if ($aliance->status === 'A' || $acceptdInvite) {
+            if(!$this->availableSlot($aliancaId)){
+                return response()->json(['message'=>"There are no vacancies available for this alliance."],Response::HTTP_FORBIDDEN);
+            }
             //verificar se tem vaga, ingressar, avisar founder
-            $success =  $this->saveRequest($player->id, $aliance->id, $aliance->status);
+            $success =  $this->saveRequest($player->id, $aliance->id, $acceptdInvite ? 'A' : $aliance->status);
             if ($success) {
                 $this->notify($aliance->founder, "A new member has joined the alliance!", "aliance");
                 DB::table('players')->where('id', $player->id)->update([
                     'aliance' => DB::raw($aliance->id)
                 ]);
                 $this->notify($player->id, "You are now a part of an alliance!", "aliance");
+                if($acceptdInvite){
+                    AlianceMember::where('player_id', $player->id)
+                    ->where('status', '!=', 'A')
+                    ->delete();   
+                    //zerar todos os convites
+                }
+                AlianceRequest::where('player_id', $player->id)->delete();                 
             }
         } else {
             $this->notify($aliance->founder, "A member has requested to join the alliance!", "aliance");
             $this->notify($player->id, "Request sent for review!", "aliance");
             return $this->saveRequest($player->id, $aliance->id, $aliance->status);
         }
-        return response()->json(['alianca' => $aliance, 'player' => $player], Response::HTTP_OK);
+        return response()->json([], Response::HTTP_OK);
     }
 
     private function saveRequest($playerId, $alianceId, $status)
@@ -145,7 +156,7 @@ class AlianceService
             $responseData['countMembers'] = AlianceMember::where([['idAliance', '=', $alianceMember->idAliance], ['status', '=', 'A']])->count();
             return response($responseData, Response::HTTP_OK);
         } catch (Exception $e) {
-            return response(["message"=>$e->getMessage(),"teste"=>'teste'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response(["message" => $e->getMessage(), "teste" => 'teste'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
     public function removeMember($memberId)
@@ -368,5 +379,70 @@ class AlianceService
         } catch (Exception $e) {
             return response()->json(['message' => 'Erro ao deixar patente'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function invite(Request $request)
+    {
+        try {
+            $loggedPlayer = Player::getPlayerLogged();
+            $idNewMember = $request->input('idPlayer');
+            $idAliance = $request->input("idAliance");
+            $aliance = Aliance::find($idAliance);
+            if (!$aliance) {
+                return response()->json(['message' => "Aliance does not exist."], Response::HTTP_NOT_FOUND);
+            }
+            $newMember = Player::find($idNewMember);
+            if (!$newMember) {
+                return response()->json(['message' => "Player does not exist."], Response::HTTP_NOT_FOUND);
+            }
+            if ($newMember->aliance == $idAliance) {
+                //tratar msg no front
+                return response()->json(['message' => "The player is already a member of this alliance."], Response::HTTP_CONFLICT);
+            }
+            $conviteJaEnviado = AlianceRequest::where([['player_id', '=', $idNewMember], ["alianceId", "=", $idAliance]])->count();
+            if ($conviteJaEnviado > 0) {
+                //tratar msg no front
+                return response()->json(['message' => "The player has already received an invitation from this alliance."], Response::HTTP_CONFLICT);
+            }
+            //verificar se o membro ja tem alianca
+            //verificar o limite da alianca
+            //verificar se o membro ja recebeu convite dessa alianca
+            //salvar msg
+            //avisar o jogador que enviou o convite
+            //avisar o jogador que recebeu o convite
+            //alterar o tipo de dado do status
+            $alianceRequest = new AlianceRequest();
+            $alianceRequest->player_id = $idNewMember;
+            $alianceRequest->sentBy = $loggedPlayer->id;
+            $alianceRequest->alianceId = $idAliance;
+            $alianceRequest->message = "aceita?";
+            $alianceRequest->created_at = now();
+            $alianceRequest->status = 0;
+            $alianceRequest->save();
+            $this->notify($idNewMember, "You have received an invitation to join a new alliance", "aliance");
+            $this->notify($loggedPlayer->id, "Invitation sent to: " . $newMember->name, "Aliance");
+            // return ['idAliance' => $idAliance, "jogador" => $newMember, "aliance" => $aliance, 'conviteJaEnviado' => $conviteJaEnviado];
+            return response()->json(['message' => 'fazer os ajustes'], Response::HTTP_ACCEPTED);
+        } catch (Exception $e) {
+            return response()->json(['message' => "erro " . $e->getMessage()], 400);
+        }
+    }
+
+    public function getDataReceivedInvitationAliance( $player)
+    {
+        $alianceRequest = AlianceRequest::where('player_id', $player->id)->get();
+        foreach ($alianceRequest as $key => $value) {
+            $aInveited = Aliance::where('id', $value->alianceId)->first();
+            $aliance = new Aliance();
+            $level = $aliance->getLevelBuildAliance($aInveited->founder);
+            $aInveited['level'] = $level;
+            $aInveited['totalMembers'] = $level * env("TRITIUM_COUNT_MEMBER_LEVEL_ALIANCE"); 
+            $qtdMembrosAtivos = AlianceMember::where([['idAliance','=',$aInveited->id],['status','=','A']])->count();
+            $aInveited['members'] = $qtdMembrosAtivos;
+            $alianceRequest[$key]['aliance'] = $aInveited;
+            $alianceRequest[$key]['totalMembers'] = $level * env("TRITIUM_COUNT_MEMBER_LEVEL_ALIANCE");
+            $alianceRequest[$key]['members'] = $qtdMembrosAtivos;
+        }
+        return $alianceRequest;
     }
 }
