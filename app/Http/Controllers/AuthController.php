@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
 use App\Jobs\VerificationNotificationJob;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Response;
@@ -64,7 +65,7 @@ class AuthController extends Controller
         $this->userService = $userService;
     }
 
-    public function createToken(Request $request)
+    public function createToken(LoginRequest $request)
     {
         $result = $this->userService->createToken($request);
 

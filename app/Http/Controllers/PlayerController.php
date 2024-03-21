@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Player\RegisterRequest;
 use App\Jobs\VerificationNotificationJob;
 use App\Models\Player;
 use App\Models\User;
@@ -10,7 +11,6 @@ use App\Services\UserService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
 
 /**
  * @OA\Schema(
@@ -177,31 +177,7 @@ class PlayerController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function register(Request $request) {
-
-        $validator =Validator::make($request->all(), [
-            'name' => 'required',
-            'country' => 'required',
-            'email' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response(['message' => $validator->messages()->first(),'success'=>false],
-            Response::HTTP_OK);
-        }
-
-        $userExist   =  User::where('email',$request->input("email"))->first();
-        $playedExist =  Player::where('name',$request->input("name"))->first();
-
-        if($userExist){
-            return response(['message' => 'There is already a registered user with this E-mail!','success'=>false],
-                Response::HTTP_OK);
-        }
-
-        if($playedExist){
-            return response(['message' => 'There is already a registered user with this Player Name!','success'=>false],
-                Response::HTTP_OK);
-        }
+    public function register(RegisterRequest $request) {
 
         $user = new User();
         $user->email    = $request->input("email");
