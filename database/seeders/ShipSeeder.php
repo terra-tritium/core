@@ -15,7 +15,7 @@ class ShipSeeder extends Seeder
      */
     public function run()
     {
-        
+
         // DB::table('ships')->insert([
         //     'name' => 'Rocket Rainer RR50',
         //     'nick' => 'Rocket',
@@ -31,13 +31,13 @@ class ShipSeeder extends Seeder
         //     'time' => 5
         // ]);
         DB::table('builds')->where('name','Shipyard')->update(
-            ['effect' => 'Choose your starships wisely, customize their settings, and lead your faction to supremacy in the ever-expanding universe of Terra Tritium. The fate of your faction rests among the stars — command your fleet and forge your destiny among the cosmos!']
+            ['effect' => "Command your starships and shape your faction's destiny in the cosmos of Terra Tritium."]
         );
-        
+
 
         // DB::table('unitsShipyard')->delete();
 
-        
+
         DB::table('ships')->insert([
             "name" => "Fighter Craft",
             "nick" => "Fighter",
@@ -54,7 +54,7 @@ class ShipSeeder extends Seeder
             "crystal" => 0,
             "time"=> 5
         ]);
- 
+
 
         DB::table('ships')->insert([
             "name" => "Heavy Bomber",
@@ -139,6 +139,6 @@ class ShipSeeder extends Seeder
             "uranium" => 500000,
             "crystal" => 50000,
             "time"=> 250
-        ]);    
+        ]);
     }
 }
