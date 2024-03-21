@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Aliance;
 use App\Models\AlianceMember;
+use App\Models\AlianceRequest;
 use App\Models\Building;
 use App\Models\Logo;
 use App\Models\Planet;
@@ -322,7 +323,7 @@ class AliancesController extends Controller
      */
     public function joinAliance(Request $request)
     {
-        return $this->alianceService->joinAlliance($request->input('alianca_id'));
+        return $this->alianceService->joinAlliance($request->input('alianca_id'),false);
 
 
         /* if ($player->leave_date) {
@@ -404,6 +405,7 @@ class AliancesController extends Controller
      */
     public function handlePlayerRequest(Request $request, AlianceService $alianceService)
     {
+        /** @todo aqui */
         $playerId = $request->input('player_id');
         $alianceId = $request->input('aliance_id');
         $acceptRequest = $request->input('accept_request'); // true or false
@@ -785,4 +787,56 @@ class AliancesController extends Controller
         $aliances = $aliance->listAlianceForChat();
         return response()->json($aliances, Response::HTTP_OK);
     }
-}
+
+    public function searchUser($string)
+    {
+        $result = [];
+        $loggedPlayer = Player::getPlayerLogged();
+        if (!$loggedPlayer) {
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+        $aliancemember = new AlianceMember();
+        $type = strstr($string, "@") ? "email" : "name";
+        $result = $aliancemember->searchUser($loggedPlayer->id, $string, $type);
+       
+        return response()->json($result, Response::HTTP_OK);
+    }
+    public function invite(Request $request){
+        $loggedPlayer = Player::getPlayerLogged();
+        if (!$loggedPlayer) {
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
+        $alianceService = new AlianceService();
+        return $alianceService->invite($request);
+    }
+    public function receivedInvitations(){
+        try{
+            $loggedPlayer = Player::getPlayerLogged();
+            if (!$loggedPlayer) {
+                return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+            }
+            if(!$loggedPlayer->aliance){
+               $dados = $this->alianceService->getDataReceivedInvitationAliance($loggedPlayer);
+               return response()->json($dados,Response::HTTP_OK);
+            }
+            return response()->json([], Response::HTTP_OK);
+        }catch(Exception $e){
+            return response()->json(['message' => 'Erro ao buscar convites '.$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }      
+    }
+    public function acceptInvite(Request $request){
+        try{
+            $loggedPlayer = Player::getPlayerLogged();
+            if (!$loggedPlayer) {
+                return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+            }
+            $alianceRequest = AlianceRequest::where('id','=',$request->input("idInvite"))->first();
+            return $this->alianceService->joinAlliance($alianceRequest->alianceId,true);
+
+        }catch(Exception $e){
+            return response()->json(['message' => 'Erro ao aceitar convite '.$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+  
+        }
+
+    }
+} 
