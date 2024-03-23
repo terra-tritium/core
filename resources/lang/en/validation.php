@@ -123,6 +123,7 @@ return [
     'uploaded' => 'The :attribute failed to upload.',
     'url' => 'The :attribute must be a valid URL.',
     'uuid' => 'The :attribute must be a valid UUID.',
+    'alpha_num_with_letter' =>'The :attribute must contain at least one letter and one number.',
 
     /*
     |--------------------------------------------------------------------------
