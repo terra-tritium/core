@@ -15,9 +15,9 @@ class RegisterRequest extends FormRequest
     {
         $validate = [
             'email' => 'required|unique:users,email',
-            'password' => 'required',
+            'password' => 'required|min:8',
             'country' => 'required',
-            'name' => 'required|unique:players,name',
+            'name' => 'required|unique:players,name|max:15|min:3|regex:/(^([a-zA-Z0-9]+)?$)/u',
         ];
 
         if (config('api.app_env') == 'production') {
