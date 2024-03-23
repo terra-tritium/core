@@ -17,6 +17,5 @@ class Espionage extends Model
     CONST TYPE_SPY_TROOP    = 3; // Unit
     CONST TYPE_SPY_FLEET    = 4; // Ship
 
-    CONST TRITIUM_TRAVEL_MISSION_SPIONAGE_COST = 100;
 
 }

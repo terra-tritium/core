@@ -35,6 +35,7 @@ class UserService
             $success['name']    =  $user->name;
             $success['planet']  =  $planets[0]->id;
 
+            $result->message  = '';
             $result->success = true;
             $result->data  =  $success;
             return $result;
