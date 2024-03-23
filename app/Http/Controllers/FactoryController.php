@@ -100,7 +100,7 @@ class FactoryController extends Controller
         try {
             $resp = $this->transportShipFactoryService->createTransportShip($planet,$qtd);
             return response()->json([
-                'status' => 'success',
+                'status' => ( $resp > 0),
                 'data' => [
                     'qtd' => $resp
                 ]

@@ -27,13 +27,12 @@ class TransportShipsFactoryService
     $user = auth()->user()->id;
     $player = Player::where("user", $user)->firstOrFail();
     $planet = Planet::where("id", $planetId)->where("player", $player->id)->firstOrFail();
-  
 
     $this->workerService->syncronizeEnergy($planet);
 
     $energyCost = $qtd * env('TRITIUM_TRANSPORTSHIP_PRICE');
     $metalCost = $qtd * env('TRITIUM_TRANSPORTSHIP_PRICE');
-    
+
     # enough energy and metal?
     if ($planet->energy < $energyCost || $planet->metal < $metalCost) {
       return false;
@@ -43,7 +42,7 @@ class TransportShipsFactoryService
 
     $planet->energy -= $energyCost;
     $planet->metal -= $metalCost;
-    $planet->transportShips += $qtd;
+    $player->transportShips += $qtd;
 
     $player->save();
     $planet->save();

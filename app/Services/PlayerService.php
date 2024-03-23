@@ -119,7 +119,6 @@ class PlayerService
     $planet->pwCrystal = 0;
     $planet->pwEnergy = 0;
     $planet->pwWorker = 0;
-    $planet->transportShips = 0;
     $planet->researchPoints = 0;
     $planet->pwResearch = 0;
     $planet->defenseStrategy = 7;

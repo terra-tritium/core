@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 use App\Models\Travel;
+use App\Models\Player;
 use App\Models\ProcessJob;
 
 class ResourceJob implements ShouldQueue
@@ -67,8 +68,11 @@ class ResourceJob implements ShouldQueue
             $planetOrigim->metal    += $this->metal;
             $planetOrigim->uranium  += $this->uranium;
             $planetOrigim->crystal  += $this->crystal;
-            $planetOrigim->transportShips += $this->transportShips ;
             $planetOrigim->save();
+
+            $playerOrigim = Player::findOrFail($planetOrigim->player);
+            $playerOrigim->transportShips += $this->transportShips ;
+            $playerOrigim->save();
         }
     }
 }
