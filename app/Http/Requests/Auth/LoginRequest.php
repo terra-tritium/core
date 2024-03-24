@@ -16,8 +16,13 @@ class LoginRequest extends FormRequest
         $validate = [
             'email' => 'required',
             'password' => 'required',
-            'g-recaptcha-response'=>'required|recaptcha'
         ];
+
+        if(config('api.app_env') == 'production')
+        {
+            $validate['g-recaptcha-response'] = 'required|recaptcha';
+        }
+
         return $validate;
     }
 
@@ -26,8 +31,12 @@ class LoginRequest extends FormRequest
         $messages = [
             'email.required' => 'E-mail is required.',
             'password.required' => 'Password is required.',
-            'g-recaptcha-response' => 'Captcha is required.'
         ];
+
+        if(config('api.app_env') == 'production')
+        {
+            $messages['g-recaptcha-response'] = 'Captcha is required.';
+        }
 
         return $messages;
     }
