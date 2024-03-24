@@ -16,7 +16,7 @@ class LoginRequest extends FormRequest
         $validate = [
             'email' => 'required',
             'password' => 'required',
-            'g-recaptcha-response' => 'required|recaptcha',
+            'g-recaptcha-response' => 'required|recaptchav3:0.5'
         ];
         return $validate;
     }
