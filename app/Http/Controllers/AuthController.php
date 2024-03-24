@@ -67,11 +67,6 @@ class AuthController extends Controller
 
     public function createToken(LoginRequest $request)
     {
-        $request->validate(
-            [
-                'g-recaptcha-response' => 'required|recaptchav3:login'
-            ]
-        );
         $result = $this->userService->createToken($request);
 
         return response([
