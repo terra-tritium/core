@@ -19,7 +19,7 @@ class LoginRequest extends FormRequest
         ];
 
         if (config('api.app_env') == 'production') {
-            $validate['g-recaptcha-response'] = 'required|recaptcha';
+            $validate['g-recaptcha-response'] = 'required|recaptchav3:register,0.5';
         }
 
         return $validate;
