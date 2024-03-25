@@ -69,14 +69,7 @@ class AuthController extends Controller
     {
         $result = $this->userService->createToken($request);
 
-        return response([
-                            'message' => $result->message,
-                            'success'=>$result->success,
-                            'token' => $result->data['token'],
-                            'name' => $result->data['name'],
-                            'planet' => $result->data['planet']
-                        ],
-                        $result->response);
+        return response([$result], Response::HTTP_OK);
     }
 
     public function logout(Request $request)
