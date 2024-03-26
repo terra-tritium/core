@@ -15,7 +15,7 @@ class RegisterRequest extends FormRequest
     {
         $validate = [
             'email' => 'required|unique:users,email',
-            'password' => ['required', 'string','min:8' ,'regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]?)[A-Za-z\d@$!%*?&]+$/'],
+            'password' => ['required', 'string','min:8' ,'regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#-=_+]?)[A-Za-z\d@$!%*?&#-=_+]+$/'],
             'country' => 'required',
             'name' => 'required|unique:players,name|max:15|min:3|alpha_num_with_letter',
         ];
