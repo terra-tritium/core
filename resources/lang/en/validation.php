@@ -98,7 +98,7 @@ return [
     'numeric' => 'The :attribute must be a number.',
     'password' => 'The password is incorrect.',
     'present' => 'The :attribute field must be present.',
-    'regex' => 'The :attribute format is invalid.',
+    'regex' => 'The :attribute must contain at least one letter and one number.',
     'required' => 'The :attribute field is required.',
     'required_if' => 'The :attribute field is required when :other is :value.',
     'required_unless' => 'The :attribute field is required unless :other is in :values.',
@@ -123,7 +123,7 @@ return [
     'uploaded' => 'The :attribute failed to upload.',
     'url' => 'The :attribute must be a valid URL.',
     'uuid' => 'The :attribute must be a valid UUID.',
-    'alpha_num_with_letter' =>'The :attribute must contain at least one letter and one number.',
+    'alpha_num_with_letter' =>'The :attribute must contain only letter and number.',
 
     /*
     |--------------------------------------------------------------------------
