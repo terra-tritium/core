@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class Trading extends Model
 {
     CONST TRITIUM_MARKET_STATUS_CANCELED = 0;
-    CONST TRITIUM_MARKET_STATUS_OPEN = 1 ; 
+    CONST TRITIUM_MARKET_STATUS_OPEN = 1 ;
     CONST TRITIUM_MARKET_STATUS_FINISHED = 2;
     CONST TRITIUM_MARKET_STATUS_PENDING = 3;
 
@@ -57,7 +57,9 @@ class Trading extends Model
     public function getMyResources($player)
     {
         $resources = DB::table('planets as p')
-            ->select('p.resource', 'p.region', 'p.uranium', 'p.crystal', 'p.metal', 'p.transportShips')
+            ->select('p.resource', 'p.region', 'p.uranium', 'p.crystal', 'p.metal', 'pp            $planetOrigim->transportShips += $this->transportShips ;
+            .transportShips')
+            ->leftJoin('player as pp', 'pp.id', '=', 'p.player')
             ->where('p.player', $player)->first();
         return $resources;
     }
@@ -69,14 +71,15 @@ class Trading extends Model
                     ->where('t.status', Trading::TRITIUM_MARKET_STATUS_OPEN)
                     ->where('t.type', 'S');
             })
+            ->leftJoin('player as pp', 'pp.id', '=', 'p.player')
             ->where('p.player', $player)
-            ->groupBy('p.player', 'p.uranium', 'p.crystal', 'p.metal', 'p.region', 'p.transportShips')
-            ->selectRaw('p.player, 
+            ->groupBy('p.player', 'p.uranium', 'p.crystal', 'p.metal', 'p.region', 'pp.transportShips')
+            ->selectRaw('p.player,
             p.uranium - COALESCE(SUM(CASE WHEN t.resource = "Uranium" THEN t.quantity ELSE 0 END), 0) AS uranium,
             p.crystal - COALESCE(SUM(CASE WHEN t.resource = "Crystal" THEN t.quantity ELSE 0 END), 0) AS crystal,
             p.metal - COALESCE(SUM(CASE WHEN t.resource = "Metal" THEN t.quantity ELSE 0 END), 0) AS metal,
             p.region,
-            p.transportShips')
+            pp.transportShips')
             ->first();
         return $resources;
     }

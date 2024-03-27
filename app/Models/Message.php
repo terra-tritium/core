@@ -114,7 +114,7 @@ class Message extends Model
             ->select(DB::raw('CASE WHEN recipientId = ' . $userId . ' THEN senderId ELSE recipientId END AS id_usuario'))
             ->select('users.name', 'users.id as userId')
             ->selectRaw('MAX(m.createdAt) AS createdAt')
-            ->selectRaw('SUM(m.read = 0) AS countNotRead')
+            ->selectRaw('SUM(m.read = 0 and recipientId = '.$userId.') AS countNotRead')
             ->join('users', function ($join) use ($userId) {
                 $join->on('users.id', '=', DB::raw('CASE WHEN recipientId = ' . $userId . ' THEN senderId ELSE recipientId END'));
             })

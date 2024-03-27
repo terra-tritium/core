@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Log;
 
 class TradingService
 {
-    public function __construct(protected readonly Trading $trading, 
+    public function __construct(protected readonly Trading $trading,
                                 protected readonly LogbookController $logbookController,
                                 protected readonly PlanetService $planetService)
     {}
@@ -124,10 +124,10 @@ class TradingService
                 }
                 $planeta = $this->getPlanetUserLogged();
                 //verifica se o status pode ser alterado e quem ta alterando a ordem é quem criou
-                if ($trading->status !=  env("TRITIUM_MARKET_STATUS_OPEN") || $trading->idPlanetCreator != $planeta[0]->player) {
+                if ($trading->status != config("app.tritium_market_status_open") || $trading->idPlanetCreator != $planeta[0]->player) {
                     return response(['message' => 'Status não pode ser alterado ou não é o criador', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
-                $trading->status =  env("TRITIUM_MARKET_STATUS_CANCELED");
+                $trading->status = config("app.tritium_market_status_canceled");
                 $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                 $trading->save();
                 $this->logbookController->notify($planeta[0]->player,"You canceled your order", "Market");
@@ -143,7 +143,7 @@ class TradingService
     {
         if ($id) {
             $this->trading = Trading::where('id', $id)
-                ->where('status',  env("TRITIUM_MARKET_STATUS_OPEN"))
+                ->where('status', config("app.tritium_market_status_open"))
                 ->first();
             return $this->trading;
         }
@@ -163,15 +163,17 @@ class TradingService
             if (!$trading) {
                 return response(['message' => 'Trading não encontrado', 'success' => false], Response::HTTP_NOT_FOUND);
             }
-            if ($trading->status !=  env("TRITIUM_MARKET_STATUS_OPEN")) {
+            if ($trading->status != config("app.tritium_market_status_open")) {
                 return response(['message' => 'Essa ordem não está mais disponível ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
             if ($request->price <= 0 || $request->quantity <= 0) {
                 return response(['message' => 'Quantidade e/ou preço devem ser superior a zero', 'code' => 4002, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
             $planeta = $this->getPlanetUserLogged();
+            $player = Player::getPlayerLogged();
+
             //verificar se tem cargueiro para buscar
-            if ($planeta[0]->transportShips <= 0) {
+            if ($player->transportShips <= 0) {
                 return response(['message' => 'Você não possui a quantidade necessária de cargueiros para realizar o transporte', 'code' => 4003, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
             $planetaPassivo = Planet::find($request->idPlanetSale);
@@ -180,7 +182,7 @@ class TradingService
             //S pq o passivo esta vendendo e o ativo comprando, ativo tem que buscar
             if ($request->type == 'S') {
                 $panetaInteressado = $request->idPlanetPurch;
-                //verificar se tem saldo suficiente para compra 
+                //verificar se tem saldo suficiente para compra
                 if ($request->currency == 'energy') {
                     $total = $request->price * $request->quantity;
                     if ($total > $planeta[0]->energy) {
@@ -191,12 +193,12 @@ class TradingService
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 if ($quantidade > $planetaPassivo->{$resourceKey}) {
-                    $status =  env("TRITIUM_MARKET_STATUS_CANCELED");
+                    $status = config("app.tritium_market_status_canceled");
                     $trading->status = $status;
                     $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                     $trading->save();
                     //notificar o passivo que foi cancelado
-                    $this->logbookController->notify($planetaPassivo->player, "O vendedor não possui recurso para concluir essa transação","Market");                    
+                    $this->logbookController->notify($planetaPassivo->player, "O vendedor não possui recurso para concluir essa transação","Market");
                     return response(['message' => 'O vendedor não possui recurso para concluir essa transação', 'code' => 4005, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 $distance = $this->planetService->calculeDistance($planeta[0], $planetaPassivo);
@@ -246,7 +248,7 @@ class TradingService
 
     /**
      * $from Ativo
-     * $to passivo 
+     * $to passivo
      */
     public function calcDistance($from, $to)
     {
@@ -334,7 +336,7 @@ class TradingService
     {
         $trade = Trading::find($trading->id);
         $trade->idPlanetInterested = $planetaInteressado;
-        $trade->status = env("TRITIUM_MARKET_STATUS_PENDING");
+        $trade->status = config("app.tritium_market_status_pending");
         $trade->currency = 'energy'; //default
         $trade->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
         return $trade->save();
@@ -344,12 +346,12 @@ class TradingService
     {
         try {
             //ida e volta
-            $travelTime = (env("TRITIUM_TRAVEL_SPEED") * $distancia) * 2;
+            $travelTime = ( config("app.tritium_travel_speed") * $distancia) * 2;
             $safe = new Safe();
             $safe->idPlanetSale = $request->idPlanetSale;
             $safe->idPlanetPurch = $request->idPlanetPurch;
             $safe->idPlanetCreator = $planetCreator;
-            $safe->status = env("TRITIUM_MARKET_STATUS_PENDING");
+            $safe->status = config("app.tritium_market_status_pending");
             $safe->deliveryTime = $travelTime;
             $safe->type = $request->type;
             $safe->currency = $request->currency;
@@ -361,7 +363,7 @@ class TradingService
             $safe->idTrading = $request->idTrading;
             $safe->transportShips = $transportShips;
             $safe->distance = $distancia;
-            $safe->loaded = $request->type == 'P'; //nessa caso o cargueiro sai carregado 
+            $safe->loaded = $request->type == 'P'; //nessa caso o cargueiro sai carregado
             $safe->save();
             return $safe->save();
         } catch (Exception $e) {
@@ -379,7 +381,7 @@ class TradingService
                     $arr[$resource] = $result;
                     break;
                 }
-                else 
+                else
                   $arr[$resource] = '';
             }
         }*/
@@ -517,7 +519,7 @@ class TradingService
                 $finished->distance = $c->distance;
                 $finished->deliveryTime = $c->deliveryTime;
                 $finished->idTrading = $c->idTrading;
-                $finished->status = env("TRITIUM_MARKET_STATUS_FINISHED"); //concluido
+                $finished->status = config("app.tritium_market_status_finished"); //concluido
                 $finished->currency = $c->currency;
                 $finished->type = $c->type;
                 $finished->idMarket = $c->idMarket;
@@ -558,15 +560,23 @@ class TradingService
             if ($request->type === 'S' && $etapa === 'inicio') {
                 $planetaAtivo = Planet::find($request->idPlanetPurch);
                 $planetaAtivo->energy -= ($request->quantity * $request->price);
-                $planetaAtivo->transportShips -= 1;
                 $planetaAtivo->save();
+
+                $player = Player::findOrFail($planetaAtivo->player);
+                $player->transportShips -= 1;
+                $player->save();
+
                 return "Debitando o inicio, ativo comprando";
             } elseif ($request->type === 'P' && $etapa === 'inicio') {
                 $keyResource = strtolower($request->resource);
                 $planetaAtivo = Planet::find($request->idPlanetSale);
                 $planetaAtivo->{$keyResource} -= $request->quantity;
-                $planetaAtivo->transportShips -= 1;
                 $planetaAtivo->save();
+
+                $player = Player::findOrFail($planetaAtivo->player);
+                $player->transportShips -= 1;
+                $player->save();
+
                 return "Debitando o inicio, ativo vendendo";
             }
             return true; // Corrigir o que está retornando se necessário
@@ -605,8 +615,12 @@ class TradingService
         if ($request->type === 'P' && $etapa === 'fim') {
             $planetaAtivo = Planet::find($request->idPlanetSale);
             $planetaAtivo->energy += ($request->quantity * $request->price);;
-            $planetaAtivo->transportShips += 1;
             $planetaAtivo->save();
+
+            $player = Player::findOrFail($planetaAtivo->player);
+            $player->transportShips  += 1;
+            $player->save();
+
             $this->logbookController->notify($planetaAtivo->id,'Venda concluida, seu cargueiro retornou','Market');
             return "Debitando o fim, ativo vendendo";
         }
@@ -614,8 +628,13 @@ class TradingService
             $keyResource = strtolower($request->resource);
             $planetaAtivo = Planet::find($request->idPlanetPurch);
             $planetaAtivo->{$keyResource} += $request->quantity;
-            $planetaAtivo->transportShips += 1;
             $planetaAtivo->save();
+
+            $player = Player::findOrFail($planetaAtivo->player);
+            $player->transportShips  += 1;
+            $player->save();
+
+
             $this->logbookController->notify($planetaAtivo->id,'Compora concluida, seu cargueiro retornou','Market');
             return "Debitando o fim, ativo comprando";
         }

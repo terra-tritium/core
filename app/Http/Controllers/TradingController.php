@@ -66,7 +66,7 @@ class TradingController extends Controller
     {
         //
     }
-    
+
     public function list()
     {
         $player = Player::getPlayerLogged();
@@ -123,17 +123,20 @@ class TradingController extends Controller
             if(!$planet)
                 return response(['message'=>"planet not found", Response::HTTP_NOT_FOUND]);
             if($planet->energy < 10)
-                return response(["message"=>"Insufficient energy to buy a freighter."], Response::HTTP_NOT_FOUND); 
+                return response(["message"=>"Insufficient energy to buy a freighter."], Response::HTTP_NOT_FOUND);
             $planet->energy -= 10;
-            $planet->transportShips += 1;
-            $planet->save();     
-            return response($planet,Response::HTTP_OK);      
+            $planet->save();
+
+            $player = Player::findOrFail($planet->player);
+            $player->transportShips += 1;
+            $player->save();
+            return response($planet,Response::HTTP_OK);
         }catch(Exception $e){
             Log::error('Erro ao realizar compra de cargueiro ' . $e->getMessage());
             return response(['message'=>"Erro ao realizar compra de cargueiro", Response::HTTP_INTERNAL_SERVER_ERROR]);
 
         }
-        
+
         return $planet;
         // return response($, Response::HTTP_OK);
     }

@@ -81,7 +81,7 @@ class LandCombatService
       LandCombatJob::dispatch(
           $this,
           $combatId
-      )->delay(now()->addSeconds(env("TRITIUM_STAGE_SPEED")));
+      )->delay(now()->addSeconds(config("app.tritium_stage_speed")));
     }
 
     # recebe novos viajantes que chegaram ao planeta

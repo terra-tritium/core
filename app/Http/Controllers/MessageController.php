@@ -16,7 +16,7 @@ use Illuminate\Http\Response;
 class MessageController extends Controller
 {
 
-    public function __construct(protected readonly MessageService $messageService) 
+    public function __construct(protected readonly MessageService $messageService)
     {
     }
     /**
@@ -147,9 +147,20 @@ class MessageController extends Controller
         return $msg->getAllByUserRecipient($player->user);
     }
 
-    public function getCountMessageNotRead(){
-        $naoLidas = $this->getAllMessageNotRead();
-        return $naoLidas;
+    public function getCountConversationUnread()
+    {
+        try {
+            $player = Player::getPlayerLogged();
+            if (!$player) {
+                return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+            }
+            $unreadConversations = Message::selectRaw('count(senderId) as sender_count, senderId')
+                ->where([['recipientId', '=', $player->user], ['read', '=', 0]])
+                ->groupBy('senderId')->get();
+            return response()->json($unreadConversations, Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response(["message" => "Erro ao recuperar mensagens " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     private function messageForSender($messages)
@@ -168,24 +179,19 @@ class MessageController extends Controller
         return $trocas;
     }
 
-    public function getAllMessageSenderForRecipent($senderid){
+    public function getAllMessageSenderForRecipent($senderid)
+    {
         $player = Player::getPlayerLogged();
         $messages = app(Message::class)->getAllMessageSenderForRecipient($senderid, $player->user);
         return $messages;
     }
 
-    public function getAllMessageNotRead()
-    {
-        $player = Player::getPlayerLogged();
-        $messages = app(Message::class)->getAllMessageNotRead($player->user);
-        return  $messages;
 
-    }
 
     public function newMessage(Request $request)
     {
         try {
-            $recipientId = $request->input("recipientId") ;
+            $recipientId = $request->input("recipientId");
             $this->messageService->newMessage($request, $recipientId);
         } catch (Exception $e) {
             return response(["msg" => "error " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -197,31 +203,41 @@ class MessageController extends Controller
     {
         $player = Player::getPlayerLogged();
         $msg = app(Message::class);
-        $msg->readMessagesForUser($request->input("id"),$player->user);
+        $msg->readMessagesForUser($request->input("id"), $player->user);
         return response(['message' => 'message read!', 'success' => true], Response::HTTP_OK);
     }
 
-    public function getSenders(){
-        $player = Player::getPlayerLogged();
-        $messages = app(Message::class)->getSenders($player->user);
-        return $messages;
+    public function getSenders()
+    {
+        try {
+            $player = Player::getPlayerLogged();
+            if (!$player) {
+                return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+            }
+            $messages = app(Message::class)->getSenders($player->user);
+            return response()->json($messages, Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response(["message" => "Erro ao recuperar conversas " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    public function getConversation($senderId){
+    public function getConversation($senderId)
+    {
         $player = Player::getPlayerLogged();
         $messages = app(Message::class)->getConversation($player->user, $senderId);
         return $messages;
     }
 
-    public function getLastMessageNotReadBySender($senderid){
+    public function getLastMessageNotReadBySender($senderid)
+    {
         $message = app(Message::class);
         $player = Player::getPlayerLogged();
-        $msg = $message->getLastMessageNotReadBySender($player->user,$senderid);
+        $msg = $message->getLastMessageNotReadBySender($player->user, $senderid);
         return $msg;
     }
 
-    public function searchUser($string){
+    public function searchUser($string)
+    {
         return  $this->messageService->searchUser($string);
     }
-    
 }
