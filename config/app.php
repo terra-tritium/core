@@ -212,4 +212,48 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Tritium parameters
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    'tritium_galaxy' => env('TRITIUM_GALAXY', 'Rigel'),
+    'tritium_construction_speed' => env('TRITIUM_CONSTRUCTION_SPEED', 10),
+    'tritium_research_speed' => env('TRITIUM_RESEARCH_SPEED', 10),
+    'tritium_production_speed' => env('TRITIUM_PRODUCTION_SPEED', 10),
+    'tritium_travel_speed' => env('TRITIUM_TRAVEL_SPEED', 300),
+    'tritium_stage_speed' => env('TRITIUM_STAGE_SPEED', 10),
+    'tritium_energy_base' => env('TRITIUM_ENERGY_BASE', 50),
+    'tritium_metal_base' => env('TRITIUM_METAL_BASE', 20),
+    'tritium_uranium_base' => env('TRITIUM_URANIUM_BASE', 10),
+    'tritium_crystal_base' => env('TRITIUM_CRYSTAL_BASE', 10),
+    'tritium_humanoid_base' => env('TRITIUM_HUMANOID_BASE', 10),
+    'tritium_humanoid_price' => env('TRITIUM_HUMANOID_PRICE', 500),
+    'tritium_transportship_base' => env('TRITIUM_TRANSPORTSHIP_BASE', 1000),
+    'tritium_transportship_price' => env('TRITIUM_TRANSPORTSHIP_PRICE', 2000),
+    'tritium_transportship_capacity' => env('TRITIUM_TRANSPORTSHIP_CAPACITY', 500),
+    'tritium_count_member_level_alliance' => env('TRITIUM_COUNT_MEMBER_LEVEL_ALIANCE', 5),
+    'tritium_member_founder' => env('TRITIUM_MEMBER_FOUNDER', 1),
+    'tritium_member_general' => env('TRITIUM_MEMBER_GENERAL', 2),
+    'tritium_member_fleet_cap' => env('TRITIUM_MEMBER_FLEET_CAP', 3),
+    'tritium_member_troop_cap' => env('TRITIUM_MEMBER_TROOP_CAP', 4),
+    'tritium_member_diplomat' => env('TRITIUM_MEMBER_DIPLOMAT', 5),
+    'tritium_member_corporal' => env('TRITIUM_MEMBER_CORPORAL', 6),
+    'tritium_member_soldier' => env('TRITIUM_MEMBER_SOLDIER', 7),
+    'tritium_chat_other_alliance' => env('TRITIUM_CHAT_OTHER_ALLIANCE', 2),
+    'tritium_market_status_open' => env('TRITIUM_MARKET_STATUS_OPEN', 1),
+    'tritium_market_status_canceled' => env('TRITIUM_MARKET_STATUS_CANCELED', 0),
+    'tritium_market_status_pending' => env('TRITIUM_MARKET_STATUS_PENDING', 3),
+    'tritium_market_status_finished' => env('TRITIUM_MARKET_STATUS_FINISHED', 2),
+    'tritium_max_planet_player' => env('TRITIUM_MAX_PLANET_PLAYER', 7),
+    'tritium_combat_stage_time' => env('TRITIUM_COMBAT_STAGE_TIME', 300),
+    'tritium_weight_time_second' => env('TRITIUM_WEIGHT_TIME_SECOND', 18),
+    'tritium_travel_mission_spionage_cost' => env('TRITIUM_TRAVEL_MISSION_SPIONAGE_COST', 1000),
+    'tritium_charging_speed' => env('TRITIUM_CHARGING_SPEED', 100),
+    'env_url_site' => env('ENV_URL_SITE', 'http://localhost:3000'),
+    'recaptchav3_sitekey' => env('RECAPTCHAV3_SITEKEY', '6LcUEZ8pAAAAAG7qPJuMt7B67u4OoCg97VIujDhe'),
+    'recaptchav3_secret' => env('RECAPTCHAV3_SECRET', '6LcUEZ8pAAAAAA3tFHx44zikQc2sGR3BNWHIty9O'),
+
 ];

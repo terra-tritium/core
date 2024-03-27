@@ -97,7 +97,7 @@ class BuildService
  
 
         $require = $this->calcResourceRequire($building->build, 1, $player);
-        $constructionSpeed = $this->effectService->calcConstructionBuildSpeed(env("TRITIUM_CONSTRUCTION_SPEED"),$player);
+        $constructionSpeed = $this->effectService->calcConstructionBuildSpeed(config("app.tritium_construction_speed"),$player);
         
         $building->ready = time() + ($require->time * $constructionSpeed);
         $p1->ready = $building->ready;
@@ -312,7 +312,7 @@ class BuildService
             return false;
         }
         
-        $constructionSpeed = $this->effectService->calcConstructionBuildSpeed(env("TRITIUM_CONSTRUCTION_SPEED"),$player);
+        $constructionSpeed = $this->effectService->calcConstructionBuildSpeed(config("app.tritium_construction_speed"),$player);
         $building->ready = time() + ($require->time * $constructionSpeed);
         $planet->ready = $building->ready;
 

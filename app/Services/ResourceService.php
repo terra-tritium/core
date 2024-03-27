@@ -34,15 +34,15 @@ class ResourceService
         if ($planetOrigin->uranium < $uranium) return response()->json(["error" => "You do not have sufficient resources to send"], Response::HTTP_BAD_REQUEST);
         if ($planetOrigin->crystal < $crystal) return response()->json(["error" => "You do not have sufficient resources to send"], Response::HTTP_BAD_REQUEST);
 
-        $capacityTransportShips =  $playerOrigin->transportShips * env("TRITIUM_TRANSPORTSHIP_CAPACITY");
+        $capacityTransportShips =  $planetOrigin->transportShips * config("app.tritium_transportship_capacity");
         $totalRecursos  = $metal + $uranium + $crystal ;
 
         #Verificar se tem cargueiro disponível
         if ($totalRecursos > $capacityTransportShips) return response()->json(["error" => "Your freighter does not have the capacity to send all the resources"], Response::HTTP_BAD_REQUEST);
 
-        $transportShipsInUse = floor($totalRecursos / env("TRITIUM_TRANSPORTSHIP_CAPACITY"));
+        $transportShipsInUse = floor($totalRecursos / config("app.tritium_transportship_capacity"));
 
-        $transportShipsInUse += ($totalRecursos % env("TRITIUM_TRANSPORTSHIP_CAPACITY")) > 0 ? 1 : 0;
+        $transportShipsInUse += ($totalRecursos % config("app.tritium_transportship_capacity")) > 0 ? 1 : 0;
 
         $planetOrigin->metal -= $metal;
         $planetOrigin->uranium -= $uranium;
@@ -53,7 +53,7 @@ class ResourceService
         $playerOrigin->save();
 
 
-        $timeLoad = $transportShipsInUse * env("TRITIUM_CHARGING_SPEED");
+        $timeLoad = $transportShipsInUse * config("app.tritium_charging_speed");
 
         #Salva o job para acompanhamento até a execução
         $processJob = new ProcessJob();

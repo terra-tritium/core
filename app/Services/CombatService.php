@@ -102,7 +102,7 @@ class CombatService
             CombatJob::dispatch(
                 $this,
                 $combat->id
-            )->delay(now()->addSeconds(env("TRITIUM_STAGE_SPEED")));
+            )->delay(now()->addSeconds(config("app.tritium_stage_speed")));
         } else {
             $attackSize     = $this->getSizeTroop($this->attackReserve);
             $defenseSize    = $this->getSizeTroop($this->defenseReserve);
