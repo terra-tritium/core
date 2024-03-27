@@ -23,7 +23,7 @@ class PlanetSeeder extends Seeder
      */
     public function run()
     {
-        
+
         $numQuadrante = 100;
         $numPlanetasPorRegiao = 17;
         for ($regiao = 'A'; $regiao <= 'P'; $regiao++) {
@@ -61,7 +61,6 @@ class PlanetSeeder extends Seeder
                         "pwCrystal" => 0,
                         "pwEnergy" => 0,
                         "pwWorker" => 0,
-                        "transportShips" => 0,
                         "researchPoints" => 0,
                         "pwResearch" => 0,
                     ]);
@@ -108,6 +107,6 @@ class PlanetSeeder extends Seeder
                 Planet::insert($planets);
                 $planets = [];
             }
-        } 
+        }
     }
 }

@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Log;
 
 class TradingService
 {
-    public function __construct(protected readonly Trading $trading, 
+    public function __construct(protected readonly Trading $trading,
                                 protected readonly LogbookController $logbookController,
                                 protected readonly PlanetService $planetService)
     {}
@@ -170,8 +170,10 @@ class TradingService
                 return response(['message' => 'Quantidade e/ou preço devem ser superior a zero', 'code' => 4002, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
             $planeta = $this->getPlanetUserLogged();
+            $player = Player::getPlayerLogged();
+
             //verificar se tem cargueiro para buscar
-            if ($planeta[0]->transportShips <= 0) {
+            if ($player->transportShips <= 0) {
                 return response(['message' => 'Você não possui a quantidade necessária de cargueiros para realizar o transporte', 'code' => 4003, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
             $planetaPassivo = Planet::find($request->idPlanetSale);
@@ -180,7 +182,7 @@ class TradingService
             //S pq o passivo esta vendendo e o ativo comprando, ativo tem que buscar
             if ($request->type == 'S') {
                 $panetaInteressado = $request->idPlanetPurch;
-                //verificar se tem saldo suficiente para compra 
+                //verificar se tem saldo suficiente para compra
                 if ($request->currency == 'energy') {
                     $total = $request->price * $request->quantity;
                     if ($total > $planeta[0]->energy) {
@@ -196,7 +198,7 @@ class TradingService
                     $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                     $trading->save();
                     //notificar o passivo que foi cancelado
-                    $this->logbookController->notify($planetaPassivo->player, "O vendedor não possui recurso para concluir essa transação","Market");                    
+                    $this->logbookController->notify($planetaPassivo->player, "O vendedor não possui recurso para concluir essa transação","Market");
                     return response(['message' => 'O vendedor não possui recurso para concluir essa transação', 'code' => 4005, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 $distance = $this->planetService->calculeDistance($planeta[0], $planetaPassivo);
@@ -246,7 +248,7 @@ class TradingService
 
     /**
      * $from Ativo
-     * $to passivo 
+     * $to passivo
      */
     public function calcDistance($from, $to)
     {
@@ -361,7 +363,7 @@ class TradingService
             $safe->idTrading = $request->idTrading;
             $safe->transportShips = $transportShips;
             $safe->distance = $distancia;
-            $safe->loaded = $request->type == 'P'; //nessa caso o cargueiro sai carregado 
+            $safe->loaded = $request->type == 'P'; //nessa caso o cargueiro sai carregado
             $safe->save();
             return $safe->save();
         } catch (Exception $e) {
@@ -379,7 +381,7 @@ class TradingService
                     $arr[$resource] = $result;
                     break;
                 }
-                else 
+                else
                   $arr[$resource] = '';
             }
         }*/
@@ -558,15 +560,23 @@ class TradingService
             if ($request->type === 'S' && $etapa === 'inicio') {
                 $planetaAtivo = Planet::find($request->idPlanetPurch);
                 $planetaAtivo->energy -= ($request->quantity * $request->price);
-                $planetaAtivo->transportShips -= 1;
                 $planetaAtivo->save();
+
+                $player = Player::findOrFail($planetaAtivo->player);
+                $player->transportShips -= 1;
+                $player->save();
+
                 return "Debitando o inicio, ativo comprando";
             } elseif ($request->type === 'P' && $etapa === 'inicio') {
                 $keyResource = strtolower($request->resource);
                 $planetaAtivo = Planet::find($request->idPlanetSale);
                 $planetaAtivo->{$keyResource} -= $request->quantity;
-                $planetaAtivo->transportShips -= 1;
                 $planetaAtivo->save();
+
+                $player = Player::findOrFail($planetaAtivo->player);
+                $player->transportShips -= 1;
+                $player->save();
+
                 return "Debitando o inicio, ativo vendendo";
             }
             return true; // Corrigir o que está retornando se necessário
@@ -605,8 +615,12 @@ class TradingService
         if ($request->type === 'P' && $etapa === 'fim') {
             $planetaAtivo = Planet::find($request->idPlanetSale);
             $planetaAtivo->energy += ($request->quantity * $request->price);;
-            $planetaAtivo->transportShips += 1;
             $planetaAtivo->save();
+
+            $player = Player::findOrFail($planetaAtivo->player);
+            $player->transportShips  += 1;
+            $player->save();
+
             $this->logbookController->notify($planetaAtivo->id,'Venda concluida, seu cargueiro retornou','Market');
             return "Debitando o fim, ativo vendendo";
         }
@@ -614,8 +628,13 @@ class TradingService
             $keyResource = strtolower($request->resource);
             $planetaAtivo = Planet::find($request->idPlanetPurch);
             $planetaAtivo->{$keyResource} += $request->quantity;
-            $planetaAtivo->transportShips += 1;
             $planetaAtivo->save();
+
+            $player = Player::findOrFail($planetaAtivo->player);
+            $player->transportShips  += 1;
+            $player->save();
+
+
             $this->logbookController->notify($planetaAtivo->id,'Compora concluida, seu cargueiro retornou','Market');
             return "Debitando o fim, ativo comprando";
         }

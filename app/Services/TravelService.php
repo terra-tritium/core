@@ -247,7 +247,7 @@ class TravelService
 
         if ($planetFrom->metal < 0 || $planetFrom->uranium < 0 || $planetFrom->crystal < 0) { return false;  }
 
-        $planetFrom->save(); 
+        $planetFrom->save();
 
         $travel = new Travel();
         $travel->from = $planetFrom->id;
@@ -260,7 +260,7 @@ class TravelService
         $travel->arrival = time() + $travelTime;
         $travel->status = Travel::STATUS_ON_LOAD;
         $travel->save();
-        
+
         TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
     }
 
@@ -271,7 +271,7 @@ class TravelService
         $planet->uranium = 25000;
         $planet->crystal = 25000;
         $planet->save();
-    
+
         $logService = new LogService();
         $logService->notify(
           $travel->player,
@@ -546,7 +546,7 @@ class TravelService
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_TROOP]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::RETURN_FLEET]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::RETURN_TROOP]]);
-                            
+
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_FLEET]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_FLEET]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_TROOP]]);
@@ -619,10 +619,10 @@ class TravelService
     public function arrivedTransportOrigin($travel)
     {
         $travelModel = Travel::findOrFail($travel);
-        $planetOrige = Planet::findOrFail($travelModel->from);
-        $planetOrige->transportShips += $travelModel->transportShips ;
-        $planetOrige->save();
-        $this->logService->notify($planetOrige->player, "Your freighter has returned from its trip", "Mission");
+        $playerOrige = Player::findOrFail($travelModel->player);
+        $playerOrige->transportShips += $travelModel->transportShips ;
+        $playerOrige->save();
+        $this->logService->notify($playerOrige->id, "Your freighter has returned from its trip", "Mission");
     }
 
     public function getCurrent($player)
@@ -655,8 +655,12 @@ class TravelService
                 $planetOrigim->metal    += $travelModel->metal;
                 $planetOrigim->uranium  += $travelModel->uranium;
                 $planetOrigim->crystal  += $travelModel->crystal;
-                $planetOrigim->transportShips += $travelModel->transportShips ;
                 $planetOrigim->save();
+
+                $playerOrigim = Player::findOrFail($planetOrigim->player);
+                $playerOrigim->transportShips += $travelModel->transportShips ;
+                $playerOrigim->save();
+
                 break;
 
             case Travel::MISSION_SPIONAGE:
