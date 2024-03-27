@@ -332,7 +332,7 @@ class SpaceCombatService
     $planetService = new PlanetService();
     $stolen = 0;
     foreach ($invasors as $invasor) {
-      $capacity = $invasor->transportShips * env("TRITIUM_TRANSPORTSHIP_CAPACITY");
+      $capacity = $invasor->transportShips * config("app.tritium_transportship_capacity");
       $metal = 0;
       $crystal = 0;
       $uranium = 0;

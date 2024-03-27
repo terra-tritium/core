@@ -35,7 +35,7 @@ class ProductionService
       $production->player = $player;
       $production->planet = $planet;
       
-      $timeConstruction = ($unitModel->time *  $unit['quantity'] * env("TRITIUM_PRODUCTION_SPEED") );
+      $timeConstruction = ($unitModel->time *  $unit['quantity'] * config("app.tritium_production_speed"));
       if($type == "troop"){
         $timeConstruction = $effectService->calcRobotConstructSpeed($timeConstruction, $player);
       }else{

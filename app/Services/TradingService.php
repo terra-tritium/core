@@ -124,10 +124,10 @@ class TradingService
                 }
                 $planeta = $this->getPlanetUserLogged();
                 //verifica se o status pode ser alterado e quem ta alterando a ordem é quem criou
-                if ($trading->status !=  env("TRITIUM_MARKET_STATUS_OPEN") || $trading->idPlanetCreator != $planeta[0]->player) {
+                if ($trading->status != config("app.tritium_market_status_open") || $trading->idPlanetCreator != $planeta[0]->player) {
                     return response(['message' => 'Status não pode ser alterado ou não é o criador', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
-                $trading->status =  env("TRITIUM_MARKET_STATUS_CANCELED");
+                $trading->status = config("app.tritium_market_status_canceled");
                 $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                 $trading->save();
                 $this->logbookController->notify($planeta[0]->player,"You canceled your order", "Market");
@@ -143,7 +143,7 @@ class TradingService
     {
         if ($id) {
             $this->trading = Trading::where('id', $id)
-                ->where('status',  env("TRITIUM_MARKET_STATUS_OPEN"))
+                ->where('status', config("app.tritium_market_status_open"))
                 ->first();
             return $this->trading;
         }
@@ -163,7 +163,7 @@ class TradingService
             if (!$trading) {
                 return response(['message' => 'Trading não encontrado', 'success' => false], Response::HTTP_NOT_FOUND);
             }
-            if ($trading->status !=  env("TRITIUM_MARKET_STATUS_OPEN")) {
+            if ($trading->status != config("app.tritium_market_status_open")) {
                 return response(['message' => 'Essa ordem não está mais disponível ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
             if ($request->price <= 0 || $request->quantity <= 0) {
@@ -191,7 +191,7 @@ class TradingService
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 if ($quantidade > $planetaPassivo->{$resourceKey}) {
-                    $status =  env("TRITIUM_MARKET_STATUS_CANCELED");
+                    $status = config("app.tritium_market_status_canceled");
                     $trading->status = $status;
                     $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                     $trading->save();
@@ -334,7 +334,7 @@ class TradingService
     {
         $trade = Trading::find($trading->id);
         $trade->idPlanetInterested = $planetaInteressado;
-        $trade->status = env("TRITIUM_MARKET_STATUS_PENDING");
+        $trade->status = config("app.tritium_market_status_pending");
         $trade->currency = 'energy'; //default
         $trade->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
         return $trade->save();
@@ -344,12 +344,12 @@ class TradingService
     {
         try {
             //ida e volta
-            $travelTime = (env("TRITIUM_TRAVEL_SPEED") * $distancia) * 2;
+            $travelTime = ( config("app.tritium_travel_speed") * $distancia) * 2;
             $safe = new Safe();
             $safe->idPlanetSale = $request->idPlanetSale;
             $safe->idPlanetPurch = $request->idPlanetPurch;
             $safe->idPlanetCreator = $planetCreator;
-            $safe->status = env("TRITIUM_MARKET_STATUS_PENDING");
+            $safe->status = config("app.tritium_market_status_pending");
             $safe->deliveryTime = $travelTime;
             $safe->type = $request->type;
             $safe->currency = $request->currency;
@@ -517,7 +517,7 @@ class TradingService
                 $finished->distance = $c->distance;
                 $finished->deliveryTime = $c->deliveryTime;
                 $finished->idTrading = $c->idTrading;
-                $finished->status = env("TRITIUM_MARKET_STATUS_FINISHED"); //concluido
+                $finished->status = config("app.tritium_market_status_finished"); //concluido
                 $finished->currency = $c->currency;
                 $finished->type = $c->type;
                 $finished->idMarket = $c->idMarket;
