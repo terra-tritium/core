@@ -226,6 +226,7 @@ return [
     'tritium_travel_speed' => env('TRITIUM_TRAVEL_SPEED', 300),
     'tritium_stage_speed' => env('TRITIUM_STAGE_SPEED', 10),
     'tritium_energy_base' => env('TRITIUM_ENERGY_BASE', 50),
+    'tritium_energy_workers_by_level' => env('TRITIUM_ENERGY_WORKERS_BY_LEVEL', 50),
     'tritium_metal_base' => env('TRITIUM_METAL_BASE', 20),
     'tritium_uranium_base' => env('TRITIUM_URANIUM_BASE', 10),
     'tritium_crystal_base' => env('TRITIUM_CRYSTAL_BASE', 10),
