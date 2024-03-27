@@ -67,16 +67,16 @@ class AuthController extends Controller
 
     public function createToken(LoginRequest $request)
     {
-        $result = $this->userService->createToken($request);
+        try{
 
-        return response([
-                            'message' => $result->message,
-                            'success'=>$result->success,
-                            'token' => $result->data['token'],
-                            'name' => $result->data['name'],
-                            'planet' => $result->data['planet']
-                        ],
-                        $result->response);
+            $result = $this->userService->createToken($request);
+
+            return response((array)$result, Response::HTTP_OK);
+
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     public function logout(Request $request)

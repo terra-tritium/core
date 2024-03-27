@@ -266,14 +266,14 @@ class TravelController extends Controller
      */
     public function speyMission (Request $request) {
 
-        try {
+        // try {
             $player = Player::getPlayerLogged();
             if (!$player) {
                 return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
             }
 
-            if ($player->tritium <  Espionage::TRITIUM_TRAVEL_MISSION_SPIONAGE_COST) {
-                return response()->json(['message' => 'No resources','success'=> false ], Response::HTTP_BAD_REQUEST);
+            if ($player->tritium <  config('api.tritium_travel_mission_spionage_cost')) {
+                return response()->json(['message' => 'You don\'t have enough TRITIUM for this action.','success'=> false ], Response::HTTP_OK);
             }
 
             $espionade = Espionage::where(['spy' => $player->id,'planet'=> $request->to])->whereNull('end_date')->get();
@@ -285,8 +285,8 @@ class TravelController extends Controller
             $result = $this->travelService->speyMission($player->id, $requestData);
 
             return response()->json([ $result , 'success'=> true], Response::HTTP_OK);
-        } catch (\Exception $e) {
-              return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        // } catch (\Exception $e) {
+        //       return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        // }
     }
 }

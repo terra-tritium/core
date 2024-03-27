@@ -15,13 +15,13 @@ class RegisterRequest extends FormRequest
     {
         $validate = [
             'email' => 'required|unique:users,email',
-            'password' => 'required',
+            'password' => ['required', 'string','min:8' ,'regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&#-=_+]?)[A-Za-z\d@$!%*?&#-=_+]+$/'],
             'country' => 'required',
-            'name' => 'required|unique:players,name',
+            'name' => 'required|unique:players,name|max:15|min:3|alpha_num_with_letter',
         ];
 
         if (config('api.app_env') == 'production') {
-            $validate['g-recaptcha-response'] = 'required|captcha';
+            $validate['g-recaptcha-response'] = 'required|recaptcha';
         }
 
         return $validate;
@@ -37,7 +37,7 @@ class RegisterRequest extends FormRequest
         ];
 
         if (config('api.app_env') == 'production') {
-            $messages['g-recaptcha-response'] = '´Captcha is required.';
+            $messages['g-recaptcha-response'] = 'Captcha is required.';
         }
 
         return $messages;
