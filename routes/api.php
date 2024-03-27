@@ -188,7 +188,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/read', [MessageController::class, 'readMessage']);
         Route::get('/list', [MessageController::class, 'list']);
         Route::get('/send-for-recipient/{senderid}', [MessageController::class, 'getAllMessageSenderForRecipent']);
-        Route::get('/count', [MessageController::class, 'getCountMessageNotRead']);
+        Route::get('/unread', [MessageController::class, 'getCountConversationUnread']);
 
         Route::get('/not-read', [MessageController::class, 'getAllMessageNotRead']);
         Route::get('/getSenders', [MessageController::class, 'getSenders']);
