@@ -279,7 +279,9 @@ class PlayerController extends Controller
      */
     public function getDetails($id) {
         try {
-            $playerDetails = $this->playerService->getDetails($id);
+            $player = Player::getPlayerLogged();
+
+            $playerDetails = $this->playerService->getDetails($id,$player->id);
             return response()->json($playerDetails);
         } catch (ModelNotFoundException $exception) {
             return response()->json(['message' => 'Player not found'], Response::HTTP_NOT_FOUND);

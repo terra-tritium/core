@@ -14,6 +14,8 @@ use App\Models\Troop;
 use App\Services\PlanetService;
 use Illuminate\Http\Response;
 
+use function PHPUnit\Framework\isNull;
+
 class PlayerService
 {
   protected $planetService;
@@ -303,14 +305,17 @@ class PlayerService
     }
   }
 
-  public function getDetails($id)
+  public function getDetails($id,$playerId)
   {
+    $id = $id == 0 || isNull($id) ? $playerId : $id;
     $details = [];
     $player = Player::where('id', $id)->firstOrFail();
     $details['name'] = $player->name;
     $details['since'] = $player->since;
     $details['country'] = $player->country;
     $details['score'] = $player->score;
+    $details['transportShips'] = $player->transportShips;
+
     if ($player->aliance != null) {
       $aliance = AlianceRanking::where('id', $player->aliance)->firstOrFail();
       $details['aliance'] = $aliance->name;
