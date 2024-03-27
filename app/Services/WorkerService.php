@@ -107,13 +107,13 @@ class WorkerService
       $level = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $planet->id])->first()->level;
 
       $workersOnEnergy = 0;
-      $workersByLevel = $level * config("app.tritium_enerty_workers_by_level"); //25
+      $workersByLevel = $level * config("app.tritium_energy_workers_by_level");
       if ($workersByLevel < $planet->workersWaiting) {
         $workersOnEnergy = $workersByLevel;
       } else {
         $workersOnEnergy = $planet->workersWaiting;
       }
-      $planet->energy += ((time() - $planet->timeEnergy) / 3600) * env('TRITIUM_ENERGY_BASE') * $workersOnEnergy;
+      $planet->energy += ((time() - $planet->timeEnergy) / 3600) * config("app.tritium_energy_base") * $workersOnEnergy;
       $planet->timeEnergy = time();
       $planet->save();
     } catch (\Exception $exception) {
