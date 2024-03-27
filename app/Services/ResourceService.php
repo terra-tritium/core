@@ -34,7 +34,7 @@ class ResourceService
         if ($planetOrigin->uranium < $uranium) return response()->json(["error" => "You do not have sufficient resources to send"], Response::HTTP_BAD_REQUEST);
         if ($planetOrigin->crystal < $crystal) return response()->json(["error" => "You do not have sufficient resources to send"], Response::HTTP_BAD_REQUEST);
 
-        $capacityTransportShips =  $planetOrigin->transportShips * config("app.tritium_transportship_capacity");
+        $capacityTransportShips =  $playerOrigin->transportShips * config("app.tritium_transportship_capacity");
         $totalRecursos  = $metal + $uranium + $crystal ;
 
         #Verificar se tem cargueiro disponível
