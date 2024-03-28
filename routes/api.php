@@ -260,13 +260,14 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/myresources', [TradingController::class, 'getMyResources']);
         Route::post('/new-sale', [TradingController::class, 'tradingNewSale']);
         Route::post('/new-purch',[TradingController::class, 'tradingNewPurchase']);
-        Route::get('/my-history/{id}', [TradingController::class, 'getAllOrdersPlayer']);
-        Route::patch('/cancel/{id}', [TradingController::class, 'cancelOrder']);
+        Route::get('/my-history/{planet}/{id}', [TradingController::class, 'getAllOrderByPlanet']);
+        Route::patch('/cancel/{planet}/{id}', [TradingController::class, 'cancelOrder']);
         Route::get('/trading-process/{id}',[TradingController::class, 'getTradingProcess']);
         Route::post('/finish', [TradingController::class, 'finishTrading']);
         Route::get('/safe/conclued',[TradingController::class, 'verificaTradeConcluidoSafe'] );
         Route::get('/last-trading',[TradingController::class, 'lastTrading'] );
         Route::patch('/buy-freighter/{planetId}',[TradingController::class, 'buyFreighter']);
+        Route::get('/player/resource/{planet}',[TradingController::class, 'getPlayerResource']);
 
     });
 
