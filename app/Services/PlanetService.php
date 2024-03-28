@@ -70,14 +70,12 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
         return $p1->uranium + ($p1->pwUranium * ($effectService->calcMiningSpeed(config("app.tritium_metal_base"), $p1) * $activeUraniumMining));
       case 3:
         return $p1->crystal + ($p1->pwCrystal * ($effectService->calcMiningSpeed(config("app.tritium_metal_base"), $p1) * $activeCrystalMining));
-//        return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL_BASE") * $activeCrystalMining));
+        // return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL_BASE") * $activeCrystalMining));
       case 4:
         return $p1->researchPoints + ($p1->pwResearch * ($effectService->calcResearchSpeed(config("app.tritium_research_speed"),$p1) * $activeLaboratory));
     }
-
-    
     return 0;
-  }
+}
 
   public function enoughBalance($p1, $units, $type, $energyLevel = 1) {
     if ($units == 0){

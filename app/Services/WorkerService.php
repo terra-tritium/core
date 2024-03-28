@@ -19,6 +19,8 @@ class WorkerService
     $planet = Planet::find($planetId);
     $building = Building::find($buildingId);
 
+    $this->syncronizeEnergy($planet);
+
     switch ($building->build) {
       // Metal
       case Build::METALMINING :
@@ -53,7 +55,6 @@ class WorkerService
                 $planet->pwMetal = $workers;
                 $planet->workersOnMetal = $workers;
                 $planet->workersWaiting = $this->waitingWorkers($planet);
-                $this->syncronizeEnergy($planet);
                 break;
 
             // Uranium
@@ -63,7 +64,6 @@ class WorkerService
                 $planet->pwUranium = $workers;
                 $planet->workersOnUranium = $workers;
                 $planet->workersWaiting = $this->waitingWorkers($planet);
-                $this->syncronizeEnergy($planet);
                 break;
 
             // Crystal
@@ -73,7 +73,6 @@ class WorkerService
                 $planet->pwCrystal = $workers;
                 $planet->workersOnCrystal = $workers;
                 $planet->workersWaiting = $this->waitingWorkers($planet);
-                $this->syncronizeEnergy($planet);
                 break;
 
             // Laboratory
@@ -83,7 +82,6 @@ class WorkerService
               $planet->pwResearch = $workers;
               $planet->workersOnLaboratory = $workers;
               $planet->workersWaiting = $this->waitingWorkers($planet);
-              $this->syncronizeEnergy($planet);
               break;
         }
 
@@ -108,14 +106,17 @@ class WorkerService
 
       $workersOnEnergy = 0;
       $workersByLevel = $level * config("app.tritium_energy_workers_by_level");
+
       if ($workersByLevel < $planet->workersWaiting) {
         $workersOnEnergy = $workersByLevel;
       } else {
         $workersOnEnergy = $planet->workersWaiting;
       }
+
       $planet->energy += ((time() - $planet->timeEnergy) / 3600) * config("app.tritium_energy_base") * $workersOnEnergy;
       $planet->timeEnergy = time();
       $planet->save();
+      return $workersOnEnergy;
     } catch (\Exception $exception) {
       return false;
     }

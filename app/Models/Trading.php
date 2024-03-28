@@ -71,7 +71,7 @@ class Trading extends Model
                     ->where('t.status', Trading::TRITIUM_MARKET_STATUS_OPEN)
                     ->where('t.type', 'S');
             })
-            ->leftJoin('player as pp', 'pp.id', '=', 'p.player')
+            ->leftJoin('players as pp', 'pp.id', '=', 'p.player')
             ->where('p.player', $player)
             ->groupBy('p.player', 'p.uranium', 'p.crystal', 'p.metal', 'p.region', 'pp.transportShips')
             ->selectRaw('p.player,
@@ -83,7 +83,7 @@ class Trading extends Model
             ->first();
         return $resources;
     }
-    public function getAllOrderPlayer($player, $resource)
+    public function getAllOrderByPlanet($planet, $resource)
     {
         $status = [Trading::TRITIUM_MARKET_STATUS_OPEN, Trading::TRITIUM_MARKET_STATUS_PENDING];
         $orders = DB::table($this->table . ' as t')
@@ -103,9 +103,9 @@ class Trading extends Model
                 'tf.finishedAt'
             )
             ->leftJoin('trading_finished as tf', 'tf.idTrading', '=', 't.id')
-            ->where(function ($query) use ($player) {
-                $query->where('t.idPlanetCreator', $player)
-                    ->orWhere('t.idPlanetInterested', $player);
+            ->where(function ($query) use ($planet) {
+                $query->where('t.idPlanetCreator', $planet)
+                    ->orWhere('t.idPlanetInterested', $planet);
             })
             ->where('t.resource', $resource)
             ->whereIn('t.status', $status)

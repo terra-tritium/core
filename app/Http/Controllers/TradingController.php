@@ -79,6 +79,25 @@ class TradingController extends Controller
         return $this->tradingService->getAllTradingByMarketResource($resource, $type);
     }
 
+    public function getPlayerResource($planet)
+    {
+        try {
+            $loggedPlayer = Player::getPlayerLogged();
+            if (!$loggedPlayer) {
+                return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+            }
+            $planet = Planet::join('players as player', 'player.id', '=', 'planets.player')->where('planets.id', $planet)->first();
+            $retorno['metal'] = $planet->metal;
+            $retorno['uranium'] = $planet->uranium;
+            $retorno['crystal'] = $planet->crystal;
+            $retorno['energy'] = $planet->energy;
+            $retorno['player'] = $planet->player;
+            $retorno['transportShips'] = $planet->transportShips;
+            return response()->json($retorno, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'erro ao recuperar recursos do jogador ' . $e->getMessage(), 'success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
     public function getMyResources()
     {
         return $this->tradingService->myResources();
@@ -93,52 +112,54 @@ class TradingController extends Controller
         return $this->tradingService->newPurchOrder($request);
     }
     //subir
-    public function getAllOrdersPlayer($id = 'Crystal')
+    public function getAllOrderByPlanet($planet, $id = 'Crystal')
     {
-        $planeta = $this->tradingService->getPlanetUserLogged();
         $trading = new Trading();
-        $orders = $trading->getAllOrderPlayer($planeta[0]->player, $id) ?? [];
+        $orders = $trading->getAllOrderByPlanet($planet, $id) ?? [];
         return $orders;
     }
-    public function cancelOrder($id)
+    public function cancelOrder($planet, $id)
     {
-        return $this->tradingService->cancelOrder($id);
+        return $this->tradingService->cancelOrder($planet, $id);
     }
-    public function getTradingProcess($id){
+    public function getTradingProcess($id)
+    {
         return $this->tradingService->getTradingProcess($id);
     }
-    public function finishTrading(Request $request){
+    public function finishTrading(Request $request)
+    {
         return $this->tradingService->finish($request);
     }
-    public function verificaTradeConcluidoSafe(){
+    public function verificaTradeConcluidoSafe()
+    {
         return $this->tradingService->verificaAndamentoSafe();
         // return true;
     }
-    public function lastTrading(){
+    public function lastTrading()
+    {
         return $this->tradingService->getLastTrading();
     }
-    public function buyFreighter($planetId){
-        try{
+    public function buyFreighter($planetId)
+    {
+        try {
             $planet = Planet::find($planetId);
-            if(!$planet)
-                return response(['message'=>"planet not found", Response::HTTP_NOT_FOUND]);
-            if($planet->energy < 10)
-                return response(["message"=>"Insufficient energy to buy a freighter."], Response::HTTP_NOT_FOUND);
+            if (!$planet)
+                return response(['message' => "planet not found", Response::HTTP_NOT_FOUND]);
+            if ($planet->energy < 10)
+                return response(["message" => "Insufficient energy to buy a freighter."], Response::HTTP_NOT_FOUND);
             $planet->energy -= 10;
             $planet->save();
 
             $player = Player::findOrFail($planet->player);
             $player->transportShips += 1;
             $player->save();
-            return response($planet,Response::HTTP_OK);
-        }catch(Exception $e){
+            return response($planet, Response::HTTP_OK);
+        } catch (Exception $e) {
             Log::error('Erro ao realizar compra de cargueiro ' . $e->getMessage());
-            return response(['message'=>"Erro ao realizar compra de cargueiro", Response::HTTP_INTERNAL_SERVER_ERROR]);
-
+            return response(['message' => "Erro ao realizar compra de cargueiro", Response::HTTP_INTERNAL_SERVER_ERROR]);
         }
 
         return $planet;
         // return response($, Response::HTTP_OK);
     }
-
 }
