@@ -157,11 +157,11 @@ class SpaceCombatService
 
     $combat->status = Combat::STATUS_RUNNING;
     $combat->stage = 1;
-    $combat->nextStage = time() + env('TRITIUM_COMBAT_STAGE_TIME');
+    $combat->nextStage = time() + config("app.tritium_combat_stage_time");
     $combat->save();
 
     # Queue next stage
-    SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds(env('TRITIUM_COMBAT_STAGE_TIME')));
+    SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds( config("app.tritium_combat_stage_time")));
   }
 
   public function excuteStage($combatId) {
@@ -212,11 +212,11 @@ class SpaceCombatService
     );
 
     $combat->stage++;
-    $combat->nextStage = time() + env('TRITIUM_COMBAT_STAGE_TIME');
+    $combat->nextStage = time() + config("app.tritium_combat_stage_time");
     $combat->save();
 
     # Queue next stage
-    SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds(env('TRITIUM_COMBAT_STAGE_TIME')));
+    SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds( config("app.tritium_combat_stage_time")));
   }
 
   private function logStage($combat, $message, $killInvasor = 0, $killLocal = 0, $demageInvasor = 0, $demageLocal = 0) {
@@ -482,7 +482,7 @@ class SpaceCombatService
   private function getShieldForce($planetId) {
     $shieldBuild = Building::where([['build', Build::SHIELD],['planet', $planetId]])->first();
     if ($shieldBuild) {
-      return $shieldBuild->level * env('TRITIUM_SHIELD_FORCE');
+      return $shieldBuild->level * config("app.tritium_shield_force");
     }
     return 0;
   }
