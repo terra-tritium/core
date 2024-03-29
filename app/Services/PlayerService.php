@@ -307,7 +307,7 @@ class PlayerService
 
   public function getDetails($id,$playerId)
   {
-    $id = $id == 0 || isNull($id) ? $playerId : $id;
+    $id = $id == 0 || is_null($id) ? $playerId : $id;
     $details = [];
     $player = Player::where('id', $id)->firstOrFail();
     $details['name'] = $player->name;
