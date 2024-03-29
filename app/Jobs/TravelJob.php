@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\Travel;
 use App\Services\SpaceCombatService;
 use App\Services\EspionadeService;
+use Illuminate\Support\Facades\Log;
 
 class TravelJob implements ShouldQueue
 {
@@ -39,6 +40,7 @@ class TravelJob implements ShouldQueue
     public function handle()
     {
         $currentTravel = Travel::where('id',$this->travel)->whereNotIn('status',[Travel::STATUS_CANCEL])->first();
+        Log::info("executou o inicio da viagem");
         if ($currentTravel) {
             $currentTravel->status = Travel::STATUS_FINISHED;
             $currentTravel->save();
@@ -84,5 +86,7 @@ class TravelJob implements ShouldQueue
                     break;
             }
         }
+        Log::info("executou o fim da viagem");
+
     }
 }

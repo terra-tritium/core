@@ -3,15 +3,20 @@
 namespace App\Services;
 
 // use App\Http\Controllers\LogbookController;
+
+use App\Jobs\ResourceJob;
+use App\Jobs\TravelJob;
 use App\Models\Logbook;
 use App\Models\Market;
 use App\Models\Planet;
 use App\Models\Player;
 use App\Models\Position;
+use App\Models\ProcessJob;
 use App\Models\Safe;
 use App\Models\Trading;
 use App\Models\TradingFinished;
 use App\Models\Travel;
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Response;
 use Exception;
@@ -187,7 +192,7 @@ class TradingService
             $planetaPassivo = Planet::find($request->idPlanetSale);
             $resourceKey = strtolower($request->resource);
             $quantidade = $request->quantity;
-            
+
             //S pq o passivo esta vendendo e o ativo comprando, ativo tem que buscar
             if ($request->type == 'S') {
                 $panetaInteressado = $request->idPlanetPurch;
@@ -214,8 +219,10 @@ class TradingService
                 $distance = $this->planetService->calculeDistance($planeta[0]->id, $planetaPassivo->id);
 
 
+                #teste travel trade
+                return $this->safe($trading, $request, $distance, $planeta[0]->player, $planetaPassivo->player);
                 // Sair para a viagem antes de salvar na safe
-                if (!$this->safe($trading, $request, $distance)) {
+                if (!$this->safe($trading, $request, $distance, $planeta[0]->player, $planetaPassivo->player)) {
                     return response(['message' => 'Algum erro na hora de comprar, verificar a causa', 'code' => 4006, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 $this->notify($planeta[0]->player, 'Seu cargueiro saiu para buscar o recurso', 'Market');
@@ -241,7 +248,7 @@ class TradingService
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 $distance = $this->planetService->calculeDistance($planeta[0]->id, $planetaPassivo->id);
-                if (!$this->safe($trading, $request, $distance)) {
+                if (!$this->safe($trading, $request, $distance, $planetaPassivo->player, $planeta[0]->player)) {
                     return response(['message' => 'Algum erro na hora de vender, verificar a causa', 'code' => 4009, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 //retorno visual, deletar
@@ -326,9 +333,65 @@ class TradingService
         }
     }
 
-    public function safe(Trading $trading, $request, $distancia)
+    public function safe(Trading $trading, $request, $distancia, $origem, $destino)
     {
+        $planetaOrigem = $request->type == 'P' ? $request->idPlanetSale : $request->idPlanetPurch;
+        $planetaDestino = $request->type == 'S' ? $request->idPlanetSale : $request->idPlanetPurch;
+        $now = time();
+
+        // return ['JogadorOrigem' => $origem, 'JogadorDestino' => $destino, 
+        //         'PlanetaOrigem' => $planetaOrigem, 'PlanetaDestino' => $planetaDestino, 'trading' => $trading,
+        //         'cargueiros'=> ceil($trading->quantity / config("app.tritium_transportship_capacity"))];
+        // // $playerOrigem = Player::
+        // return ['request' => $request->toArray(), 'distancia' => $distancia];
         try {
+            $transportShipsInUse = ceil($trading->quantity / config("app.tritium_transportship_capacity")); //TRITIUM_TRANSPORTSHIP_CAPACITY
+
+            $timeLoad = $transportShipsInUse * config("app.tritium_charging_speed");
+
+            #Salva o job para acompanhamento até a execução
+            $processJob = new ProcessJob();
+            $processJob->player = $origem;
+            $processJob->planet = $planetaOrigem;
+            $processJob->finished =  Carbon::now()->addSeconds($timeLoad)->getTimestamp();
+            $processJob->type = ProcessJob::TYPE_CARRYING;
+            $processJob->save();
+            // return ["process"=>$processJob];
+            $travelService = app(TravelService::class);
+            #Job carregamento recursos
+            // ResourceJob::dispatch(
+            //     $travelService,
+            //     $origem,
+            //     $planetaOrigem,
+            //     $planetaDestino,
+            //     1,
+            //     2,
+            //     3,
+            //     $transportShipsInUse
+            // )->delay(now()->addSeconds($timeLoad));
+
+
+
+
+
+            /**Inicio */
+            $travel = new Travel();
+            $travel->player = $origem;
+            $travel->receptor = $destino;
+            $travel->from = $planetaOrigem;
+            $travel->to = $planetaDestino;
+            /**Lógica invertida, quando é venda, o comprador ta indo buscar */
+            $travel->action = $request->type == 'S' ? Travel::TRANSPORT_BUY : Travel::TRANSPORT_SELL;
+            $travel->transportShips = $transportShipsInUse;
+            $travel->start = $now;
+            $travelTime = $distancia;
+            $travel->arrival = $now + $travelTime;
+            $travel->status = Travel::STATUS_ON_GOING;
+            $successt = $travel->save();
+            TravelJob::dispatch($travelService, $travel->id, false)->delay(now()->addSeconds(180));
+
+            return ['travel'=>$travel, 'success'=>$successt];
+            /**Fim */
             $planetaInteressado = $request->type == 'S' ? $request->idPlanetPurch : $request->idPlanetSale;
             $success = $this->atualizaStatusTrading($trading, $planetaInteressado);
             if ($success) {
@@ -338,7 +401,7 @@ class TradingService
                 return ($successDebito && $successSafe);
             }
         } catch (Exception $e) {
-            return false;
+            return "erro " . $e->getMessage();
         }
     }
     /**
