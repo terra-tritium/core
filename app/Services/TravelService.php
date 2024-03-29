@@ -129,7 +129,7 @@ class TravelService
     }
 
     public function startReturnFleet($travel, $req, $player) {
-        //$this->addFleet($player, $req->from, $req->fleet);
+        $this->addFleet($player, $req->from, $req->fleet);
         return $travel;
     }
 
@@ -142,6 +142,8 @@ class TravelService
         } else {
             $player->save();
         }
+
+        return true;
     }
 
     private function startAttackFleet($travel, $req, $player) {
