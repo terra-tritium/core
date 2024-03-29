@@ -72,7 +72,7 @@ Route::get('/generate-token', [AuthController::class, 'generateToken']);
  * @todo retirar o /all
  */
 Route::middleware(['auth:sanctum','verified'])->group(function () {
-    Route::group(['prefix' => 'player', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'player', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/show', [PlayerController::class, 'show']);
         Route::get('/details/{id}', [PlayerController::class, 'getDetails']);
         Route::post('/new', [PlayerController::class, 'register']);
@@ -81,7 +81,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/all',[PlayerController::class, 'showAll']);
     });
 
-    Route::group(['prefix' => 'build', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'build', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [BuildController::class, 'list']);
         Route::get('/availables/{planet}', [BuildController::class, 'availables']);
         Route::post('/plant', [BuildController::class, 'plant']);
@@ -92,15 +92,15 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/demolish/{build}', [BuildController::class, 'demolish']);
     });
 
-    Route::get('/building/list/{planet}', [BuildController::class, 'listBildings'])->middleware(['throttle:120,1']);
+    Route::get('/building/list/{planet}', [BuildController::class, 'listBildings'])->middleware(['throttle:240,1']);
 
-    Route::group(['prefix' => 'factory', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'factory', 'middleware' => 'throttle:240,1'], function () {
         Route::post('/humanoid/create/{planet}/{qtd}', [FactoryController::class, 'createHumanoid']);
         Route::post('/transportship/create/{planet}/{qtd}', [FactoryController::class, 'createTransportShip']);
 
     });
 
-    Route::group(['prefix' => 'planet', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'planet', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [PlanetController::class, 'list']);
         Route::get('/show/{id}', [PlanetController::class, 'show']);
         Route::get('/{quadrant}/{position}', [PlanetController::class, 'find']);
@@ -108,39 +108,39 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/calcule-distance/{origin}/{destiny}', [PlanetController::class, 'calculeDistance']);
     });
 
-    Route::group(['prefix' => 'unit', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'unit', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [UnitController::class, 'list']);
     });
-    Route::group(['prefix' => 'ship', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'ship', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [ShipController::class, 'list']);
     });
 
-    Route::group(['prefix' => 'troop', 'middleware' => 'throttle:120,1'],function () {
+    Route::group(['prefix' => 'troop', 'middleware' => 'throttle:240,1'],function () {
         Route::post('/production/{planet}', [TroopController::class, 'production']);
         Route::get('/production/{planet?}', [TroopController::class, 'producing']);
         Route::get('/{planet}', [TroopController::class, 'list']);
     });
 
-    Route::group(['prefix' => 'fleet', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'fleet', 'middleware' => 'throttle:240,1'], function () {
         Route::post('/production/{planet}', [FleetController::class, 'production']);
         Route::get('/production/{planet?}', [FleetController::class, 'producing']);
         Route::get('/{planet}', [FleetController::class, 'list']);
     });
 
-    Route::group(['prefix' => 'ranking', 'middleware' => 'throttle:120,1'],function () {
+    Route::group(['prefix' => 'ranking', 'middleware' => 'throttle:240,1'],function () {
         Route::get('/players/{type}', [RankingController::class, 'players']);
         Route::get('/aliances/{type}', [RankingController::class, 'aliances']);
     });
 
-    Route::group(['prefix' => 'research', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'research', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [ResearchController::class, 'list']);
         Route::post('/laboratory/config/{planet}/{power}', [ResearchController::class, 'laboratoryConfig']);
         Route::post('/buy/{code}', [ResearchController::class, 'buyResearch']);
     });
 
-    Route::get('/researched', [ResearchController::class, 'researched'])->middleware(['throttle:120,1']);;
+    Route::get('/researched', [ResearchController::class, 'researched'])->middleware(['throttle:240,1']);;
 
-    Route::group(['prefix' => 'mode', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'mode', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [GameModeController::class, 'list']);
         Route::post('/change/{code}', [GameModeController::class, 'change']);
         Route::get('/effect/{planet}',[GameModeController::class, 'gameModeEffect']);
@@ -148,7 +148,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
 
     });
 
-    Route::group(['prefix' => 'travel', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'travel', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [TravelController::class, 'list']);
         Route::get('/current', [TravelController::class, 'current']);
         Route::get('/missions/{action}', [TravelController::class, 'missions']);
@@ -158,7 +158,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/spey', [TravelController::class, 'speyMission']);
     });
 
-    Route::group(['prefix' => 'combat', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'combat', 'middleware' => 'throttle:240,1'], function () {
         Route::post('/attackmode/{option}', [CombatController::class, 'changeAttackMode']);
         Route::post('/defensemode/{option}', [CombatController::class, 'changeDefenseMode']);
         Route::get('/start/{defense}/{planet}', [CombatController::class, 'start']);
@@ -182,14 +182,14 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/sendresource', [CombatController::class, 'sendResource']);
     });
 
-    Route::group(['prefix' => 'quadrant', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'quadrant', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/show/{code}/{planet?}', [QuadrantController::class, 'show']);
         Route::get('/map/{region}', [QuadrantController::class, 'map']);
         Route::get('/planets/{quadrant}', [QuadrantController::class, 'planets']);
         Route::get('/calule-distancte/{origin}/{destiny}', [QuadrantController::class, 'calcDistancePlants']);
     });
 
-    Route::group(['prefix' => 'message', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'message', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/all', [MessageController::class, 'getAll']);
         Route::get('/all-sender/{id}', [MessageController::class, 'getAllByUserSender']);
         Route::get('/all-recipient', [MessageController::class, 'getAllByUserRecipient']);
@@ -207,19 +207,19 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/search-usuer/{string}', [MessageController::class, 'searchUser']);
     });
 
-    Route::group(['prefix' => 'ranking', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'ranking', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/players', [RankingController::class, 'getPlayerRanking']);
         Route::get('/aliances', [RankingController::class, 'getAlianceRanking']);
     });
 
-    Route::group(['prefix' => 'logs', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'logs', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/logs', [LogController::class, 'logs']);
         Route::post('/create', [LogController::class, 'create']);
         Route::put('/update/{id}',[LogController::class, 'update']);
         Route::get('/processjob/{type}', [LogController::class, 'jobSleep']);
     });
 
-    Route::group(['prefix' => 'aliance', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'aliance', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [AliancesController::class, 'index']);
         Route::post('/create', [AliancesController::class, 'create']);
         Route::put('/edit/{id}', [AliancesController::class, 'update']);
@@ -263,7 +263,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get("/scores", [AliancesController::class, 'getScoresAliance']);
     });
 
-    Route::group(['prefix' => 'trading', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'trading', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/all/{resource}/{type}', [TradingController::class, 'getAllTradingByMarketResource']);
         Route::get('/myresources', [TradingController::class, 'getMyResources']);
         Route::post('/new-sale', [TradingController::class, 'tradingNewSale']);
@@ -279,15 +279,15 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
 
     });
 
-    Route::group(['prefix' => 'nft', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'nft', 'middleware' => 'throttle:240,1'], function () {
         Route::post('/config/{slot}/{code}', [NFTController::class, 'config']);
         Route::get('/config/get', [NFTController::class, 'get']);
     });
 
-    Route::group(['prefix' => 'nft-effect', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'nft-effect', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/get', [NFTEffectsController::class, 'getNftEffects']);
     });
-    Route::group(['prefix' => 'espionage', 'middleware' => 'throttle:120,1'], function () {
+    Route::group(['prefix' => 'espionage', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [EspionadeController::class, 'list']);
     });
 
