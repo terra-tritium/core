@@ -141,7 +141,7 @@ class ResearchService
             $this->bonusService->addSpeedResearch($player, 1);
         }
 
-        $points = $research->cost * env('TRITIUM_RESEARCH_SPEED');
+        $points = $research->cost * 0.1;
 
         $player->score += $points;
         $player->researchScore += $points;
