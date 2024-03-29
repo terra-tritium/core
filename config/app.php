@@ -253,6 +253,7 @@ return [
     'tritium_weight_time_second' => env('TRITIUM_WEIGHT_TIME_SECOND', 18),
     'tritium_travel_mission_spionage_cost' => env('TRITIUM_TRAVEL_MISSION_SPIONAGE_COST', 1000),
     'tritium_charging_speed' => env('TRITIUM_CHARGING_SPEED', 100),
+    'tritium_shield_force' => env('TRITIUM_SHIELD_FORCE'),
     'env_url_site' => env('ENV_URL_SITE', 'http://localhost:3000'),
     'recaptchav3_sitekey' => env('RECAPTCHAV3_SITEKEY', '6LcUEZ8pAAAAAG7qPJuMt7B67u4OoCg97VIujDhe'),
     'recaptchav3_secret' => env('RECAPTCHAV3_SECRET', '6LcUEZ8pAAAAAA3tFHx44zikQc2sGR3BNWHIty9O'),
