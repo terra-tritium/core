@@ -50,7 +50,7 @@ Route::group(['prefix' => 'country', 'middleware' => 'throttle:30,1'], function 
     Route::get('/list', [CountryController::class, 'list']);
 });
 
-Route::group(['prefix' => 'servers', 'middleware' => 'throttle:30,1'], function () {
+Route::group(['prefix' => 'server', 'middleware' => 'throttle:30,1'], function () {
     Route::get('/list', [ServerController::class, 'list']);
 });
 

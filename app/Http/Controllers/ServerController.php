@@ -9,14 +9,14 @@ class ServerController extends Controller
     public function list() {
         try {
             return response()->json([
-                'Rigel' => [
+                [
                     'id' => 1,
                     'name' => 'Rigel',
                     'url' => 'rigel.terratritium.com',
                     'type' => 'Beta'
                 ],
-                'Rigel' => [
-                    'id' => 1,
+                [
+                    'id' => 2,
                     'name' => 'Sirius',
                     'url' => 'sirius.terratritium.com',
                     'type' => 'Test'
