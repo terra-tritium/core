@@ -8,7 +8,7 @@ class ServerController extends Controller
 {
     public function list() {
         try {
-            return json_encode([
+            return response()->json([
                 'Rigel' => [
                     'id' => 1,
                     'name' => 'Rigel',
