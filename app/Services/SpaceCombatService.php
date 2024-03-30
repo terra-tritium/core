@@ -13,6 +13,7 @@ use App\Models\Fleet;
 use App\Models\Strategy;
 use App\Models\Travel;
 use App\Services\PlanetService;
+use App\Services\PlayerService;
 use App\Services\LogService;
 use App\Jobs\SpaceCombatJob;
 use App\Jobs\TravelJob;
@@ -202,6 +203,17 @@ class SpaceCombatService
       return true;
     }
 
+    $playerService = new PlayerService();
+
+    # Apply scores
+    foreach ($locals as $local) {
+      $playerService->addAttackScore($local->player, ($this->totalDemageInvasor / floor(count($locals))));
+    }
+    foreach ($invasors as $invasor) {
+      $playerService->addAttackScore($invasor->player, ($this->totalDemageLocal / floor(count($invasors))));
+    }
+
+    # Log stage informations
     $this->logStage(
       $combat,
       "Invasor Kills: " . $this->totalKillInvasor . " Locals Kills: " . $this->totalKilllocal,
@@ -407,6 +419,7 @@ class SpaceCombatService
   public function landingOfShips($travel) {
     $planetService = new PlanetService();
     $planetService->offFire($travel->to);
+    $planetService->offFire($travel->from);
     $this->addFleet($travel);
     $this->depositeResource($travel);
   }
