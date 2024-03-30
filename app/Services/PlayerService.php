@@ -31,6 +31,38 @@ class PlayerService
     return $player;
   }
 
+  public function addAttackScore($playerId, $units)
+  {
+    $player = Player::find($playerId);
+    $player->attackScore += $units;
+    $player->save();
+    return $player;
+  }
+
+  public function addMilitaryScore($playerId, $units)
+  {
+    $player = Player::find($playerId);
+    $player->militaryScore += $units;
+    $player->save();
+    return $player;
+  }
+
+  public function removeMilitaryScore($playerId, $units)
+  {
+    $player = Player::find($playerId);
+    $player->militaryScore -= $units;
+    $player->save();
+    return $player;
+  }
+
+  public function addDefenseScore($playerId, $units)
+  {
+    $player = Player::find($playerId);
+    $player->defenseScore += $units;
+    $player->save();
+    return $player;
+  }
+
   public function register(Player $player)
   {
     $player->score = 0;

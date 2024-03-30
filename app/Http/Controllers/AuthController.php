@@ -71,7 +71,11 @@ class AuthController extends Controller
 
             $result = $this->userService->createToken($request);
 
-            return response((array)$result, Response::HTTP_OK);
+            if ($result->success == true) {
+                return response((array)$result, Response::HTTP_OK);
+            } else {
+                return response((array)$result, Response::HTTP_UNAUTHORIZED);
+            }
 
         } catch (\Exception $exception) {
             Log::error($exception);

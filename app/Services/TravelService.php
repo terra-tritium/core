@@ -108,8 +108,8 @@ class TravelService
                 $newTravel = $this->startMissionExplorer($newTravel);
                 break;
             case Travel::RETURN_FLEET:
-                // $newTravel = $this->startReturnFleet($newTravel, $travel, $player);
-                // $this->planetService->offFire($travel->to);
+                $newTravel = $this->startReturnFleet($newTravel, $travel, $player);
+                $this->planetService->offFire($travel->to);
                 break;
             case Travel::MISSION_SPIONAGE:
                 $newTravel->status = Travel::STATUS_ON_GOING;
@@ -129,7 +129,7 @@ class TravelService
     }
 
     public function startReturnFleet($travel, $req, $player) {
-        //$this->addFleet($player, $req->from, $req->fleet);
+        $this->addFleet($player, $req->from, $req->fleet);
         return $travel;
     }
 
@@ -142,6 +142,8 @@ class TravelService
         } else {
             $player->save();
         }
+
+        return true;
     }
 
     private function startAttackFleet($travel, $req, $player) {
