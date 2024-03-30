@@ -23,7 +23,7 @@ use App\Http\Controllers\ShipController;
 use App\Http\Controllers\FleetController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RotinasController;
+use App\Http\Controllers\ServerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,6 +48,10 @@ Route::group(['prefix' => 'user', 'middleware' => 'throttle:30,1'], function () 
 
 Route::group(['prefix' => 'country', 'middleware' => 'throttle:30,1'], function () {
     Route::get('/list', [CountryController::class, 'list']);
+});
+
+Route::group(['prefix' => 'servers', 'middleware' => 'throttle:30,1'], function () {
+    Route::get('/list', [ServerController::class, 'list']);
 });
 
 Route::group(['prefix' => 'player', 'middleware' => 'throttle:30,1'], function () {

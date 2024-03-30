@@ -68,7 +68,7 @@ class Handler extends ExceptionHandler
             {
                 return $this->dataResponse($e->getMessage());
             }else {
-                return $this->errorResponse('Tente novamente mais tarde', Response::HTTP_INTERNAL_SERVER_ERROR);
+                return $this->errorResponse('Try again later', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
     }
