@@ -13,12 +13,13 @@ class ServerController extends Controller
                     'id' => 1,
                     'name' => 'Rigel',
                     'url' => 'rigel.terratritium.com',
+                    'apiUrl' => 'api-rigel.terratritium.com',
                     'type' => 'Beta'
                 ],
                 [
                     'id' => 2,
                     'name' => 'Sirius',
-                    'url' => 'sirius.terratritium.com',
+                    'urlUrl' => 'api-sirius.terratritium.com',
                     'type' => 'Test'
                 ]
             ]);
