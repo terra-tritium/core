@@ -14,13 +14,15 @@ class ServerController extends Controller
                     'name' => 'Rigel',
                     'url' => 'rigel.terratritium.com',
                     'apiUrl' => 'api-rigel.terratritium.com',
-                    'type' => 'Beta'
+                    'type' => 'Beta',
+                    "default" => true
                 ],
                 [
                     'id' => 2,
                     'name' => 'Sirius',
                     'urlUrl' => 'api-sirius.terratritium.com',
-                    'type' => 'Test'
+                    'type' => 'Test',
+                    "default" => false
                 ]
             ]);
         } catch (\Exception $e) {
