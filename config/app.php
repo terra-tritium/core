@@ -221,7 +221,7 @@ return [
 
     'tritium_galaxy' => env('TRITIUM_GALAXY', 'Rigel'),
     'tritium_construction_speed' => env('TRITIUM_CONSTRUCTION_SPEED', 10),
-    'tritium_research_speed' => env('TRITIUM_RESEARCH_SPEED', 10),
+    'tritium_research_speed' => env('TRITIUM_RESEARCH_SPEED', 1),
     'tritium_production_speed' => env('TRITIUM_PRODUCTION_SPEED', 10),
     'tritium_travel_speed' => env('TRITIUM_TRAVEL_SPEED', 300),
     'tritium_stage_speed' => env('TRITIUM_STAGE_SPEED', 10),
