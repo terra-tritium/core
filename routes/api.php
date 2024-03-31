@@ -64,7 +64,7 @@ Route::group(['prefix' => 'player', 'middleware' => 'throttle:30,1'], function (
  */
 Route::get('/ping',function(){
     return "pong";
-})->middleware(['throttle:1,1']);
+})->middleware(['throttle:10,1']);
 
 /**
  * @todo remover endpoint antes de enviar para produção
