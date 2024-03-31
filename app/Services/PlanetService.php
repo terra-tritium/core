@@ -46,13 +46,13 @@ public function syncronizeDefenseScore(Planet $planet) {
 
 public function currentBalance($p1, $type, $energyLevel = 1) {
   $effectService = new EffectService();
-  $padronizeTimestamp = 1000;
+  $inHour = 3600000;
 
-  $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $padronizeTimestamp;
-  $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $padronizeTimestamp;
-  $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $padronizeTimestamp;
-  $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $padronizeTimestamp;
-  $activeLaboratory = ($this->timeNow - $p1->timeResearch) / $padronizeTimestamp;
+  $activeEnergyMining =   (1000 * ($this->timeNow - $p1->timeEnergy   )) / $inHour;
+  $activeMetalMining =    (1000 * ($this->timeNow - $p1->timeMetal    )) / $inHour;
+  $activeUraniumMining =  (1000 * ($this->timeNow - $p1->timeUranium  )) / $inHour;
+  $activeCrystalMining =  (1000 * ($this->timeNow - $p1->timeCrystal  )) / $inHour;
+  $activeLaboratory =     (1000 * ($this->timeNow - $p1->timeResearch )) / $inHour;
 
   $workersOnEnergy = $p1->workersWaiting;
 
