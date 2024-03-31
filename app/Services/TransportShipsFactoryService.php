@@ -30,15 +30,15 @@ class TransportShipsFactoryService
 
     $this->workerService->syncronizeEnergy($planet);
 
-    $energyCost = $qtd * env('TRITIUM_TRANSPORTSHIP_PRICE');
-    $metalCost = $qtd * env('TRITIUM_TRANSPORTSHIP_PRICE');
+    $energyCost = $qtd * config("app.tritium_transportship_price");
+    $metalCost = $qtd * config("app.tritium_transportship_price");
 
     # enough energy and metal?
     if ($planet->energy < $energyCost || $planet->metal < $metalCost) {
       return false;
     }
 
-    $player->score += $qtd * env('TRITIUM_TRANSPORTSHIP_BASE');
+    $player->score += $qtd * config("app.tritium_transportship_base");
 
     $planet->energy -= $energyCost;
     $planet->metal -= $metalCost;
