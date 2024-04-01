@@ -49,7 +49,7 @@ class ShipSeeder extends Seeder
             "speed" => 5,
             "size" => 5,
             "hp" => 50,
-            "metal" => 2500,
+            "metal" => 1500,
             "uranium" => 0,
             "crystal" => 0,
             "time"=> 5
@@ -67,7 +67,7 @@ class ShipSeeder extends Seeder
             "speed" => 4,
             "size" => 7,
             "hp" => 80,
-            "metal" => 5000,
+            "metal" => 2200,
             "uranium" => 0,
             "crystal" => 0,
             "time"=> 25
@@ -84,8 +84,8 @@ class ShipSeeder extends Seeder
             "speed" => 7,
             "size" => 7,
             "hp" => 80,
-            "metal" => 11000,
-            "uranium" => 3000,
+            "metal" => 5000,
+            "uranium" => 1500,
             "crystal" => 0,
             "time"=> 25
         ]);
@@ -101,7 +101,7 @@ class ShipSeeder extends Seeder
             "speed" => 20,
             "size" => 5,
             "hp" => 50,
-            "metal" => 20000,
+            "metal" => 10000,
             "uranium" => 0,
             "crystal" => 0,
             "time"=> 30
@@ -118,9 +118,9 @@ class ShipSeeder extends Seeder
             "speed" => 5,
             "size" => 5,
             "hp" => 100,
-            "metal" => 10000,
-            "uranium" => 5000,
-            "crystal" => 15000,
+            "metal" => 5000,
+            "uranium" => 2500,
+            "crystal" => 7000,
             "time"=> 100
         ]);
 
@@ -135,9 +135,9 @@ class ShipSeeder extends Seeder
             "speed" => 2,
             "size" => 50,
             "hp" => 250,
-            "metal" => 150000,
-            "uranium" => 70000,
-            "crystal" => 25000,
+            "metal" => 75000,
+            "uranium" => 35000,
+            "crystal" => 10000,
             "time"=> 250
         ]);
     }

@@ -141,7 +141,7 @@ class ResearchService
             $this->bonusService->addSpeedResearch($player, 1);
         }
 
-        $points = $research->cost * env('TRITIUM_RESEARCH_SPEED');
+        $points = $research->cost * 0.1;
 
         $player->score += $points;
         $player->researchScore += $points;
@@ -151,7 +151,7 @@ class ResearchService
         return $researched;
     }
     public function planetSincronize($planet) {
-        $planet->researchPoints = ($planet->pwResearch * ((time() - $planet->timeResearch)/1000)) * env('TRITIUM_RESEARCH_SPEED');
+        $planet->researchPoints = ($planet->pwResearch * ((time() - $planet->timeResearch)/1000)) * config("app.tritium_research_speed");
         $planet->timeResearch = time();
         $planet->save();
         return $planet;

@@ -108,8 +108,8 @@ class TravelService
                 $newTravel = $this->startMissionExplorer($newTravel);
                 break;
             case Travel::RETURN_FLEET:
-                // $newTravel = $this->startReturnFleet($newTravel, $travel, $player);
-                // $this->planetService->offFire($travel->to);
+                $newTravel = $this->startReturnFleet($newTravel, $travel, $player);
+                $this->planetService->offFire($travel->to);
                 break;
             case Travel::MISSION_SPIONAGE:
                 $newTravel->status = Travel::STATUS_ON_GOING;
@@ -129,12 +129,30 @@ class TravelService
     }
 
     public function startReturnFleet($travel, $req, $player) {
-        //$this->addFleet($player, $req->from, $req->fleet);
+        $this->addFleet($player, $req->from, $req->fleet);
         return $travel;
+    }
+
+    private function removeTransportShips ($player, $qtd) {
+        $player = Player::find($player);
+        $player->transportShips -= $qtd;
+
+        if ($player->transportShips < 0) {
+            return false;
+        } else {
+            $player->save();
+        }
+
+        return true;
     }
 
     private function startAttackFleet($travel, $req, $player) {
 
+        $resultTranport = $this->removeTransportShips($player, $req->transportShips);
+        if (!$resultTranport) {
+            return "You don't have enough transport ships";
+        }
+        
         $this->removeFleet($player, $req->from, $req->fleet);
 
         if (isset($req->fleet)) {
