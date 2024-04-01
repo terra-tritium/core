@@ -45,7 +45,7 @@ class RobotFactoryService
       return false;
     }
 
-    $player->score += $qtd * config("app.tritium_humanoid_price");
+    $player->score += $qtd * (config("app.tritium_humanoid_price") / 10);
 
     $planet->energy -= $energyCost;
     $planet->metal -= $metalCost;
