@@ -387,8 +387,17 @@ class TradingService
             $travelTime = $distancia;
             $travel->arrival = $now + $travelTime;
             $travel->status = Travel::STATUS_ON_GOING;
+            if($trading->resource == 'Metal'){
+                $travel->metal = $trading->quantity;
+            }
+            if($trading->resource == 'Crystal'){
+                $travel->crystal = $trading->quantity;
+            }
+            if($trading->resource == 'Uranium'){
+                $travel->uranium = $trading->quantity;
+            }
             $successt = $travel->save();
-            TravelJob::dispatch($travelService, $travel->id, false)->delay(now()->addSeconds(180));
+            TravelJob::dispatch($travelService, $travel->id, false)->delay(now()->addSeconds(180)); 
 
             return ['travel'=>$travel, 'success'=>$successt];
             /**Fim */

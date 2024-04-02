@@ -40,7 +40,7 @@ class TravelJob implements ShouldQueue
     public function handle()
     {
         $currentTravel = Travel::where('id',$this->travel)->whereNotIn('status',[Travel::STATUS_CANCEL])->first();
-        Log::info("executou o inicio da viagem");
+        Log::info("executou o inicio da viagem". json_encode($currentTravel));
         if ($currentTravel) {
             $currentTravel->status = Travel::STATUS_FINISHED;
             $currentTravel->save();
@@ -67,6 +67,18 @@ class TravelJob implements ShouldQueue
                     }
                     break;
                 case Travel::TRANSPORT_BUY:
+                    if($this->back){
+                        Log::info("foi realizar a compra, voltar carregado - fim");
+                        // $this->travelService->arrivedTransportOrigin($this->travel);
+                    }else{
+                        Log::info("foi realizar a compra, esta indo, ao finalizar retornar - ajustar o tempo");
+                        $currentTravel->status = Travel::STATUS_RETURN;
+                        $currentTravel->save();
+                        TravelJob::dispatch($this->travelService, $currentTravel->id, true)->delay(now()->addSeconds(180));
+
+                        // TravelJob::dispatch($this->travelService, $this->travel->id, true)->delay(now()->addSeconds(180));
+                        // $this->travelService->arrivedTransportResource($this->travel);
+                    }
                     //$this->travelService->starTransportBuy($this->travel);
                     break;
                 case Travel::TRANSPORT_SELL:
