@@ -27,15 +27,19 @@ class RobotFactoryService
     $user = auth()->user()->id;
     $player = Player::where("user", $user)->firstOrFail();
     $planet = Planet::where("id", $planetId)->where("player", $player->id)->firstOrFail();
+
+    $this->workerService->syncronizeEnergy($planet);
+
+    // update planet info after woker service syncronize energy
+    $planet = Planet::where("id", $planetId)->where("player", $player->id)->firstOrFail();
+
     $humanoidFactoryBuilding = Building::where('planet', $planetId)
                                         ->where('build', 3) 
-                                        ->get();                                        
+                                        ->get();          
     
     if (count($humanoidFactoryBuilding) == 0 || $qtd > $humanoidFactoryBuilding[0]->max_humanoids) {
         return false; 
     }
-
-    $this->workerService->syncronizeEnergy($planet);
 
     $energyCost = $qtd * config("app.tritium_humanoid_price");
     $metalCost = $qtd * config("app.tritium_humanoid_price");
