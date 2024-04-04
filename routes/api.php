@@ -209,6 +209,8 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/lastmsg-sender/{senderid}', [MessageController::class, 'getLastMessageNotReadBySender']);
 
         Route::get('/search-usuer/{string}', [MessageController::class, 'searchUser']);
+        Route::get('/owner/{id}', [MessageController::class, 'getOwnerPlanet']);
+
     });
 
     Route::group(['prefix' => 'ranking', 'middleware' => 'throttle:240,1'], function () {
