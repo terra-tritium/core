@@ -108,7 +108,6 @@ class TravelService
                 $newTravel = $this->startMissionExplorer($newTravel);
                 break;
             case Travel::RETURN_FLEET:
-                $newTravel = $this->startReturnFleet($newTravel, $travel, $player);
                 $this->planetService->offFire($travel->to);
                 break;
             case Travel::MISSION_SPIONAGE:
@@ -126,11 +125,6 @@ class TravelService
         TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
 
         return $newTravel;
-    }
-
-    public function startReturnFleet($travel, $req, $player) {
-        $this->addFleet($player, $req->from, $req->fleet);
-        return $travel;
     }
 
     private function removeTransportShips ($player, $qtd) {

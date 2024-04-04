@@ -8,6 +8,7 @@ use App\Models\Combat;
 use App\Models\CombatStage;
 use App\Models\Fighters;
 use App\Models\Planet;
+use App\Models\Player;
 use App\Models\Ship;
 use App\Models\Fleet;
 use App\Models\Strategy;
@@ -421,6 +422,7 @@ class SpaceCombatService
     $planetService->offFire($travel->to);
     $planetService->offFire($travel->from);
     $this->addFleet($travel);
+    $this->addTransportShips($travel);
     $this->depositeResource($travel);
   }
 
@@ -431,6 +433,12 @@ class SpaceCombatService
     $this->addShip($travel, Ship::SHIP_SCOUT);
     $this->addShip($travel, Ship::SHIP_STEALTH);
     $this->addShip($travel, Ship::SHIP_FLAGSHIP);
+  }
+
+  public function addTransportShips($travel) {
+    $player = Player::find($travel->player);
+    $player->transportShips += $travel->transportShips;
+    $player->save();
   }
 
   private function addShip($travel, $shipCode) {

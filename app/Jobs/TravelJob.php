@@ -43,9 +43,10 @@ class TravelJob implements ShouldQueue
             $currentTravel->status = Travel::STATUS_FINISHED;
             $currentTravel->save();
 
+            $spaceCombatService = new SpaceCombatService();
+
             switch ($currentTravel->action) {
                 case Travel::ATTACK_FLEET:
-                    $spaceCombatService = new SpaceCombatService();
                     $spaceCombatService->createNewCombat($currentTravel);
                     break;
                 case Travel::ATTACK_TROOP:
@@ -74,7 +75,7 @@ class TravelJob implements ShouldQueue
                     //$this->travelService->starMissionExplorer($this->travel);
                     break;
                 case Travel::RETURN_FLEET:
-                    $this->travelService->landingOfShips($currentTravel);
+                    $spaceCombatService->landingOfShips($currentTravel);
                     break;
                 case Travel::MISSION_COLONIZATION:
                     $this->travelService->missionColonization($currentTravel);
