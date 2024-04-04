@@ -45,9 +45,8 @@ class PlanetController extends Controller
 
     public function __construct(PlayerService $playerService, PlanetService $planetService,)
     {
-        $this->playerService = $playerService;     
-        $this->planetService = $planetService;        
-
+        $this->playerService = $playerService;
+        $this->planetService = $planetService;
     }
 
     /**
@@ -89,7 +88,8 @@ class PlanetController extends Controller
      * @param $position
      * @return string
      */
-    public function find ($quadrant, $position) {
+    public function find($quadrant, $position)
+    {
         try {
             if (empty($quadrantParam) || empty($positionParam)) {
                 return response()->json(['error' => 'Invalid quadrant or position'], Response::HTTP_BAD_REQUEST);
@@ -217,8 +217,10 @@ class PlanetController extends Controller
         $player = Player::getPlayerLogged();
 
         if ($planet->player !== $player->id) {
-            return response()->json(['message' => "You aren't the owner of this planet"],
-                Response::HTTP_FORBIDDEN);
+            return response()->json(
+                ['message' => "You aren't the owner of this planet"],
+                Response::HTTP_FORBIDDEN
+            );
         }
 
         $request->validate([
@@ -261,7 +263,8 @@ class PlanetController extends Controller
      *
      * @return mixed
      */
-    public function list() {
+    public function list()
+    {
         $player = Player::getPlayerLogged();
         if (!$player) {
             return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
@@ -272,7 +275,7 @@ class PlanetController extends Controller
         return response()->json($planets, Response::HTTP_OK);
     }
 
-/**
+    /**
      *  * @OA\Get(
      *     path="/planet/calcule-distance/{origin}/{destiny}",
      *     operationId="calculeDistancePlanet",
@@ -317,17 +320,20 @@ class PlanetController extends Controller
      * @param $position
      * @return string
      */
-    public function calculeDistance(Request $request){
+    public function calculeDistance(Request $request)
+    {
         try {
 
             $origin = $request->origin;
             $destiny = $request->destiny;
 
-           $time = $this->planetService->calculeDistance($origin,$destiny);
+            $time = $this->planetService->calculeDistance($origin, $destiny);
 
-            return response()->json(['origin'=> $origin, 'destiny'=>  $destiny, 'distance' => $time], Response::HTTP_OK);
+            return response()->json(['origin' => $origin, 'destiny' =>  $destiny, 'distance' => $time], Response::HTTP_OK);
         } catch (\Exception $e) {
-             return response()->json(['error' => 'An error occurred'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['error' => 'An error occurred'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+   
 }
