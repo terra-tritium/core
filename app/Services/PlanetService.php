@@ -6,240 +6,272 @@ use App\Models\Planet;
 use App\Models\Building;
 use App\Models\Build;
 use App\Services\RankingService;
+use Illuminate\Support\Facades\Log;
+use function Laravel\Prompts\error;
 
 class PlanetService
 {
-  protected $timeNow;
-  protected $rankingService;
-  protected $pesoCaluleDistance;
+    protected $timeNow;
+    protected $rankingService;
+    protected $pesoCaluleDistance;
 
-  public function __construct () {
-    $this->timeNow = time();
-    $this->rankingService = new RankingService();
-    $this->pesoCaluleDistance = config("app.tritium_travel_speed");
-  }
-
-  public function syncronizeEnergy(Planet $planet) {
-
-    $level = 0;
-
-    $levelEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $planet->id])->first();
-
-    if ($levelEnergy) {
-      $level = $levelEnergy->level;
+    public function __construct () {
+        $this->timeNow = time();
+        $this->rankingService = new RankingService();
+        $this->pesoCaluleDistance = config("app.tritium_travel_speed");
     }
 
-    $energyMultiplier = $planet->terrainType ? $planet->terrainType->energy : 1.0;
-    $currentBalance = $this->currentBalance($planet, 0, $level) * $energyMultiplier;
-    $planet->energy = $currentBalance;
-    $planet->timeEnergy = $this->timeNow;
-    $planet->save();
-}
+    public function syncronizeEnergy(Planet $planet) {
 
-public function syncronizeDefenseScore(Planet $planet) {
-  $defenseMultiplier = $planet->terrainType ? $planet->terrainType->defenseScore : 1.0;
-  $planetDefense = $planet->baseDefense * $defenseMultiplier;
-  $planet->defenseScore = $planetDefense;
-  $planet->save();
-}
+        $level = 0;
 
+        $levelEnergy = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $planet->id])->first();
 
-public function currentBalance($p1, $type, $energyLevel = 1) {
-  $effectService = new EffectService();
-  $inHour = 3600;
-
-  $activeEnergyMining =   ($this->timeNow - $p1->timeEnergy  ) / $inHour;
-  $activeMetalMining =    ($this->timeNow - $p1->timeMetal   ) / $inHour;
-  $activeUraniumMining =  ($this->timeNow - $p1->timeUranium ) / $inHour;
-  $activeCrystalMining =  ($this->timeNow - $p1->timeCrystal ) / $inHour;
-  $activeLaboratory =     ($this->timeNow - $p1->timeResearch) / $inHour;
-
-  $workersOnEnergy = $p1->workersWaiting;
-
-  if ($p1->workersWaiting > (config("app.tritium_energy_workers_by_level") * $energyLevel)) {
-    $workersOnEnergy = config("app.tritium_energy_workers_by_level") * $energyLevel;
-  }
-
-    switch ($type) {
-      case 0:
-        return $p1->energy + ($workersOnEnergy * (config("app.tritium_energy_base") * $activeEnergyMining));
-      case 1:
-        return $p1->metal + ($p1->pwMetal * ($effectService->calcMiningSpeed(config("app.tritium_metal_base"), $p1)  * $activeMetalMining));
-      case 2:
-        // return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM_BASE") * $activeUraniumMining));
-        return $p1->uranium + ($p1->pwUranium * ($effectService->calcMiningSpeed(config("app.tritium_metal_base"), $p1) * $activeUraniumMining));
-      case 3:
-        return $p1->crystal + ($p1->pwCrystal * ($effectService->calcMiningSpeed(config("app.tritium_metal_base"), $p1) * $activeCrystalMining));
-        // return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL_BASE") * $activeCrystalMining));
-      case 4:
-        return $p1->researchPoints + ($p1->pwResearch * ($effectService->calcResearchSpeed(config("app.tritium_research_speed"),$p1) * $activeLaboratory));
-    }
-    return 0;
-}
-
-  public function enoughBalance($p1, $units, $type, $energyLevel = 1) {
-    if ($units == 0){
-      return true;
-    }
-    switch ($type) {
-      case 0:
-        if ($this->currentBalance($p1, 0, $energyLevel) >= $units) {
-          return true;
+        if ($levelEnergy) {
+            $level = $levelEnergy->level;
         }
-        break;
-      case 1:
-        if ($this->currentBalance($p1, 1, $energyLevel) >= $units) {
-          return true;
-        }
-        break;
-      case 2:
-        if ($this->currentBalance($p1, 2, $energyLevel) >= $units) {
-          return true;
-        }
-        break;
-      case 3:
-        if ($this->currentBalance($p1, 3, $energyLevel) >= $units) {
-          return true;
-        }
-        break;
-    }
 
-    return false;
-  }
-
-  public function startMining($planet, $resource) {
-
-    switch ($resource) {
-      case 0:
+        $energyMultiplier = $planet->terrainType ? $planet->terrainType->energy : 1.0;
+        $currentBalance = $this->currentBalance($planet, 0, $level) * $energyMultiplier;
+        $planet->energy = $currentBalance;
         $planet->timeEnergy = $this->timeNow;
-        $planet->pwEnergy = 1;
-        break;
-
-      case 1:
-        $planet->timeMetal = $this->timeNow;
-        $planet->pwMetal = 0;
-        break;
-
-      case 2:
-        $planet->timeUranium = $this->timeNow;
-        $planet->pwUranium = 0;
-        break;
-
-      case 3:
-        $planet->timeCrystal = $this->timeNow;
-        $planet->pwCrystal = 0;
-        break;
+        $planet->save();
     }
 
-    return $planet;
-  }
-
-  public function addEnergy($p1, $units) {
-    $p1->energy += $units;
-    return $p1;
-  }
-
-  public function removeEnergy($p1, $units) {
-    $p1->energy -= $units;
-    return $p1;
-  }
-
-  public function addMetal($p1, $units) {
-    $p1->metal = $this->currentBalance($p1, 1);
-    $p1->timeMetal = $this->timeNow;
-    $p1->metal += $units;
-    return $p1;
-  }
-
-  public function removeMetal($p1, $units) {
-    if ($this->currentBalance($p1, 1) >= $units) {
-      $p1->metal = $this->currentBalance($p1, 1);
-      $p1->timeMetal = $this->timeNow;
-      $p1->metal -= $units;
-      $this->rankingService->addPoints($units / 100);
+    public function syncronizeDefenseScore(Planet $planet) {
+        $defenseMultiplier = $planet->terrainType ? $planet->terrainType->defenseScore : 1.0;
+        $planetDefense = $planet->baseDefense * $defenseMultiplier;
+        $planet->defenseScore = $planetDefense;
+        $planet->save();
     }
-    return $p1;
-  }
 
-  public function addUranium($p1, $units) {
-    $p1->uranium = $this->currentBalance($p1, 2);
-    $p1->timeUranium = $this->timeNow;
-    $p1->uranium += $units;
-    return $p1;
-  }
 
-  public function removeUranium($p1, $units) {
-    if ($this->currentBalance($p1, 2) > $units) {
-      $p1->uranium = $this->currentBalance($p1, 2);
-      $p1->timeUranium = $this->timeNow;
-      $p1->uranium -= $units;
-      $this->rankingService->addPoints($units / 20);
+    public function currentBalance($p1, $type, $energyLevel = 1) {
+        $effectService = new EffectService();
+        $sInHour = 3600;
+
+        $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $sInHour;
+        $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $sInHour;
+        $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $sInHour;
+        $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $sInHour;
+        $activeLaboratory = ($this->timeNow - $p1->timeResearch) / $sInHour;
+
+        $workersOnEnergy = $p1->workersWaiting;
+
+        if ($p1->workersWaiting > (config("app.tritium_energy_workers_by_level") * $energyLevel)) {
+            $workersOnEnergy = config("app.tritium_energy_workers_by_level") * $energyLevel;
+        }
+
+        switch ($type) {
+            case 0:
+                return $p1->energy + ($workersOnEnergy * (config("app.tritium_energy_base") * $activeEnergyMining));
+            case 1:
+                return $p1->metal + ($p1->pwMetal * ($effectService->calcMiningSpeed(config("app.tritium_metal_base"), $p1)  * $activeMetalMining));
+            case 2:
+                $uranium = $p1->uranium + ($p1->pwUranium * ($effectService->calcMiningSpeed(config("app.tritium_uranium_base"), $p1) * $activeUraniumMining));
+                $crystal = $p1->crystal + ($p1->pwCrystal * ($effectService->calcMiningSpeed(2, $p1) * $activeCrystalMining));
+                return [
+                    'uranium' => $uranium,
+                    'crystal' => $crystal
+                ];
+            case 3:
+                $crystal = $p1->crystal + ($p1->pwCrystal * ($effectService->calcMiningSpeed(config("app.tritium_crystal_base"), $p1) * $activeCrystalMining));
+                $uranium = $p1->uranium + ($p1->pwUranium * ($effectService->calcMiningSpeed(2, $p1) * $activeUraniumMining));
+                return [
+                    'crystal' => $crystal,
+                    'uranium' => $uranium
+                ];
+
+            case 4:
+                return $p1->researchPoints + ($p1->pwResearch * ($effectService->calcResearchSpeed(config("app.tritium_research_speed"),$p1) * $activeLaboratory));
+        }
+
+
+        return 0;
     }
-    return $p1;
-  }
 
-  public function addCrystal($p1, $units) {
-    $p1->uranium = $this->currentBalance($p1, 3);
-    $p1->timeUranium = $this->timeNow;
-    $p1->uranium += $units;
-    return $p1;
-  }
+    public function enoughBalance($p1, $units, $type, $energyLevel = 1) {
+        if ($units == 0){
+            return true;
+        }
+        switch ($type) {
+            case 0:
+                if ($this->currentBalance($p1, 0, $energyLevel) >= $units) {
+                    return true;
+                }
+                break;
+            case 1:
+                if ($this->currentBalance($p1, 1, $energyLevel) >= $units) {
+                    return true;
+                }
+                break;
+            case 2:
+                if ($this->currentBalance($p1, 2, $energyLevel) >= $units) {
+                    return true;
+                }
+                break;
+            case 3:
+                if ($this->currentBalance($p1, 3, $energyLevel) >= $units) {
+                    return true;
+                }
+                break;
+        }
 
-  public function removeCrystal($p1, $units) {
-    if ($this->currentBalance($p1, 2) > $units) {
-      $p1->crystal = $this->currentBalance($p1, 3);
-      $p1->timeCrystal = $this->timeNow;
-      $p1->crystal -= $units;
-      $this->rankingService->addPoints($units / 20);
+        return false;
     }
-    return $p1;
-  }
 
-  public function incrementBattery(&$p1, $units) {
-    $p1->battery += $units;
-    return $p1;
-  }
+    public function startMining($planet, $resource) {
 
-  public function calculeDistance($origin, $destiny, $peso = null) {
+        switch ($resource) {
+            case 0:
+                $planet->timeEnergy = $this->timeNow;
+                $planet->pwEnergy = 1;
+                break;
 
-    $peso  = is_null($peso) ? $this->pesoCaluleDistance :  $peso ;
+            case 1:
+                $planet->timeMetal = $this->timeNow;
+                $planet->pwMetal = 0;
+                break;
 
-    $arrayRegion = ['A'=>0,'B'=>1,'C'=>2,'D'=>3,'E'=>4,'F'=>5,'G'=>6,'H'=>7,'I'=>8,'J'=>9,'K'=>10,'L'=>11,'M'=>12,'N'=>13,'O'=>14,'P'=>15];
-    $result       = 0.5;
-    $qtdQuadrante = 100;
+            case 2:
+                $planet->timeUranium = $this->timeNow;
+                $planet->pwUranium = 0;
+                break;
 
-    $originModel     = Planet::findOrFail($origin);
-    $destinyModel    = Planet::findOrFail($destiny);
+            case 3:
+                $planet->timeCrystal = $this->timeNow;
+                $planet->pwCrystal = 0;
+                break;
+        }
 
-    $regionOrigin  = $originModel->region ;
-    $regionDestiny =  $destinyModel->region ;
-
-    $quatrandOrigin  =  $originModel->quadrant ;
-    $quatrandDestiny =  $destinyModel->quadrant ;
-
-    if( $regionOrigin != $regionDestiny){
-      $regionsDistance =  abs($arrayRegion[$regionOrigin] - $arrayRegion[$regionDestiny]) ;
-      $result  = ($regionsDistance  *  $qtdQuadrante);
-    }else{
-      if($quatrandOrigin != $quatrandDestiny){
-        $q1 = substr($quatrandOrigin,1);
-        $q2 =  substr( $quatrandDestiny,1);
-        $result = abs($q1 - $q2 );
-      }
+        return $planet;
     }
-    return $result * $peso;
-  }
 
-  public function onFire($planetId) {
-    $planet = Planet::findOrFail($planetId);
-    $planet->onFire = true;
-    $planet->save();
-  }
+    public function addEnergy($p1, $units) {
+        $p1->energy += $units;
+        return $p1;
+    }
 
-  public function offFire($planetId) {
-    $planet = Planet::findOrFail($planetId);
-    $planet->onFire = false;
-    $planet->save();
-  }
+    public function removeEnergy($p1, $units) {
+        $p1->energy -= $units;
+        return $p1;
+    }
+
+    public function addMetal($p1, $units) {
+        $p1->metal = $this->currentBalance($p1, 1);
+        $p1->timeMetal = $this->timeNow;
+        $p1->metal += $units;
+        return $p1;
+    }
+
+    public function removeMetal($p1, $units) {
+        if ($this->currentBalance($p1, 1) >= $units) {
+            $p1->metal = $this->currentBalance($p1, 1);
+            $p1->timeMetal = $this->timeNow;
+            $p1->metal -= $units;
+            $this->rankingService->addPoints($units / 100);
+        }
+        return $p1;
+    }
+
+    public function addUranium($p1, $units) {
+        $result = $p1->uranium = $this->currentBalance($p1, 2);
+
+        if (is_array($result)) {
+            return $this->prepareSaveUraniumAndCrystal($result, $p1, $units);
+        } else {
+            Log::error("Error to add uranium, Planet Type : Uranium, Player ID : " . $p1->player);
+        }
+    }
+
+    public function removeUranium($p1, $units) {
+        if ($this->currentBalance($p1, 2) > $units) {
+            $p1->uranium = $this->currentBalance($p1, 2);
+            $p1->timeUranium = $this->timeNow;
+            $p1->uranium -= $units;
+            $this->rankingService->addPoints($units / 20);
+        }
+        return $p1;
+    }
+
+    public function addCrystal($p1, $units) {
+        $result= $p1->uranium = $this->currentBalance($p1, 3);
+
+        if (is_array($result)) {
+            return $this->prepareSaveUraniumAndCrystal($result, $p1, $units);
+        } else {
+            Log::error("Error to add Crystal, Planet Type : Crystal, Player ID : " . $p1->player);
+        }
+    }
+
+    public function removeCrystal($p1, $units) {
+        if ($this->currentBalance($p1, 2) > $units) {
+            $p1->crystal = $this->currentBalance($p1, 3);
+            $p1->timeCrystal = $this->timeNow;
+            $p1->crystal -= $units;
+            $this->rankingService->addPoints($units / 20);
+        }
+        return $p1;
+    }
+
+    public function incrementBattery(&$p1, $units) {
+        $p1->battery += $units;
+        return $p1;
+    }
+
+    public function calculeDistance($origin, $destiny, $peso = null) {
+
+        $peso  = is_null($peso) ? $this->pesoCaluleDistance :  $peso ;
+
+        $arrayRegion = ['A'=>0,'B'=>1,'C'=>2,'D'=>3,'E'=>4,'F'=>5,'G'=>6,'H'=>7,'I'=>8,'J'=>9,'K'=>10,'L'=>11,'M'=>12,'N'=>13,'O'=>14,'P'=>15];
+        $result       = 0.5;
+        $qtdQuadrante = 100;
+
+        $originModel     = Planet::findOrFail($origin);
+        $destinyModel    = Planet::findOrFail($destiny);
+
+        $regionOrigin  = $originModel->region ;
+        $regionDestiny =  $destinyModel->region ;
+
+        $quatrandOrigin  =  $originModel->quadrant ;
+        $quatrandDestiny =  $destinyModel->quadrant ;
+
+        if( $regionOrigin != $regionDestiny){
+            $regionsDistance =  abs($arrayRegion[$regionOrigin] - $arrayRegion[$regionDestiny]) ;
+            $result  = ($regionsDistance  *  $qtdQuadrante);
+        }else{
+            if($quatrandOrigin != $quatrandDestiny){
+                $q1 = substr($quatrandOrigin,1);
+                $q2 =  substr( $quatrandDestiny,1);
+                $result = abs($q1 - $q2 );
+            }
+        }
+        return $result * $peso;
+    }
+
+    public function onFire($planetId) {
+        $planet = Planet::findOrFail($planetId);
+        $planet->onFire = true;
+        $planet->save();
+    }
+
+    public function offFire($planetId) {
+        $planet = Planet::findOrFail($planetId);
+        $planet->onFire = false;
+        $planet->save();
+    }
+
+    private function prepareSaveUraniumAndCrystal(array $result, Planet $p1, $units)
+    {
+        $p1->uranium = $result['uranium'];
+        $p1->crystal = $result['crystal'];
+
+        $p1->timeUranium = $this->timeNow;
+        $p1->timeCrystal = $this->timeNow;
+        $p1->uranium += $units;
+        $p1->crystal += $units;
+
+        return $p1;
+    }
 
 }

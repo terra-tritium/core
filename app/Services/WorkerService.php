@@ -10,7 +10,7 @@ use App\Services\PlanetService;
 class WorkerService
 {
   private $planetService;
-      
+
   public function __construct() {
     $this->planetService = new PlanetService();
   }
@@ -27,15 +27,15 @@ class WorkerService
           $planet->workersOnMetal = 0;
           break;
       // Uranium
-      case Build::URANIUMMINING : 
+      case Build::URANIUMMINING :
           $planet->workersOnUranium = 0;
           break;
       // Crystal
-      case Build::CRYSTALMINING : 
+      case Build::CRYSTALMINING :
           $planet->workersOnCrystal = 0;
           break;
       // Laboratory
-      case Build::LABORATORY : 
+      case Build::LABORATORY :
         $planet->workersOnLaboratory = 0;
         break;
     }
@@ -43,10 +43,10 @@ class WorkerService
     if ($this->waitingWorkers($planet) < $workers) {
       return "Insuficients waiting workers";
     }
-    
+
     if ($workers < 1) {
       return "Invalid workers";
-    } else {    
+    } else {
         switch ($building->build) {
             // Metal
             case Build::METALMINING :
@@ -58,8 +58,10 @@ class WorkerService
                 break;
 
             // Uranium
-            case Build::URANIUMMINING : 
-                $planet->uranium = $this->planetService->currentBalance($planet, 2);
+            case Build::URANIUMMINING :
+                $result = $this->planetService->currentBalance($planet, 2);
+                $planet->uranium = $result['uranium'];
+                $planet->crystal = $result['crystal'];
                 $planet->timeUranium = time();
                 $planet->pwUranium = $workers;
                 $planet->workersOnUranium = $workers;
@@ -67,8 +69,10 @@ class WorkerService
                 break;
 
             // Crystal
-            case Build::CRYSTALMINING : 
-                $planet->crystal = $this->planetService->currentBalance($planet, 3);
+            case Build::CRYSTALMINING :
+                $result = $this->planetService->currentBalance($planet, 3);
+                $planet->crystal = $result['crystal'];
+                $planet->uranium = $result['uranium'];
                 $planet->timeCrystal = time();
                 $planet->pwCrystal = $workers;
                 $planet->workersOnCrystal = $workers;
@@ -76,7 +80,7 @@ class WorkerService
                 break;
 
             // Laboratory
-            case Build::LABORATORY : 
+            case Build::LABORATORY :
               $planet->researchPoints = $this->planetService->currentBalance($planet, 4);
               $planet->timeResearch = time();
               $planet->pwResearch = $workers;
@@ -87,7 +91,7 @@ class WorkerService
 
         $building->workers = $workers;
 
-        $building->save(); 
+        $building->save();
         $planet->save();
     }
   }
@@ -100,8 +104,8 @@ class WorkerService
 
     if ($planet->timeEnergy == null) { return false; }
     if ($planet->timeEnergy == 0) { return false; }
-     
-    try { 
+
+    try {
       $level = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $planet->id])->first()->level;
 
       $workersOnEnergy = 0;
