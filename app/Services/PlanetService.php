@@ -6,8 +6,6 @@ use App\Models\Planet;
 use App\Models\Building;
 use App\Models\Build;
 use App\Services\RankingService;
-use Illuminate\Support\Facades\Log;
-use function Laravel\Prompts\error;
 
 class PlanetService
 {
@@ -18,7 +16,7 @@ class PlanetService
   public function __construct () {
     $this->timeNow = time();
     $this->rankingService = new RankingService();
-    $this->pesoCaluleDistance = env("TRITIUM_TRAVEL_SPEED");
+    $this->pesoCaluleDistance = config("app.tritium_travel_speed");
   }
 
   public function syncronizeEnergy(Planet $planet) {
@@ -48,47 +46,36 @@ public function syncronizeDefenseScore(Planet $planet) {
 
 public function currentBalance($p1, $type, $energyLevel = 1) {
   $effectService = new EffectService();
-  $sInHour = 3600;
+  $inHour = 3600;
 
-  $activeEnergyMining = ($this->timeNow - $p1->timeEnergy) / $sInHour;
-  $activeMetalMining = ($this->timeNow - $p1->timeMetal) / $sInHour;
-  $activeUraniumMining = ($this->timeNow - $p1->timeUranium) / $sInHour;
-  $activeCrystalMining = ($this->timeNow - $p1->timeCrystal) / $sInHour;
-  $activeLaboratory = ($this->timeNow - $p1->timeResearch) / $sInHour;
+  $activeEnergyMining =   ($this->timeNow - $p1->timeEnergy  ) / $inHour;
+  $activeMetalMining =    ($this->timeNow - $p1->timeMetal   ) / $inHour;
+  $activeUraniumMining =  ($this->timeNow - $p1->timeUranium ) / $inHour;
+  $activeCrystalMining =  ($this->timeNow - $p1->timeCrystal ) / $inHour;
+  $activeLaboratory =     ($this->timeNow - $p1->timeResearch) / $inHour;
 
   $workersOnEnergy = $p1->workersWaiting;
 
-  if ($p1->workersWaiting > (env("TRITIUM_ENERGY_WORKERS_BY_LEVEL") * $energyLevel)) {
-    $workersOnEnergy = env("TRITIUM_ENERGY_WORKERS_BY_LEVEL") * $energyLevel;
+  if ($p1->workersWaiting > (config("app.tritium_energy_workers_by_level") * $energyLevel)) {
+    $workersOnEnergy = config("app.tritium_energy_workers_by_level") * $energyLevel;
   }
 
     switch ($type) {
       case 0:
-        return $p1->energy + ($workersOnEnergy * (env("TRITIUM_ENERGY_BASE") * $activeEnergyMining));
+        return $p1->energy + ($workersOnEnergy * (config("app.tritium_energy_base") * $activeEnergyMining));
       case 1:
-        return $p1->metal + ($p1->pwMetal * ($effectService->calcMiningSpeed(env("TRITIUM_METAL_BASE"), $p1)  * $activeMetalMining));
+        return $p1->metal + ($p1->pwMetal * ($effectService->calcMiningSpeed(config("app.tritium_metal_base"), $p1)  * $activeMetalMining));
       case 2:
-          $uranium = $p1->uranium + ($p1->pwUranium * ($effectService->calcMiningSpeed(env("TRITIUM_URANIUM_BASE"), $p1) * $activeUraniumMining));
-          $crystal = $p1->crystal + ($p1->pwCrystal * ($effectService->calcMiningSpeed(2, $p1) * $activeCrystalMining));
-          return [
-              'uranium' => $uranium,
-              'crystal' => $crystal
-          ];
+        // return $p1->uranium + ($p1->pwUranium * (env("TRITIUM_URANIUM_BASE") * $activeUraniumMining));
+        return $p1->uranium + ($p1->pwUranium * ($effectService->calcMiningSpeed(config("app.tritium_metal_base"), $p1) * $activeUraniumMining));
       case 3:
-          $crystal = $p1->crystal + ($p1->pwCrystal * ($effectService->calcMiningSpeed(env("TRITIUM_CRYSTAL_BASE"), $p1) * $activeCrystalMining));
-          $uranium = $p1->uranium + ($p1->pwUranium * ($effectService->calcMiningSpeed(2, $p1) * $activeUraniumMining));
-          return [
-              'crystal' => $crystal,
-              'uranium' => $uranium
-          ];
-
-        case 4:
-        return $p1->researchPoints + ($p1->pwResearch * ($effectService->calcResearchSpeed(env("TRITIUM_RESEARCH_SPEED"),$p1) * $activeLaboratory));
+        return $p1->crystal + ($p1->pwCrystal * ($effectService->calcMiningSpeed(config("app.tritium_metal_base"), $p1) * $activeCrystalMining));
+        // return $p1->crystal + ($p1->pwCrystal * (env("TRITIUM_CRYSTAL_BASE") * $activeCrystalMining));
+      case 4:
+        return $p1->researchPoints + ($p1->pwResearch * ($effectService->calcResearchSpeed(config("app.tritium_research_speed"),$p1) * $activeLaboratory));
     }
-
-
     return 0;
-  }
+}
 
   public function enoughBalance($p1, $units, $type, $energyLevel = 1) {
     if ($units == 0){
@@ -175,13 +162,10 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
   }
 
   public function addUranium($p1, $units) {
-      $result = $p1->uranium = $this->currentBalance($p1, 2);
-
-      if (is_array($result)) {
-          return $this->prepareSaveUraniumAndCrystal($result, $p1, $units);
-      } else {
-          Log::error("Error to add uranium, Planet Type : Uranium, Player ID : " . $p1->player);
-      }
+    $p1->uranium = $this->currentBalance($p1, 2);
+    $p1->timeUranium = $this->timeNow;
+    $p1->uranium += $units;
+    return $p1;
   }
 
   public function removeUranium($p1, $units) {
@@ -195,13 +179,10 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
   }
 
   public function addCrystal($p1, $units) {
-      $result= $p1->uranium = $this->currentBalance($p1, 3);
-
-      if (is_array($result)) {
-          return $this->prepareSaveUraniumAndCrystal($result, $p1, $units);
-      } else {
-          Log::error("Error to add Crystal, Planet Type : Crystal, Player ID : " . $p1->player);
-      }
+    $p1->uranium = $this->currentBalance($p1, 3);
+    $p1->timeUranium = $this->timeNow;
+    $p1->uranium += $units;
+    return $p1;
   }
 
   public function removeCrystal($p1, $units) {
@@ -260,18 +241,5 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
     $planet->onFire = false;
     $planet->save();
   }
-
-    private function prepareSaveUraniumAndCrystal(array $result, Planet $p1, $units)
-    {
-        $p1->uranium = $result['uranium'];
-        $p1->crystal = $result['crystal'];
-
-        $p1->timeUranium = $this->timeNow;
-        $p1->timeCrystal = $this->timeNow;
-        $p1->uranium += $units;
-        $p1->crystal += $units;
-
-        return $p1;
-    }
 
 }
