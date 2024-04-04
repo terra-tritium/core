@@ -372,7 +372,7 @@ class TradingService
 
 
 
-
+ 
 
             /**Inicio */
             $travel = new Travel();

@@ -75,7 +75,7 @@ class TravelJob implements ShouldQueue
                         $currentTravel->status = Travel::STATUS_RETURN;
                         $currentTravel->save();
                         TravelJob::dispatch($this->travelService, $currentTravel->id, true)->delay(now()->addSeconds(180));
-
+ 
                         // TravelJob::dispatch($this->travelService, $this->travel->id, true)->delay(now()->addSeconds(180));
                         // $this->travelService->arrivedTransportResource($this->travel);
                     }
