@@ -240,4 +240,24 @@ class MessageController extends Controller
     {
         return  $this->messageService->searchUser($string);
     }
+
+    public function getOwnerPlanet($planetId)
+    {
+        try {
+            $player = Player::getPlayerLogged();
+            if (!$player) {
+                return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+            }
+
+
+            $p = Player::select('players.*')
+                ->join('planets', 'planets.player', '=', 'players.id')
+                ->where('planets.player', $planetId)
+                ->first();
+
+            return response()->json(['name' => $p->name], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['error' => "An error occurred in recovery player name " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
