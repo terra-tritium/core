@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\DB;
 
 class Trading extends Model
 {
-    CONST TRITIUM_MARKET_STATUS_CANCELED = 0;
-    CONST TRITIUM_MARKET_STATUS_OPEN = 1 ;
-    CONST TRITIUM_MARKET_STATUS_FINISHED = 2;
-    CONST TRITIUM_MARKET_STATUS_PENDING = 3;
+    CONST STATUS_CANCELED = 0;
+    CONST STATUS_OPEN = 1 ;
+    CONST STATUS_FINISHED = 2;
+    CONST STATUS_PENDING = 3;
 
     use HasFactory;
     protected $table = 'trading';
@@ -44,7 +44,7 @@ class Trading extends Model
             ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')
             ->join('players as p', 'p.id', '=', 'planeta.player')
             ->where('m.status', true)
-            ->where('t.status',  Trading::TRITIUM_MARKET_STATUS_OPEN)
+            ->where('t.status',  Trading::STATUS_OPEN)
             ->where('m.region', '=', $region)
             ->where('t.resource', '=', $resource)
             ->where('t.type', '=', $type)
@@ -68,7 +68,7 @@ class Trading extends Model
         $resources = DB::table('planets as p')
             ->leftJoin('trading as t', function ($join) {
                 $join->on('p.player', '=', 't.idPlanetCreator')
-                    ->where('t.status', Trading::TRITIUM_MARKET_STATUS_OPEN)
+                    ->where('t.status', Trading::STATUS_OPEN)
                     ->where('t.type', 'S');
             })
             ->leftJoin('players as pp', 'pp.id', '=', 'p.player')
@@ -85,7 +85,7 @@ class Trading extends Model
     }
     public function getAllOrderByPlanet($planet, $resource)
     {
-        $status = [Trading::TRITIUM_MARKET_STATUS_OPEN, Trading::TRITIUM_MARKET_STATUS_PENDING];
+        $status = [Trading::STATUS_OPEN, Trading::STATUS_PENDING];
         $orders = DB::table($this->table . ' as t')
             ->select(
                 't.id',

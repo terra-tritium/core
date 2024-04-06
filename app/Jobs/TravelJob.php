@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\Travel;
 use App\Services\SpaceCombatService;
 use App\Services\EspionadeService;
+use App\Services\TradingService;
 use Illuminate\Support\Facades\Log;
 
 class TravelJob implements ShouldQueue
@@ -69,13 +70,13 @@ class TravelJob implements ShouldQueue
                     break;
                 case Travel::TRANSPORT_BUY:
                     if($this->back){
-                        Log::info("foi realizar a compra, voltar carregado - fim");
+                        $tradingService = app(TradingService::class);
+                        $tradingService->realizaChegada($this->travelService, $currentTravel);
                         // $this->travelService->arrivedTransportOrigin($this->travel);
                     }else{
-                        Log::info("foi realizar a compra, esta indo, ao finalizar retornar - ajustar o tempo");
-                        $currentTravel->status = Travel::STATUS_RETURN;
-                        $currentTravel->save();
-                        TravelJob::dispatch($this->travelService, $currentTravel->id, true)->delay(now()->addSeconds(180));
+                        $tradingService = app(TradingService::class);
+                        $tradingService->realizaCompra($this->travelService, $currentTravel);
+                        
  
                         // TravelJob::dispatch($this->travelService, $this->travel->id, true)->delay(now()->addSeconds(180));
                         // $this->travelService->arrivedTransportResource($this->travel);

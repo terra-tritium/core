@@ -372,7 +372,7 @@ class TradingService
 
 
 
- 
+
 
             /**Inicio */
             $travel = new Travel();
@@ -387,19 +387,17 @@ class TradingService
             $travelTime = $distancia;
             $travel->arrival = $now + $travelTime;
             $travel->status = Travel::STATUS_ON_GOING;
-            if($trading->resource == 'Metal'){
-                $travel->metal = $trading->quantity;
-            }
-            if($trading->resource == 'Crystal'){
-                $travel->crystal = $trading->quantity;
-            }
-            if($trading->resource == 'Uranium'){
-                $travel->uranium = $trading->quantity;
-            }
+            $travel->trading = $trading->id;
             $successt = $travel->save();
-            TravelJob::dispatch($travelService, $travel->id, false)->delay(now()->addSeconds(180)); 
+            #debita a quantidade de cargueiro que será usado
+            $player = Player::find($travel->player);
+            $player->transportShips -= $transportShipsInUse;
+            $player->save();
 
-            return ['travel'=>$travel, 'success'=>$successt];
+
+            TravelJob::dispatch($travelService, $travel->id, false)->delay(now()->addSeconds(60));
+
+            return ['travel' => $travel, 'success' => $successt];
             /**Fim */
             $planetaInteressado = $request->type == 'S' ? $request->idPlanetPurch : $request->idPlanetSale;
             $success = $this->atualizaStatusTrading($trading, $planetaInteressado);
@@ -411,6 +409,89 @@ class TradingService
             }
         } catch (Exception $e) {
             return "erro " . $e->getMessage();
+        }
+    }
+    /**
+     * Cargueiro chegou no destino, deve realizar a retirada de recurso e iniciar viagem de volta
+     */
+    public function realizaCompra(TravelService $travelService, Travel $travel)
+    {
+        Log::info("foi realizar a compra, esta indo, ao finalizar retornar - ajustar o tempo 2");
+        $trading = Trading::find($travel->trading);
+        #Retirar do vendedor a quantidade de recurso necessária e entrega a energia - OK
+        if ($this->atualizaRecursoVendedor($trading)) {
+            if ($trading->resource == 'Metal') {
+                $travel->metal = $trading->quantity;
+            }
+            if ($trading->resource == 'Crystal') {
+                $travel->crystal = $trading->quantity;
+            }
+            if ($trading->resource == 'Uranium') {
+                $travel->uranium = $trading->quantity;
+            }
+        } else {
+            #Notificar
+            Log::info("notificar a situação, vendedor nao tem mais o recurso disponível");
+        }
+
+        $travel->status = Travel::STATUS_RETURN;
+        $travel->save();
+        #atualizar situação trading
+        TravelJob::dispatch($travelService, $travel->id, true)->delay(now()->addSeconds(60));
+    }
+    private function atualizaRecursoVendedor(Trading $trading)
+    {
+        if ($trading->type == 'S') {
+            $planet = Planet::find($trading->idPlanetCreator);
+            $keyResource = strtolower($trading->resource);
+            #sincronizar
+            if ($planet->{$keyResource} >= $trading->quantity) {
+                $planet->{$keyResource} -= $trading->quantity;
+                $planet->energy += $trading->total;
+                $planet->save();
+                $this->notify($planet->player,"Recurso recolhido, energia creditada", "Market");
+                return true;
+            } else {
+                #Notificar, devolver energia para o comprador, cancelar a trading
+                $this->notify($planet->player, "Quantidade de recurso insuficiente", "Market");
+                Log::info("Notificar e cancelar por falta de recurso");
+                return false;
+            }
+        }else{
+            Log::info("erro no type?");
+        }
+    }
+    /**
+     * Finaliza a transação de compra, o comprador recebe o recurso
+     * A transação não pode ter sido cancelada
+     */
+    private function finalizaCompra(Travel $travel){
+        Log::info("finaliza a transação de compra, comprador recebe o recurso");
+        $trading = Trading::find($travel->trading);
+        #sincronizar recursos
+        if($trading->type == 'S' && $trading->status != Trading::STATUS_CANCELED){
+            $planet = Planet::find($travel->from);
+            $keyResource = strtolower($trading->resource);
+            $planet->{$keyResource} += $trading->quantity;
+            $planet->save();
+            $this->notify($travel->player, "Recurso recebido", "Market");
+        }
+    }
+    /**
+     * Realiza o recebimento do cargueiro com o recurso
+     */
+    public function realizaChegada(TravelService $travelService, Travel $travel)
+    {
+        try {
+            Log::info("Devolvendo cargueiro, entregando recurso comprador- fim");
+            $player = Player::find($travel->player);
+            $player->transportShips += $travel->transportShips;
+            $player->save();
+            $this->finalizaCompra($travel);
+            $travel->status = Travel::STATUS_FINISHED;
+            $travel->save();
+        } catch (Exception $e) {
+            Log::info("TradingService - realizaChegada " . $e->getMessage());
         }
     }
     /**
