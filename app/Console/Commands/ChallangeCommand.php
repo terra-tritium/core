@@ -30,12 +30,11 @@ class ChallangeCommand extends Command
     public function handle()
     {
         try {
-            
-            //DB::table('planets')->insert("");
-
+            DB::table('planets')->update(['yellowTrit' => 1]);
         } catch (\Exception $exception) {
             Log::error('Erro ao executar starto do tritium challange: ' . $exception->getMessage());
         }
 
     }
 }
+ 
