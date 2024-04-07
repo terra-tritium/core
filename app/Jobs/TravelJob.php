@@ -71,20 +71,20 @@ class TravelJob implements ShouldQueue
                 case Travel::TRANSPORT_BUY:
                     if($this->back){
                         $tradingService = app(TradingService::class);
-                        $tradingService->realizaChegada($this->travelService, $currentTravel);
-                        // $this->travelService->arrivedTransportOrigin($this->travel);
+                        $tradingService->realizaChegada($this->travelService, $currentTravel); 
                     }else{
                         $tradingService = app(TradingService::class);
                         $tradingService->realizaCompra($this->travelService, $currentTravel);
-                        
- 
-                        // TravelJob::dispatch($this->travelService, $this->travel->id, true)->delay(now()->addSeconds(180));
-                        // $this->travelService->arrivedTransportResource($this->travel);
                     }
-                    //$this->travelService->starTransportBuy($this->travel);
                     break;
                 case Travel::TRANSPORT_SELL:
-                    //$this->travelService->starTransportSell($this->travel);
+                    if($this->back){
+                        $tradingService = app(TradingService::class);
+                        $tradingService->realizaChegada($this->travelService, $currentTravel); 
+                    }else{
+                        $tradingService = app(TradingService::class);
+                        $tradingService->realizaEnvio($this->travelService, $currentTravel);
+                    }
                     break;
                 case Travel::MISSION_EXPLORER:
                     //$this->travelService->starMissionExplorer($this->travel);
@@ -100,7 +100,5 @@ class TravelJob implements ShouldQueue
                     break;
             }
         }
-        Log::info("executou o fim da viagem");
-
     }
 }

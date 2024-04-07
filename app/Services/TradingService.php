@@ -218,17 +218,16 @@ class TradingService
                 }
                 $distance = $this->planetService->calculeDistance($planeta[0]->id, $planetaPassivo->id);
 
-
-                #teste travel trade
+                #O ativo esta comprando recurso, indo realizar a compra
                 return $this->safe($trading, $request, $distance, $planeta[0]->player, $planetaPassivo->player);
-                // Sair para a viagem antes de salvar na safe
-                if (!$this->safe($trading, $request, $distance, $planeta[0]->player, $planetaPassivo->player)) {
-                    return response(['message' => 'Algum erro na hora de comprar, verificar a causa', 'code' => 4006, 'success' => false], Response::HTTP_BAD_REQUEST);
-                }
-                $this->notify($planeta[0]->player, 'Seu cargueiro saiu para buscar o recurso', 'Market');
-                $this->notify($planetaPassivo->player, 'O comprador está vindo em sua direção', 'Market');
-                //retorno visual, deletar
-                return response(['Ativo' => $planeta[0], 'passivo' => $planetaPassivo, 'tipo' => $request->type, 'desc' => "ativo tem que ir buscar "]);
+                // // Sair para a viagem antes de salvar na safe
+                // if (!$this->safe($trading, $request, $distance, $planeta[0]->player, $planetaPassivo->player)) {
+                //     return response(['message' => 'Algum erro na hora de comprar, verificar a causa', 'code' => 4006, 'success' => false], Response::HTTP_BAD_REQUEST);
+                // }
+                // $this->notify($planeta[0]->player, 'Seu cargueiro saiu para buscar o recurso', 'Market');
+                // $this->notify($planetaPassivo->player, 'O comprador está vindo em sua direção', 'Market');
+                // //retorno visual, deletar
+                // return response(['Ativo' => $planeta[0], 'passivo' => $planetaPassivo, 'tipo' => $request->type, 'desc' => "ativo tem que ir buscar "]);
             } else {
                 $planetaPassivo = Planet::find($request->idPlanetPurch);
                 $panetaInteressado = $request->idPlanetSale;
@@ -248,6 +247,8 @@ class TradingService
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 $distance = $this->planetService->calculeDistance($planeta[0]->id, $planetaPassivo->id);
+                // return ["msg"=>"o ativo esta indo levar o recurso", "trading"=>$trading,"passivo"=>$planetaPassivo, "ativo"=>$planeta[0]->player];
+                return $this->safe($trading, $request, $distance, $planeta[0]->player, $planetaPassivo->player);
                 if (!$this->safe($trading, $request, $distance, $planetaPassivo->player, $planeta[0]->player)) {
                     return response(['message' => 'Algum erro na hora de vender, verificar a causa', 'code' => 4009, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
@@ -388,12 +389,24 @@ class TradingService
             $travel->arrival = $now + $travelTime;
             $travel->status = Travel::STATUS_ON_GOING;
             $travel->trading = $trading->id;
+            #o cargueiro tem que sair carregado de quem ta vendendo e debitar recursos
+            if ($request->type == 'P') {
+                $keyResource = strtolower($request->resource);
+                $travel->{$keyResource} = $request->quantity;
+                #debitando de quem esta indo vender
+                $planet = Planet::find($planetaOrigem);
+                $planet->{$keyResource} -= $request->quantity;
+                $planet->save();
+            }
             $successt = $travel->save();
             #debita a quantidade de cargueiro que será usado
             $player = Player::find($travel->player);
             $player->transportShips -= $transportShipsInUse;
             $player->save();
 
+            $planetaInteressado = $request->type == 'S' ? $request->idPlanetPurch : $request->idPlanetSale;
+            #descomentar
+            // $success = $this->atualizaStatusTrading($trading, $planetaInteressado);
 
             TravelJob::dispatch($travelService, $travel->id, false)->delay(now()->addSeconds(60));
 
@@ -410,6 +423,25 @@ class TradingService
         } catch (Exception $e) {
             return "erro " . $e->getMessage();
         }
+    }
+    /**
+     * Cargueiro ja sai carregado, vendedor está indo levar o recurso
+     */
+    public function realizaEnvio(TravelService $travelService, Travel $travel)
+    {
+        Log::info("Chegou no planeta do comprador, descarregar, somar recurso e retornar");
+        $trading = Trading::find($travel->trading);
+        $planet = Planet::find($travel->to);
+        #Entregar ao comprador a quantidade de recurso necessária 
+        $keyResource = strtolower($trading->resource);
+        $travel->{$keyResource} -= $trading->quantity;
+        $travel->status = Travel::STATUS_RETURN;
+        $travel->save();
+        $planet->{$keyResource} += $trading->quantity;
+        $planet->save();
+        $this->notify($travel->receptor,"O recurso chegou ao seu planeta","Market");
+        $this->notify($travel->player, "Recurso entregue, carrgueiro retornando com sua energia", "Market");
+        TravelJob::dispatch($travelService, $travel->id, true)->delay(now()->addSeconds(60));
     }
     /**
      * Cargueiro chegou no destino, deve realizar a retirada de recurso e iniciar viagem de volta
@@ -449,7 +481,7 @@ class TradingService
                 $planet->{$keyResource} -= $trading->quantity;
                 $planet->energy += $trading->total;
                 $planet->save();
-                $this->notify($planet->player,"Recurso recolhido, energia creditada", "Market");
+                $this->notify($planet->player, "Recurso recolhido, energia creditada", "Market");
                 return true;
             } else {
                 #Notificar, devolver energia para o comprador, cancelar a trading
@@ -457,24 +489,40 @@ class TradingService
                 Log::info("Notificar e cancelar por falta de recurso");
                 return false;
             }
-        }else{
+        } else {
             Log::info("erro no type?");
         }
     }
     /**
-     * Finaliza a transação de compra, o comprador recebe o recurso
+     * Finaliza a transação de compra, o comprador (ativo) recebe o recurso
+     * Finaliza a transação de venda, o vendedor (ativo) recebe a energia
      * A transação não pode ter sido cancelada
      */
-    private function finalizaCompra(Travel $travel){
+    private function finalizaCompra(Travel $travel)
+    {
         Log::info("finaliza a transação de compra, comprador recebe o recurso");
         $trading = Trading::find($travel->trading);
-        #sincronizar recursos
-        if($trading->type == 'S' && $trading->status != Trading::STATUS_CANCELED){
+        #sincronizar recursos 
+        if ($trading->type == 'S' && $trading->status != Trading::STATUS_CANCELED) {
             $planet = Planet::find($travel->from);
             $keyResource = strtolower($trading->resource);
             $planet->{$keyResource} += $trading->quantity;
             $planet->save();
-            $this->notify($travel->player, "Recurso recebido", "Market");
+            $this->notify($travel->player, "Recurso recebido e cargueiro devolvido", "Market");
+            $trading->status = Trading::STATUS_FINISHED;
+            $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
+            $trading->save();
+        }
+        #vendedor (ativo) recebe a energia
+        if($trading->type == 'P' && $trading->status != Trading::STATUS_CANCELED){
+            Log::info("FINALIZAR a venda");
+            $planet = Planet::find($travel->from);
+            $planet->energy += $trading->total;
+            $planet->save();
+            $this->notify($travel->player,"Energia Creditada", "Market");
+            $trading->status = Trading::STATUS_FINISHED;
+            $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
+            $trading->save();
         }
     }
     /**
@@ -501,7 +549,7 @@ class TradingService
     {
         $trade = Trading::find($trading->id);
         $trade->idPlanetInterested = $planetaInteressado;
-        $trade->status = config("app.tritium_market_status_pending");
+        $trade->status = Trading::STATUS_PENDING;
         $trade->currency = 'energy'; //default
         $trade->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
         return $trade->save();
