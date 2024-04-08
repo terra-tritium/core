@@ -24,6 +24,7 @@ use App\Http\Controllers\FleetController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ServerController;
+use App\Http\Controllers\ChallangeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -117,6 +118,10 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     });
     Route::group(['prefix' => 'ship', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [ShipController::class, 'list']);
+    });
+
+    Route::group(['prefix' => 'challange', 'middleware' => 'throttle:240,1'], function () {
+        Route::get('/start/{from}/{to}', [ChallangeController::class, 'startMission']);
     });
 
     Route::group(['prefix' => 'troop', 'middleware' => 'throttle:240,1'],function () {

@@ -1,19 +1,26 @@
 <?php
 
+
 namespace App\Http\Controllers;
+
+use App\Models\Player;
+use App\Models\Planet;
+use App\Services\ChallangeService;
+use Symfony\Component\HttpFoundation\Response;
 
 class ChallangeController extends Controller
 {
-    public function startMission ()
+    public function startMission ($from, $to)
     {
-        // $player = Player::getPlayerLogged();
+        $player = Player::getPlayerLogged();
 
-        // if (!$player) {
-        //     return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
-        // }
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
 
-        // $mission = Mission::where([['player','=', $player->id],['status', '=', 'pending']])->orderBy('date', 'desc')->limit(1)->get();
+        Planet::where([['id' => $from], ['player' => $player->id]])->firstOrFail();
 
-        // return response()->json($mission);
+        $challangeService = new ChallangeService();
+        $challangeService->startMission($player->id, $from, $to);
     }
 }
