@@ -44,7 +44,7 @@ class ChallangeJob implements ShouldQueue
                 $challangeService->executeMission($this->travel);
             }
         } catch (\Exception $e) {
-           
+           return $e->getMessage();
         }
     }
 }

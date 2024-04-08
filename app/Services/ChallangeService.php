@@ -78,7 +78,7 @@ class ChallangeService
         $planetFrom = Planet::findOrFail($travel->from);
         $planetTo = Planet::findOrFail($travel->to);
 
-        if ($planetFrom->yellotTrit > $planetTo->yellotTrit) {
+        if ($planetFrom->yellotTrit >= $planetTo->yellotTrit) {
 
             $yTrit = $planetTo->yellotTrit;
 
@@ -91,11 +91,6 @@ class ChallangeService
         } else {
             $logService = new LogService();
             $logService->notify($travel->player, 'You lost the challange in '. $planetTo->name .'!', 'Challange');
-        }
-
-        if ($planetFrom->yellotTrit == $planetTo->yellotTrit) {
-            $logService = new LogService();
-            $logService->notify($travel->player, 'You draw the challange in '. $planetTo->name .'!', 'Challange');
         }
 
         $travel->status = Travel::STATUS_FINISHED;
