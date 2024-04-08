@@ -18,7 +18,7 @@ class ChallangeController extends Controller
             return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
         }
 
-        Planet::where([['id' => $from], ['player' => $player->id]])->firstOrFail();
+        Planet::where([['id', '=', $from], ['player', '=', $player->id]])->firstOrFail();
 
         $challangeService = new ChallangeService();
         $challangeService->startMission($player->id, $from, $to);

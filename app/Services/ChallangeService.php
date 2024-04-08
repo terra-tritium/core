@@ -27,6 +27,7 @@ class ChallangeService
         $travel->player = $player;
         $travel->start = $now;
         $travel->arrival = $now + $travelTime;
+        $travel->receptor = 0;
         $travel->status = Travel::STATUS_ON_GOING;
 
         $travel->save();

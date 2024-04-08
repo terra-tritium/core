@@ -121,7 +121,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     });
 
     Route::group(['prefix' => 'challange', 'middleware' => 'throttle:240,1'], function () {
-        Route::get('/start/{from}/{to}', [ChallangeController::class, 'startMission']);
+        Route::post('/start/{from}/{to}', [ChallangeController::class, 'startMission']);
     });
 
     Route::group(['prefix' => 'troop', 'middleware' => 'throttle:240,1'],function () {
