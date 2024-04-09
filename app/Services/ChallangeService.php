@@ -35,6 +35,21 @@ class ChallangeService
         ChallangeJob::dispatch($travel)->delay(now()->addSeconds($travelTime));
     }
 
+    public function convert($player, $planetId) {
+        $planet = Planet::findOrFail($planetId);
+
+        if ($planet->yellowTrit > 0) {
+            $player->yellowTrit += $planet->yellowTrit;
+            $player->save();
+
+            $planet->yellowTrit = 0;
+            $planet->save();
+
+            $logService = new LogService();
+            $logService->notify($player, 'You converted '. $planet->yellowTrit .' yellow tritium from '. $planet->name .'!', 'Convert');
+        }
+    }
+
     public function endMission ($player, $from, $to)
     {
         $now = time();
