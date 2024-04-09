@@ -3,6 +3,7 @@
 namespace App\Services;
 use App\Models\Travel;
 use App\Models\Planet;
+use App\Models\Player;
 use App\Services\PlanetService;
 use App\Services\LogService;
 use App\Jobs\ChallangeJob;
@@ -35,18 +36,19 @@ class ChallangeService
         ChallangeJob::dispatch($travel)->delay(now()->addSeconds($travelTime));
     }
 
-    public function convert($player, $planetId) {
+    public function convert($playerId, $planetId) {
         $planet = Planet::findOrFail($planetId);
+        $player = Player::findOrFail($playerId);
 
         if ($planet->yellowTrit > 0) {
-            $player->yellowTrit += $planet->yellowTrit;
+            $player->tritium += $planet->yellowTrit;
             $player->save();
 
             $planet->yellowTrit = 0;
             $planet->save();
 
             $logService = new LogService();
-            $logService->notify($player, 'You converted '. $planet->yellowTrit .' yellow tritium from '. $planet->name .'!', 'Convert');
+            $logService->notify($player->id, 'You converted '. $planet->yellowTrit .' yellow tritium from '. $planet->name .'!', 'Convert');
         }
     }
 
@@ -94,7 +96,10 @@ class ChallangeService
         $planetFrom = Planet::findOrFail($travel->from);
         $planetTo = Planet::findOrFail($travel->to);
 
-        if ($planetFrom->yellowTrit >= $planetTo->yellowTrit) {
+        if (
+            ($planetFrom->yellowTrit >= $planetTo->yellowTrit) ||
+            ($planetFrom->yellowTrit == 0 && $planetTo->yellowTrit == 1)
+        ) {
 
             $yTrit = $planetTo->yellowTrit;
 

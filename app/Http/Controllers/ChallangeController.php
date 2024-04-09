@@ -38,7 +38,7 @@ class ChallangeController extends Controller
         }
 
         $challangeService = new ChallangeService();
-        $challangeService->convert($player, $planet);
+        $challangeService->convert($player->id, $planet);
 
         return response()->json("Success");
     }
