@@ -50,7 +50,8 @@ class ChallangeService
         $travel->player = $player;
         $travel->start = $now;
         $travel->arrival = $now + $travelTime;
-        $travel->status = Travel::STATUS_RETURN;
+        $travel->receptor = 0;
+        $travel->status = Travel::STATUS_ON_GOING;
 
         $travel->save();
 
@@ -78,12 +79,15 @@ class ChallangeService
         $planetFrom = Planet::findOrFail($travel->from);
         $planetTo = Planet::findOrFail($travel->to);
 
-        if ($planetFrom->yellotTrit >= $planetTo->yellotTrit) {
+        if ($planetFrom->yellowTrit >= $planetTo->yellowTrit) {
 
-            $yTrit = $planetTo->yellotTrit;
+            $yTrit = $planetTo->yellowTrit;
 
-            $planetFrom->yellotTrit += $planetTo->yellotTrit;
-            $planetTo->yellotTrit = 0;
+            $planetFrom->yellowTrit += $planetTo->yellowTrit;
+            $planetTo->yellowTrit = 0;
+
+            $planetFrom->save();
+            $planetTo->save();
 
             $logService = new LogService();
             $logService->notify($travel->player, 'You won the challange in '. $planetTo->name .'! You got '.$yTrit.' yellot tritium.', 'Challange');
@@ -95,6 +99,8 @@ class ChallangeService
 
         $travel->status = Travel::STATUS_FINISHED;
 
-        $this->endMission($travel->player, $travel->to, $travel->from);
+        $travel->save();
+
+        $this->endMission($travel->player, $travel->from, $travel->to);
     }
 }
