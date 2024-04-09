@@ -278,7 +278,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::patch('/cancel/{planet}/{id}', [TradingController::class, 'cancelOrder']);
         Route::get('/trading-process/{id}',[TradingController::class, 'getTradingProcess']);
         Route::post('/finish', [TradingController::class, 'finishTrading']);
-        Route::get('/safe/conclued',[TradingController::class, 'verificaTradeConcluidoSafe'] );
+        // Route::get('/safe/conclued',[TradingController::class, 'verificaTradeConcluidoSafe'] );
         Route::get('/last-trading',[TradingController::class, 'lastTrading'] );
         Route::patch('/buy-freighter/{planetId}',[TradingController::class, 'buyFreighter']);
         Route::get('/player/resource/{planet}',[TradingController::class, 'getPlayerResource']);
