@@ -389,7 +389,7 @@ class TradingService
             $travel->arrival = $now + $travelTime;
             $travel->status = Travel::STATUS_ON_GOING;
             $travel->trading = $trading->id;
-           
+
             #o cargueiro tem que sair carregado de quem ta vendendo e debitar recursos
             if ($request->type == 'P') {
                 $keyResource = strtolower($request->resource);
@@ -400,12 +400,12 @@ class TradingService
                 $planet->save();
             }
             #Recolhe a energia do comprador para entregar para o vendedor, ação pelo ativo comprando
-            if($request->type == 'S'){
+            if ($request->type == 'S') {
                 $planet = Planet::find($planetaOrigem);
                 $planet->energy -= $trading->total;
                 $planet->save();
-                $this->notify($destino, "Transação iniciada","Market");
             }
+            $this->notify($destino, "Transação iniciada", "Market");
             $successt = $travel->save();
             #debita a quantidade de cargueiro que será usado
             $player = Player::find($travel->player);
@@ -417,29 +417,41 @@ class TradingService
             $this->atualizaStatusTrading($trading, $planetaInteressado);
             TravelJob::dispatch($travelService, $travel->id, false)->delay(now()->addSeconds(60));
             return ['travel' => $travel, 'success' => $successt];
-            
         } catch (Exception $e) {
-            Log::info("Erro funcionalidade que inicia os jobs de finalização trade ".$e->getMessage());
+            Log::info("Erro funcionalidade que inicia os jobs de finalização trade " . $e->getMessage());
             return "erro " . $e->getMessage();
         }
     }
     /**
-     * Cargueiro ja sai carregado, vendedor está indo levar o recurso
+     * Cargueiro ja sai carregado, vendedor está indo levar o recurso, debitar energia do passivo que está comprando
      */
     public function realizaEnvio(TravelService $travelService, Travel $travel)
     {
         Log::info("Chegou no planeta do comprador, descarregar, somar recurso e retornar");
         $trading = Trading::find($travel->trading);
         $planet = Planet::find($travel->to);
-        #Entregar ao comprador a quantidade de recurso necessária 
         $keyResource = strtolower($trading->resource);
-        $travel->{$keyResource} -= $trading->quantity;
+        Log::info("SINCRONIZAR RECURSO");
+        if ($planet->energy >= $trading->total) {
+            #Entregar ao comprador a quantidade de recurso necessária 
+            $travel->{$keyResource} -= $trading->quantity;
+            $planet->energy -= $trading->total;
+            $planet->{$keyResource} += $trading->quantity;
+            $planet->save();
+            $this->notify($travel->receptor, "O recurso chegou ao seu planeta, energia debitada", "Market");
+            $this->notify($travel->player, "Recurso entregue, carrgueiro retornando com sua energia", "Market");
+        } else {
+            #Estorno de recurso
+            $trading->status = TRADING::STATUS_CANCELED;
+            $trading->save();
+            $planetAtivo = Planet::find($travel->from);
+            $planetAtivo->{$keyResource} += $trading->quantity;
+            $planetAtivo->save();
+            $this->notify($travel->player, "O comprador não possui energia suficiente, transação cancelada, recurso devolvido", "Market");
+            $this->notify($travel->receptor, "Energia insuficiente para completar a transação", "Market");
+        }
         $travel->status = Travel::STATUS_RETURN;
         $travel->save();
-        $planet->{$keyResource} += $trading->quantity;
-        $planet->save();
-        $this->notify($travel->receptor,"O recurso chegou ao seu planeta","Market");
-        $this->notify($travel->player, "Recurso entregue, carrgueiro retornando com sua energia", "Market");
         TravelJob::dispatch($travelService, $travel->id, true)->delay(now()->addSeconds(60));
     }
     /**
@@ -463,12 +475,12 @@ class TradingService
         } else {
             #Notificar
             Log::info("###notificar a situação, vendedor nao tem mais o recurso disponível");
-            Log::info("###planeta que deve receber novamente o recurso ".$travel->from." o valor de ".$trading->total );
+            Log::info("###planeta que deve receber novamente o recurso " . $travel->from . " o valor de " . $trading->total);
 
             $planet = Planet::find($travel->from);
             $planet->energy += $trading->total;
             $planet->save();
-            $this->notify($travel->player,"###O vendedor não possui mais recurso, transação cancelada", "Market");
+            $this->notify($travel->player, "###O vendedor não possui mais recurso, transação cancelada", "Market");
             // $this->notify($travel->raceptor, "Voc")
             $trading->status = Trading::STATUS_CANCELED;
             $trading->save();
@@ -485,6 +497,7 @@ class TradingService
             $planet = Planet::find($trading->idPlanetCreator);
             $keyResource = strtolower($trading->resource);
             #sincronizar
+            Log::info("SINCRONIZAR RECURSO");
             if ($planet->{$keyResource} >= $trading->quantity) {
                 $planet->{$keyResource} -= $trading->quantity;
                 $planet->energy += $trading->total;
@@ -522,20 +535,21 @@ class TradingService
             $trading->save();
         }
         #vendedor (ativo) recebe a energia
-        if($trading->type == 'P' && $trading->status != Trading::STATUS_CANCELED){
+        if ($trading->type == 'P' && $trading->status != Trading::STATUS_CANCELED) {
             Log::info("FINALIZAR a venda");
             $planet = Planet::find($travel->from);
             $planet->energy += $trading->total;
             $planet->save();
-            $this->notify($travel->player,"Energia Creditada", "Market");
+            $this->notify($travel->player, "Energia Creditada, cargueiro devolvido", "Market");
             $trading->status = Trading::STATUS_FINISHED;
             $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
             $trading->save();
         }
-        if($trading->status == Trading::STATUS_CANCELED){
-            Log::info("Transação não concluída por falta de recursos do vendedor, todos seus recursos utilizados foram devolvidos");
+        if ($trading->status == Trading::STATUS_CANCELED) {
+            $this->notify($travel->player,"Cargueiro devolvido","Market");
+            Log::info("Transação não concluída por falta de recursos por parte do passivo, todos seus recursos utilizados foram devolvidos");
             // $this->notify($travel->player,"Transação não concluída por falta de recursos do vendedor, todos seus recursos utilizados foram devolvidos", "Market");
-            
+
             // $trading->status = Trading::STATUS_FINISHED;
             // $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
             // $trading->save();
@@ -547,7 +561,7 @@ class TradingService
     public function realizaChegada(TravelService $travelService, Travel $travel)
     {
         try {
-            Log::info("Devolvendo cargueiro, entregando recurso comprador- fim");
+            Log::info("Devolvendo cargueiro, finalizando transações");
             $player = Player::find($travel->player);
             $player->transportShips += $travel->transportShips;
             $player->save();
@@ -571,7 +585,7 @@ class TradingService
         return $trade->save();
     }
 
-    
+
     public function getLastTrading()
     {
         try {
