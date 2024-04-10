@@ -29,8 +29,39 @@ class ChallangeCommand extends Command
      */
     public function handle()
     {
+
+        $multiplyFactor = 3;
+
         try {
+            
+            $planets = DB::table('planets as p')
+                ->select('p.id', 'p.name', 'p.yellowTrit')
+                ->orderBy('p.yellowTrit', 'desc')
+                ->limit(5)
+                ->get();
+
+            DB::table('challanges')->insert([
+                'first' => $planets[0]->id,
+                'second' => $planets[1]->id,
+                'third' => $planets[2]->id,
+                'fourth' => $planets[3]->id,
+                'fifth' => $planets[4]->id,
+                'firstScore' => $planets[0]->yellowTrit,
+                'secondScore' => $planets[1]->yellowTrit,
+                'thirdScore' => $planets[2]->yellowTrit,
+                'fourthScore' => $planets[3]->yellowTrit,
+                'fifthScore' => $planets[4]->yellowTrit
+            ]);
+
+            foreach ($planets as $planet) {
+                $player = DB::table('players')->where('planet', $planet->id)->first();
+                $player->tritium += ($planet->yellowTrit * $multiplyFactor);
+                $player->save();
+            }
+
             DB::table('planets')->update(['yellowTrit' => 1]);
+
+
         } catch (\Exception $exception) {
             Log::error('Erro ao executar starto do tritium challange: ' . $exception->getMessage());
         }
