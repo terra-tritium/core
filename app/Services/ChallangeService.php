@@ -34,6 +34,8 @@ class ChallangeService
         $travel->save();
 
         ChallangeJob::dispatch($travel)->delay(now()->addSeconds($travelTime));
+
+        return true;
     }
 
     public function mission($playerId, $planetId) {
@@ -92,7 +94,10 @@ class ChallangeService
 
     public function onMission ($planetId)
     {
-        $travel = Travel::where([['from', '=', $planetId], ['status', '=', Travel::STATUS_ON_GOING], ['status', '=', Travel::STATUS_RETURN]])->first();
+        $travel = Travel::
+                        where([['from', '=', $planetId], ['status', '=', Travel::STATUS_ON_GOING], ['action', '=', Travel::MISSION_CHALLANGE]])
+                        ->orWhere([['to', '=', $planetId], ['status', '=', Travel::STATUS_ON_GOING], ['action', '=', Travel::RETURN_CHALLANGE]])
+                        ->first();
 
         if ($travel) {
             return true;

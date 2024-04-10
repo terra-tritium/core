@@ -25,7 +25,11 @@ class ChallangeController extends Controller
         }
 
         $challangeService = new ChallangeService();
-        $challangeService->startMission($player->id, $from, $to);
+        $result = $challangeService->startMission($player->id, $from, $to);
+
+        if (!$result) {
+            return response()->json(['error' => 'Exist current mission'], Response::HTTP_ACCEPTED);
+        }
 
         return response()->json("Success");
     }
