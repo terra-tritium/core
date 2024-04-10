@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\Travel;
 use App\Models\Planet;
 use App\Models\Player;
+use App\Models\Challange;
 use App\Services\PlanetService;
 use App\Services\LogService;
 use App\Jobs\ChallangeJob;
@@ -36,6 +37,11 @@ class ChallangeService
         ChallangeJob::dispatch($travel)->delay(now()->addSeconds($travelTime));
 
         return true;
+    }
+
+    public function podium () {
+        $list = Challange::orderBy('id', 'desc')->limit(10)->get();
+        return $list;
     }
 
     public function mission($playerId, $planetId) {

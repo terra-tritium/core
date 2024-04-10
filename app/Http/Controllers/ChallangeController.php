@@ -34,6 +34,13 @@ class ChallangeController extends Controller
         return response()->json("Success");
     }
 
+    public function podium () {
+        $challangeService = new ChallangeService();
+        $podium = $challangeService->podium();
+
+        return response()->json($podium);
+    }
+
     public function mission ($planet) {
         $player = Player::getPlayerLogged();
 

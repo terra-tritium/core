@@ -10,16 +10,16 @@ return new class extends Migration
     {
         Schema::create('challanges', function (Blueprint $table) {
             $table->id()->index();
-            $table->integer("first");
-            $table->integer("second");
-            $table->integer("third");
-            $table->integer("fourth");
-            $table->integer("fifth");
-            $table->integer("firstScore");
-            $table->integer("secondScore");
-            $table->integer("thirdScore");
-            $table->integer("fourthScore");
-            $table->integer("fifthScore");
+            $table->integer("first")->default(0);
+            $table->integer("second")->default(0);
+            $table->integer("third")->default(0);
+            $table->integer("fourth")->default(0);
+            $table->integer("fifth")->default(0);
+            $table->integer("firstScore")->default(0);
+            $table->integer("secondScore")->default(0);
+            $table->integer("thirdScore")->default(0);
+            $table->integer("fourthScore")->default(0);
+            $table->integer("fifthScore")->default(0);
         });
     }
 
