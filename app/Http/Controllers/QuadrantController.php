@@ -139,15 +139,20 @@ class QuadrantController extends Controller
 
         $player = Player::getPlayerLogged();
 
-        $platet = new stdClass();
+        $platets = new stdClass();
 
-        $platet->origin = $origin;
-        $platet->destiny  =  $destiny;
+        $planetOrigin = Planet::find($origin);
+        $planetDestiny = Planet::find($destiny);
+
+        $platets->origin = $origin;
+        $platets->originName = $planetOrigin->quadrant.' : '.$planetOrigin->name ;
+        $platets->destiny  =  $destiny;
+        $platets->destinyName  =  $planetDestiny->quadrant.' : '.$planetDestiny->name ;
 
         $distante = $this->quadrantService->calcDistancePlanets($player, $origin, $destiny);
 
-        $platet->distance = $distante;
+        $platets->distance = $distante;
 
-        return $platet ;
+        return $platets ;
     }
 }
