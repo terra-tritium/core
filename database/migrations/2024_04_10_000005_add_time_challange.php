@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('challanges', function (Blueprint $table) {
-            $table->timestamp("created");
+            $table->bigInteger("start");
         });
     }
 

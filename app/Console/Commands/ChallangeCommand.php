@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Player;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -41,6 +42,7 @@ class ChallangeCommand extends Command
                 ->get();
 
             DB::table('challanges')->insert([
+                'start' => time(),
                 'first' => $planets[0]->id,
                 'second' => $planets[1]->id,
                 'third' => $planets[2]->id,
@@ -53,8 +55,15 @@ class ChallangeCommand extends Command
                 'fifthScore' => $planets[4]->yellowTrit
             ]);
 
+            $planets = DB::table('planets as p')
+                ->select('p.id', 'p.name', 'p.yellowTrit', 'p.player')
+                ->where('p.yellowTrit', '>', 1)
+                ->orderBy('p.yellowTrit', 'desc')
+                ->limit(5)
+                ->get();
+
             foreach ($planets as $planet) {
-                $player = DB::table('players')->where('planet', $planet->id)->first();
+                $player = Player::find($planet->player);
                 $player->tritium += ($planet->yellowTrit * $multiplyFactor);
                 $player->save();
             }
