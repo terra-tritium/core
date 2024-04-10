@@ -30,6 +30,19 @@ class ChallangeController extends Controller
         return response()->json("Success");
     }
 
+    public function mission ($planet) {
+        $player = Player::getPlayerLogged();
+
+        if (!$player) {
+            return response()->json(['error' => 'Unauthenticated player.'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $challangeService = new ChallangeService();
+        $missions = $challangeService->mission($player->id, $planet);
+
+        return response()->json($missions);
+    }
+
     public function convert($planet) {
         $player = Player::getPlayerLogged();
 

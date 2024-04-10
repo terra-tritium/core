@@ -36,6 +36,16 @@ class ChallangeService
         ChallangeJob::dispatch($travel)->delay(now()->addSeconds($travelTime));
     }
 
+    public function mission($playerId, $planetId) {
+
+        $mission = Travel::with('from', 'to')
+                            ->where([['player', $playerId], ['from', $planetId], ['status', Travel::STATUS_ON_GOING], ['action', '=', Travel::MISSION_CHALLANGE]])
+                            ->orWhere([['player', $playerId], ['to', $planetId], ['status', Travel::STATUS_ON_GOING], ['action', '=', Travel::RETURN_CHALLANGE]])
+                            ->first();
+
+        return $mission;
+    }
+
     public function convert($playerId, $planetId) {
         $planet = Planet::findOrFail($planetId);
         $player = Player::findOrFail($playerId);
@@ -48,7 +58,7 @@ class ChallangeService
             $planet->save();
 
             $logService = new LogService();
-            $logService->notify($player->id, 'You converted '. $planet->yellowTrit .' yellow tritium from '. $planet->name .'!', 'Convert');
+            $logService->notify($player->id, 'You converted '. $planet->yellowTrit .' power tritium from '. $planet->name .'!', 'Convert');
         }
     }
 
@@ -110,7 +120,7 @@ class ChallangeService
             $planetTo->save();
 
             $logService = new LogService();
-            $logService->notify($travel->player, 'You won the challange in '. $planetTo->name .'! You got '.$yTrit.' yellot tritium.', 'Challange');
+            $logService->notify($travel->player, 'You won the challange in '. $planetTo->name .'! You got '.$yTrit.' power tritium.', 'Challange');
 
         } else {
             $logService = new LogService();

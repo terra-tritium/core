@@ -123,6 +123,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::group(['prefix' => 'challange', 'middleware' => 'throttle:240,1'], function () {
         Route::post('/start/{from}/{to}', [ChallangeController::class, 'startMission']);
         Route::post('/convert/{planet}', [ChallangeController::class, 'convert']);
+        Route::get('/mission/{planet}', [ChallangeController::class, 'mission']);
     });
 
     Route::group(['prefix' => 'troop', 'middleware' => 'throttle:240,1'],function () {
