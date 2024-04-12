@@ -128,7 +128,7 @@ class TravelService
 
         TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
 
-        return $newTravel;
+        return "success";
     }
 
     private function removeTransportShips ($player, $qtd) {
@@ -146,7 +146,7 @@ class TravelService
 
     private function validateTransportShip($playerId, $qtd) {
         $player = Player::find($playerId);
-        if ($player->transportShips == $qtd) {
+        if ($player->transportShips >= $qtd) {
             return true;
         } else {
             return false;
