@@ -16,6 +16,8 @@ class ChallangeService
     {
         if ($this->onMission($from)) { return false; }
 
+        if ($from == $to) { return false; }
+
         $now = time();
 
         $planetService = new PlanetService();
