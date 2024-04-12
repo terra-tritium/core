@@ -49,6 +49,10 @@ class TravelService
             return "Impossible travel";
         }
 
+        if (!$this->validateTransportShip($player, $travel->transportShips)) {
+            return "You don't have enough transport ships";
+        }
+
         if ($travel->action === Travel::ATTACK_TROOP && !isset($travel->troop))  {
             return "Set the troop";
         } elseif ($travel->action === Travel::ATTACK_TROOP) {
@@ -138,6 +142,15 @@ class TravelService
         }
 
         return true;
+    }
+
+    private function validateTransportShip($playerId, $qtd) {
+        $player = Player::find($playerId);
+        if ($player->transportShips == $qtd) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private function startAttackFleet($travel, $req, $player) {
