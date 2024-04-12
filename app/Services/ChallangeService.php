@@ -58,15 +58,20 @@ class ChallangeService
         $planet = Planet::findOrFail($planetId);
         $player = Player::findOrFail($playerId);
 
-        if ($planet->yellowTrit > 0) {
-            $player->tritium += $planet->yellowTrit;
-            $player->save();
+        $mission = Travel::where([['from', $planetId], ['status', Travel::STATUS_ON_GOING], ['action', '=', Travel::MISSION_CHALLANGE]])
+                        ->orWhere([['to', $planetId], ['status', Travel::STATUS_ON_GOING], ['action', '=', Travel::MISSION_CHALLANGE]]);
 
-            $planet->yellowTrit = 0;
-            $planet->save();
-
-            $logService = new LogService();
-            $logService->notify($player->id, 'You converted '. $planet->yellowTrit .' power tritium from '. $planet->name .'!', 'Convert');
+        if ($mission->count() <= 0) {
+            if ($planet->yellowTrit > 0) {
+                $player->tritium += $planet->yellowTrit;
+                $player->save();
+    
+                $planet->yellowTrit = 0;
+                $planet->save();
+    
+                $logService = new LogService();
+                $logService->notify($player->id, 'You converted '. $planet->yellowTrit .' power tritium from '. $planet->name .'!', 'Convert');
+            }
         }
     }
 
