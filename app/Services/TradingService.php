@@ -537,11 +537,6 @@ class TradingService
         if ($trading->status == Trading::STATUS_CANCELED  || $trading->status == Trading::SATUS_CANCELLED_INSUFFICIENT_RESOURCES) {
             $this->notify($travel->player, "Cargueiro devolvido", "Market");
             Log::info("Transação não concluída por falta de recursos por parte do passivo, todos seus recursos utilizados foram devolvidos");
-            // $this->notify($travel->player,"Transação não concluída por falta de recursos do vendedor, todos seus recursos utilizados foram devolvidos", "Market");
-
-            // $trading->status = Trading::STATUS_FINISHED;
-            // $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
-            // $trading->save();
         }
     }
     /** 
@@ -593,12 +588,7 @@ class TradingService
     {
         $safe = new Safe();
         $dadosSafe = $safe->getDadosSafe();
-        // $filtrado = $this->getDeliveryTimeConclued($dadosSafe);
-        // $atualizar = $this->atualizaTradingMetadeTempoConcluido($filtrado['metadeTempo']);
-        // $executados = $this->updateResourceTradeConclued($filtrado['concluido']);
-        // $parcial = $this->updateTradeParcial($filtrado['conclusaoParcial']);
-        // $saveFinish = $this->saveTradeFinish($filtrado['concluido']);
-        // $delete = $this->deleteTradingConcluidos($filtrado['concluido']);
+   
 
         return response([
             'message' => 'Finish', 'success' => true,
