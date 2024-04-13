@@ -109,6 +109,8 @@ class ChallangeService
     {
         $travel = Travel::
                         where([['from', '=', $planetId], ['status', '=', Travel::STATUS_ON_GOING], ['action', '=', Travel::MISSION_CHALLANGE]])
+                        ->orWhere([['from', '=', $planetId], ['status', '=', Travel::STATUS_ON_GOING], ['action', '=', Travel::RETURN_CHALLANGE]])
+                        ->orWhere([['to', '=', $planetId], ['status', '=', Travel::STATUS_ON_GOING], ['action', '=', Travel::MISSION_CHALLANGE]])
                         ->orWhere([['to', '=', $planetId], ['status', '=', Travel::STATUS_ON_GOING], ['action', '=', Travel::RETURN_CHALLANGE]])
                         ->first();
 
@@ -139,12 +141,12 @@ class ChallangeService
 
             $logService = new LogService();
             $logService->notify($travel->player, 'You won the challange in '. $planetTo->name .':'.$planetTo->quadrant.'! You got '.$yTrit.' power tritium.', 'Challange');
-            $logService->notify($planetTo->player, $planetTo->name .':'.$planetTo->quadrant. 'stole your power tritium in '. $planetTo->name .':'.$planetTo->quadrant.'! You lost '.$yTrit.' power tritium.', 'Challange');
+            $logService->notify($planetTo->player, $planetFrom->name .':'.$planetFrom->quadrant. ' stole your power tritium in '. $planetTo->name .':'.$planetTo->quadrant.'! You lost '.$yTrit.' power tritium.', 'Challange');
 
         } else {
             $logService = new LogService();
             $logService->notify($travel->player, 'You lost the challange in '. $planetTo->name .':'.$planetTo->quadrant.'!', 'Challange');
-            $logService->notify($planetTo->player, $planetTo->name .':'.$planetTo->quadrant. 'stole your power tritium in ' . $planetTo->name .':'.$planetTo->quadrant.'!', 'Challange');
+            $logService->notify($planetTo->player, $planetFrom->name .':'.$planetFrom->quadrant.' tried to steal power tritium but without success!', 'Challange');
         }
 
         $travel->status = Travel::STATUS_FINISHED;
