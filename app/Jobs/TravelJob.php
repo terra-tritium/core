@@ -41,7 +41,6 @@ class TravelJob implements ShouldQueue
     public function handle()
     {
         $currentTravel = Travel::where('id',$this->travel)->whereNotIn('status',[Travel::STATUS_CANCEL])->first();
-        Log::info("executou o inicio da viagem". json_encode($currentTravel));
         if ($currentTravel) {
             $currentTravel->status = Travel::STATUS_FINISHED;
             $currentTravel->save();

@@ -220,7 +220,7 @@ class TradingService
                 if ($request->currency == 'energy') {
                     $total = $request->price * $request->quantity;
                     if ($total > $planeta->energy) {
-                        $this->notify($planeta->player, "saldo insuficiente para concluira a transação", "Market");
+                        $this->notify($planeta->player, "saldo insuficiente para concluir a transação", "Market");
                         return response(['message' => 'Você não possui saldo suficiente para concluir a transação', 'code' => 4004, 'success' => false], Response::HTTP_BAD_REQUEST);
                     }
                 } else {
@@ -353,7 +353,20 @@ class TradingService
                 $travel->{$keyResource} = $request->quantity;
                 #debitando de quem esta indo vender
                 $planet = Planet::find($planetaOrigem);
-                $planet->{$keyResource} -= $request->quantity;
+                Log::info("ajustar aqui");
+                if($keyResource == "metal"){
+                    $planet->metal -= $request->quantity;
+                    $planet->timeMetal = time();
+                }
+                if($keyResource == "crystal"){
+                    $planet->crystal -= $request->quantity;
+                    $planet->timeCrystal = now();
+                }
+                if($keyResource == "uranium"){
+                    $planet->uranium -= $request->quantity;
+                    $planet->timeUranium = now();
+                }
+                // $planet->{$keyResource} -= $request->quantity;
                 $planet->save();
             }
             #Recolhe a energia do comprador para entregar para o vendedor, ação pelo ativo comprando
@@ -361,6 +374,8 @@ class TradingService
                 $planet = Planet::find($planetaOrigem);
                 $planet->energy -= $trading->total;
                 $planet->save();
+                // $planet = $this->planetService->removeEnergy($planet, $trading->total);
+                // $planet->save();
             }
             $this->notify($destino, "Transação iniciada", "Market");
             $successt = $travel->save();
@@ -384,7 +399,14 @@ class TradingService
     }
     /**
      * 0 - Energy, 1 - Metal, 2 - uranium, 3 - crystal 
-     * Cargueiro ja sai carregado, vendedor está indo levar o recurso, debitar energia do passivo que está comprando
+     * O cargueiro do vendedor (ativo) chega no planeta passivo
+     * - Verifica se o passivo (comprador) tem energia para pagar pelo recurso
+     * - Remove energia do passivo 
+     * - Entrega recurso para o passivo
+     * - Notifica as partes
+     * - Inicia viagem de volta
+     * (Metade da transação)
+     * 
      */
     public function realizaEnvio(TravelService $travelService, Travel $travel)
     {
@@ -397,17 +419,36 @@ class TradingService
         if ($this->planetService->enoughBalance($planet, $trading->total, 0)) {
             #Entregar ao comprador a quantidade de recurso necessária 
             $travel->{$keyResource} -= $trading->quantity;
-            $planet->energy -= $trading->total;
-            $planet->{$keyResource} += $trading->quantity;
+            // $planet->energy -= $trading->total;
+            // $planet->{$keyResource} += $trading->quantity;
+            $planet = $this->planetService->removeEnergy($planet,$trading->total);
+            if($keyResource == "metal"){
+                $planet = $this->planetService->addMetal($planet,$trading->quantity);
+            }
+            if($keyResource == "crystal"){
+                $planet = $this->planetService->addCrystal($planet,$trading->quantity);
+            }
+            if($keyResource == "uranium"){
+                $planet = $this->planetService->addUranium($planet,$trading->quantity);
+            }
             $planet->save();
             $this->notify($travel->receptor, "O recurso chegou ao seu planeta, energia debitada", "Market");
-            $this->notify($travel->player, "Recurso entregue, carrgueiro retornando com sua energia", "Market");
+            $this->notify($travel->player, "Recurso entregue, cargueiro retornando com sua energia", "Market");
         } else {
             #Estorno de recurso
             $trading->status = TRADING::SATUS_CANCELLED_INSUFFICIENT_RESOURCES;
             $trading->save();
             $planetAtivo = Planet::find($travel->from);
-            $planetAtivo->{$keyResource} += $trading->quantity;
+            // $planetAtivo->{$keyResource} += $trading->quantity;
+            if($keyResource == "metal"){
+                $planetAtivo = $this->planetService->addMetal($planetAtivo,$trading->quantity);
+            }
+            if($keyResource == "crystal"){
+                $planetAtivo = $this->planetService->addCrystal($planetAtivo,$trading->quantity);
+            }
+            if($keyResource == "uranium"){
+                $planetAtivo = $this->planetService->addUranium($planetAtivo,$trading->quantity);
+            }
             $planetAtivo->save();
             $this->notify($travel->player, "O comprador não possui energia suficiente, transação cancelada, recurso devolvido", "Market");
             $this->notify($travel->receptor, "Energia insuficiente para completar a transação", "Market");
@@ -422,11 +463,14 @@ class TradingService
         TravelJob::dispatch($travelService, $travel->id, true)->delay(now()->addSeconds($newDistancia));
     }
     /**
-     * Cargueiro chegou no destino, deve realizar a retirada de recurso e iniciar viagem de volta
+     * Cargueiro do Ativo chegou no destino para realizar a compra.
+     * - Verifica se o passivo (vendedor) ainda possui recurso suficiente
+     * - Retira a quantidade de recurso, 
+     * - Inicia viagem de volta
+     *  (Metade da transação concluída)
      */
     public function realizaCompra(TravelService $travelService, Travel $travel)
     {
-        Log::info("foi realizar a compra, esta indo, ao finalizar retornar - ajustar o tempo 2");
         $trading = Trading::find($travel->trading);
         #Retirar do vendedor a quantidade de recurso necessária e entrega a energia - OK
         if ($this->atualizaRecursoVendedor($trading)) {
@@ -448,7 +492,6 @@ class TradingService
             $planet->energy += $trading->total;
             $planet->save();
             $this->notify($travel->player, "###O vendedor não possui mais recurso, transação cancelada", "Market");
-            // $this->notify($travel->raceptor, "Voc")
             $trading->status = Trading::SATUS_CANCELLED_INSUFFICIENT_RESOURCES;
             $trading->save();
         }
@@ -489,8 +532,23 @@ class TradingService
 
             // if ($planet->{$keyResource} >= $trading->quantity) {
             if ($this->planetService->enoughBalance($planet, $trading->quantity, $typeResource)) {
-                $planet->{$keyResource} -= $trading->quantity;
+                // $planet->{$keyResource} -= $trading->quantity;
+                
                 $planet->energy += $trading->total;
+
+                if($keyResource == "metal"){
+                    $planet->metal -= $trading->quantity;
+                    $planet->timeMetal = time();
+                }
+                if($keyResource == "crystal"){
+                    $planet->crystal -= $trading->quantity;
+                    $planet->timeCrystal = now();
+                }
+                if($keyResource == "uranium"){
+                    $planet->uranium -= $trading->quantity;
+                    $planet->timeUranium = now();
+                }
+
                 $planet->save();
                 $this->notify($planet->player, "Recurso recolhido, energia creditada", "Market");
                 return true;
@@ -516,7 +574,19 @@ class TradingService
         if ($trading->type == 'S' && $trading->status != Trading::STATUS_CANCELED) {
             $planet = Planet::find($travel->from);
             $keyResource = strtolower($trading->resource);
-            $planet->{$keyResource} += $trading->quantity;
+            // $planet->{$keyResource} += $trading->quantity;
+
+            if($keyResource == "metal"){
+                $planet = $this->planetService->addMetal($planet,$trading->quantity);
+            }
+            if($keyResource == "crystal"){
+                $planet = $this->planetService->addCrystal($planet,$trading->quantity);
+            }
+            if($keyResource == "uranium"){
+                $planet = $this->planetService->addUranium($planet,$trading->quantity);
+            }
+
+
             $planet->save();
             $this->notify($travel->player, "Recurso recebido e cargueiro devolvido", "Market");
             $trading->status = Trading::STATUS_FINISHED;
@@ -541,6 +611,9 @@ class TradingService
     }
     /** 
      * Realiza o recebimento do cargueiro com o recurso
+     * - Finaliza a transação.
+     * - O ativo recebe os cargueiros utilizados
+     * - Finaliza a viagem
      */
     public function realizaChegada(TravelService $travelService, Travel $travel)
     {
