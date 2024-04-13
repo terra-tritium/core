@@ -414,6 +414,17 @@ class SpaceCombatService
 
     $planet->save();
 
+    # Log local pillage
+    $logService = new LogService();
+    $logService->notify(
+      $planet->player,
+      "After the combat some of its resources were looted, " 
+      . $travel->metal . " metal, " 
+      . $travel->crystal . " crystal and " 
+      . $travel->uranium . " uranium",
+      "Space Combat"
+    );
+
     return $stolen;
   }
 
