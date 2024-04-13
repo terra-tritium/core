@@ -38,11 +38,23 @@ class TradingService
         $player = Player::getPlayerLogged();
         return Planet::where('player', $player->id)->get();
     }
-    public function getAllTradingByMarketResource($resource, $type)
+    public function getAllTradingByMarketResource($planetId, $resource, $type)
     {
-        $planeta = $this->getPlanetUserLogged();
-        $trads = $this->trading->getDadosTradingByResourceAndMarket($planeta[0]->id, $resource, $planeta[0]->region, $type);
-        return $trads;
+        try {
+            // $planeta = $this->getPlanetUserLogged();
+            $planeta = Planet::find($planetId);
+            $trads = $this->trading->getDadosTradingByResourceAndMarket($planetId, $resource, $planeta->region, $type);
+
+            $tradsWithDistance = array();
+            foreach ($trads as $trad) {
+                $t = $trad;
+                $t->distance = $planetId != $trad->idPlanetCreator ? $this->planetService->calculeDistance($planetId, $trad->idPlanetCreator) : 0;
+                $tradsWithDistance[] = $t;
+            }
+            return response()->json($tradsWithDistance, Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json(["erro " => "erro find open tradings  " . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
     public function myResources()
     {
@@ -149,13 +161,20 @@ class TradingService
         }
         return response(['message' => 'Trading não encontrado', 'success' => false], Response::HTTP_NOT_FOUND);
     }
-    public function getTradingProcess($id)
+    public function getTradingProcess($planetId, $id)
     {
         try {
             if ($id) {
                 $trade = Trading::where('id', $id)
-                    ->where('status', config("app.tritium_market_status_open"))
+                    ->where('status', TRADING::STATUS_OPEN)
                     ->first();
+                $effectService = app(EffectService::class);
+                $player = Player::join('planets', 'planets.player', '=', 'players.id')
+                    ->select('players.*')
+                    ->where('planets.id', 4)
+                    ->first();
+                $distancia = $this->planetService->calculeDistance($planetId, $trade->idPlanetCreator);
+                $trade->distance = $effectService->calcTravelSpeed($distancia, $player);
                 return response()->json($trade, Response::HTTP_OK);
             }
             return response()->json(['message' => 'Trading nao encontrada', 'success' => false], Response::HTTP_NOT_FOUND);
@@ -176,13 +195,14 @@ class TradingService
             if (!$trading) {
                 return response(['message' => 'Trading não encontrado', 'success' => false], Response::HTTP_NOT_FOUND);
             }
-            if ($trading->status != config("app.tritium_market_status_open")) {
+            if ($trading->status !=  Trading::STATUS_OPEN) {
                 return response(['message' => 'Essa ordem não está mais disponível ', 'code' => 4001, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
             if ($request->price <= 0 || $request->quantity <= 0) {
                 return response(['message' => 'Quantidade e/ou preço devem ser superior a zero', 'code' => 4002, 'success' => false], Response::HTTP_BAD_REQUEST);
             }
-            $planeta = $this->getPlanetUserLogged();
+            // $planeta = $this->getPlanetUserLogged();
+            $planeta = Planet::findOrFail($request->planetAtivo);
             $player = Player::getPlayerLogged();
 
             //verificar se tem cargueiro para buscar
@@ -199,8 +219,8 @@ class TradingService
                 //verificar se tem saldo suficiente para compra
                 if ($request->currency == 'energy') {
                     $total = $request->price * $request->quantity;
-                    if ($total > $planeta[0]->energy) {
-                        $this->notify($planeta[0]->player, "saldo insuficiente para concluira a transação", "Market");
+                    if ($total > $planeta->energy) {
+                        $this->notify($planeta->player, "saldo insuficiente para concluira a transação", "Market");
                         return response(['message' => 'Você não possui saldo suficiente para concluir a transação', 'code' => 4004, 'success' => false], Response::HTTP_BAD_REQUEST);
                     }
                 } else {
@@ -208,7 +228,7 @@ class TradingService
                 }
 
                 if ($quantidade > $planetaPassivo->{$resourceKey}) {
-                    $status = config("app.tritium_market_status_canceled");
+                    $status = Trading::SATUS_CANCELLED_INSUFFICIENT_RESOURCES;
                     $trading->status = $status;
                     $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                     $trading->save();
@@ -216,10 +236,11 @@ class TradingService
                     $this->notify($planetaPassivo->player, "O vendedor não possui recurso para concluir essa transação", "Market");
                     return response(['message' => 'O vendedor não possui recurso para concluir essa transação', 'code' => 4005, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
-                $distance = $this->planetService->calculeDistance($planeta[0]->id, $planetaPassivo->id);
+                $distance = $this->planetService->calculeDistance($planeta->id, $planetaPassivo->id);
+
 
                 #O ativo esta comprando recurso, indo realizar a compra
-                return $this->safe($trading, $request, $distance, $planeta[0]->player, $planetaPassivo->player);
+                return $this->safe($trading, $request, $distance, $planeta->player, $planetaPassivo->player);
                 // // Sair para a viagem antes de salvar na safe
                 // if (!$this->safe($trading, $request, $distance, $planeta[0]->player, $planetaPassivo->player)) {
                 //     return response(['message' => 'Algum erro na hora de comprar, verificar a causa', 'code' => 4006, 'success' => false], Response::HTTP_BAD_REQUEST);
@@ -232,8 +253,8 @@ class TradingService
                 $planetaPassivo = Planet::find($request->idPlanetPurch);
                 $panetaInteressado = $request->idPlanetSale;
                 //verificar se o ativo (vendedor) possui a quantidade de recurso
-                if ($planeta[0]->{$resourceKey} < $request->quantity) {
-                    $this->notify($planeta[0]->player, "Você não possui essa quantidade de recurso para venda", "Market");
+                if ($planeta->{$resourceKey} < $request->quantity) {
+                    $this->notify($planeta->player, "Você não possui essa quantidade de recurso para venda", "Market");
                     return response(['message' => 'Você não possui essa quantidade de recurso para venda', 'code' => 4007, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 if ($request->currency == 'energy') {
@@ -246,16 +267,17 @@ class TradingService
                 } else {
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
-                $distance = $this->planetService->calculeDistance($planeta[0]->id, $planetaPassivo->id);
+                $distance = $this->planetService->calculeDistance($planeta->id, $planetaPassivo->id);
+
                 // return ["msg"=>"o ativo esta indo levar o recurso", "trading"=>$trading,"passivo"=>$planetaPassivo, "ativo"=>$planeta[0]->player];
-                return $this->safe($trading, $request, $distance, $planeta[0]->player, $planetaPassivo->player);
-                if (!$this->safe($trading, $request, $distance, $planetaPassivo->player, $planeta[0]->player)) {
+                return $this->safe($trading, $request, $distance, $planeta->player, $planetaPassivo->player);
+                if (!$this->safe($trading, $request, $distance, $planetaPassivo->player, $planeta->player)) {
                     return response(['message' => 'Algum erro na hora de vender, verificar a causa', 'code' => 4009, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 //retorno visual, deletar
-                $this->notify($planeta[0]->player, 'Seu cargueiro saiu para buscar o recurso ?', 'Market');
+                $this->notify($planeta->player, 'Seu cargueiro saiu para buscar o recurso ?', 'Market');
                 $this->notify($planetaPassivo->player, 'O comprador está vindo em sua direção ?', 'Market');
-                return response(['Ativo' => $planeta[0], 'passivo' => $planetaPassivo, 'tipo' => $request->type, 'desc' => "ativo tem que entregra de imediato"]);
+                return response(['Ativo' => $planeta, 'passivo' => $planetaPassivo, 'tipo' => $request->type, 'desc' => "ativo tem que entregra de imediato"]);
             }
         } catch (Exception $e) {
             return response(["message" => "error " . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -266,79 +288,13 @@ class TradingService
         ], Response::HTTP_OK);
     }
 
-    /**
-     * $from Ativo
-     * $to passivo
-     */
-    public function calcDistance($from, $to)
-    {
-        $positionFrom = $this->convertPosition($from);
-        $positionTo = $this->convertPosition($to);
-        if (!($positionFrom && $positionTo)) {
-            return false;
-        }
-        $diffRegion = abs(ord($positionFrom->region) - ord($positionTo->region));
-        $diffQuadrant = abs($positionFrom->quadrant - $positionTo->quadrant);
-        $diffPosition = abs($positionFrom->position - $positionTo->position);
-        // return ['diiffRegion' =>$diffRegion, 'diffQuadrant' => $diffQuadrant, 'diffPosition' => $diffPosition, 'calc' =>($diffRegion * 100) + ($diffQuadrant * 10) + $diffPosition];
-        return ($diffRegion * 100) + ($diffQuadrant * 10) + $diffPosition;
-    }
-
-    public function convertPosition($location)
-    {
-        $position = new Position();
-        $position->region = substr($location->region, 0, 1);
-        $position->quadrant = substr($location->quadrant, 1, 3);
-        $position->quadrant_full = substr($location->quadrant, 0, 4);
-        $position->position = $location->position;
-        if (!$this->isValidRegion($position->region)) {
-            return false;
-        }
-        if (!$this->isValidQuadrant($position->quadrant)) {
-            return false;
-        }
-        if (!$this->isValidPosition($position->position)) {
-            return false;
-        }
-
-        return $position;
-    }
-
-    public function isValidRegion($letter)
-    {
-        $valorAscii = ord($letter);
-        $valorAsciiA = ord('A');
-        $valorAsciiP = ord('P');
-        if ($valorAscii >= $valorAsciiA && $valorAscii <= $valorAsciiP) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function isValidQuadrant($quadrant)
-    {
-        if ($quadrant >= 0 && $quadrant < 100) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function isValidPosition($position)
-    {
-        if ($position > 0 && $position <= 16) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     public function safe(Trading $trading, $request, $distancia, $origem, $destino)
     {
         $planetaOrigem = $request->type == 'P' ? $request->idPlanetSale : $request->idPlanetPurch;
         $planetaDestino = $request->type == 'S' ? $request->idPlanetSale : $request->idPlanetPurch;
         $now = time();
+        Log::info("A distancia entre os planetas é de ----> " . $distancia . " ida e volta tem que ser de " . $distancia * 2);
 
         // return ['JogadorOrigem' => $origem, 'JogadorDestino' => $destino, 
         //         'PlanetaOrigem' => $planetaOrigem, 'PlanetaDestino' => $planetaDestino, 'trading' => $trading,
@@ -377,6 +333,7 @@ class TradingService
 
             /**Inicio */
             $travel = new Travel();
+            $effectService = app(EffectService::class);
             $travel->player = $origem;
             $travel->receptor = $destino;
             $travel->from = $planetaOrigem;
@@ -414,8 +371,11 @@ class TradingService
 
             $planetaInteressado = $request->type == 'S' ? $request->idPlanetPurch : $request->idPlanetSale;
             #descomentar
-            $this->atualizaStatusTrading($trading, $planetaInteressado);
-            TravelJob::dispatch($travelService, $travel->id, false)->delay(now()->addSeconds(60));
+            $this->atualizaStatusTrading($trading, $planetaInteressado, $distancia);
+
+            /**aplica o efeito do game mode */
+            $newDistancia = $effectService->calcTravelSpeed($distancia, $player);
+            TravelJob::dispatch($travelService, $travel->id, false)->delay(now()->addSeconds($newDistancia));
             return ['travel' => $travel, 'success' => $successt];
         } catch (Exception $e) {
             Log::info("Erro funcionalidade que inicia os jobs de finalização trade " . $e->getMessage());
@@ -444,7 +404,7 @@ class TradingService
             $this->notify($travel->player, "Recurso entregue, carrgueiro retornando com sua energia", "Market");
         } else {
             #Estorno de recurso
-            $trading->status = TRADING::STATUS_CANCELED;
+            $trading->status = TRADING::SATUS_CANCELLED_INSUFFICIENT_RESOURCES;
             $trading->save();
             $planetAtivo = Planet::find($travel->from);
             $planetAtivo->{$keyResource} += $trading->quantity;
@@ -453,8 +413,13 @@ class TradingService
             $this->notify($travel->receptor, "Energia insuficiente para completar a transação", "Market");
         }
         $travel->status = Travel::STATUS_RETURN;
+        $travel->arrival += $trading->distance;
         $travel->save();
-        TravelJob::dispatch($travelService, $travel->id, true)->delay(now()->addSeconds(60));
+        /**aplica o efeito do game mode */
+        $effectService = app(EffectService::class);
+
+        $newDistancia = $effectService->calcTravelSpeed($trading->distance, Player::find($travel->player));
+        TravelJob::dispatch($travelService, $travel->id, true)->delay(now()->addSeconds($newDistancia));
     }
     /**
      * Cargueiro chegou no destino, deve realizar a retirada de recurso e iniciar viagem de volta
@@ -484,14 +449,20 @@ class TradingService
             $planet->save();
             $this->notify($travel->player, "###O vendedor não possui mais recurso, transação cancelada", "Market");
             // $this->notify($travel->raceptor, "Voc")
-            $trading->status = Trading::STATUS_CANCELED;
+            $trading->status = Trading::SATUS_CANCELLED_INSUFFICIENT_RESOURCES;
             $trading->save();
         }
 
         $travel->status = Travel::STATUS_RETURN;
+        $travel->arrival += $trading->distance;
         $travel->save();
+        /**aplica o efeito do game mode */
+        $effectService = app(EffectService::class);
+
+        $newDistancia = $effectService->calcTravelSpeed($trading->distance, Player::find($travel->player));
+
         #atualizar situação trading
-        TravelJob::dispatch($travelService, $travel->id, true)->delay(now()->addSeconds(60));
+        TravelJob::dispatch($travelService, $travel->id, true)->delay(now()->addSeconds($newDistancia));
     }
     /**
      * 0 - Energy, 1 - Metal, 2 - uranium, 3 - crystal 
@@ -515,6 +486,7 @@ class TradingService
                 default:
                     $typeResource = 0;
             }
+
             // if ($planet->{$keyResource} >= $trading->quantity) {
             if ($this->planetService->enoughBalance($planet, $trading->quantity, $typeResource)) {
                 $planet->{$keyResource} -= $trading->quantity;
@@ -552,7 +524,7 @@ class TradingService
             $trading->save();
         }
         #vendedor (ativo) recebe a energia
-        if ($trading->type == 'P' && $trading->status != Trading::STATUS_CANCELED) {
+        if ($trading->type == 'P' && $trading->status != Trading::STATUS_CANCELED && $trading->status != Trading::SATUS_CANCELLED_INSUFFICIENT_RESOURCES) {
             Log::info("FINALIZAR a venda");
             $planet = Planet::find($travel->from);
             $planet->energy += $trading->total;
@@ -562,7 +534,7 @@ class TradingService
             $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
             $trading->save();
         }
-        if ($trading->status == Trading::STATUS_CANCELED) {
+        if ($trading->status == Trading::STATUS_CANCELED  || $trading->status == Trading::SATUS_CANCELLED_INSUFFICIENT_RESOURCES) {
             $this->notify($travel->player, "Cargueiro devolvido", "Market");
             Log::info("Transação não concluída por falta de recursos por parte do passivo, todos seus recursos utilizados foram devolvidos");
             // $this->notify($travel->player,"Transação não concluída por falta de recursos do vendedor, todos seus recursos utilizados foram devolvidos", "Market");
@@ -591,13 +563,15 @@ class TradingService
     }
     /**
      * @todo alterar o currency quando tiver tratando com tritium
+     * Altera a situação da transação e a distancia entre os planetas
      */
-    private function atualizaStatusTrading(Trading $trading, $planetaInteressado)
+    private function atualizaStatusTrading(Trading $trading, $planetaInteressado, $distancia)
     {
         $trade = Trading::find($trading->id);
         $trade->idPlanetInterested = $planetaInteressado;
         $trade->status = Trading::STATUS_PENDING;
         $trade->currency = 'energy'; //default
+        $trade->distance = $distancia;
         $trade->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
         return $trade->save();
     }

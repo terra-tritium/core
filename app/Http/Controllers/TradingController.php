@@ -74,9 +74,9 @@ class TradingController extends Controller
     }
 
 
-    public function getAllTradingByMarketResource($resource, $type)
+    public function getAllTradingByMarketResource($planetId, $resource, $type)
     {
-        return $this->tradingService->getAllTradingByMarketResource($resource, $type);
+        return $this->tradingService->getAllTradingByMarketResource($planetId, $resource, $type);
     }
 
     public function getPlayerResource($planet)
@@ -122,9 +122,9 @@ class TradingController extends Controller
     {
         return $this->tradingService->cancelOrder($planet, $id);
     }
-    public function getTradingProcess($id)
+    public function getTradingProcess($planetId, $id)
     {
-        return $this->tradingService->getTradingProcess($id);
+        return $this->tradingService->getTradingProcess($planetId,$id);
     }
     public function finishTrading(Request $request)
     {

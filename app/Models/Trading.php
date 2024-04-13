@@ -12,6 +12,7 @@ class Trading extends Model
     CONST STATUS_OPEN = 1 ;
     CONST STATUS_FINISHED = 2;
     CONST STATUS_PENDING = 3;
+    CONST SATUS_CANCELLED_INSUFFICIENT_RESOURCES = 4;
 
     use HasFactory;
     protected $table = 'trading';
@@ -37,8 +38,8 @@ class Trading extends Model
         $trading = DB::table($this->table . ' as t')
             ->select(
                 "t.*",
-                "p.name",
-                DB::raw("(SELECT origin.calc_distancia(p.id, $idPlanetaLogado)) AS distance"),
+                "p.name"
+                // DB::raw("(SELECT origin.calc_distancia(p.id, $idPlanetaLogado)) AS distance"),
             )
             ->join('market as m', 'm.id', '=', 't.idMarket')
             ->join('planets as planeta', 'planeta.id', '=', 't.idPlanetCreator')
@@ -48,7 +49,7 @@ class Trading extends Model
             ->where('m.region', '=', $region)
             ->where('t.resource', '=', $resource)
             ->where('t.type', '=', $type)
-            ->orderBy('distance')
+            // ->orderBy('distance')
             // ->orderBy($columnOrder, $orderByDirection)
             ->get();
         return $trading;
