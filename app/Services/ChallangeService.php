@@ -141,12 +141,16 @@ class ChallangeService
 
             $logService = new LogService();
             $logService->notify($travel->player, 'You won the challange in '. $planetTo->name .':'.$planetTo->quadrant.'! You got '.$yTrit.' power tritium.', 'Challange');
-            $logService->notify($planetTo->player, $planetFrom->name .':'.$planetFrom->quadrant. ' stole your power tritium in '. $planetTo->name .':'.$planetTo->quadrant.'! You lost '.$yTrit.' power tritium.', 'Challange');
+            if ($planetTo->player != null) {
+                $logService->notify($planetTo->player, $planetFrom->name .':'.$planetFrom->quadrant. ' stole your power tritium in '. $planetTo->name .':'.$planetTo->quadrant.'! You lost '.$yTrit.' power tritium.', 'Challange');
+            }
 
         } else {
             $logService = new LogService();
             $logService->notify($travel->player, 'You lost the challange in '. $planetTo->name .':'.$planetTo->quadrant.'!', 'Challange');
-            $logService->notify($planetTo->player, $planetFrom->name .':'.$planetFrom->quadrant.' tried to steal power tritium but without success!', 'Challange');
+            if ($planetTo->player != null) {
+                $logService->notify($planetTo->player, $planetFrom->name .':'.$planetFrom->quadrant.' tried to steal power tritium but without success!', 'Challange');
+            }
         }
 
         $travel->status = Travel::STATUS_FINISHED;
