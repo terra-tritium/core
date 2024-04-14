@@ -49,6 +49,10 @@ class TravelService
             return "Impossible travel";
         }
 
+        if (!$this->validateTransportShip($player, $travel->transportShips)) {
+            return "You don't have enough transport ships";
+        }
+
         if ($travel->action === Travel::ATTACK_TROOP && !isset($travel->troop))  {
             return "Set the troop";
         } elseif ($travel->action === Travel::ATTACK_TROOP) {
@@ -124,7 +128,7 @@ class TravelService
 
         TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
 
-        return $newTravel;
+        return "success";
     }
 
     private function removeTransportShips ($player, $qtd) {
@@ -138,6 +142,15 @@ class TravelService
         }
 
         return true;
+    }
+
+    private function validateTransportShip($playerId, $qtd) {
+        $player = Player::find($playerId);
+        if ($player->transportShips >= $qtd) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private function startAttackFleet($travel, $req, $player) {
@@ -552,6 +565,8 @@ class TravelService
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_TROOP]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_FLEET]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_TROOP]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::MISSION_CHALLANGE]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_CHALLANGE]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_FLEET]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_FLEET]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_TROOP]]);
@@ -565,6 +580,8 @@ class TravelService
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_TROOP]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_FLEET]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_TROOP]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::MISSION_CHALLANGE]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_CHALLANGE]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_FLEET]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_FLEET]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_TROOP]]);
