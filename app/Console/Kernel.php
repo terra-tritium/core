@@ -22,7 +22,7 @@ class Kernel extends ConsoleKernel
         //$schedule->command('cache:prune-stale-tags')->hourly();
 
         $schedule->command('rankings:update')->everyThirtyMinutes();
-        $schedule->command('challange:start')->cron('0 12 */1 * *');
+        $schedule->command('challange:start')->cron('0 12 */15 * *');
         $schedule->command('energy:update')->everyThirtyMinutes();
         $schedule->command('aliances-rankings:update')->everyThirtyMinutes();
         // $schedule->command('trade:verifytrades')->everyFiveMinutes();
