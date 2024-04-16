@@ -134,13 +134,7 @@ class TravelService
     private function removeTransportShips ($player, $qtd) {
         $player = Player::find($player);
         $player->transportShips -= $qtd;
-
-        if ($player->transportShips < 0) {
-            return false;
-        } else {
-            $player->save();
-        }
-
+        $player->save();
         return true;
     }
 
@@ -155,10 +149,7 @@ class TravelService
 
     private function startAttackFleet($travel, $req, $player) {
 
-        $resultTranport = $this->removeTransportShips($player, $req->transportShips);
-        if (!$resultTranport) {
-            return "You don't have enough transport ships";
-        }
+        $this->removeTransportShips($player, $req->transportShips);
         
         $this->removeFleet($player, $req->from, $req->fleet);
 
