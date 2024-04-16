@@ -25,9 +25,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('challange:start')->cron('0 12 */15 * *');
         $schedule->command('energy:update')->everyThirtyMinutes();
         $schedule->command('aliances-rankings:update')->everyThirtyMinutes();
+        $schedule->command('clear-table:start')->daily();
+
         // $schedule->command('trade:verifytrades')->everyFiveMinutes();
 
- 
+
         # Ranking
         // $schedule->call(function () {
 
