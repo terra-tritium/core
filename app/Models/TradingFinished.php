@@ -35,17 +35,18 @@ class TradingFinished extends Model
     {
         $resources = ['crystal', 'metal', 'uranium'];
 
-        $results = DB::table('trading_finished as tf')
-            ->whereIn('tf.resource', $resources)
-            ->select('tf.id', 'tf.quantity', 'tf.price', 'tf.resource', 'tf.currency', 'tf.idMarket')
-            ->whereIn('tf.finishedAt', function ($query) {
-                $query->select('max_finishedAt')
+        $results = DB::table('trading as t')
+            ->whereIn('t.resource', $resources)
+            ->select('t.id', 't.quantity', 't.price', 't.resource', 't.currency', 't.idMarket')
+            ->where('t.status', Trading::STATUS_FINISHED)
+            ->whereIn('t.updatedAt', function ($query) {
+                $query->select('max_updatedAt')
                     ->from(function ($subquery) {
-                        $subquery->selectRaw('MAX(finishedAt) as max_finishedAt')
-                            ->from('trading_finished')
+                        $subquery->selectRaw('MAX(updatedAt) as max_updatedAt')
+                            ->from('trading')
                             ->groupBy('resource');
                     }, 'subquery')
-                    ->whereColumn('subquery.max_finishedAt', 'tf.finishedAt');
+                    ->whereColumn('subquery.max_updatedAt', 't.updatedAt');
             })
             ->get();
         return $results;

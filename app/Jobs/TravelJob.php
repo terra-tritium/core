@@ -11,6 +11,8 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\Travel;
 use App\Services\SpaceCombatService;
 use App\Services\EspionadeService;
+use App\Services\TradingService;
+use Illuminate\Support\Facades\Log;
 
 class TravelJob implements ShouldQueue
 {
@@ -66,10 +68,22 @@ class TravelJob implements ShouldQueue
                     }
                     break;
                 case Travel::TRANSPORT_BUY:
-                    //$this->travelService->starTransportBuy($this->travel);
+                    if($this->back){
+                        $tradingService = app(TradingService::class);
+                        $tradingService->realizaChegada($this->travelService, $currentTravel); 
+                    }else{
+                        $tradingService = app(TradingService::class);
+                        $tradingService->realizaCompra($this->travelService, $currentTravel);
+                    }
                     break;
                 case Travel::TRANSPORT_SELL:
-                    //$this->travelService->starTransportSell($this->travel);
+                    if($this->back){
+                        $tradingService = app(TradingService::class);
+                        $tradingService->realizaChegada($this->travelService, $currentTravel); 
+                    }else{
+                        $tradingService = app(TradingService::class);
+                        $tradingService->realizaEnvio($this->travelService, $currentTravel);
+                    }
                     break;
                 case Travel::MISSION_EXPLORER:
                     //$this->travelService->starMissionExplorer($this->travel);
