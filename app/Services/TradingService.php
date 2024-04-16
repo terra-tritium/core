@@ -87,16 +87,22 @@ class TradingService
     {
         try {
             if ($request) {
-                $planeta = $this->getPlanetUserLogged();
-                $resources = $this->trading->getResourceAvailable($planeta[0]->player)  ?? [];
+                $planetaLogado = $this->getPlanetUserLogged();
+                $planet = Planet::find($request->input("origin"));
+                if($planet->player != $planetaLogado[0]->player){
+                    return response(["message"=>"You don't own this planet"],Response::HTTP_FORBIDDEN);
+                }
+
+                $resources = $this->trading->getResourceAvailable($planet->player)  ?? [];
                 $resourceKey = strtolower($request->resource);
                 if (property_exists($resources, $resourceKey)) {
                     if ($resources->{$resourceKey} <= $request->quantity) {
                         return response(['error' => 'Trying to sell a quantity of resource higher than available'], Response::HTTP_BAD_REQUEST);
                     } else {
-                        $success = $this->createTrading($request, $planeta[0]->id);
+
+                        $success = $this->createTrading($request, $planet->id);
                         if ($success) {
-                            $this->notify($planeta[0]->player, "New order successfully registered", "Market");
+                            $this->notify($planet->player, "New order successfully registered", "Market");
                             return response(['message' => 'New order successfully registered!', 'success' => true], Response::HTTP_OK);
                         } else {
 
@@ -108,6 +114,7 @@ class TradingService
                 }
             }
         } catch (\Exception $e) {
+            Log::info('Trying not registered ' . $e->getMessage());
             return response(['error' => 'Trying not registered ' . $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
@@ -115,13 +122,17 @@ class TradingService
     {
         if ($request) {
             try {
+                $planetaLogado = $this->getPlanetUserLogged();
+                $planet = Planet::find($request->input("origin"));
+                if($planet->player != $planetaLogado[0]->player){
+                    return response(["message"=>"You don't own this planet"],Response::HTTP_FORBIDDEN);
+                }
                 if ($request->quantity <= 0 || $request->unitityPrice <= 0) {
                     return response(['message' => 'Quantidade e preço unitário devem ser superiores a 0', 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
-                $planeta = $this->getPlanetUserLogged();
-                $success = $this->createTrading($request, $planeta[0]->id);
+                $success = $this->createTrading($request, $planet->id);
                 if ($success) {
-                    $this->notify($planeta[0]->player, "New order purch successfully registered", "Market");
+                    $this->notify($planet->player, "New order purch successfully registered", "Market");
                     return response(['message' => 'New order purch successfully registered!', 'success' => true], Response::HTTP_OK);
                 } else {
                     return response(["msg" => "error "], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -144,7 +155,11 @@ class TradingService
                 if (!$trading) {
                     return response(['message' => 'Trading não encontrado', 'success' => false], Response::HTTP_NOT_FOUND);
                 }
-                $planeta = $this->getPlanetUserLogged();
+                $planetaLogado = $this->getPlanetUserLogged();
+                $p = Planet::find($planet);
+                if($p->player != $planetaLogado[0]->player){
+                    return response(["messag"=>"You don't own this planet"],Response::HTTP_FORBIDDEN);
+                }
                 //verifica se o status pode ser alterado e quem ta alterando a ordem é quem criou
                 if ($trading->status != config("app.tritium_market_status_open") || $trading->idPlanetCreator != $planet) {
                     return response(['message' => 'Status não pode ser alterado ou não é o criador', 'success' => false], Response::HTTP_BAD_REQUEST);
@@ -152,7 +167,7 @@ class TradingService
                 $trading->status = config("app.tritium_market_status_canceled");
                 $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                 $trading->save();
-                $this->notify($planeta[0]->player, "You canceled your order", "Market");
+                $this->notify($p->player, "You canceled your order", "Market");
                 return response(['message' => 'You canceled your order!', 'success' => true, 'new' => $trading], Response::HTTP_OK);
             } catch (Exception $e) {
                 Log::error('Erro no cancelamento da ordem: ' . $e->getMessage());
@@ -220,8 +235,8 @@ class TradingService
                 if ($request->currency == 'energy') {
                     $total = $request->price * $request->quantity;
                     if ($total > $planeta->energy) {
-                        $this->notify($planeta->player, "saldo insuficiente para concluir a transação", "Market");
-                        return response(['message' => 'Você não possui saldo suficiente para concluir a transação', 'code' => 4004, 'success' => false], Response::HTTP_BAD_REQUEST);
+                        $this->notify($planeta->player, "Insufficient balance to complete the transaction.", "Market");
+                        return response(['message' => 'Insufficient balance to complete the transaction.', 'code' => 4004, 'success' => false], Response::HTTP_BAD_REQUEST);
                     }
                 } else {
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
@@ -233,14 +248,14 @@ class TradingService
                     $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
                     $trading->save();
                     //notificar o passivo que foi cancelado
-                    $this->notify($planetaPassivo->player, "O vendedor não possui recurso para concluir essa transação", "Market");
-                    return response(['message' => 'O vendedor não possui recurso para concluir essa transação', 'code' => 4005, 'success' => false], Response::HTTP_BAD_REQUEST);
+                    $this->notify($planetaPassivo->player, "The seller does not have enough resources to complete this transaction.", "Market");
+                    return response(['message' => 'The seller does not have enough resources to complete this transaction.', 'code' => 4005, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 $distance = $this->planetService->calculeDistance($planeta->id, $planetaPassivo->id);
 
 
                 #O ativo esta comprando recurso, indo realizar a compra
-                return $this->safe($trading, $request, $distance, $planeta->player, $planetaPassivo->player);
+                return $this->saveTradingProcess($trading, $request, $distance, $planeta->player, $planetaPassivo->player);
                 // // Sair para a viagem antes de salvar na safe
                 // if (!$this->safe($trading, $request, $distance, $planeta[0]->player, $planetaPassivo->player)) {
                 //     return response(['message' => 'Algum erro na hora de comprar, verificar a causa', 'code' => 4006, 'success' => false], Response::HTTP_BAD_REQUEST);
@@ -254,15 +269,15 @@ class TradingService
                 $panetaInteressado = $request->idPlanetSale;
                 //verificar se o ativo (vendedor) possui a quantidade de recurso
                 if ($planeta->{$resourceKey} < $request->quantity) {
-                    $this->notify($planeta->player, "Você não possui essa quantidade de recurso para venda", "Market");
-                    return response(['message' => 'Você não possui essa quantidade de recurso para venda', 'code' => 4007, 'success' => false], Response::HTTP_BAD_REQUEST);
+                    $this->notify($planeta->player, "You do not have enough resources to complete the sale.", "Market");
+                    return response(['message' => 'You do not have enough resources to complete the sale.', 'code' => 4007, 'success' => false], Response::HTTP_BAD_REQUEST);
                 }
                 if ($request->currency == 'energy') {
                     $total = $request->price * $request->quantity;
                     //verifica se o quem deseja comprar tem energia suficiente
                     if ($planetaPassivo->energy < $total) {
-                        $this->notify($planetaPassivo->player, "O planeta comprador não possui energia suficiente para comprar", "Market");
-                        return response(['message' => 'O planeta comprador não possui energia suficiente para comprar', 'code' => 4008, 'success' => false], Response::HTTP_BAD_REQUEST);
+                        $this->notify($planetaPassivo->player, "The buying planet does not have enough energy to purchase.", "Market");
+                        return response(['message' => 'The buying planet does not have enough energy to purchase.', 'code' => 4008, 'success' => false], Response::HTTP_BAD_REQUEST);
                     }
                 } else {
                     return response(['message' => 'Validar tritium', 'success' => false], Response::HTTP_BAD_REQUEST);
@@ -270,67 +285,36 @@ class TradingService
                 $distance = $this->planetService->calculeDistance($planeta->id, $planetaPassivo->id);
 
                 // return ["msg"=>"o ativo esta indo levar o recurso", "trading"=>$trading,"passivo"=>$planetaPassivo, "ativo"=>$planeta[0]->player];
-                return $this->safe($trading, $request, $distance, $planeta->player, $planetaPassivo->player);
-                if (!$this->safe($trading, $request, $distance, $planetaPassivo->player, $planeta->player)) {
-                    return response(['message' => 'Algum erro na hora de vender, verificar a causa', 'code' => 4009, 'success' => false], Response::HTTP_BAD_REQUEST);
-                }
+                return $this->saveTradingProcess($trading, $request, $distance, $planeta->player, $planetaPassivo->player);
+                // if (!$this->safe($trading, $request, $distance, $planetaPassivo->player, $planeta->player)) {
+                //     return response(['message' => 'Algum erro na hora de vender, verificar a causa', 'code' => 4009, 'success' => false], Response::HTTP_BAD_REQUEST);
+                // }
                 //retorno visual, deletar
-                $this->notify($planeta->player, 'Seu cargueiro saiu para buscar o recurso ?', 'Market');
-                $this->notify($planetaPassivo->player, 'O comprador está vindo em sua direção ?', 'Market');
-                return response(['Ativo' => $planeta, 'passivo' => $planetaPassivo, 'tipo' => $request->type, 'desc' => "ativo tem que entregra de imediato"]);
+                // $this->notify($planeta->player, 'Seu cargueiro saiu para buscar o recurso ?', 'Market');
+                // $this->notify($planetaPassivo->player, 'O comprador está vindo em sua direção ?', 'Market');
+                // return response(['Ativo' => $planeta, 'passivo' => $planetaPassivo, 'tipo' => $request->type, 'desc' => "ativo tem que entregra de imediato"]);
             }
         } catch (Exception $e) {
-            return response(["message" => "error " . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response(["message" => "error finish open process trading" . $e->getMessage(), "code" => 4010], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         return response([
-            'message' => 'trade ', 'Requisicao' => $request->toArray(),
+            'message' => 'ok',
             'trade' => $trading
         ], Response::HTTP_OK);
     }
 
 
-    public function safe(Trading $trading, $request, $distancia, $origem, $destino)
+    public function saveTradingProcess(Trading $trading, $request, $distancia, $origem, $destino)
     {
         $planetaOrigem = $request->type == 'P' ? $request->idPlanetSale : $request->idPlanetPurch;
         $planetaDestino = $request->type == 'S' ? $request->idPlanetSale : $request->idPlanetPurch;
         $now = time();
-        Log::info("A distancia entre os planetas é de ----> " . $distancia . " ida e volta tem que ser de " . $distancia * 2);
-
-        // return ['JogadorOrigem' => $origem, 'JogadorDestino' => $destino, 
-        //         'PlanetaOrigem' => $planetaOrigem, 'PlanetaDestino' => $planetaDestino, 'trading' => $trading,
-        //         'cargueiros'=> ceil($trading->quantity / config("app.tritium_transportship_capacity"))];
-        // // $playerOrigem = Player::
-        // return ['request' => $request->toArray(), 'distancia' => $distancia];
         try {
             $transportShipsInUse = ceil($trading->quantity / config("app.tritium_transportship_capacity")); //TRITIUM_TRANSPORTSHIP_CAPACITY
 
             $timeLoad = $transportShipsInUse * config("app.tritium_charging_speed");
-
-            #Salva o job para acompanhamento até a execução
-            $processJob = new ProcessJob();
-            $processJob->player = $origem;
-            $processJob->planet = $planetaOrigem;
-            $processJob->finished =  Carbon::now()->addSeconds($timeLoad)->getTimestamp();
-            $processJob->type = ProcessJob::TYPE_CARRYING;
-            $processJob->save();
-            // return ["process"=>$processJob];
             $travelService = app(TravelService::class);
-            #Job carregamento recursos
-            // ResourceJob::dispatch(
-            //     $travelService,
-            //     $origem,
-            //     $planetaOrigem,
-            //     $planetaDestino,
-            //     1,
-            //     2,
-            //     3,
-            //     $transportShipsInUse
-            // )->delay(now()->addSeconds($timeLoad));
-
-
-
-
-
+        
             /**Inicio */
             $travel = new Travel();
             $effectService = app(EffectService::class);
@@ -377,7 +361,7 @@ class TradingService
                 // $planet = $this->planetService->removeEnergy($planet, $trading->total);
                 // $planet->save();
             }
-            $this->notify($destino, "Transação iniciada", "Market");
+            $this->notify($destino, "Transaction initiated.", "Market");
             $successt = $travel->save();
             #debita a quantidade de cargueiro que será usado
             $player = Player::find($travel->player);
@@ -391,7 +375,7 @@ class TradingService
             /**aplica o efeito do game mode */
             $newDistancia = $effectService->calcTravelSpeed($distancia, $player);
             TravelJob::dispatch($travelService, $travel->id, false)->delay(now()->addSeconds($newDistancia));
-            return ['travel' => $travel, 'success' => $successt];
+            return true;
         } catch (Exception $e) {
             Log::info("Erro funcionalidade que inicia os jobs de finalização trade " . $e->getMessage());
             return "erro " . $e->getMessage();
@@ -410,7 +394,6 @@ class TradingService
      */
     public function realizaEnvio(TravelService $travelService, Travel $travel)
     {
-        Log::info("Chegou no planeta do comprador, descarregar, somar recurso e retornar");
         $trading = Trading::find($travel->trading);
         $planet = Planet::find($travel->to);
         $keyResource = strtolower($trading->resource);
@@ -432,8 +415,8 @@ class TradingService
                 $planet = $this->planetService->addUranium($planet,$trading->quantity);
             }
             $planet->save();
-            $this->notify($travel->receptor, "O recurso chegou ao seu planeta, energia debitada", "Market");
-            $this->notify($travel->player, "Recurso entregue, cargueiro retornando com sua energia", "Market");
+            $this->notify($travel->receptor, "Resource has reached your planet, energy debited.", "Market");
+            $this->notify($travel->player, "Resource delivered, cargo ship returning with your energy.", "Market");
         } else {
             #Estorno de recurso
             $trading->status = TRADING::SATUS_CANCELLED_INSUFFICIENT_RESOURCES;
@@ -450,8 +433,8 @@ class TradingService
                 $planetAtivo = $this->planetService->addUranium($planetAtivo,$trading->quantity);
             }
             $planetAtivo->save();
-            $this->notify($travel->player, "O comprador não possui energia suficiente, transação cancelada, recurso devolvido", "Market");
-            $this->notify($travel->receptor, "Energia insuficiente para completar a transação", "Market");
+            $this->notify($travel->player, "Buyer lacks sufficient energy, transaction canceled, resource returned.", "Market");
+            $this->notify($travel->receptor, "Insufficient energy to complete the transaction.", "Market");
         }
         $travel->status = Travel::STATUS_RETURN;
         $travel->arrival += $trading->distance;
@@ -485,13 +468,10 @@ class TradingService
             }
         } else {
             #Notificar
-            Log::info("###notificar a situação, vendedor nao tem mais o recurso disponível");
-            Log::info("###planeta que deve receber novamente o recurso " . $travel->from . " o valor de " . $trading->total);
-
             $planet = Planet::find($travel->from);
             $planet->energy += $trading->total;
             $planet->save();
-            $this->notify($travel->player, "###O vendedor não possui mais recurso, transação cancelada", "Market");
+            $this->notify($travel->player, "The seller no longer has resources, transaction canceled.", "Market");
             $trading->status = Trading::SATUS_CANCELLED_INSUFFICIENT_RESOURCES;
             $trading->save();
         }
@@ -550,16 +530,14 @@ class TradingService
                 }
 
                 $planet->save();
-                $this->notify($planet->player, "Recurso recolhido, energia creditada", "Market");
+                $this->notify($planet->player, "Resource collected, energy credited.", "Market");
                 return true;
             } else {
                 #Notificar, devolver energia para o comprador, cancelar a trading
-                $this->notify($planet->player, "Quantidade de recurso insuficiente", "Market");
-                Log::info("Notificar e cancelar por falta de recurso");
+                $this->notify($planet->player, "Insufficient resource quantity.", "Market");
+                Log::info("Insufficient resource quantity. !");
                 return false;
             }
-        } else {
-            Log::info("erro no type?");
         }
     }
     /**
@@ -569,7 +547,6 @@ class TradingService
      */
     private function finalizaCompra(Travel $travel)
     {
-        Log::info("finaliza a transação de compra, comprador recebe o recurso");
         $trading = Trading::find($travel->trading);
         if ($trading->type == 'S' && $trading->status != Trading::STATUS_CANCELED) {
             $planet = Planet::find($travel->from);
@@ -588,24 +565,23 @@ class TradingService
 
 
             $planet->save();
-            $this->notify($travel->player, "Recurso recebido e cargueiro devolvido", "Market");
+            $this->notify($travel->player, "Resource received and cargo ship returned.", "Market");
             $trading->status = Trading::STATUS_FINISHED;
             $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
             $trading->save();
         }
         #vendedor (ativo) recebe a energia
         if ($trading->type == 'P' && $trading->status != Trading::STATUS_CANCELED && $trading->status != Trading::SATUS_CANCELLED_INSUFFICIENT_RESOURCES) {
-            Log::info("FINALIZAR a venda");
             $planet = Planet::find($travel->from);
             $planet->energy += $trading->total;
             $planet->save();
-            $this->notify($travel->player, "Energia Creditada, cargueiro devolvido", "Market");
+            $this->notify($travel->player, "Energy credited, cargo ship returned.", "Market");
             $trading->status = Trading::STATUS_FINISHED;
             $trading->updatedAt = (new DateTime())->format('Y-m-d H:i:s');
             $trading->save();
         }
         if ($trading->status == Trading::STATUS_CANCELED  || $trading->status == Trading::SATUS_CANCELLED_INSUFFICIENT_RESOURCES) {
-            $this->notify($travel->player, "Cargueiro devolvido", "Market");
+            $this->notify($travel->player, "Cargo ship returned.", "Market");
             Log::info("Transação não concluída por falta de recursos por parte do passivo, todos seus recursos utilizados foram devolvidos");
         }
     }
@@ -618,7 +594,6 @@ class TradingService
     public function realizaChegada(TravelService $travelService, Travel $travel)
     {
         try {
-            Log::info("Devolvendo cargueiro, finalizando transações");
             $player = Player::find($travel->player);
             $player->transportShips += $travel->transportShips;
             $player->save();
