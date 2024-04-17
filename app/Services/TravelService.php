@@ -69,6 +69,12 @@ class TravelService
             }
         }
 
+        if ($travel->action === Travel::RETURN_FLEET) {
+            if (!$this->validateReturnFleet($travel)) {
+                return "You can't send a return fleet at moment";
+            }
+        }
+
         $now = time();
         $travelTime = $this->planetService->calculeDistance($travel->from, $travel->to);
         $newTravel->from = $travel->from;
@@ -129,6 +135,20 @@ class TravelService
         TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
 
         return "success";
+    }
+
+    private function validateReturnFleet ($player) {
+        $travelAtack = Travel::where([['player', $player], ['action', Travel::ATTACK_FLEET]])->orderBy('id', 'desc')->first();
+        $travelReturn = Travel::where([['player', $player], ['action', Travel::RETURN_FLEET]])->orderBy('id', 'desc')->first();
+        if ($travelAtack) {
+            if (!$travelReturn) {
+                return true;
+            }
+            if ($travelAtack->id > $travelReturn->id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function removeTransportShips ($player, $qtd) {
