@@ -71,8 +71,15 @@ class FleetController extends Controller
         try {
             $player = Player::getPlayerLogged();
 
+            $unit = $request->all();
+
+            if ($unit["quantity"] <= 0) {
+                return response()->json(['message' => 'Quantity must be greater than 0.'],
+                    Response::HTTP_BAD_REQUEST);
+            }
+
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
-                return $this->fleetService->production($player->id, $planet, $request->all());
+                return $this->fleetService->production($player->id, $planet, $unit);
             } else {
                 return response()->json(['message' => 'You are not authorized to perform this action.'],
                     Response::HTTP_FORBIDDEN);

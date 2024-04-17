@@ -349,6 +349,11 @@ class TravelService
     {
         foreach($troops as $troop)
         {
+
+            if ($troop->quantity <= 0) {
+                return false;
+            }
+
             $troopModel = Troop::where(['unit' => $troop->unit, 'player' => $player, 'planet' => $planet])->first();
 
             if(!$troopModel) {
@@ -365,8 +370,13 @@ class TravelService
 
     public function hasFleetAvailable($player, $planet, $fleets)
     {
+
         foreach($fleets as $fleet)
         {
+            if ($fleet->quantity <= 0) {
+                return false;
+            }
+
             $fleetModel = Fleet::where(['unit' => $fleet->unit, 'player' => $player, 'planet' => $planet])->first();
 
             if(!$fleetModel) {
