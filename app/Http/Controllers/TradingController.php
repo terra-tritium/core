@@ -74,9 +74,9 @@ class TradingController extends Controller
     }
 
 
-    public function getAllTradingByMarketResource($resource, $type)
+    public function getAllTradingByMarketResource($planetId, $resource, $type)
     {
-        return $this->tradingService->getAllTradingByMarketResource($resource, $type);
+        return $this->tradingService->getAllTradingByMarketResource($planetId, $resource, $type);
     }
 
     public function getPlayerResource($planet)
@@ -122,9 +122,9 @@ class TradingController extends Controller
     {
         return $this->tradingService->cancelOrder($planet, $id);
     }
-    public function getTradingProcess($id)
+    public function getTradingProcess($planetId, $id)
     {
-        return $this->tradingService->getTradingProcess($id);
+        return $this->tradingService->getTradingProcess($planetId,$id);
     }
     public function finishTrading(Request $request)
     {
@@ -138,28 +138,5 @@ class TradingController extends Controller
     public function lastTrading()
     {
         return $this->tradingService->getLastTrading();
-    }
-    public function buyFreighter($planetId)
-    {
-        try {
-            $planet = Planet::find($planetId);
-            if (!$planet)
-                return response(['message' => "planet not found", Response::HTTP_NOT_FOUND]);
-            if ($planet->energy < 10)
-                return response(["message" => "Insufficient energy to buy a freighter."], Response::HTTP_NOT_FOUND);
-            $planet->energy -= 10;
-            $planet->save();
-
-            $player = Player::findOrFail($planet->player);
-            $player->transportShips += 1;
-            $player->save();
-            return response($planet, Response::HTTP_OK);
-        } catch (Exception $e) {
-            Log::error('Erro ao realizar compra de cargueiro ' . $e->getMessage());
-            return response(['message' => "Erro ao realizar compra de cargueiro", Response::HTTP_INTERNAL_SERVER_ERROR]);
-        }
-
-        return $planet;
-        // return response($, Response::HTTP_OK);
     }
 }

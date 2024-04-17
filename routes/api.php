@@ -83,7 +83,6 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/new', [PlayerController::class, 'register']);
         Route::post('/list-name/{id}', [PlayerController::class, 'getNameUser']);
         Route::post('/change-name', [PlayerController::class, 'changeName']);
-        Route::get('/all',[PlayerController::class, 'showAll']);
     });
 
     Route::group(['prefix' => 'build', 'middleware' => 'throttle:240,1'], function () {
@@ -278,19 +277,16 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     });
 
     Route::group(['prefix' => 'trading', 'middleware' => 'throttle:240,1'], function () {
-        Route::get('/all/{resource}/{type}', [TradingController::class, 'getAllTradingByMarketResource']);
+        Route::get('/all/{planet}/{resource}/{type}', [TradingController::class, 'getAllTradingByMarketResource']);
         Route::get('/myresources', [TradingController::class, 'getMyResources']);
         Route::post('/new-sale', [TradingController::class, 'tradingNewSale']);
         Route::post('/new-purch',[TradingController::class, 'tradingNewPurchase']);
         Route::get('/my-history/{planet}/{id}', [TradingController::class, 'getAllOrderByPlanet']);
         Route::patch('/cancel/{planet}/{id}', [TradingController::class, 'cancelOrder']);
-        Route::get('/trading-process/{id}',[TradingController::class, 'getTradingProcess']);
+        Route::get('/trading-process/{planet}/{id}',[TradingController::class, 'getTradingProcess']);
         Route::post('/finish', [TradingController::class, 'finishTrading']);
-        Route::get('/safe/conclued',[TradingController::class, 'verificaTradeConcluidoSafe'] );
         Route::get('/last-trading',[TradingController::class, 'lastTrading'] );
-        Route::patch('/buy-freighter/{planetId}',[TradingController::class, 'buyFreighter']);
         Route::get('/player/resource/{planet}',[TradingController::class, 'getPlayerResource']);
-
     });
 
     Route::group(['prefix' => 'nft', 'middleware' => 'throttle:240,1'], function () {

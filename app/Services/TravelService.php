@@ -69,6 +69,12 @@ class TravelService
             }
         }
 
+        if ($travel->action === Travel::RETURN_FLEET) {
+            if (!$this->validateReturnFleet($travel)) {
+                return "You can't send a return fleet at moment";
+            }
+        }
+
         $now = time();
         $travelTime = $this->planetService->calculeDistance($travel->from, $travel->to);
         $newTravel->from = $travel->from;
@@ -131,16 +137,24 @@ class TravelService
         return "success";
     }
 
+    private function validateReturnFleet ($player) {
+        $travelAtack = Travel::where([['player', $player], ['action', Travel::ATTACK_FLEET]])->orderBy('id', 'desc')->first();
+        $travelReturn = Travel::where([['player', $player], ['action', Travel::RETURN_FLEET]])->orderBy('id', 'desc')->first();
+        if ($travelAtack) {
+            if (!$travelReturn) {
+                return true;
+            }
+            if ($travelAtack->id > $travelReturn->id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private function removeTransportShips ($player, $qtd) {
         $player = Player::find($player);
         $player->transportShips -= $qtd;
-
-        if ($player->transportShips < 0) {
-            return false;
-        } else {
-            $player->save();
-        }
-
+        $player->save();
         return true;
     }
 
@@ -155,10 +169,7 @@ class TravelService
 
     private function startAttackFleet($travel, $req, $player) {
 
-        $resultTranport = $this->removeTransportShips($player, $req->transportShips);
-        if (!$resultTranport) {
-            return "You don't have enough transport ships";
-        }
+        $this->removeTransportShips($player, $req->transportShips);
         
         $this->removeFleet($player, $req->from, $req->fleet);
 
@@ -358,6 +369,11 @@ class TravelService
     {
         foreach($troops as $troop)
         {
+
+            if ($troop->quantity <= 0) {
+                return false;
+            }
+
             $troopModel = Troop::where(['unit' => $troop->unit, 'player' => $player, 'planet' => $planet])->first();
 
             if(!$troopModel) {
@@ -374,8 +390,13 @@ class TravelService
 
     public function hasFleetAvailable($player, $planet, $fleets)
     {
+
         foreach($fleets as $fleet)
         {
+            if ($fleet->quantity <= 0) {
+                return false;
+            }
+
             $fleetModel = Fleet::where(['unit' => $fleet->unit, 'player' => $player, 'planet' => $planet])->first();
 
             if(!$fleetModel) {
