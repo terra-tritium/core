@@ -24,6 +24,8 @@
 ```
 php artisan schedule:work
 php artisan queue:work
+
+php artisan challange:start
 ```
 
 ## Procedure to update the database (run every time there is a database change)

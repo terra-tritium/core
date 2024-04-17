@@ -481,8 +481,10 @@ class SpaceCombatService
         'planet'    => $travel->to
     ])->first();
 
-    $fleet->quantity = ($fleet->quantity + $qtdShips);
-    $fleet->save();
+    if ($fleet) {
+      $fleet->quantity = ($fleet->quantity + $qtdShips);
+      $fleet->save();
+    }
   }
 
   private function depositeResource ($travel) {
