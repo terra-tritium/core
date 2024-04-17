@@ -246,9 +246,18 @@ class SpaceCombatService
 
   public function leave($combatId, $player) {
     $combat = Combat::find($combatId);
+
     $planetService = new PlanetService();
     $now = time();
     $figther = Fighters::where(['combat'=>$combatId, 'player'=>$player->id])->first();
+
+    if (!$figther) {
+      return false;
+    }
+
+    if (!$this->validReturn($player->id)) {
+      return false;
+    }
 
     $travel = new Travel();
     $travel->player = $player->id;
@@ -273,6 +282,19 @@ class SpaceCombatService
 
     if ($figther) {
       $figther->delete();
+    }
+  }
+
+  private function validReturn ($player) {
+    $travelAtack = Travel::where([['player', $player], ['action', Travel::ATTACK_FLEET]])->orderBy('id', 'desc')->first();
+    $travelReturn = Travel::where([['player', $player], ['action', Travel::RETURN_FLEET]])->orderBy('id', 'desc')->first();
+    if ($travelAtack) {
+        if (!$travelReturn) {
+            return true;
+        }
+        if ($travelAtack->id > $travelReturn->id) {
+            return true;
+        }
     }
   }
 
@@ -438,12 +460,12 @@ class SpaceCombatService
   }
 
   public function addFleet($travel){
-    $this->addShip($travel, Ship::SHIP_CRAFT);
-    $this->addShip($travel, Ship::SHIP_BOMBER);
-    $this->addShip($travel, Ship::SHIP_CRUISER);
-    $this->addShip($travel, Ship::SHIP_SCOUT);
-    $this->addShip($travel, Ship::SHIP_STEALTH);
-    $this->addShip($travel, Ship::SHIP_FLAGSHIP);
+    $this->addShip($travel, Ship::SHIP_CRAFT, $travel->craft);
+    $this->addShip($travel, Ship::SHIP_BOMBER, $travel->bomber);
+    $this->addShip($travel, Ship::SHIP_CRUISER, $travel->cruiser);
+    $this->addShip($travel, Ship::SHIP_SCOUT, $travel->scout);
+    $this->addShip($travel, Ship::SHIP_STEALTH, $travel->stealth);
+    $this->addShip($travel, Ship::SHIP_FLAGSHIP, $travel->flagship);
   }
 
   public function addTransportShips($travel) {
@@ -452,17 +474,15 @@ class SpaceCombatService
     $player->save();
   }
 
-  private function addShip($travel, $shipCode) {
-      $fleet = Fleet::where([
-          'unit'      => $shipCode,
-          'player'    => $travel->player,
-          'planet'    => $travel->to
-      ])->first();
+  private function addShip($travel, $shipCode, $qtdShips) {
+    $fleet = Fleet::where([
+        'unit'      => $shipCode,
+        'player'    => $travel->player,
+        'planet'    => $travel->to
+    ])->first();
 
-      if ($fleet && $travel->craft > 0) {
-          $fleet->quantity = ($fleet->quantity +  $travel->craft);
-          $fleet->save();
-      }
+    $fleet->quantity = ($fleet->quantity + $qtdShips);
+    $fleet->save();
   }
 
   private function depositeResource ($travel) {

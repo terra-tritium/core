@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\Travel;
 use App\Models\Player;
 use App\Models\ProcessJob;
+use Illuminate\Support\Facades\Log;
 
 class ResourceJob implements ShouldQueue
 {
@@ -49,6 +50,7 @@ class ResourceJob implements ShouldQueue
      */
     public function handle()
     {
+        Log::info("executou o carregamento");
         $travel = new Travel();
         $travel->metal = $this->metal;
         $travel->uranium = $this->uranium;

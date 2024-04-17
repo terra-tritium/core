@@ -91,7 +91,9 @@ class ProductionService
       if (!$this->planetService->enoughBalance($p1, ($unitModel->crystal * $unit["quantity"]), 3)){
           return false;
       }
-    } 
+    } else {
+      return false;
+    }
     return true;
   }
 
