@@ -24,10 +24,12 @@ class RankingService
     public function getRankings($name = null, $orderBy = null)
     {
         $query = Ranking::query();
-
+        $query->select("ranking.*", "ali.logo as logo")
+            ->LeftJoin("aliances as ali", "ranking.aliance", "=", "ali.id");
         if ($name) {
-            $query->whereRaw('name LIKE ?', ['%' . $name . '%']);
+            $query->whereRaw('ranking.name LIKE ?', ['%' . $name . '%']);
         }
+
 
         if ($orderBy) {
             switch ($orderBy) {
