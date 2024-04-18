@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Ranking;
 use App\Models\AlianceRanking;
+use App\Models\Planet;
 use App\Models\Player;
 use App\Services\RankingService;
 use App\ValueObjects\RankingCategory;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class RankingController extends Controller
 {
@@ -80,6 +82,23 @@ class RankingController extends Controller
                 return AlianceRanking::orderBy(RankingCategory::DEFENSE_SCORE, 'DESC')->paginate($this->itensPerPage);
             case "energy":
                 return AlianceRanking::orderBy(RankingCategory::ENERGY, 'DESC')->paginate($this->itensPerPage);
+        }
+    }
+    /**
+     * 
+     */
+    public function getMyRanking($planetId){
+        try {
+            $loggedPlayer = Player::getPlayerLogged();
+            if (!$loggedPlayer) {
+                return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+            }
+            $planet = Planet::findOrFail($planetId);
+            $player = Player::findOrFail($planet->player);
+            $raking = Ranking::where("player", $player->id)->first();
+            return response()->json($raking, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'erro ao recuperar ranking  do jogador ' , 'success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
