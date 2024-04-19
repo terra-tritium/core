@@ -141,6 +141,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::group(['prefix' => 'ranking', 'middleware' => 'throttle:240,1'],function () {
         Route::get('/players/{type}', [RankingController::class, 'players']);
         Route::get('/aliances/{type}', [RankingController::class, 'aliances']);
+        Route::get('/my/{planetId}', [RankingController::class, 'getMyRanking']);
     });
 
     Route::group(['prefix' => 'research', 'middleware' => 'throttle:240,1'], function () {

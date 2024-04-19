@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Ranking;
 use App\Models\AlianceRanking;
+use App\Models\Planet;
 use App\Models\Player;
 use App\Services\RankingService;
 use App\ValueObjects\RankingCategory;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class RankingController extends Controller
 {
@@ -21,42 +23,47 @@ class RankingController extends Controller
         $this->rankingService = $rankingService;
     }
 
-    public function players(Request $request) {
+    public function players(Request $request)
+    {
 
-            $type = $request->input('type', 'general');
-            $player = Player::getPlayerLogged();
+        $type = $request->input('type', 'general');
+        $player = Player::getPlayerLogged();
 
-            switch ($type) {
-                case "top":
-                    $query = Ranking::orderBy(RankingCategory::SCORE, 'DESC')->take(4);
-                    break;
-                case "general":
-                    $query = Ranking::orderBy(RankingCategory::SCORE, 'DESC');
-                    break;
-                case "builder":
-                    $query = Ranking::orderBy(RankingCategory::BUILD_SCORE, 'DESC');
-                    break;
-                case "military":
-                    $query = Ranking::orderBy(RankingCategory::MILITARY_SCORE, 'DESC');
-                    break;
-                case "attack":
-                    $query = Ranking::orderBy(RankingCategory::ATTACK_SCORE, 'DESC');
-                    break;
-                case "defense":
-                    $query = Ranking::orderBy(RankingCategory::DEFENSE_SCORE, 'DESC');
-                    break;
-                case "energy":
-                    $query = Ranking::orderBy(RankingCategory::ENERGY, 'DESC');
-                    break;
-                default:
-                    return response()->json(['error' => 'Invalid ranking type'], 400);
-            }
-
-            $rankings = $query->skip(0)->take($this->itensPerPage)->get();
-            return response()->json($rankings);
+        switch ($type) {
+            case "top":
+                $query = Ranking::orderBy(RankingCategory::SCORE, 'DESC')->take(4);
+                break;
+            case "general":
+                $query = Ranking::orderBy(RankingCategory::SCORE, 'DESC');
+                break;
+            case "builder":
+                $query = Ranking::orderBy(RankingCategory::BUILD_SCORE, 'DESC');
+                break;
+            case "military":
+                $query = Ranking::orderBy(RankingCategory::MILITARY_SCORE, 'DESC');
+                break;
+            case "attack":
+                $query = Ranking::orderBy(RankingCategory::ATTACK_SCORE, 'DESC');
+                break;
+            case "defense":
+                $query = Ranking::orderBy(RankingCategory::DEFENSE_SCORE, 'DESC');
+                break;
+            case "energy":
+                $query = Ranking::orderBy(RankingCategory::ENERGY, 'DESC');
+                break;
+            default:
+                return response()->json(['error' => 'Invalid ranking type'], 400);
+        }
+ 
+        $rankings = $query
+            ->select("ranking.*", "ali.logo as logo")
+            ->LeftJoin("aliances as ali", "ranking.aliance", "=", "ali.id")
+            ->skip(0)->take($this->itensPerPage)->get();
+        return response()->json($rankings);
     }
 
-    public function aliances(Request $request) {
+    public function aliances(Request $request)
+    {
         $type = $request->input('type', 'general');
 
         $player = Player::getPlayerLogged();
@@ -77,6 +84,23 @@ class RankingController extends Controller
                 return AlianceRanking::orderBy(RankingCategory::ENERGY, 'DESC')->paginate($this->itensPerPage);
         }
     }
+    /**
+     * 
+     */
+    public function getMyRanking($planetId){
+        try {
+            $loggedPlayer = Player::getPlayerLogged();
+            if (!$loggedPlayer) {
+                return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+            }
+            $planet = Planet::findOrFail($planetId);
+            $player = Player::findOrFail($planet->player);
+            $raking = Ranking::where("player", $player->id)->first();
+            return response()->json($raking, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'erro ao recuperar ranking  do jogador ' , 'success' => false], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
     /**
      * @param Request $request
@@ -86,7 +110,6 @@ class RankingController extends Controller
     {
         $name = $request->input('name');
         $orderBy = $request->input('orderBy');
-
         $rankings = $this->rankingService->getRankings($name, $orderBy);
 
         return response()->json($rankings);
@@ -101,7 +124,7 @@ class RankingController extends Controller
         $name = $request->input('name');
         $orderBy = $request->input('orderBy');
 
-        $aliances = $this->rankingService->getAlianceRankings($orderBy,$name);
+        $aliances = $this->rankingService->getAlianceRankings($orderBy, $name);
 
         return response()->json($aliances);
     }
