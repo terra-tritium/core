@@ -43,7 +43,7 @@ class SpaceCombatService
     $combat->start = time();
     $combat->stage = 0;
     $combat->save();
-    
+
     $player1 = new Fighters();
     $player1->combat = $combat->id;
     $player1->player = $travel->player;
@@ -63,7 +63,7 @@ class SpaceCombatService
     $player1->save();
 
     $planet = Planet::find($travel->to);
-    
+
     $player2 = new Fighters();
     $player2->combat = $combat->id;
     $player2->player = $planet->player;
@@ -107,7 +107,7 @@ class SpaceCombatService
         }
       }
     }
-    
+
     $player2->save();
 
     $this->totalLocalShips = $player2->cruiser + $player2->craft + $player2->bomber + $player2->scout + $player2->stealth + $player2->flagship;
@@ -152,7 +152,7 @@ class SpaceCombatService
 
   public function startCombat($combatId) {
     $combat = Combat::find($combatId);
-    
+
     if ($combat->status != Combat::STATUS_CREATE) {
       return false;
     }
@@ -364,6 +364,24 @@ class SpaceCombatService
 
   private function pillage($combat, $invasors) {
     $planet = Planet::find($combat->planet);
+    $buildWhareHouse    = 9;
+    $metalProtected     = 0 ;
+    $crystalProtected   = 0;
+    $uraniumProtected   = 0;
+
+    $mdWhareHouse = Building::where(['planet'=> $combat->planet,'build' => $buildWhareHouse])->first();
+
+    if(!is_null($mdWhareHouse))
+    {
+        $metalProtected     = $planet->capMetal     * $mdWhareHouse->level ;
+        $crystalProtected   = $planet->capCrystal   * $mdWhareHouse->level;
+        $uraniumProtected   = $planet->capUranium   * $mdWhareHouse->level;
+
+        $planet->metal   -= $metalProtected;
+        $planet->crystal -= $crystalProtected;
+        $planet->uranium -= $uraniumProtected;
+    }
+
     $planetService = new PlanetService();
     $stolen = 0;
     foreach ($invasors as $invasor) {
@@ -372,36 +390,36 @@ class SpaceCombatService
       $crystal = 0;
       $uranium = 0;
 
-      if ($planet->metal >= $capacity) {
+      if ($planet->metal >= $capacity && $planet->metal  > 0) {
         $planet->metal -= $capacity;
         $stolen += $capacity;
         $metal = $capacity;
         $capacity = 0;
-      } else {
+      } elseif($planet->metal  > 0) {
         $stolen += $planet->metal;
         $metal = $planet->metal;
         $capacity -= $planet->metal;
         $planet->metal = 0;
       }
 
-      if ($planet->crystal >= $capacity) {
+      if ($planet->crystal >= $capacity && $planet->crystal  > 0) {
         $planet->crystal -= $capacity;
         $stolen += $capacity;
         $crystal = $capacity;
         $capacity = 0;
-      } else {
+      } elseif($planet->crystal  > 0) {
         $stolen += $planet->crystal;
         $crystal = $planet->crystal;
         $capacity -= $planet->crystal;
         $planet->crystal = 0;
       }
 
-      if ($planet->uranium >= $capacity) {
+      if ($planet->uranium >= $capacity && $planet->uranium  > 0) {
         $planet->uranium -= $capacity;
         $stolen += $capacity;
         $uranium = $capacity;
         $capacity = 0;
-      } else {
+      } elseif($planet->uranium  > 0) {
         $stolen += $planet->uranium;
         $uranium = $planet->uranium;
         $capacity -= $planet->uranium;
@@ -434,15 +452,19 @@ class SpaceCombatService
       TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
     }
 
+    $planet->metal   += $metalProtected;
+    $planet->crystal += $crystalProtected;
+    $planet->uranium += $uraniumProtected;
+
     $planet->save();
 
     # Log local pillage
     $logService = new LogService();
     $logService->notify(
       $planet->player,
-      "After the combat some of its resources were looted, " 
-      . $travel->metal . " metal, " 
-      . $travel->crystal . " crystal and " 
+      "After the combat some of its resources were looted, "
+      . $travel->metal . " metal, "
+      . $travel->crystal . " crystal and "
       . $travel->uranium . " uranium",
       "Space Combat"
     );
@@ -497,9 +519,9 @@ class SpaceCombatService
       $logService = new LogService();
       $logService->notify(
         $travel->player,
-        "His fleet returned from combat and brought, " 
-        . $travel->metal . " metal, " 
-        . $travel->crystal . " crystal and " 
+        "His fleet returned from combat and brought, "
+        . $travel->metal . " metal, "
+        . $travel->crystal . " crystal and "
         . $travel->uranium . " uranium",
         "Space Combat"
       );
@@ -599,7 +621,7 @@ class SpaceCombatService
     }
 
     foreach ($locals as $local) {
-        
+
       # Adjust ships to battle field size
       $localCraftInBattle = $local->craft > $this->battleFieldSize ? $this->battleFieldSize : $local->craft;
       $localBomberInBattle = $local->bomber > $this->battleFieldSize ? $this->battleFieldSize : $local->bomber;
