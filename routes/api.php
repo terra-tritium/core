@@ -93,7 +93,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/workers', [BuildController::class, 'workers']);
         Route::get('/requires/{build}', [BuildController::class, 'requires']);
         Route::get('/require/{build}/{level}', [BuildController::class, 'require']);
-        Route::post('/demolish/{build}', [BuildController::class, 'demolish']);
+        Route::post('/demolish', [BuildController::class, 'demolish']);
     });
 
     Route::get('/building/list/{planet}', [BuildController::class, 'listBildings'])->middleware(['throttle:240,1']);
