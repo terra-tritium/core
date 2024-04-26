@@ -281,8 +281,8 @@ class BuildService
         $player->save();
     }
 
-    public function demolish($buildId) {
-        $building = Building::find($buildId);
+    public function demolish($build,$planet) {
+        $building = Building::where('build',$build)->where('planet',$planet)->first();
 
         # Don't demolish all colonizators, have to have at least one
         if ($building->build == Build::COLONIZATION) {
@@ -295,7 +295,6 @@ class BuildService
         if ($building->build == Build::METALMINING || $building->build == Build::URANIUMMINING || $building->build == Build::CRYSTALMINING || $building->build == Build::LABORATORY) {
             $this->workerService->configWorkers($building->planet, 0, $building->id);
         }
-
         $building->delete();
     }
 
