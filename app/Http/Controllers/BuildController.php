@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Build;
 use App\Models\Building;
+use App\Models\Planet;
+use App\Models\Player;
 use App\Services\BuildService;
 use App\Services\WorkerService;
 
@@ -206,6 +208,16 @@ class BuildController extends Controller
             $building->build = $request->input("build");
             $building->planet = $request->input("planet");
             $building->slot = $request->input("slot");
+            
+            $playerLogged = Player::getPlayerLogged();
+            $planet = Planet::where('player', $playerLogged->id)
+                ->where('id', $building->planet)
+                ->get();
+            if(count($planet) == 0){
+                return response()->json(
+                ['message' => "You aren't the owner of this planet"],
+                Response::HTTP_FORBIDDEN);
+            }    
 
             $this->buildService->plant($building);
 
@@ -247,7 +259,18 @@ class BuildController extends Controller
     public function upgrade(Request $request) {
         $buildingId = $request->input("id");
 
+       
         try {
+            $playerLogged = Player::getPlayerLogged();
+            $planet = Planet::where('player', $playerLogged->id)
+                ->where('id', $request->input("planet"))
+                ->get();
+            if(count($planet) == 0){
+                return response()->json(
+                ['message' => "You aren't the owner of this planet"],
+                Response::HTTP_FORBIDDEN);
+            }    
+
             $this->buildService->upgrade($buildingId);
             return response()->json(['message' => 'Building upgrade successful'], Response::HTTP_OK);
         } catch (InvalidArgumentException $exception) {
@@ -284,14 +307,27 @@ class BuildController extends Controller
      *     )
      * )
      */
-    public function demolish($buildId) {
+    public function demolish(Request $request) {
         try {
 
-            $this->buildService->demolish($buildId);
+            $playerLogged = Player::getPlayerLogged();
+            $planet = Planet::where('player', $playerLogged->id)
+                ->where('id', $request->input("planet"))
+                ->get();
+            if(count($planet) == 0){
+                return response()->json(
+                ['message' => "You aren't the owner of this planet"],
+                Response::HTTP_FORBIDDEN);
+            }    
+            $build = $request->input("build");
+            $planetId = $request->input("planet");
+
+
+            $this->buildService->demolish($build,$planetId);
 
             return response()->json(['message' => 'Build demolish successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['error' => 'Internal server error', $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
