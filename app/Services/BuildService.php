@@ -294,7 +294,6 @@ class BuildService
         if ($building->build == Build::METALMINING || $building->build == Build::URANIUMMINING || $building->build == Build::CRYSTALMINING || $building->build == Build::LABORATORY) {
             $this->workerService->configWorkers($building->planet, 0, $building->id);
         }
-        return ["build"=>$build, "planetId"=>$planet];
 
         $building->delete();
     }

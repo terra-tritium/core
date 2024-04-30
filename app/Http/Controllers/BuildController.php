@@ -322,7 +322,7 @@ class BuildController extends Controller
             $build = $request->input("build");
             $planetId = $request->input("planet");
 
-            return $this->buildService->demolish($build,$planetId);
+             $this->buildService->demolish($build,$planetId);
 
             return response()->json(['message' => 'Build demolish successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
