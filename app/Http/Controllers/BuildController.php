@@ -258,7 +258,7 @@ class BuildController extends Controller
      */
     public function upgrade(Request $request) {
         $buildingId = $request->input("id");
-
+    
        
         try {
             $playerLogged = Player::getPlayerLogged();
@@ -322,8 +322,7 @@ class BuildController extends Controller
             $build = $request->input("build");
             $planetId = $request->input("planet");
 
-
-            $this->buildService->demolish($build,$planetId);
+            return $this->buildService->demolish($build,$planetId);
 
             return response()->json(['message' => 'Build demolish successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
