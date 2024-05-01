@@ -127,6 +127,7 @@ class AlianceService
         $alianceMember->player_id = $playerId;
         $alianceMember->status = $status === 'F' ? 'P' : 'A';
         $alianceMember->role = 'member';
+        $alianceMember->idRank = config("app.tritium_member_soldier");
         $alianceMember->dateAdmission = $status === 'A' ? (new DateTime())->format('Y-m-d H:i:s') : null;
         return $alianceMember->save();
     }
@@ -143,20 +144,20 @@ class AlianceService
         try {
             $alianceMember = AlianceMember::where('player_id', $playerId)->first();
             $aliance = Aliance::find($alianceMember->idAliance ?? 0);
-            // return response(['member'=>$alianceMember, "aliance"=>$aliance], Response::HTTP_OK);
-            $rank = RankMember::find($alianceMember->idRank);
+            $rank = RankMember::find($alianceMember->idRank ?? config("app.tritium_member_soldier"));
             if (!$alianceMember || !$aliance) {
                 return response(['message' => 'Alliance not found.'], Response::HTTP_NOT_FOUND);
             }
 
             $responseData = $alianceMember;
+            $responseData["statusAliance"] = $aliance->status;
             $responseData['currentPlayer'] = $playerId;
             $responseData['role'] = $rank->rankName;
             $responseData['logo'] = $aliance->logo;
             $responseData['countMembers'] = AlianceMember::where([['idAliance', '=', $alianceMember->idAliance], ['status', '=', 'A']])->count();
             return response($responseData, Response::HTTP_OK);
         } catch (Exception $e) {
-            return response(["message" => $e->getMessage(), "teste" => 'teste'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response(["message" => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
     public function removeMember($memberId)
