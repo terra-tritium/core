@@ -34,7 +34,7 @@ class Aliance extends Model
         $level = DB::table('planets as p')
             ->join('buildings as b', 'p.id', '=', 'b.planet')
             ->where('p.player', $playerId)
-            ->where('b.build', 14)
+            ->where('b.build', 15)
             ->sum('b.level');
         return $level;
     }

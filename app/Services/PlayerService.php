@@ -31,13 +31,15 @@ class PlayerService
     return $player;
   }
 
-  public function addAttackScore($playerId, $units)
-  {
+  public function addAttackScore($playerId, $units) {
     $player = Player::find($playerId);
+    if ($units < 0) {
+        $units = 0;
+    }
     $player->attackScore += $units;
     $player->save();
     return $player;
-  }
+}
 
   public function addMilitaryScore($playerId, $units)
   {
@@ -57,11 +59,15 @@ class PlayerService
 
   public function addDefenseScore($playerId, $units)
   {
-    $player = Player::find($playerId);
-    $player->defenseScore += $units;
-    $player->save();
-    return $player;
+      $player = Player::find($playerId);
+      if ($units < 0) {
+          $units = 0;
+      }
+      $player->defenseScore += $units;
+      $player->save();
+      return $player;
   }
+
 
   public function register(Player $player)
   {
