@@ -208,16 +208,19 @@ class SpaceCombatService
 
     # Apply scores
     foreach ($locals as $local) {
-      $playerService->addAttackScore($local->player, ($this->totalDemageInvasor / floor(count($locals))));
+        $damagePerLocal = max(0, $this->totalDemageInvasor / floor(count($locals)));
+        $playerService->addAttackScore($local->player, $damagePerLocal);
     }
+
     foreach ($invasors as $invasor) {
-      $playerService->addAttackScore($invasor->player, ($this->totalDemageLocal / floor(count($invasors))));
+        $damagePerInvasor = max(0, $this->totalDemageLocal / floor(count($invasors)));
+        $playerService->addAttackScore($invasor->player, $damagePerInvasor);
     }
 
     # Log stage informations
     $this->logStage(
       $combat,
-      "Invasor Kills: " . $this->totalKillInvasor . " Locals Kills: " . $this->totalKilllocal,
+      "Invasor Kills: " . $this->totalKillInvasor . " / Locals Kills: " . $this->totalKilllocal,
       $this->totalKillInvasor,
       $this->totalKilllocal,
       $this->totalDemageInvasor,
@@ -341,9 +344,11 @@ class SpaceCombatService
   }
 
   private function applyDemage($demage, $figther, $hp, $qtdPlayers, $effects, $ship) {
-    $demage = $demage + $effects;
+    $demage = max(0, $demage + $effects);
     $kills = $demage / $hp;
     $kills = ceil($kills / $qtdPlayers);
+
+    $kills = max(0, $kills);
 
     if ($figther->side == Combat::SIDE_LOCAL) {
       $this->totalDemageLocal += $demage;
@@ -354,13 +359,16 @@ class SpaceCombatService
     }
 
     if ($figther->$ship > 0) {
-      $figther->$ship -= $kills;
-      if ($figther->$ship < 0) {
-        $figther->$ship = 0;
-      }
+        $newQuantity = $figther->$ship - $kills;
+        if ($newQuantity < 0) {
+            $newQuantity = 0;
+        }
+
+        $figther->$ship = $newQuantity;
     }
     return $figther;
-  }
+}
+
 
   private function pillage($combat, $invasors) {
     $planet = Planet::find($combat->planet);
