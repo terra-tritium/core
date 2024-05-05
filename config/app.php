@@ -232,7 +232,7 @@ return [
     'tritium_crystal_base' => env('TRITIUM_CRYSTAL_BASE', 10),
     'tritium_humanoid_base' => env('TRITIUM_HUMANOID_BASE', 10),
     'tritium_humanoid_price' => env('TRITIUM_HUMANOID_PRICE', 500),
-    'tritium_transportship_base' => env('TRITIUM_TRANSPORTSHIP_BASE', 1000),
+    'tritium_transportship_base' => env('TRITIUM_TRANSPORTSHIP_BASE', 100),
     'tritium_transportship_price' => env('TRITIUM_TRANSPORTSHIP_PRICE', 2000),
     'tritium_transportship_capacity' => env('TRITIUM_TRANSPORTSHIP_CAPACITY', 500),
     'tritium_count_member_level_alliance' => env('TRITIUM_COUNT_MEMBER_LEVEL_ALIANCE', 5),
