@@ -309,11 +309,63 @@ class SpaceCombatService
     $this->logStage($combat, 'Combat finish, winner: ' . $winner);
 
     if ($winner == Combat::SIDE_INVASOR) {
-      $stolen = $this->pillage($combat, Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get());
-      $this->logStage($combat, 'Total stolen: ' . $stolen . ' resources');
+        $stolen = $this->pillage($combat, Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get());
+        $this->logStage($combat, 'Total stolen: ' . $stolen . ' resources');
     }
 
-  }
+    $fighters = Fighters::where('combat', $combatId)->get();
+    foreach ($fighters as $fighter) {
+        if ($fighter->side == $winner) {
+            $this->initiateReturn($combatId, $fighter, true);
+        } else {
+            $this->initiateReturn($combatId, $fighter, false, true);
+        }
+    }
+}
+
+private function initiateReturn($combatId, $fighter, $isWinner, $isLoser = false) {
+    $combat = Combat::find($combatId);
+    if (!$combat) return false;
+
+    $planetService = new PlanetService();
+    $now = time();
+    $resources = $isWinner ? ['metal' => $fighter->metal, 'crystal' => $fighter->crystal, 'uranium' => $fighter->uranium] : ['metal' => 0, 'crystal' => 0, 'uranium' => 0];
+
+    $travel = new Travel();
+    $travel->player = $fighter->player;
+    $travel->receptor = $fighter->player;
+    $travel->from = $combat->planet;
+    $travel->to = $fighter->planet;
+    $travel->action = Travel::RETURN_FLEET;
+    $travel->transportShips = $fighter->transportShips;
+    $travelTime = $planetService->calculeDistance($travel->from, $travel->to);
+    $travel->metal = $resources['metal'];
+    $travel->crystal = $resources['crystal'];
+    $travel->uranium = $resources['uranium'];
+    $travel->status = Travel::STATUS_ON_GOING;
+
+    if ($isLoser) {
+        $travel->cruiser = 0;
+        $travel->craft = 0;
+        $travel->bomber = 0;
+        $travel->scout = 0;
+        $travel->stealth = 0;
+        $travel->flagship = 0;
+        $travel->metal = 0;
+        $travel->crystal = 0;
+        $travel->uranium = 0;
+    } else {
+        $travel->cruiser = $fighter->cruiser;
+        $travel->craft = $fighter->craft;
+        $travel->bomber = $fighter->bomber;
+        $travel->scout = $fighter->scout;
+        $travel->stealth = $fighter->stealth;
+        $travel->flagship = $fighter->flagship;
+    }
+
+    $travel->save();
+    TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
+}
 
   private function haveShips($fighters) {
     $ships = 0;
