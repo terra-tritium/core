@@ -47,7 +47,7 @@ class ResearchService
         $researched->player = $player->id;
         $researched->code = $research->code;
         $player->researchPoints -= $research->cost;
-        
+
         # Don't have enough balance
         if ($player->researchPoints < 0) { return false; }
 
@@ -166,7 +166,7 @@ class ResearchService
         }
         $player->researchPoints += $points;
         $player->save();
-    }  
+    }
 
 
     public function updateBuildPower($planet, $power)
