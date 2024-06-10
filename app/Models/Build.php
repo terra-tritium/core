@@ -33,6 +33,9 @@ class Build extends Model
     CONST SHIELD = 12;
     CONST MARKET = 13;
     CONST GALACTICCOUNCIL = 14;
+    CONST TRITIUMMINNING = 15;
+
+
 
     public function building()
     {
