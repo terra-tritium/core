@@ -94,11 +94,11 @@ class BuildService
         if ($p1->ready != null && $p1->ready > time()) {
             return false;
         }
- 
+
 
         $require = $this->calcResourceRequire($building->build, 1, $player);
         $constructionSpeed = $this->effectService->calcConstructionBuildSpeed(config("app.tritium_construction_speed"),$player);
-        
+
         $building->ready = time() + ($require->time * $constructionSpeed);
         $p1->ready = $building->ready;
 
@@ -144,6 +144,14 @@ class BuildService
             $this->starNewMining($p1, $building, 3, 1, $require->metal);
         }
 
+        // Tritium Mining
+        if ($building->build == Build::TRITIUMMINNING) {
+            if (!$this->researchService->isResearched($player, 1400)) {
+                return false;
+            }
+            $this->starNewMining($p1, $building, 2, 1, $require->metal);
+        }
+
         // Warehouse
         if ($building->build == Build::WAREHOUSE) {
             if (!$this->researchService->isResearched($player, 1800)) {
@@ -182,7 +190,7 @@ class BuildService
             if ($building->slot != 4) {
                 return false;
             }
-        
+
             if ($this->planetService->enoughBalance($p1, $require->metal, 1, $levelEnergy)) {
                 $p1 = $this->planetService->removeMetal($p1, $require->metal);
                 $player = $this->playerService->addBuildScore($player, $require->metal * $this->basicScoreFator);
@@ -303,14 +311,14 @@ class BuildService
         $planet = Planet::find($building->planet);
         $player = Player::findOrFail($planet->player);
 
-        
+
         $require = $this->calcResourceRequire($building->build, $building->level + 1, $player);
 
         # Yet have a building in construction on this planet
         if ($planet->ready != null && $planet->ready > time()) {
             return false;
         }
-        
+
         $constructionSpeed = $this->effectService->calcConstructionBuildSpeed(config("app.tritium_construction_speed"),$player);
         $building->ready = time() + ($require->time * $constructionSpeed);
         $planet->ready = $building->ready;
