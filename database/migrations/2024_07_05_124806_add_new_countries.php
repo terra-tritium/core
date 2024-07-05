@@ -9,22 +9,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::table('paises')->insert([
-            'nome' => "Australia",
-            'codigo' => "AU",
-            'imagem' => "au.svg",
+        DB::table('countrys')->insert([
+            'name' => "Australia",
+            'code' => "AU",
+            'image' => "au.svg",
         ]);
         
-        DB::table('paises')->insert([
-            'nome' => "New Zealand",
-            'codigo' => "NZ",
-            'imagem' => "nz.svg",
+        DB::table('countrys')->insert([
+            'name' => "New Zealand",
+            'code' => "NZ",
+            'image' => "nz.svg",
         ]);
         
-        DB::table('paises')->insert([
-            'nome' => "Norway",
-            'codigo' => "NO",
-            'imagem' => "no.svg",
+        DB::table('countrys')->insert([
+            'name' => "Norway",
+            'code' => "NO",
+            'image' => "no.svg",
         ]);
         
     }
