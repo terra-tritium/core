@@ -27,7 +27,7 @@ class BuildSeeder extends Seeder
             "metalLevel" => 1,
             "uraniumLevel" => 2,
             "crystalLevel" => 3,
-            "coefficient" => 1000
+            "coefficient" => 150
         ]);
 
         DB::table('builds')->insert([
