@@ -103,7 +103,7 @@ class BuildService
         $p1->ready = $building->ready;
 
         // Colonization
-        if ($building->build == Build::COLONIZATION) {
+        if ($building->code == Build::COLONIZATION) {
             if ($this->planetService->enoughBalance($p1, $require->metal, 1, $levelEnergy)) {
                 $p1 = $this->planetService->removeMetal($p1, $require->metal);
                 $p1->save();
@@ -113,23 +113,23 @@ class BuildService
         }
 
         // Energy Collector
-        if ($building->build == Build::ENERGYCOLLECTOR) {
+        if ($building->code == Build::ENERGYCOLLECTOR) {
             $this->starNewMining($p1, $building, 0, 1, $require->metal);
         }
 
         // Humanoid Factory
-        if ($building->build == Build::HUMANOIDFACTORY) {
+        if ($building->code == Build::HUMANOIDFACTORY) {
             $this->starNewMining($p1, $building, 0, 1, $require->metal);
             $building->max_humanoids = 10;
         }
 
         // Metal Mining
-        if ($building->build == Build::METALMINING) {
+        if ($building->code == Build::METALMINING) {
             $this->starNewMining($p1, $building, 1, 1, $require->metal);
         }
 
         // Uranium Mining
-        if ($building->build == Build::URANIUMMINING) {
+        if ($building->code == Build::URANIUMMINING) {
             if (!$this->researchService->isResearched($player, 1300)) {
                 return false;
             }
@@ -137,7 +137,7 @@ class BuildService
         }
 
         // Crystal Mining
-        if ($building->build == Build::CRYSTALMINING) {
+        if ($building->code == Build::CRYSTALMINING) {
             if (!$this->researchService->isResearched($player, 1300)) {
                 return false;
             }
@@ -145,7 +145,7 @@ class BuildService
         }
 
         // Tritium Mining
-        if ($building->build == Build::TRITIUMMINNING) {
+        if ($building->code == Build::TRITIUMMINNING) {
             if (!$this->researchService->isResearched($player, 1400)) {
                 return false;
             }
@@ -153,14 +153,14 @@ class BuildService
         }
 
         // Warehouse
-        if ($building->build == Build::WAREHOUSE) {
+        if ($building->code == Build::WAREHOUSE) {
             if (!$this->researchService->isResearched($player, 1800)) {
                 return false;
             }
         }
 
         // Shipyard
-        if ($building->build == Build::SHIPYARD) {
+        if ($building->code == Build::SHIPYARD) {
             if (!$this->researchService->isResearched($player, 300)) {
                 return false;
             }
@@ -168,21 +168,21 @@ class BuildService
         }
 
         // Battery House
-        if ($building->build == Build::BATERYHOUSE) {
+        if ($building->code == Build::BATERYHOUSE) {
             if (!$this->researchService->isResearched($player, 2700)) {
                 return false;
             }
         }
 
         // Military Camp
-        if ($building->build == Build::MILITARYCAMP) {
+        if ($building->code == Build::MILITARYCAMP) {
             if (!$this->researchService->isResearched($player, 200)) {
                 return false;
             }
         }
 
         // Shield
-        if ($building->build == Build::SHIELD) {
+        if ($building->code == Build::SHIELD) {
             if (!$this->researchService->isResearched($player, 100)) {
                 return false;
             }
@@ -200,20 +200,20 @@ class BuildService
         }
 
         // Market
-        if ($building->build == Build::MARKET) {
+        if ($building->code == Build::MARKET) {
             if (!$this->researchService->isResearched($player, 1500)) {
                 return false;
             }
         }
 
         // Galatic Concil
-        if ($building->build == Build::GALACTICCOUNCIL) {
+        if ($building->code == Build::GALACTICCOUNCIL) {
             if (!$this->researchService->isResearched($player, 400)) {
                 return false;
             }
         }
 
-        if ($building->build == Build::COLONIZATION || $building->code > Build::METALMINING) {
+        if ($building->code == Build::COLONIZATION || $building->code > Build::METALMINING) {
             if ($this->planetService->enoughBalance($p1, $require->metal, 1, $levelEnergy)) {
                 $p1 = $this->planetService->removeMetal($p1, $require->metal);
                 $player = $this->playerService->addBuildScore($player, $require->metal * $this->basicScoreFator);
@@ -235,7 +235,7 @@ class BuildService
         }
 
         // Laboratory
-        if ($building->build == Build::LABORATORY) {
+        if ($building->code == Build::LABORATORY) {
             if ($this->planetService->enoughBalance($p1, $require->metal, 1, $levelEnergy)) {
                 $p1 = $this->planetService->removeMetal($p1, $require->metal);
                 $player = $this->playerService->addBuildScore($player, $require->metal * $this->basicScoreFator);
