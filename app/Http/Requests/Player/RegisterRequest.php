@@ -20,9 +20,9 @@ class RegisterRequest extends FormRequest
             'name' => 'required|unique:players,name|max:15|min:3|alpha_num_with_letter',
         ];
 
-        if (config('api.app_env') == 'production') {
-            $validate['g-recaptcha-response'] = 'required|recaptcha';
-        }
+        // if (config('api.app_env') == 'production') {
+        //     $validate['g-recaptcha-response'] = 'required|recaptcha';
+        // }
 
         return $validate;
     }

@@ -18,10 +18,10 @@ class LoginRequest extends FormRequest
             'password' => 'required',
         ];
 
-        if(config('api.app_env') == 'production')
-        {
-            $validate['g-recaptcha-response'] = 'required|recaptcha';
-        }
+        // if(config('api.app_env') == 'production')
+        // {
+        //     $validate['g-recaptcha-response'] = 'required|recaptcha';
+        // }
 
         return $validate;
     }
