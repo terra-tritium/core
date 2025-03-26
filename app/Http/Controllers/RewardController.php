@@ -21,7 +21,19 @@ class RewardController extends Controller
         } catch (\Exception $exception) {
             Log::error($exception);
             return response()->json(['message' => 'Reward controller error'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        } 
+        }
 
+    }
+
+    public function verify($code) {
+        $rewardService = new RewardService;
+        // Verifica se o usuario já fez esse claim antes
+        $result = $rewardService->verify($code);
+        if ($result == true) {
+            return response()->json("true", Response::HTTP_OK);
+        }
+        if ($result == false) {
+            return response()->json("false", Response::HTTP_OK);
+        }
     }
 }

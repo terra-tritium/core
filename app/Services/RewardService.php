@@ -5,7 +5,7 @@ namespace App\Services;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
-use app\Models\Reward;
+use App\Models\Reward;
 use App\Models\Player;
 use App\Models\Planet;
 
@@ -15,7 +15,7 @@ class RewardService
   {
     try {
       $player = Player::getPlayerLogged();
-      $existsReward = Reward::where([['user', $player->user->id], ['code', $code]])->first();
+      $existsReward = Reward::where([['user', $player->user], ['code', $code]])->first();
       $existsPlanet = Planet::find($planetId);
 
       if (!$this->isValidCode($code)) {
@@ -34,7 +34,7 @@ class RewardService
 
       $reward = new Reward();
       $reward->code = $code;
-      $reward->user = $player->user->id;
+      $reward->user = $player->user;
       $reward->used = 1;
       $reward->wallet = $wallet;
       $reward->save();
@@ -42,11 +42,22 @@ class RewardService
       return "ok";
 
     } catch (Exception $e) {
-      Log::error('Erro ao recuperar mensagens em grupo: ' . $e->getMessage());
+      Log::error('Erro ao executar um claim de reward: ' . $e->getMessage());
       return response()->json(
-          ['message' => "Erro ao enviar messagem", 'error' => $e->getMessage()],
+          ['message' => "Erro ao executar um claim de reward", 'error' => $e->getMessage()],
           Response::HTTP_INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  public function verify($code) {
+    $player = Player::getPlayerLogged();
+    $existsReward = Reward::where([['user', $player->user], ['code', $code]])->first();
+
+    if ($existsReward) {
+      return true;
+    } else {
+      return false;
     }
   }
 
