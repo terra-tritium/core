@@ -25,6 +25,7 @@ use App\Http\Controllers\CountryController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\ChallangeController;
+use App\Http\Controllers\RewardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -300,6 +301,10 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     });
     Route::group(['prefix' => 'espionage', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [EspionadeController::class, 'list']);
+    });
+
+    Route::group(['prefix' => 'reward', 'middleware' => 'throttle:240,1'], function () {
+        Route::post('/claim/{code}/{wallet}/{planetId}', [RewardController::class, 'claim']);
     });
 
 });
