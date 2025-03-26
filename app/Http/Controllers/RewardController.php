@@ -11,6 +11,11 @@ class RewardController extends Controller
     public function claim($code, $wallet, $planetId){
         try {
             $rewardService = new RewardService;
+
+            if (!$rewardService->validNFT($wallet)) {
+                return response()->json("No NFT valid", Response::HTTP_BAD_REQUEST);
+            }
+
             $resultClaim = $rewardService->claim($code, $wallet, $planetId);
             if ($resultClaim == "ok") {
                 return response()->json($resultClaim, Response::HTTP_OK);

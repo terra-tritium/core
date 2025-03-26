@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Reward;
 use App\Models\Player;
 use App\Models\Planet;
+use GuzzleHttp\Client;
 
 class RewardService
 {
@@ -59,6 +60,51 @@ class RewardService
     } else {
       return false;
     }
+  }
+
+  public function validNFT($wallet) {
+    $hasFounder = false;
+    $hasKey = false;
+    $client = new Client();
+
+    $query = base64_encode('{"tokens_with_info": { "owner": "'.$wallet.'"}}');
+    
+    try {
+        $response = $client->request('GET', 'https://lcd-terraclassic.tfl.foundation/cosmwasm/wasm/v1/contract/terra18sj5hluytww5hmy4teqsr4a7qr66pcd2x3qm9ns96ucpkdyserpszlx3qw/smart/' . $query, [
+            'headers' => [
+                'Accept' => 'application/json',
+            ]
+        ]);
+
+        $body = $response->getBody();
+        $data = json_decode($body, true);
+
+        if(!isset($data['data']['tokens'])){
+          return false;
+        }
+
+        if (count($data['data']['tokens']) <= 1) {
+          return false;
+        }
+
+        foreach($data['data']['tokens'] as $token){
+          $arrToken = explode("#", $token['name']);
+          $tokenName = $arrToken[0];
+          $codToken = $arrToken[1] + 0;
+
+          if ($tokenName == "TT_ORIGINS_ASSET_" && $codToken <= 250) {
+            $hasFounder = true;
+          }
+          if ($tokenName == "TT_ORIGINS_ASSET_" && ($codToken > 250 && $codToken <= 350)) {
+            $hasKey = true;
+          }
+        }
+
+    } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+
+    return ($hasFounder && $hasKey);
   }
 
   private function isValidCode($code) {
