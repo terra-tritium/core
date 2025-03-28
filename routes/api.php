@@ -309,7 +309,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/verify/{code}', [RewardController::class, 'verify']);
     });
 
-    Route::group(['shop' => 'reward', 'middleware' => 'throttle:240,1'], function () {
+    Route::group(['prefix' => 'shop', 'middleware' => 'throttle:240,1'], function () {
         Route::post('/buy/{code}/{planetId}', [RewardController::class, 'claim']);
         Route::post('/redeem/{wallet}/{collection}/{token_id}', [RewardController::class, 'verify']);
     });
