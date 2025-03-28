@@ -26,7 +26,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\ChallangeController;
 use App\Http\Controllers\RewardController;
-use App\Models\Reward;
+use App\Http\Controllers\ShopController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -310,8 +310,8 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     });
 
     Route::group(['prefix' => 'shop', 'middleware' => 'throttle:240,1'], function () {
-        Route::post('/buy/{code}/{planetId}', [RewardController::class, 'claim']);
-        Route::post('/redeem/{wallet}/{collection}/{token_id}', [RewardController::class, 'verify']);
+        Route::post('/buy/{code}/{planetId}', [ShopController::class, 'buy']);
+        Route::post('/redeem/{wallet}/{collection}/{token_id}', [ShopController::class, 'redeem']);
     });
 
 });

@@ -135,6 +135,8 @@ class ShopService
   private function processBuy($code, $planetId, $price) {
     $player = Player::getPlayerLogged();
 
+    $playerDTO = Player::find($player->id);
+
     switch ($code) {
       case "M001" : $this->addMetal($planetId, 25000);
         break;
@@ -162,8 +164,8 @@ class ShopService
         break;
     }
 
-    $player->tritium -= $price;
-    $player->save();
+    $playerDTO->tritium -= $price;
+    $playerDTO->save();
   }
 
   public function validNFT($wallet, $collection, $tokenId) {
