@@ -312,6 +312,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::group(['prefix' => 'shop', 'middleware' => 'throttle:240,1'], function () {
         Route::post('/buy/{code}/{planetId}', [ShopController::class, 'buy']);
         Route::post('/redeem/{wallet}/{collection}/{token_id}', [ShopController::class, 'redeem']);
+        Route::get('/used/{wallet}',  [ShopController::class, 'used']);
     });
 
 });

@@ -93,6 +93,64 @@ class ShopService
     }
   }
 
+  public function used($wallet) {
+    $client = new Client();
+    $query = base64_encode('{"tokens_with_info": { "owner": "'.$wallet.'"}}');
+
+    $listCards = [];
+    
+    try {
+        $moreNfts = true;
+
+        while ($moreNfts) {
+          $response = $client->request('GET', 'https://lcd-terraclassic.tfl.foundation/cosmwasm/wasm/v1/contract/'.$this->contract.'/smart/' . $query, [
+              'headers' => [
+                  'Accept' => 'application/json',
+              ]
+          ]);
+
+          $body = $response->getBody();
+          $data = json_decode($body, true);
+
+          if(!isset($data['data']['tokens'])){
+            return false;
+          }
+
+          if (count($data['data']['tokens']) <= 0) {
+            return false;
+          }
+
+          foreach($data['data']['tokens'] as $token){
+
+            if ($token['collection'] == $this->collection5k ||
+                $token['collection'] == $this->collection25k ||
+                $token['collection'] == $this->collection100k) {
+
+              $redeemFound = Redeem::where([['contract', $this->contract], ['collection', $this->collection5k], ['token_id', $token['token_id']]])->first();
+
+              if ($redeemFound) {
+                $token['used'] = 1;
+              } else {
+                $token['used'] = 0;
+              }
+              
+              array_push($listCards, $token);
+            }
+          }
+
+          if (count($data['data']['tokens']) < 20) {
+            $moreNfts = false;
+          }
+        }
+
+        return $listCards;
+
+    } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+
+  }
+
   private function getPrice($code) {
     switch ($code) {
       case "M001" : return 1000;

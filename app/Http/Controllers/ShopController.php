@@ -43,4 +43,18 @@ class ShopController extends Controller
             return response()->json(['message' => 'Shop controller error'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function used($wallet) {
+        try {
+            $shopService = new ShopService;
+
+            $resultUseList = $shopService->used($wallet);
+
+            return response()->json($resultUseList, Response::HTTP_OK);
+            
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'Shop controller error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
