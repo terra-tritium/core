@@ -27,6 +27,7 @@ use App\Http\Controllers\ServerController;
 use App\Http\Controllers\ChallangeController;
 use App\Http\Controllers\RewardController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\TritiumController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -313,6 +314,11 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/buy/{code}/{planetId}', [ShopController::class, 'buy']);
         Route::post('/redeem/{wallet}/{collection}/{token_id}', [ShopController::class, 'redeem']);
         Route::get('/used/{wallet}',  [ShopController::class, 'used']);
+    });
+
+    Route::group(['prefix' => 'tritium', 'middleware' => 'throttle:240,1'], function () {
+        Route::post('/upgrade/{planetId}/{building}', [TritiumController::class, 'upgrade']);
+        Route::post('/claim/{building}', [TritiumController::class, 'claim']);
     });
 
 });
