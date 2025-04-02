@@ -171,7 +171,7 @@ class ResearchService
 
     public function updateBuildPower($planet, $power)
     {
-        $building = Building::where([['planet', $planet], ['build', Build::LABORATORY]])->first();
+        $building = Building::where([['planet', $planet], ['build', 8 /*ID LABORATORY*/]])->first();
         if ($building) {
             $building->workers = $power;
             $building->save();
