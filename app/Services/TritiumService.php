@@ -29,11 +29,12 @@ class TritiumService
       }
 
       if ($building->level == 1) {
-        $building->start_tritium = time();
         $building->tritium = 0;
       } else {
-        $building->tritium += (time() - $building->start_tritium) * 0.0001;
+        $building->tritium += (time() - $building->start_tritium) * (($building->level - 1) * 0.0001);
       }
+
+      $building->start_tritium = time();
 
       $this->spendResources($playerDTO, $planet);
 
@@ -54,10 +55,14 @@ class TritiumService
   public function claim($building) {
     try {
       $player = Player::getPlayerLogged();
+
       $playerDTO = Player::find($player->id);
       $building = Building::find($building);
-      $building->tritium += (time() - $building->start_tritium) * 0.0001;
-      $playerDTO->tritium += $building->tritium;
+      $tritiumMinerado = (time() - $building->start_tritium) * (($building->level - 1) * 0.0001);
+      $playerDTO->tritium += intval($tritiumMinerado);
+      $building->tritium = 0;
+      $building->start_tritium = time();
+      $building->save();
       $playerDTO->save();
 
       return "ok";
@@ -90,5 +95,6 @@ class TritiumService
     $player->tritium -= 5000;
     $planet = $planetService->removeCrystal($planet, 9000);
     $planet->save();
+    $player->save();
   }
 }
