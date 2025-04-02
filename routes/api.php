@@ -111,7 +111,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/list', [PlanetController::class, 'list']);
         Route::get('/show/{id}', [PlanetController::class, 'show']);
         Route::get('/{quadrant}/{position}', [PlanetController::class, 'find']);
-        Route::put('/edit/{planet}', [PlanetController::class, 'update']);
+        Route::post('/edit/{planet}', [PlanetController::class, 'update']);
         Route::get('/calcule-distance/{origin}/{destiny}', [PlanetController::class, 'calculeDistance']);
     });
 
