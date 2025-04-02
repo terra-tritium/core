@@ -18,10 +18,11 @@ class WorkerService
   public function configWorkers ($planetId, $workers, $buildingId) {
     $planet = Planet::find($planetId);
     $building = Building::find($buildingId);
+    $build = Build::find($building->build);
 
     $this->syncronizeEnergy($planet);
 
-    switch ($building->build) {
+    switch ($build->code) {
       // Metal
       case Build::METALMINING :
           $planet->workersOnMetal = 0;
@@ -39,15 +40,16 @@ class WorkerService
         $planet->workersOnLaboratory = 0;
         break;
     }
-
+    
     if ($this->waitingWorkers($planet) < $workers) {
       return "Insuficients waiting workers";
     }
 
+
     if ($workers < 0) {
         return "Invalid workers";
     } else {
-        switch ($building->build) {
+        switch ($build->code) {
             // Metal
             case Build::METALMINING :
                 $planet->metal = $this->planetService->currentBalance($planet, 1);
