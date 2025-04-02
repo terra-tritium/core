@@ -311,6 +311,11 @@ class BuildService
         $planet = Planet::find($building->planet);
         $player = Player::findOrFail($planet->player);
 
+        // Tritium mining no upgrade by this way
+        if ($building->build == 1) {
+            return "Build no elegible";
+        }
+
 
         $require = $this->calcResourceRequire($building->build, $building->level + 1, $player);
 
