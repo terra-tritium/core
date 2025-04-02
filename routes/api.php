@@ -26,7 +26,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\ChallangeController;
 use App\Http\Controllers\RewardController;
-use App\Models\Reward;
+use App\Http\Controllers\ShopController;
+use App\Http\Controllers\TritiumController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -110,7 +111,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/list', [PlanetController::class, 'list']);
         Route::get('/show/{id}', [PlanetController::class, 'show']);
         Route::get('/{quadrant}/{position}', [PlanetController::class, 'find']);
-        Route::put('/edit/{planet}', [PlanetController::class, 'update']);
+        Route::post('/edit/{planet}', [PlanetController::class, 'update']);
         Route::get('/calcule-distance/{origin}/{destiny}', [PlanetController::class, 'calculeDistance']);
     });
 
@@ -307,6 +308,17 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::group(['prefix' => 'reward', 'middleware' => 'throttle:240,1'], function () {
         Route::post('/claim/{code}/{wallet}/{planetId}', [RewardController::class, 'claim']);
         Route::get('/verify/{code}', [RewardController::class, 'verify']);
+    });
+
+    Route::group(['prefix' => 'shop', 'middleware' => 'throttle:240,1'], function () {
+        Route::post('/buy/{code}/{planetId}', [ShopController::class, 'buy']);
+        Route::post('/redeem/{wallet}/{collection}/{token_id}', [ShopController::class, 'redeem']);
+        Route::get('/used/{wallet}',  [ShopController::class, 'used']);
+    });
+
+    Route::group(['prefix' => 'tritium', 'middleware' => 'throttle:240,1'], function () {
+        Route::post('/upgrade/{planetId}/{building}', [TritiumController::class, 'upgrade']);
+        Route::post('/claim/{building}', [TritiumController::class, 'claim']);
     });
 
 });

@@ -34,7 +34,7 @@ class PlanetService
     $planet->energy = $currentBalance;
     $planet->timeEnergy = $this->timeNow;
     $planet->save();
-}
+  }
 
 public function syncronizeDefenseScore(Planet $planet) {
   $defenseMultiplier = $planet->terrainType ? $planet->terrainType->defenseScore : 1.0;
@@ -82,21 +82,25 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
       return true;
     }
     switch ($type) {
+      // Energia
       case 0:
         if ($this->currentBalance($p1, 0, $energyLevel) >= $units) {
           return true;
         }
         break;
+      // Metal
       case 1:
         if ($this->currentBalance($p1, 1, $energyLevel) >= $units) {
           return true;
         }
         break;
+      // Uranium
       case 2:
         if ($this->currentBalance($p1, 2, $energyLevel) >= $units) {
           return true;
         }
         break;
+      // Cristal
       case 3:
         if ($this->currentBalance($p1, 3, $energyLevel) >= $units) {
           return true;
@@ -111,22 +115,22 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
 
     switch ($resource) {
       case 0:
-        $planet->timeEnergy = $this->timeNow;
+        $planet->timeEnergy = time();
         $planet->pwEnergy = 1;
         break;
 
       case 1:
-        $planet->timeMetal = $this->timeNow;
+        $planet->timeMetal = time();
         $planet->pwMetal = 0;
         break;
 
       case 2:
-        $planet->timeUranium = $this->timeNow;
+        $planet->timeUranium = time();
         $planet->pwUranium = 0;
         break;
 
       case 3:
-        $planet->timeCrystal = $this->timeNow;
+        $planet->timeCrystal = time();
         $planet->pwCrystal = 0;
         break;
     }
