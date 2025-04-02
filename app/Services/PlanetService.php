@@ -34,7 +34,7 @@ class PlanetService
     $planet->energy = $currentBalance;
     $planet->timeEnergy = $this->timeNow;
     $planet->save();
-}
+  }
 
 public function syncronizeDefenseScore(Planet $planet) {
   $defenseMultiplier = $planet->terrainType ? $planet->terrainType->defenseScore : 1.0;
@@ -115,22 +115,22 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
 
     switch ($resource) {
       case 0:
-        $planet->timeEnergy = $this->timeNow;
+        $planet->timeEnergy = time();
         $planet->pwEnergy = 1;
         break;
 
       case 1:
-        $planet->timeMetal = $this->timeNow;
+        $planet->timeMetal = time();
         $planet->pwMetal = 0;
         break;
 
       case 2:
-        $planet->timeUranium = $this->timeNow;
+        $planet->timeUranium = time();
         $planet->pwUranium = 0;
         break;
 
       case 3:
-        $planet->timeCrystal = $this->timeNow;
+        $planet->timeCrystal = time();
         $planet->pwCrystal = 0;
         break;
     }

@@ -310,9 +310,10 @@ class BuildService
         $building = Building::find($buildingId);
         $planet = Planet::find($building->planet);
         $player = Player::findOrFail($planet->player);
+        $build = Build::find($building->build);
 
         // Tritium mining no upgrade by this way
-        if ($building->build == 1) {
+        if ($build->code == Build::TRITIUMMINNING) {
             return "Build no elegible";
         }
 
@@ -338,22 +339,25 @@ class BuildService
         $building->level += 1;
 
         // Battery House
-        if ($building->build == Build::BATERYHOUSE) {
+        if ($build->code == Build::BATERYHOUSE) {
             $this->planetService->incrementBattery($planet, $this->initialBattery * $building->level);
         }
 
         // Energy
-        if ($building->build == Build::ENERGYCOLLECTOR) {
+        if ($build->code == Build::ENERGYCOLLECTOR) {
             $planet->pwEnergy = $building->level;
+            if ($planet->timeEnergy == null) {
+                $planet->timeEnergy = time();
+            }
         }
 
         // Humanoid Factory
-        if ($building->build == Build::HUMANOIDFACTORY) {
+        if ($build->code == Build::HUMANOIDFACTORY) {
             $building->max_humanoids = $building->level * 10;
         }
 
         // Warehouse
-        if ($building->build == Build::WAREHOUSE) {
+        if ($build->code == Build::WAREHOUSE) {
             $planet->capMetal = $building->level * 10000;
             $planet->capUranium = $building->level * 10000;
             $planet->capCrystal = $building->level * 10000;
