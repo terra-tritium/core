@@ -34,8 +34,8 @@ class RobotFactoryService
     $planet = Planet::where("id", $planetId)->where("player", $player->id)->firstOrFail();
 
     $humanoidFactoryBuilding = Building::where('planet', $planetId)
-                                        ->where('build', 3) 
-                                        ->get();          
+                                        ->where('build', 4)
+                                        ->get();
     
     if (count($humanoidFactoryBuilding) == 0 || $qtd > $humanoidFactoryBuilding[0]->max_humanoids) {
         return false; 
