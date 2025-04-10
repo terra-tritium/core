@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Building;
 use App\Models\Planet;
 use App\Models\Player;
+use App\Models\Build;
 use App\Services\WorkerService;
 
 class RobotFactoryService
@@ -32,9 +33,10 @@ class RobotFactoryService
 
     // update planet info after woker service syncronize energy
     $planet = Planet::where("id", $planetId)->where("player", $player->id)->firstOrFail();
+    $build = Build::where("code", Build::HUMANOIDFACTORY)->firstOrFail();
 
     $humanoidFactoryBuilding = Building::where('planet', $planetId)
-                                        ->where('build', 4)
+                                        ->where('build', $build->id)
                                         ->get();
     
     if (count($humanoidFactoryBuilding) == 0 || $qtd > $humanoidFactoryBuilding[0]->max_humanoids) {
