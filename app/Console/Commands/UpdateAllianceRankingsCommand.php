@@ -23,12 +23,19 @@ class UpdateAllianceRankingsCommand extends Command
     public function handle()
     {
         try {
-            $aliances = Aliance::all();
+            // Usando carregamento eager para as relações
+            $aliances = Aliance::with(['players.planets'])->get();
 
             foreach ($aliances as $aliance) {
-                $energy = $aliance->players->sum(function ($player) {
-                    return $player->planets->sum('energy');
-                });
+                $energy = 0;
+
+                // Verifica se há jogadores antes de tentar somar a energia
+                if ($aliance->players) {
+                    $energy = $aliance->players->sum(function ($player) {
+                        // Verifica se o jogador tem planetas antes de somar a energia
+                        return $player->planets ? $player->planets->sum('energy') : 0;
+                    });
+                }
 
                 $ranking = AlianceRanking::firstOrNew(['aliance' => $aliance->id]);
                 $ranking->energy = $energy;
@@ -47,4 +54,5 @@ class UpdateAllianceRankingsCommand extends Command
             Log::error('Erro no agendamento de ranking aliance: ' . $e->getMessage());
         }
     }
+
 }
