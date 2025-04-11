@@ -38,7 +38,7 @@ class Aliance extends Model
             ->sum('b.level');
         return $level;
     }
-    public function getSumScoresMembers()
+    public static function getSumScoresMembers()
     {
         $aliances = Aliance::select(
             'aliances.name',
@@ -49,7 +49,9 @@ class Aliance extends Model
             DB::raw('SUM(players.buildScore) as buildScore'),
             DB::raw('SUM(players.defenseScore) as defenseScore'),
             DB::raw('SUM(players.militaryScore) as militaryScore'),
-            DB::raw('SUM(players.researchScore) as researchScore')
+            DB::raw('SUM(players.militaryScore) as warScore'),
+            DB::raw('SUM(players.researchScore) as researchScore'),
+            DB::raw('SUM(players.researchScore) as labScore')
         )
             ->join('aliances_members', 'aliances_members.idAliance', '=', 'aliances.id')
             ->join('players', 'players.id', '=', 'aliances_members.player_id')

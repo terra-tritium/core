@@ -24,28 +24,18 @@ class UpdateAllianceRankingsCommand extends Command
     {
         try {
             // Usando carregamento eager para as relações
-            $aliances = Aliance::with(['players.planets'])->get();
+            $aliances = Aliance::getSumScoresMembers();
 
             foreach ($aliances as $aliance) {
-                $energy = 0;
-
-                // Verifica se há jogadores antes de tentar somar a energia
-                if ($aliance->players) {
-                    $energy = $aliance->players->sum(function ($player) {
-                        // Verifica se o jogador tem planetas antes de somar a energia
-                        return $player->planets ? $player->planets->sum('energy') : 0;
-                    });
-                }
-
+                
                 $ranking = AlianceRanking::firstOrNew(['aliance' => $aliance->id]);
-                $ranking->energy = $energy;
                 $ranking->score = $aliance->score;
                 $ranking->buildScore = $aliance->buildScore;
-                $ranking->labScore = $aliance->labScore;
-                $ranking->tradeScore = $aliance->tradeScore;
+                $ranking->labScore = $aliance->researchScore;
                 $ranking->attackScore = $aliance->attackScore;
                 $ranking->defenseScore = $aliance->defenseScore;
-                $ranking->warScore = $aliance->warScore;
+                $ranking->warScore = $aliance->militaryScore;
+                $ranking->tradeScore = 0;
                 $ranking->save();
             }
 
