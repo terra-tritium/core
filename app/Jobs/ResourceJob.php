@@ -63,9 +63,10 @@ class ResourceJob implements ShouldQueue
 
         ProcessJob::where(['planet' => $this->origin,'type' => ProcessJob::TYPE_CARRYING])->delete();
         try{
-            $this->travelService->start($this->player,$travel);
+            $this->travelService->start($this->player, $travel);
         } catch (\Exception $e)
         {
+            Log::error($e->getMessage());
             $planetOrigim = Planet::findOrFail($this->origin);
             $planetOrigim->metal    += $this->metal;
             $planetOrigim->uranium  += $this->uranium;

@@ -23,22 +23,19 @@ class UpdateAllianceRankingsCommand extends Command
     public function handle()
     {
         try {
-            $aliances = Aliance::all();
+            // Usando carregamento eager para as relações
+            $aliances = Aliance::getSumScoresMembers();
 
             foreach ($aliances as $aliance) {
-                $energy = $aliance->players->sum(function ($player) {
-                    return $player->planets->sum('energy');
-                });
-
+                
                 $ranking = AlianceRanking::firstOrNew(['aliance' => $aliance->id]);
-                $ranking->energy = $energy;
                 $ranking->score = $aliance->score;
                 $ranking->buildScore = $aliance->buildScore;
-                $ranking->labScore = $aliance->labScore;
-                $ranking->tradeScore = $aliance->tradeScore;
+                $ranking->labScore = $aliance->researchScore;
                 $ranking->attackScore = $aliance->attackScore;
                 $ranking->defenseScore = $aliance->defenseScore;
-                $ranking->warScore = $aliance->warScore;
+                $ranking->warScore = $aliance->militaryScore;
+                $ranking->tradeScore = 0;
                 $ranking->save();
             }
 
@@ -47,4 +44,5 @@ class UpdateAllianceRankingsCommand extends Command
             Log::error('Erro no agendamento de ranking aliance: ' . $e->getMessage());
         }
     }
+
 }

@@ -103,8 +103,10 @@ class WorkerService
     if ($planet->timeEnergy == null) { return false; }
     if ($planet->timeEnergy == 0) { return false; }
 
+    $build = Build::where("code", Build::ENERGYCOLLECTOR)->firstOrFail();
+
     try {
-      $level = Building::where(['build' => Build::ENERGYCOLLECTOR, 'planet' => $planet->id])->first()->level;
+      $level = Building::where(['build' => $build->id, 'planet' => $planet->id])->first()->level;
 
       $workersOnEnergy = 0;
       $workersByLevel = $level * config("app.tritium_energy_workers_by_level");
