@@ -75,6 +75,12 @@ class ResourceService
             $transportShipsInUse
         )->delay(now()->addSeconds($timeLoad));
 
+        $log = new Logbook();
+        $log->player = $planetOrigin->player;
+        $log->text = "Resource loading process started, expected to be ready " . now()->addSeconds($timeLoad);
+        $log->type = "Transport";
+        $log->save();
+
         return response()->json(["message" => "atualizados"], Response::HTTP_OK);
 
     }

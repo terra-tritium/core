@@ -662,7 +662,7 @@ class TravelService
         $planetTarget->crystal += $travelModel->crystal;
 
         $planetTarget->save();
-        $this->logService->notify($planetTarget->player, "You received a resource", "Mission");
+        $this->logService->notify($planetTarget->player, "You received a resource: Metal [".$travelModel->metal."] Uranium [".$travelModel->uranium."] Crystal [".$travelModel->crystal."]", "Mission");
         $this->back($travel);
     }
 
@@ -670,16 +670,23 @@ class TravelService
     {
         $travelModel = Travel::findOrFail($travel);
         $playerOrige = Player::findOrFail($travelModel->player);
-        $playerOrige->transportShips += $travelModel->transportShips ;
+        $playerOrige->transportShips += $travelModel->transportShips;
         $playerOrige->save();
-        $this->logService->notify($playerOrige->id, "Your freighter has returned from its trip", "Mission");
+        $this->logService->notify($playerOrige->id, "Your freighter has returned from its trip, TransportShips [".$travelModel->transportShips."]", "Mission");
     }
 
     public function getCurrent($player)
     {
         $currentTravel = Travel::with('from', 'to')
-                                ->where('player', $player)
-                                ->whereIn('status',[2,3])->orderBy('arrival')->get();
+                                ->where(function ($query) use ($player) {
+                                    $query->where('player', $player)
+                                        ->orWhere('receptor', $player);
+                                })
+                                ->whereIn('status',[
+                                    Travel::STATUS_ON_LOAD,
+                                    Travel::STATUS_ON_GOING,
+                                    Travel::STATUS_RETURN]
+                                )->orderBy('arrival')->get();
         return  $currentTravel;
     }
 
