@@ -319,6 +319,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::group(['prefix' => 'tritium', 'middleware' => 'throttle:240,1'], function () {
         Route::post('/upgrade/{planetId}/{building}', [TritiumController::class, 'upgrade']);
         Route::post('/claim/{building}', [TritiumController::class, 'claim']);
+        Route::post('/swap/{txhash}',  [TritiumController::class, 'swap']);
     });
 
 });

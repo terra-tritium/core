@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Building;
 use App\Models\Player;
 use App\Models\Planet;
+use App\Models\Swap;
 use App\Services\PlanetService;
 
 class TritiumService
@@ -74,6 +75,34 @@ class TritiumService
           Response::HTTP_INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  public function swap($thash, $amount, $memo) {
+
+    $swapFound = Swap::where('txhash', $thash)->first();
+
+    if ($swapFound) {
+      return "TxHash already used";
+    }
+
+    # Padronize amount value for 6 blockchain decimals
+    $amount = $amount / 1000000;
+
+    $player = Player::getPlayerLogged();
+
+    $playerDTO = Player::find($player->id);
+    $playerDTO->tritium += $amount;
+    $playerDTO->save();
+
+    $swapDTO = new Swap();
+    $swapDTO->txhash = $thash;
+    $swapDTO->user = $player->id;
+    $swapDTO->tritium = $amount;
+    $swapDTO->memo = $memo;
+    $swapDTO->used = 1;
+    $swapDTO->save();
+
+    return "ok";
   }
 
   private function hasFunds($player, $planet) {
