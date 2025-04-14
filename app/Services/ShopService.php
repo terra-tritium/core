@@ -22,8 +22,9 @@ class ShopService
   {
     try {
       $player = Player::getPlayerLogged();
+      $playerDTO = Player::find($player->id);
 
-      $existsRedeem = Redeem::where([['contract', $this->contract], ['collection', $collection], ['token_id', $token_id]])->first();
+      $existsRedeem = Redeem::where([['contract', $this->contract], ['colection', $collection], ['token_id', $token_id]])->first();
 
       if ($existsRedeem) {
         return "Redeem no elegible";
@@ -34,23 +35,22 @@ class ShopService
       }
 
       switch ($collection) {
-        case $this->collection1k : $player->tritium += 1000;
+        case $this->collection1k : $playerDTO->tritium += 1000;
           break;
-        case $this->collection5k : $player->tritium += 5000;
+        case $this->collection5k : $playerDTO->tritium += 5000;
           break;
-        case $this->collection25k : $player->tritium += 25000;
+        case $this->collection25k : $playerDTO->tritium += 25000;
           break;
       }
 
-      $player->save();
+      $playerDTO->save();
 
       $reward = new Redeem();
-      $reward->code = $token_id;
-      $reward->user = $player->user;
+      $reward->token_id = $token_id;
+      $reward->user = $player->id;
       $reward->used = 1;
       $reward->contract = $this->contract;
-      $reward->collection = $collection;
-      $reward->token_id = $token_id;
+      $reward->colection = $collection;
       $reward->save();
 
       return "ok";
@@ -137,9 +137,8 @@ class ShopService
                 $token['used'] = 1;
               } else {
                 $token['used'] = 0;
+                array_push($listCards, $token);
               }
-              
-              array_push($listCards, $token);
             }
           }
 

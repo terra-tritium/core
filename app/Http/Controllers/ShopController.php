@@ -33,9 +33,9 @@ class ShopController extends Controller
             $resultRedeem = $shopService->redeem($wallet, $collection, $token_id);
 
             if ($resultRedeem == "ok") {
-                return response()->json($resultRedeem, Response::HTTP_OK);
+                return response()->json(['message' => $resultRedeem], Response::HTTP_OK);
             } else {
-                return response()->json($resultRedeem, Response::HTTP_BAD_REQUEST);
+                return response()->json(['message' => $resultRedeem], Response::HTTP_BAD_REQUEST);
             }
             
         } catch (\Exception $exception) {
