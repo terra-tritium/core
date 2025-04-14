@@ -13,9 +13,9 @@ use GuzzleHttp\Client;
 class ShopService
 {
 
-  private $collection5k = 500;
-  private $collection25k = 501;
-  private $collection100k = 502;
+  private $collection1k = 151;
+  private $collection5k = 152;
+  private $collection25k = 153;
   private $contract = "terra18sj5hluytww5hmy4teqsr4a7qr66pcd2x3qm9ns96ucpkdyserpszlx3qw";
 
   public function redeem($wallet, $collection, $token_id)
@@ -34,11 +34,11 @@ class ShopService
       }
 
       switch ($collection) {
+        case $this->collection1k : $player->tritium += 1000;
+          break;
         case $this->collection5k : $player->tritium += 5000;
           break;
         case $this->collection25k : $player->tritium += 25000;
-          break;
-        case $this->collection100k : $player->tritium += 100000;
           break;
       }
 
@@ -95,14 +95,17 @@ class ShopService
 
   public function used($wallet) {
     $client = new Client();
-    $query = base64_encode('{"tokens_with_info": { "owner": "'.$wallet.'"}}');
 
     $listCards = [];
     
     try {
         $moreNfts = true;
+        $navigateIndex = 0;
 
         while ($moreNfts) {
+
+          $query = base64_encode('{"tokens_with_info": { "owner": "'.$wallet.'", "start_after": '.$navigateIndex.'}}');
+
           $response = $client->request('GET', 'https://lcd-terraclassic.tfl.foundation/cosmwasm/wasm/v1/contract/'.$this->contract.'/smart/' . $query, [
               'headers' => [
                   'Accept' => 'application/json',
@@ -122,11 +125,13 @@ class ShopService
 
           foreach($data['data']['tokens'] as $token){
 
-            if ($token['collection'] == $this->collection5k ||
-                $token['collection'] == $this->collection25k ||
-                $token['collection'] == $this->collection100k) {
+            $collection = $token['collection'];
 
-              $redeemFound = Redeem::where([['contract', $this->contract], ['collection', $this->collection5k], ['token_id', $token['token_id']]])->first();
+            if ($collection == $this->collection1k ||
+                $collection == $this->collection5k ||
+                $collection == $this->collection25k) {
+
+              $redeemFound = Redeem::where([['contract', $this->contract], ['colection', $collection], ['token_id', $token['token_id']]])->first();
 
               if ($redeemFound) {
                 $token['used'] = 1;
@@ -140,6 +145,8 @@ class ShopService
 
           if (count($data['data']['tokens']) < 20) {
             $moreNfts = false;
+          } else {
+            $navigateIndex += 20;
           }
         }
 
