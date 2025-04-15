@@ -303,9 +303,9 @@ class TravelService
     public function missionColonization ($travel) {
         $planet = Planet::find($travel->to);
         $planet->player = $travel->player;
-        $planet->metal = 50000;
-        $planet->uranium = 25000;
-        $planet->crystal = 25000;
+        $planet->metal = 1500;
+        $planet->uranium = 0;
+        $planet->crystal = 0;
         $planet->save();
 
         $logService = new LogService();
