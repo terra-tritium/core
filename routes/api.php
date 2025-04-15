@@ -169,7 +169,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/missions/{action}', [TravelController::class, 'missions']);
         Route::post('/start', [TravelController::class, 'start']);
         Route::post('/back', [TravelController::class, 'back']);
-        Route::put('/cancel/{travel}', [TravelController::class, 'cancel']);
+        Route::post('/cancel/{travel}', [TravelController::class, 'cancel']);
         Route::post('/spey', [TravelController::class, 'speyMission']);
     });
 
@@ -182,9 +182,9 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/list', [CombatController::class, 'list']);
         Route::get('/strategy/list/', [CombatController::class, 'listStrategy']);
         Route::get('/strategy/selected/{planet}',[CombatController::class, 'strategiesSelectedPlanet']);
-        Route::put('/strategy/{planet}/{type}/{newStrategy}',[CombatController::class, 'changeStrategy']);
+        Route::post('/strategy/{planet}/{type}/{newStrategy}',[CombatController::class, 'changeStrategy']);
         Route::get("/check-number-planets",[CombatController::class, 'checkNumberOfPlanets']);
-        Route::put("/colonizer/{planet}",[CombatController::class, "colonizePlanet"]);
+        Route::post("/colonizer/{planet}",[CombatController::class, "colonizePlanet"]);
         Route::get("/available-ship",[CombatController::class, "availableShip"]);
         Route::post("/actionmode",[CombatController::class, "actionMode"]);
         Route::get("/available-resources/{planet}",[CombatController::class, "availableResources"]);
@@ -232,17 +232,17 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::group(['prefix' => 'logs', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/logs', [LogController::class, 'logs']);
         Route::post('/create', [LogController::class, 'create']);
-        Route::put('/update/{id}',[LogController::class, 'update']);
+        Route::post('/update/{id}',[LogController::class, 'update']);
         Route::get('/processjob/{type}', [LogController::class, 'jobSleep']);
     });
 
     Route::group(['prefix' => 'aliance', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [AliancesController::class, 'index']);
         Route::post('/create', [AliancesController::class, 'create']);
-        Route::put('/edit/{id}', [AliancesController::class, 'update']);
+        Route::post('/edit/{id}', [AliancesController::class, 'update']);
         Route::delete('/delete/{idAliance}', [AliancesController::class, 'destroy']);
 
-        Route::put('/updatelogo/{id}', [AliancesController::class, 'updateLogo']);
+        Route::post('/updatelogo/{id}', [AliancesController::class, 'updateLogo']);
         Route::post('/join', [AliancesController::class,'joinAliance']);
         Route::post('/request', [AliancesController::class,'handlePlayerRequest']);
         Route::post('/leave',[AliancesController::class,'leaveAliance']);
@@ -253,22 +253,22 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::get('/myaliance/details', [AliancesController::class, 'alianceDetailsCreated']);
         Route::get('/members/{alianceId}', [AliancesController::class,'listMembers']);
         Route::get('/members/pending/{alianceId}',[AliancesController::class, 'listMembersPending']);
-        Route::patch('member/remove/{memberId}', [AliancesController::class, 'removeMember']);
+        Route::post('member/remove/{memberId}', [AliancesController::class, 'removeMember']);
         Route::get('/logos',[AliancesController::class, 'allLogos']);
-        Route::put('/member/update-request/{idMemberAliance}/{action}',[AliancesController::class, 'updateRequestMember']);
+        Route::post('/member/update-request/{idMemberAliance}/{action}',[AliancesController::class, 'updateRequestMember']);
         Route::get('/available-name/{name}',[AliancesController::class, 'getAvailableName']);
-        Route::put('/exit/{alianceId}',[AliancesController::class, 'exit']);
-        Route::put('/cancel-request',[AliancesController::class, 'cancelRequest']);
+        Route::post('/exit/{alianceId}',[AliancesController::class, 'exit']);
+        Route::post('/cancel-request',[AliancesController::class, 'cancelRequest']);
         Route::get('/ranks',[AliancesController::class, 'getRanks']);
         Route::get('/members-rank/{idAliance}',[AliancesController::class, 'getMembersRank']);
-        Route::put('/change-rank/{idRank}/{idMember}/{idAliance}',[AliancesController::class, 'changeRankMember']);
-        Route::put('/relinquish-rank/{idAliance}/{idMember}',[AliancesController::class, 'deixarRank']);
+        Route::post('/change-rank/{idRank}/{idMember}/{idAliance}',[AliancesController::class, 'changeRankMember']);
+        Route::post('/relinquish-rank/{idAliance}/{idMember}',[AliancesController::class, 'deixarRank']);
         Route::get('/member/units/{playerid}/{type}',[AliancesController::class, 'getUnitsPlayer']);
         /** Chat Alianca */
         Route::get('/list-aliance-chat',[AliancesController::class, 'listAlianceForChat']);
         Route::post('/chat',[AliancesController::class, 'newMessageGroup']);/*  */
         Route::get('/chat/{idAliance}',[AliancesController::class, 'getMessagesGroup']);
-        Route::put('/chat/{idMessage}',[AliancesController::class, 'delMessage']);
+        Route::post('/chat/{idMessage}',[AliancesController::class, 'delMessage']);
         Route::post('/chat-aliance',[AliancesController::class, 'newMessageAliance']);
         Route::get('/chat-with-aliance/{destino}',[AliancesController::class, 'getMessageWithAliance']);
 
@@ -286,7 +286,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/new-sale', [TradingController::class, 'tradingNewSale']);
         Route::post('/new-purch',[TradingController::class, 'tradingNewPurchase']);
         Route::get('/my-history/{planet}/{id}', [TradingController::class, 'getAllOrderByPlanet']);
-        Route::patch('/cancel/{planet}/{id}', [TradingController::class, 'cancelOrder']);
+        Route::post('/cancel/{planet}/{id}', [TradingController::class, 'cancelOrder']);
         Route::get('/trading-process/{planet}/{id}',[TradingController::class, 'getTradingProcess']);
         Route::post('/finish', [TradingController::class, 'finishTrading']);
         Route::get('/last-trading',[TradingController::class, 'lastTrading'] );
