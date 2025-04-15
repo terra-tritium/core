@@ -68,7 +68,11 @@ class SpaceCombatService
     $player2->combat = $combat->id;
     $player2->player = $planet->player;
     $player2->side = Combat::SIDE_LOCAL;
-    $player2->strategy = $planet->defenseStrategy;
+    if ($planet->defenseStrategy) {
+      $player2->strategy = $planet->defenseStrategy;
+    } else {
+      $player2->strategy = 1;
+    }
     $player2->demage = 0;
     $player2->start = time();
     $player2->stage = 0;
@@ -318,13 +322,11 @@ class SpaceCombatService
 
     // Perdeu a batalha então pega o caminho de volta de maos vazias
     if ($winner == Combat::SIDE_LOCAL) {
-      $this->initiateReturn($combatId, $lutadorInvasor);
+      $this->initiateReturn($combat, $lutadorInvasor);
     }
 }
 
-private function initiateReturn($combatId, $fighter) {
-    $combat = Combat::find($combatId);
-    if (!$combat) return false;
+private function initiateReturn($combat, $fighter) {
 
     $planetService = new PlanetService();
     $now = time();
