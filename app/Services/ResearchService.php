@@ -22,7 +22,6 @@ class ResearchService
 
     public function laboratoryConfig($player, $planet, $power)
     {
-
         $planet->workersWaiting = $planet->workers - ($planet->workersOnMetal + $planet->workersOnUranium + $planet->workersOnCrystal + $power);
 
         # Don't have enough workers
@@ -35,8 +34,8 @@ class ResearchService
         $planet->workersOnLaboratory = (int) $power;
         $planet->save();
 
-        $this->workerService->syncronizeEnergy($planet);
         $this->updateBuildPower($planet->id, $power);
+        $this->workerService->syncronizeEnergy($planet);
 
         return $planet;
     }
@@ -171,7 +170,8 @@ class ResearchService
 
     public function updateBuildPower($planet, $power)
     {
-        $building = Building::where([['planet', $planet], ['build', 8 /*ID LABORATORY*/]])->first();
+        $build = Build::where("code", Build::LABORATORY)->first();
+        $building = Building::where([['planet', $planet], ['build', $build->id]])->first();
         if ($building) {
             $building->workers = $power;
             $building->save();
