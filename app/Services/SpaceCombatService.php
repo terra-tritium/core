@@ -312,22 +312,23 @@ class SpaceCombatService
     $combat->save();
     $this->logStage($combat, 'Combat finish, winner: ' . $winner);
 
-    $lutadorInvasor = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
+    $timeInvasor = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
 
     // Venceu a batalha entao pilha o planeta atacado
     if ($winner == Combat::SIDE_INVASOR) {
-        $stolen = $this->pillage($combat, $lutadorInvasor);
+        $stolen = $this->pillage($combat, $timeInvasor);
         $this->logStage($combat, 'Total stolen: ' . $stolen . ' resources');
     }
 
     // Perdeu a batalha então pega o caminho de volta de maos vazias
     if ($winner == Combat::SIDE_LOCAL) {
-      $this->initiateReturn($combat, $lutadorInvasor);
+      $this->initiateReturn($combat, $timeInvasor);
     }
 }
 
-private function initiateReturn($combat, $fighter) {
+private function initiateReturn($combat, $timeInvasor) {
 
+  foreach ($timeInvasor as $fighter) {
     $planetService = new PlanetService();
     $now = time();
     $travel = new Travel();
@@ -342,6 +343,7 @@ private function initiateReturn($combat, $fighter) {
     $travel->crystal = 0;
     $travel->uranium = 0;
     $travel->status = Travel::STATUS_ON_GOING;
+    $travel->start = $now;
     $travel->arrival = $now + $travelTime;
   
     $travel->cruiser = $fighter->cruiser;
@@ -353,6 +355,7 @@ private function initiateReturn($combat, $fighter) {
 
     $travel->save();
     TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
+  }
 }
 
   private function haveShips($fighters) {
