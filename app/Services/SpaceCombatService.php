@@ -308,29 +308,26 @@ class SpaceCombatService
     $combat->save();
     $this->logStage($combat, 'Combat finish, winner: ' . $winner);
 
+    $lutadorInvasor = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
+
+    // Venceu a batalha entao pilha o planeta atacado
     if ($winner == Combat::SIDE_INVASOR) {
-        $stolen = $this->pillage($combat, Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get());
+        $stolen = $this->pillage($combat, $lutadorInvasor);
         $this->logStage($combat, 'Total stolen: ' . $stolen . ' resources');
     }
 
-    $fighters = Fighters::where('combat', $combatId)->get();
-    foreach ($fighters as $fighter) {
-        if ($fighter->side == $winner) {
-            $this->initiateReturn($combatId, $fighter, true);
-        } else {
-            $this->initiateReturn($combatId, $fighter, false, true);
-        }
+    // Perdeu a batalha então pega o caminho de volta de maos vazias
+    if ($winner == Combat::SIDE_LOCAL) {
+      $this->initiateReturn($combatId, $lutadorInvasor);
     }
 }
 
-private function initiateReturn($combatId, $fighter, $isWinner, $isLoser = false) {
+private function initiateReturn($combatId, $fighter) {
     $combat = Combat::find($combatId);
     if (!$combat) return false;
 
     $planetService = new PlanetService();
     $now = time();
-    $resources = $isWinner ? ['metal' => $fighter->metal, 'crystal' => $fighter->crystal, 'uranium' => $fighter->uranium] : ['metal' => 0, 'crystal' => 0, 'uranium' => 0];
-
     $travel = new Travel();
     $travel->player = $fighter->player;
     $travel->receptor = $fighter->player;
@@ -339,29 +336,18 @@ private function initiateReturn($combatId, $fighter, $isWinner, $isLoser = false
     $travel->action = Travel::RETURN_FLEET;
     $travel->transportShips = $fighter->transportShips;
     $travelTime = $planetService->calculeDistance($travel->from, $travel->to);
-    $travel->metal = $resources['metal'];
-    $travel->crystal = $resources['crystal'];
-    $travel->uranium = $resources['uranium'];
+    $travel->metal = 0;
+    $travel->crystal = 0;
+    $travel->uranium = 0;
     $travel->status = Travel::STATUS_ON_GOING;
-
-    if ($isLoser) {
-        $travel->cruiser = 0;
-        $travel->craft = 0;
-        $travel->bomber = 0;
-        $travel->scout = 0;
-        $travel->stealth = 0;
-        $travel->flagship = 0;
-        $travel->metal = 0;
-        $travel->crystal = 0;
-        $travel->uranium = 0;
-    } else {
-        $travel->cruiser = $fighter->cruiser;
-        $travel->craft = $fighter->craft;
-        $travel->bomber = $fighter->bomber;
-        $travel->scout = $fighter->scout;
-        $travel->stealth = $fighter->stealth;
-        $travel->flagship = $fighter->flagship;
-    }
+    $travel->arrival = $now + $travelTime;
+  
+    $travel->cruiser = $fighter->cruiser;
+    $travel->craft = $fighter->craft;
+    $travel->bomber = $fighter->bomber;
+    $travel->scout = $fighter->scout;
+    $travel->stealth = $fighter->stealth;
+    $travel->flagship = $fighter->flagship;
 
     $travel->save();
     TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
@@ -419,7 +405,7 @@ private function initiateReturn($combatId, $fighter, $isWinner, $isLoser = false
         $figther->$ship = $newQuantity;
     }
     return $figther;
-}
+  }
 
 
   private function pillage($combat, $invasors) {
