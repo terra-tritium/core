@@ -224,7 +224,7 @@ class SpaceCombatService
     # Log stage informations
     $this->logStage(
       $combat,
-      "Invasor Kills: " . $this->totalKillInvasor . " / Locals Kills: " . $this->totalKilllocal,
+      "Invaders Kills: " . $this->totalKillInvasor . " / Defensors Kills: " . $this->totalKilllocal,
       $this->totalKillInvasor,
       $this->totalKilllocal,
       $this->totalDemageInvasor,
