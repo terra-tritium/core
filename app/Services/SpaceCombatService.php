@@ -18,7 +18,6 @@ use App\Services\PlayerService;
 use App\Services\LogService;
 use App\Jobs\SpaceCombatJob;
 use App\Jobs\TravelJob;
-
 class SpaceCombatService
 {
   private $battleFieldSize;
@@ -37,85 +36,120 @@ class SpaceCombatService
 
   public function createNewCombat ($travel) {
 
-    $combat = new Combat();
-    $combat->planet = $travel->to;
-    $combat->status = Combat::STATUS_CREATE;
-    $combat->start = time();
-    $combat->stage = 0;
-    $combat->save();
+    $currentCombat = $this->currentCombat($travel->to);
+    $player = Player::find($travel->player);
+    
+    if ($currentCombat) {
+      $combat = $currentCombat;
+    } else {
+      $combat = new Combat();
+      $combat->planet = $travel->to;
+      $combat->status = Combat::STATUS_CREATE;
+      $combat->start = time();
+      $combat->stage = 0;
+      $combat->save();
 
-    $player1 = new Fighters();
-    $player1->combat = $combat->id;
-    $player1->player = $travel->player;
-    $player1->side = Combat::SIDE_INVASOR;
-    $player1->strategy = $travel->strategy;
-    $player1->demage = 0;
-    $player1->start = time();
-    $player1->stage = 0;
-    $player1->planet = $travel->from;
-    $player1->transportShips = $travel->transportShips;
-    $player1->cruiser = $travel->cruiser;
-    $player1->craft = $travel->craft;
-    $player1->bomber = $travel->bomber;
-    $player1->scout = $travel->scout;
-    $player1->stealth = $travel->stealth;
-    $player1->flagship = $travel->flagship;
-    $player1->save();
+      $this->logStage($combat, 'The fleet has arrived and combat begins');
+    }
+
+    $fighter = Fighters::where([["planet", $travel->from], ["player", $travel->player], ["combat", $combat->id]])->first();
+
+    # se ja existe o esse jogador no combate entao junta as naves a frota que ele ja tem
+    if ($fighter) {
+      $this->joinFleet($combat, $fighter, $travel, $player);
+    } else {
+      # se nao existe o jogador nesta batalha ele cria o jogador e insere no combate
+      $player1 = new Fighters();
+      $player1->combat = $combat->id;
+      $player1->player = $travel->player;
+      $player1->side = Combat::SIDE_INVASOR;
+      $player1->strategy = $travel->strategy;
+      $player1->demage = 0;
+      $player1->start = time();
+      $player1->stage = 0;
+      $player1->planet = $travel->from;
+      $player1->transportShips = $travel->transportShips;
+      $player1->cruiser = $travel->cruiser;
+      $player1->craft = $travel->craft;
+      $player1->bomber = $travel->bomber;
+      $player1->scout = $travel->scout;
+      $player1->stealth = $travel->stealth;
+      $player1->flagship = $travel->flagship;
+      $player1->save();
+
+      $tShips = $travel->cruiser + $travel->craft + $travel->bomber + $travel->scout + $travel->stealth + $travel->flagship;;
+
+      $this->logStage($combat, $player->name . ' joined the invaders side and arrived with '.$tShips.' ships');
+    }
 
     $planet = Planet::find($travel->to);
 
-    $player2 = new Fighters();
-    $player2->combat = $combat->id;
-    $player2->player = $planet->player;
-    $player2->side = Combat::SIDE_LOCAL;
-    if ($planet->defenseStrategy) {
-      $player2->strategy = $planet->defenseStrategy;
-    } else {
-      $player2->strategy = 1;
-    }
-    $player2->demage = 0;
-    $player2->start = time();
-    $player2->stage = 0;
-    $player2->planet = $travel->to;
-    $player2->transportShips = $travel->transportShips;
-    $player2->cruiser = 0;
-    $player2->craft = 0;
-    $player2->bomber = 0;
-    $player2->scout = 0;
-    $player2->stealth = 0;
-    $player2->flagship = 0;
+    if ($currentCombat == false) {
 
-    $fleet = Fleet::where('planet', $travel->to)->get();
+      $playerDefensor = Player::find($planet->player);
 
-    if ($fleet) {
-      foreach ($fleet as $ship) {
-        switch ($ship->unit) {
-          case Ship::SHIP_CRUISER:
-            $player2->cruiser = $ship->quantity;
-            break;
-          case Ship::SHIP_CRAFT:
-            $player2->craft = $ship->quantity;
-            break;
-          case Ship::SHIP_BOMBER:
-            $player2->bomber = $ship->quantity;
-            break;
-          case Ship::SHIP_SCOUT:
-            $player2->scout = $ship->quantity;
-            break;
-          case Ship::SHIP_STEALTH:
-            $player2->stealth = $ship->quantity;
-            break;
-          case Ship::SHIP_FLAGSHIP:
-            $player2->flagship = $ship->quantity;
-            break;
+      $player2 = new Fighters();
+      $player2->combat = $combat->id;
+      $player2->player = $planet->player;
+      $player2->side = Combat::SIDE_LOCAL;
+      if ($planet->defenseStrategy) {
+        $player2->strategy = $planet->defenseStrategy;
+      } else {
+        $player2->strategy = 1;
+      }
+      $player2->demage = 0;
+      $player2->start = time();
+      $player2->stage = 0;
+      $player2->planet = $travel->to;
+      $player2->transportShips = $travel->transportShips;
+      $player2->cruiser = 0;
+      $player2->craft = 0;
+      $player2->bomber = 0;
+      $player2->scout = 0;
+      $player2->stealth = 0;
+      $player2->flagship = 0;
+      $fleet = Fleet::where('planet', $travel->to)->get();
+      if ($fleet) {
+        foreach ($fleet as $ship) {
+          switch ($ship->unit) {
+            case Ship::SHIP_CRUISER:
+              $player2->cruiser = $ship->quantity;
+              break;
+            case Ship::SHIP_CRAFT:
+              $player2->craft = $ship->quantity;
+              break;
+            case Ship::SHIP_BOMBER:
+              $player2->bomber = $ship->quantity;
+              break;
+            case Ship::SHIP_SCOUT:
+              $player2->scout = $ship->quantity;
+              break;
+            case Ship::SHIP_STEALTH:
+              $player2->stealth = $ship->quantity;
+              break;
+            case Ship::SHIP_FLAGSHIP:
+              $player2->flagship = $ship->quantity;
+              break;
+          }
         }
       }
+      $player2->save();
+
+      $tShips = $player2->cruiser + $player2->craft + $player2->bomber + $player2->scout + $player2->stealth + $player2->flagship;
+
+      $this->logStage($combat, $$playerDefensor->name . ' joined the defenders side with '.$tShips.' ships');
     }
 
-    $player2->save();
+    $defenderMembers = Fighters::where([["planet", $travel->to], ["side", Combat::SIDE_LOCAL], ["combat", $combat->id]])->get();
+    $invadersMembers = Fighters::where([["planet", $travel->to], ["side", Combat::SIDE_INVASOR], ["combat", $combat->id]])->get();
 
-    $this->totalLocalShips = $player2->cruiser + $player2->craft + $player2->bomber + $player2->scout + $player2->stealth + $player2->flagship;
-    $this->totalInvasorShips = $player1->cruiser + $player1->craft + $player1->bomber + $player1->scout + $player1->stealth + $player1->flagship;
+    foreach($defenderMembers as $defenderMember) {
+      $this->totalLocalShips += $defenderMember->cruiser + $defenderMember->craft + $defenderMember->bomber + $defenderMember->scout + $defenderMember->stealth + $defenderMember->flagship;
+    }
+
+    foreach($invadersMembers as $invaderMember) {
+      $this->totalLocalShips += $invaderMember->cruiser + $invaderMember->craft + $invaderMember->bomber + $invaderMember->scout + $invaderMember->stealth + $invaderMember->flagship;
+    }
 
     $this->ajustBatleField();
 
@@ -324,39 +358,39 @@ class SpaceCombatService
     if ($winner == Combat::SIDE_LOCAL) {
       $this->initiateReturn($combat, $timeInvasor);
     }
-}
-
-private function initiateReturn($combat, $timeInvasor) {
-
-  foreach ($timeInvasor as $fighter) {
-    $planetService = new PlanetService();
-    $now = time();
-    $travel = new Travel();
-    $travel->player = $fighter->player;
-    $travel->receptor = $fighter->player;
-    $travel->from = $combat->planet;
-    $travel->to = $fighter->planet;
-    $travel->action = Travel::RETURN_FLEET;
-    $travel->transportShips = $fighter->transportShips;
-    $travelTime = $planetService->calculeDistance($travel->from, $travel->to);
-    $travel->metal = 0;
-    $travel->crystal = 0;
-    $travel->uranium = 0;
-    $travel->status = Travel::STATUS_ON_GOING;
-    $travel->start = $now;
-    $travel->arrival = $now + $travelTime;
-  
-    $travel->cruiser = $fighter->cruiser;
-    $travel->craft = $fighter->craft;
-    $travel->bomber = $fighter->bomber;
-    $travel->scout = $fighter->scout;
-    $travel->stealth = $fighter->stealth;
-    $travel->flagship = $fighter->flagship;
-
-    $travel->save();
-    TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
   }
-}
+
+  private function initiateReturn($combat, $timeInvasor) {
+
+    foreach ($timeInvasor as $fighter) {
+      $planetService = new PlanetService();
+      $now = time();
+      $travel = new Travel();
+      $travel->player = $fighter->player;
+      $travel->receptor = $fighter->player;
+      $travel->from = $combat->planet;
+      $travel->to = $fighter->planet;
+      $travel->action = Travel::RETURN_FLEET;
+      $travel->transportShips = $fighter->transportShips;
+      $travelTime = $planetService->calculeDistance($travel->from, $travel->to);
+      $travel->metal = 0;
+      $travel->crystal = 0;
+      $travel->uranium = 0;
+      $travel->status = Travel::STATUS_ON_GOING;
+      $travel->start = $now;
+      $travel->arrival = $now + $travelTime;
+    
+      $travel->cruiser = $fighter->cruiser;
+      $travel->craft = $fighter->craft;
+      $travel->bomber = $fighter->bomber;
+      $travel->scout = $fighter->scout;
+      $travel->stealth = $fighter->stealth;
+      $travel->flagship = $fighter->flagship;
+
+      $travel->save();
+      TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
+    }
+  }
 
   private function haveShips($fighters) {
     $ships = 0;
@@ -411,7 +445,6 @@ private function initiateReturn($combat, $timeInvasor) {
     }
     return $figther;
   }
-
 
   private function pillage($combat, $invasors) {
     $planet = Planet::find($combat->planet);
@@ -828,5 +861,30 @@ private function initiateReturn($combat, $timeInvasor) {
 
       $invasor->save();
     }
+  }
+
+  private function currentCombat($planetId) {
+    $combat = Combat::where([["planet", $planetId],["status", Combat::STATUS_RUNNING]])->first();
+    if ($combat) {
+      return $combat;
+    }
+    return false;
+  }
+
+  private function joinFleet($combat, $fighter, $travel, $player) {
+
+    $totalShips = 0;
+    $fighter->transportShips += $travel->transportShips;
+    $fighter->cruiser += $travel->cruiser;
+    $fighter->craft += $travel->craft;
+    $fighter->bomber += $travel->bomber;
+    $fighter->scout += $travel->scout;
+    $fighter->stealth += $travel->stealth;
+    $fighter->flagship += $travel->flagship;
+    $fighter->save();
+
+    $totalShips += $travel->cruiser +  $travel->craft + $travel->bomber + $travel->scout + $travel->stealth + $travel->flagship;
+    
+    $this->logStage($combat, $player->name . ' joined the invaders side and arrived with '.$totalShips.' ships');
   }
 }
