@@ -55,7 +55,7 @@ class TravelJob implements ShouldQueue
                     //$this->travelService->starCombatTravel($this->travel);
                     break;
                 case Travel::DEFENSE_FLEET:
-                    //$this->travelService->starCombatTravel($this->travel);
+                    $spaceCombatService->defenderPlanet($currentTravel);
                     break;
                 case Travel::DEFENSE_TROOP:
                     //$this->travelService->starCombatTravel($this->travel);
