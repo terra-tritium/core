@@ -62,8 +62,16 @@ class TravelService
         }
 
         if ($travel->action === Travel::ATTACK_FLEET && !isset($travel->fleet))  {
-            return "Set the troop";
+            return "Set the fleet";
         } elseif ($travel->action === Travel::ATTACK_FLEET) {
+            if(!$this->hasFleetAvailable($player, $travel->from, $travel->fleet)){
+                return "You don't have enough ships";
+            }
+        }
+
+        if ($travel->action === Travel::DEFENSE_FLEET && !isset($travel->fleet))  {
+            return "Set the fleet";
+        } elseif ($travel->action === Travel::DEFENSE_FLEET) {
             if(!$this->hasFleetAvailable($player, $travel->from, $travel->fleet)){
                 return "You don't have enough ships";
             }
@@ -95,7 +103,8 @@ class TravelService
                 $this->planetService->onFire($travel->to);
                 break;
             case Travel::DEFENSE_FLEET:
-                $newTravel = $this->startDefenseFleet($newTravel);
+                $newTravel = $this->startDefenseFleet($newTravel, $travel, $player);
+                $newTravel->status = Travel::STATUS_ON_GOING;
                 break;
             case Travel::ATTACK_TROOP:
                 $newTravel = $this->startAttackTroop($newTravel, $travel, $player);
@@ -201,8 +210,36 @@ class TravelService
         return $travel;
     }
 
-    private function startDefenseFleet($travel) {
+    private function startDefenseFleet($travel, $req, $player) {
+        
+        $this->removeFleet($player, $req->from, $req->fleet);
 
+        if (isset($req->fleet)) {
+            foreach ($req->fleet as $ship) {
+                switch ($ship->unit) {
+                    case Ship::SHIP_CRAFT:
+                        $travel->craft = $ship->quantity;
+                        break;
+                    case Ship::SHIP_BOMBER:
+                        $travel->bomber = $ship->quantity;
+                        break;
+                    case Ship::SHIP_CRUISER:
+                        $travel->cruiser = $ship->quantity;
+                        break;
+                    case Ship::SHIP_SCOUT:
+                        $travel->scout = $ship->quantity;
+                        break;
+                    case Ship::SHIP_STEALTH:
+                        $travel->stealth = $ship->quantity;
+                        break;
+                    case Ship::SHIP_FLAGSHIP:
+                        $travel->flagship = $ship->quantity;
+                        break;
+                }
+            }
+
+        }
+        return $travel;
     }
 
     private function startAttackTroop($travel, $req, $player) {

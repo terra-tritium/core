@@ -18,6 +18,7 @@ use App\Services\PlayerService;
 use App\Services\LogService;
 use App\Jobs\SpaceCombatJob;
 use App\Jobs\TravelJob;
+use App\Models\Logbook;
 class SpaceCombatService
 {
   private $battleFieldSize;
@@ -154,6 +155,70 @@ class SpaceCombatService
     $this->ajustBatleField();
 
     $this->startCombat($combat->id);
+  }
+
+  public function defenderPlanet ($travel) {
+    $currentCombat = $this->currentCombat($travel->to);
+    $player = Player::find($travel->player);
+    $planet = Planet::find($travel->to);
+    $playerPlanet = Player::find($planet->player);
+    $combatId = 0;
+
+    if ($currentCombat) {
+      $fighter = Fighters::where([["planet", $travel->to], ["player", $travel->player], ["combat", $currentCombat->id]])->first();
+      $combatId = $currentCombat->id;
+    } else {
+      $fighter = Fighters::where([["planet", $travel->to], ["player", $travel->player]])->first();
+    }
+
+    $totalShips = 0;
+
+    if ($fighter) {
+      $fighter->combat = $combatId;
+      $fighter->transportShips = 0;
+      $fighter->cruiser += $travel->cruiser;
+      $fighter->craft += $travel->craft;
+      $fighter->bomber += $travel->bomber;
+      $fighter->scout += $travel->scout;
+      $fighter->stealth += $travel->stealth;
+      $fighter->flagship += $travel->flagship;
+    } else {
+      $fighter = new Fighters();
+      $fighter->combat = $combatId;
+      $fighter->player = $travel->player;
+      $fighter->side = Combat::SIDE_LOCAL;
+      $fighter->strategy = $travel->strategy;
+      $fighter->demage = 0;
+      $fighter->start = time();
+      $fighter->stage = 0;
+      $fighter->planet = $travel->to;
+      $fighter->transportShips = 0;
+      $fighter->cruiser += $travel->cruiser;
+      $fighter->craft += $travel->craft;
+      $fighter->bomber += $travel->bomber;
+      $fighter->scout += $travel->scout;
+      $fighter->stealth += $travel->stealth;
+      $fighter->flagship += $travel->flagship;
+    }
+    
+    $fighter->save();
+
+    $totalShips += $travel->cruiser +  $travel->craft + $travel->bomber + $travel->scout + $travel->stealth + $travel->flagship;
+    if ($currentCombat) {
+      $this->logStage($currentCombat, $player->name . ' joined the defenders side and arrived with '.$totalShips.' ships');
+    } else {
+      $log = new Logbook();
+      $log->player = $player->id;
+      $log->text = $player->name . ' landed on planet '.$planet->name.' with '.$totalShips.' ships';
+      $log->type = "SPACE";
+      $log->save();
+
+      $log = new Logbook();
+      $log->player = $playerPlanet->id;
+      $log->text = $player->name . ' landed on planet '.$planet->name.' with '.$totalShips.' ships';
+      $log->type = "SPACE";
+      $log->save();
+    }
   }
 
   private function ajustBatleField() {
