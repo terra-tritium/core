@@ -191,7 +191,7 @@ class SpaceCombatService
       $fighter->demage = 0;
       $fighter->start = time();
       $fighter->stage = 0;
-      $fighter->planet = $travel->from;
+      $fighter->planet = $travel->to;
       $fighter->transportShips = 0;
       $fighter->cruiser += $travel->cruiser;
       $fighter->craft += $travel->craft;

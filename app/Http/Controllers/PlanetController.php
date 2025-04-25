@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Planet;
 use App\Models\Player;
+use App\Models\Fighters;
 use App\Services\PlanetService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -270,7 +271,15 @@ class PlanetController extends Controller
             return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }
 
-        $planets = Planet::where('player', $player->id)->get();
+        # busca todos os planetas que o jogador possui e tmb os planetas onde ele tem naves em modo de defesa
+        $planets = Planet::where('player', $player->id)
+                    ->orWhereIn('id', function ($query) use ($player) {
+                        $query->select('planet')
+                            ->from('fighters')
+                            ->where('player', $player->id)
+                            ->where('combat', 0);
+                    })
+                    ->get();
 
         return response()->json($planets, Response::HTTP_OK);
     }
