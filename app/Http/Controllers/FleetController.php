@@ -161,8 +161,8 @@ class FleetController extends Controller
             if ($this->playerService->isPlayerOwnerPlanet($player->id, $planet)) {
                 return $this->fleetService->fleets($player->id, $planet);
             } else {
-                return response()->json(['message' => 'You are not authorized to perform this action.'],
-                    Response::HTTP_FORBIDDEN);
+                # verifica se possui naves estacionadas no planeta que nao eh seu
+                return $this->fleetService->listExternalFleets($player->id, $planet);
             }
         } catch (\Exception $exception) {
             Log::error($exception);
