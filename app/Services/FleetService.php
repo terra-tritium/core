@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Fleet;
 use App\Services\ProductionService;
+use App\Models\Fighters;
 
 class FleetService
 {
@@ -34,5 +35,9 @@ class FleetService
     public function fleets($player,$planet){
         $fleets = Fleet::with('ship')->where(['player' => $player, 'planet' => $planet])->get();
         return $fleets;
+    }
+
+    public function listExternalFleets($player, $planet) {
+        return Fighters::where(['player' => $player, 'combat' => 0, 'planet' => $planet])->first();
     }
 }
