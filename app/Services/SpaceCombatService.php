@@ -138,7 +138,7 @@ class SpaceCombatService
 
       $tShips = $player2->cruiser + $player2->craft + $player2->bomber + $player2->scout + $player2->stealth + $player2->flagship;
 
-      $this->logStage($combat, $$playerDefensor->name . ' joined the defenders side with '.$tShips.' ships');
+      $this->logStage($combat, $playerDefensor->name . ' joined the defenders side with '.$tShips.' ships');
     }
 
     $defenderMembers = Fighters::where([["planet", $travel->to], ["side", Combat::SIDE_LOCAL], ["combat", $combat->id]])->get();
@@ -149,7 +149,7 @@ class SpaceCombatService
     }
 
     foreach($invadersMembers as $invaderMember) {
-      $this->totalLocalShips += $invaderMember->cruiser + $invaderMember->craft + $invaderMember->bomber + $invaderMember->scout + $invaderMember->stealth + $invaderMember->flagship;
+      $this->totalInvasorShips += $invaderMember->cruiser + $invaderMember->craft + $invaderMember->bomber + $invaderMember->scout + $invaderMember->stealth + $invaderMember->flagship;
     }
 
     $this->ajustBatleField();
