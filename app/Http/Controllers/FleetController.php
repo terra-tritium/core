@@ -170,4 +170,25 @@ class FleetController extends Controller
                 Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function return($planet){
+        try {
+            $player = Player::getPlayerLogged();
+
+            $travel = $this->fleetService->return($player->id, $planet);
+
+            if ($travel) {
+                return response()->json(['message' => 'ok'],
+                    Response::HTTP_OK); 
+            } else {
+                return response()->json(['message' => 'An error occurred during return Fleets from defense.'],
+                Response::HTTP_BAD_REQUEST);
+            }
+
+        } catch (\Exception $exception) {
+            Log::error($exception);
+            return response()->json(['message' => 'An error occurred during list Fleets.'],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

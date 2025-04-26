@@ -12,7 +12,6 @@ use App\Models\Travel;
 use App\Services\SpaceCombatService;
 use App\Services\EspionadeService;
 use App\Services\TradingService;
-use Illuminate\Support\Facades\Log;
 
 class TravelJob implements ShouldQueue
 {
@@ -56,6 +55,9 @@ class TravelJob implements ShouldQueue
                     break;
                 case Travel::DEFENSE_FLEET:
                     $spaceCombatService->defenderPlanet($currentTravel);
+                    break;
+                case Travel::DEFENSE_RETURN:
+                    $spaceCombatService->defenseReturn($currentTravel);
                     break;
                 case Travel::DEFENSE_TROOP:
                     //$this->travelService->starCombatTravel($this->travel);

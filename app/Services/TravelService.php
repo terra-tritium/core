@@ -625,6 +625,8 @@ class TravelService
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_TROOP]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::MISSION_CHALLANGE]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_CHALLANGE]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_RETURN]]);
+
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_FLEET]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_FLEET]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_TROOP]]);
@@ -640,6 +642,8 @@ class TravelService
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_TROOP]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::MISSION_CHALLANGE]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_CHALLANGE]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_RETURN]]);
+
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_FLEET]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_FLEET]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_TROOP]]);
