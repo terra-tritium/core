@@ -23,9 +23,9 @@ class MessageGroup extends Model
     public function getMessagesGroupAliance($idAliance, $idRementente)
     {
         
-        $messages = DB::table('origin.chat_group as cg')
-            ->join('origin.message_group as mg', 'mg.idChatGroup', '=', 'cg.id')
-            ->join('origin.players as p', 'p.id', '=', 'mg.remetenteId')
+        $messages = DB::table('chat_group as cg')
+            ->join('message_group as mg', 'mg.idChatGroup', '=', 'cg.id')
+            ->join('players as p', 'p.id', '=', 'mg.remetenteId')
             ->select(
                 'mg.id',
                 'cg.idAliance',
