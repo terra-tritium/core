@@ -139,6 +139,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/production/{planet}', [FleetController::class, 'production']);
         Route::get('/production/{planet?}', [FleetController::class, 'producing']);
         Route::get('/{planet}', [FleetController::class, 'list']);
+        Route::post('/return/{planet}', [FleetController::class, 'return']);
     });
 
     Route::group(['prefix' => 'ranking', 'middleware' => 'throttle:240,1'],function () {

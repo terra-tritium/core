@@ -44,7 +44,7 @@ class PlanetController extends Controller
     protected $playerService;
     protected $planetService;
 
-    public function __construct(PlayerService $playerService, PlanetService $planetService,)
+    public function __construct(PlayerService $playerService, PlanetService $planetService)
     {
         $this->playerService = $playerService;
         $this->planetService = $planetService;

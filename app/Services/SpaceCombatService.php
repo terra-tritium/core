@@ -457,6 +457,18 @@ class SpaceCombatService
     }
   }
 
+  public function defenseReturn($travel) {
+    $this->addFleet($travel);
+
+    $planetFrom = Planet::find($travel->from);
+
+    $log = new Logbook();
+    $log->player = $travel->player;
+    $log->text = "Fleet returned from ".$planetFrom->name;
+    $log->type = "Travel";
+    $log->save();
+  }
+
   private function haveShips($fighters) {
     $ships = 0;
     foreach ($fighters as $figther) {
