@@ -138,7 +138,17 @@ class SpaceCombatService
 
       $tShips = $player2->cruiser + $player2->craft + $player2->bomber + $player2->scout + $player2->stealth + $player2->flagship;
 
-      $this->logStage($combat, $playerDefensor->name . ' joined the defenders side with '.$tShips.' ships');
+      $nameDefensor = "";
+
+      if (is_array($playerDefensor)) {
+        $nameDefensor = $playerDefensor['name'];
+      } elseif (is_object($playerDefensor)) {
+          $nameDefensor = $playerDefensor->name;
+      } else {
+          $nameDefensor = 'Unknown'; // fallback de segurança, caso não seja nem array nem objeto
+      }
+
+      $this->logStage($combat, $nameDefensor . ' joined the defenders side with '.$tShips.' ships');
     }
 
     $defenderMembers = Fighters::where([["planet", $travel->to], ["side", Combat::SIDE_LOCAL], ["combat", $combat->id]])->get();
