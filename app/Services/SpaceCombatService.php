@@ -19,6 +19,7 @@ use App\Services\LogService;
 use App\Jobs\SpaceCombatJob;
 use App\Jobs\TravelJob;
 use App\Models\Logbook;
+use Illuminate\Support\Facades\Log;
 class SpaceCombatService
 {
   private $battleFieldSize;
@@ -167,6 +168,56 @@ class SpaceCombatService
     $this->startCombat($combat->id);
   }
 
+  // Recarrega as naves que foram criadas durante o ultimo stage e joga para a batalha
+  private function reloadFleet($planet, $fighter) {
+    $fleet = Fleet::where('planet', $planet->id)->get();
+
+    $contShipAdd = 0;
+
+    foreach ($fleet as $ship) {
+      switch ($ship->unit) {
+        case Ship::SHIP_CRUISER:
+          if ($fighter->cruiser < $ship->quantity) {
+            $fighter->cruiser = $ship->quantity;
+            $contShipAdd += $ship->quantity;
+          }
+          break;
+        case Ship::SHIP_CRAFT:
+          if ($fighter->craft < $ship->quantity) {
+            $fighter->craft = $ship->quantity;
+            $contShipAdd += $ship->quantity;
+          }
+          break;
+        case Ship::SHIP_BOMBER:
+          if ($fighter->bomber < $ship->quantity) {
+            $fighter->bomber = $ship->quantity;
+            $contShipAdd += $ship->quantity;
+          }
+          break;
+        case Ship::SHIP_SCOUT:
+          if ($fighter->scout < $ship->quantity) {
+            $fighter->scout = $ship->quantity;
+            $contShipAdd += $ship->quantity;
+          }
+          break;
+        case Ship::SHIP_STEALTH:
+          if ($fighter->stealth < $ship->quantity) {
+            $fighter->stealth = $ship->quantity;
+            $contShipAdd += $ship->quantity;
+          }
+          break;
+        case Ship::SHIP_FLAGSHIP:
+          if ($fighter->flagship < $ship->quantity) {
+            $fighter->flagship = $ship->quantity;
+            $contShipAdd += $ship->quantity;
+          }
+          break;
+      }
+    }
+    $fighter->save();
+    return $contShipAdd;
+  }
+
   public function defenderPlanet ($travel) {
     $currentCombat = $this->currentCombat($travel->to);
     $player = Player::find($travel->player);
@@ -281,6 +332,15 @@ class SpaceCombatService
 
   public function excuteStage($combatId) {
     $combat = Combat::find($combatId);
+
+    $planetOwn = Planet::find($combat->planet);
+    $fighterOwn = Fighters::where(['combat'=>$combatId, 'player'=> $planetOwn->player])->first();
+
+    $contAddShip = $this->reloadFleet($planetOwn, $fighterOwn);
+
+    if ($contAddShip > 0) {
+      $this->logStage($combat, 'Defender joined with '.$contAddShip.' ships');
+    }
 
     if ($combat->status == Combat::STATUS_CREATE) {
       $this->startCombat($combatId);
@@ -842,47 +902,96 @@ class SpaceCombatService
       if ($invasorCraftDemage > 0) {
         if ($local->craft > 0) {
           $local = $this->applyDemage($invasorCraftDemage, $local, Ship::SHIP_CRAFT_HP, count($locals), $effects, 'craft');
-          $invasorCraftDemage = 0;
+        } else if ($local->bomber > 0) {
+          $local = $this->applyDemage($invasorCraftDemage, $local, Ship::SHIP_BOMBER_HP, count($locals), $effects, 'bomber');
+        } else if ($local->cruiser > 0) {
+          $local = $this->applyDemage($invasorCraftDemage, $local, Ship::SHIP_CRUISER_HP, count($locals), $effects, 'cruiser');
+        } else if ($local->scout > 0)  {
+          $local = $this->applyDemage($invasorCraftDemage, $local, Ship::SHIP_SCOUT_HP, count($locals), $effects, 'scout');
+        } else if ($local->stealth > 0)  {
+          $local = $this->applyDemage($invasorCraftDemage, $local, Ship::SHIP_STEALTH_HP, count($locals), $effects, 'stealth');
+        } else {
+          $local = $this->applyDemage($invasorCraftDemage, $local, Ship::SHIP_FLAGSHIP_HP, count($locals), $effects, 'flagship');
         }
       }
-      $invasorBomberDemage += $invasorCraftDemage;
 
       if ($invasorBomberDemage > 0) {
         if ($local->bomber > 0) {
           $local = $this->applyDemage($invasorBomberDemage, $local, Ship::SHIP_BOMBER_HP, count($locals), $effects, 'bomber');
-          $invasorBomberDemage = 0;
+        } else if ($local->craft > 0) {
+          $local = $this->applyDemage($invasorBomberDemage, $local, Ship::SHIP_CRAFT_HP, count($locals), $effects, 'craft');
+        } else if ($local->cruiser > 0) {
+          $local = $this->applyDemage($invasorBomberDemage, $local, Ship::SHIP_CRUISER_HP, count($locals), $effects, 'cruiser');
+        } else if ($local->scout > 0)  {
+          $local = $this->applyDemage($invasorBomberDemage, $local, Ship::SHIP_SCOUT_HP, count($locals), $effects, 'scout');
+        } else if ($local->stealth > 0)  {
+          $local = $this->applyDemage($invasorBomberDemage, $local, Ship::SHIP_STEALTH_HP, count($locals), $effects, 'stealth');
+        } else {
+          $local = $this->applyDemage($invasorBomberDemage, $local, Ship::SHIP_FLAGSHIP_HP, count($locals), $effects, 'flagship');
         }
       }
-      $invasorCruiserDemage += $invasorBomberDemage;
 
       if ($invasorCruiserDemage > 0) {
         if ($local->cruiser > 0) {
           $local = $this->applyDemage($invasorCruiserDemage, $local, Ship::SHIP_CRUISER_HP, count($locals), $effects, 'cruiser');
-          $invasorCruiserDemage = 0;
+        } else if ($local->craft > 0) {
+          $local = $this->applyDemage($invasorCruiserDemage, $local, Ship::SHIP_CRAFT_HP, count($locals), $effects, 'craft');
+        } else if ($local->bomber > 0) {
+          $local = $this->applyDemage($invasorCruiserDemage, $local, Ship::SHIP_BOMBER_HP, count($locals), $effects, 'bomber');
+        } else if ($local->scout > 0)  {
+          $local = $this->applyDemage($invasorCruiserDemage, $local, Ship::SHIP_SCOUT_HP, count($locals), $effects, 'scout');
+        } else if ($local->stealth > 0)  {
+          $local = $this->applyDemage($invasorCruiserDemage, $local, Ship::SHIP_STEALTH_HP, count($locals), $effects, 'stealth');
+        } else {
+          $local = $this->applyDemage($invasorCruiserDemage, $local, Ship::SHIP_FLAGSHIP_HP, count($locals), $effects, 'flagship');
         }
       }
-      $invasorScoutDemage += $invasorCruiserDemage;
 
       if ($invasorScoutDemage > 0) {
         if ($local->scout > 0) {
           $local = $this->applyDemage($invasorScoutDemage, $local, Ship::SHIP_SCOUT_HP, count($locals), $effects, 'scout');
-          $invasorScoutDemage = 0;
+        } else if ($local->craft > 0) {
+          $local = $this->applyDemage($invasorScoutDemage, $local, Ship::SHIP_CRAFT_HP, count($locals), $effects, 'craft');
+        } else if ($local->bomber > 0) {
+          $local = $this->applyDemage($invasorScoutDemage, $local, Ship::SHIP_BOMBER_HP, count($locals), $effects, 'bomber');
+        } else if ($local->cruiser > 0) {
+          $local = $this->applyDemage($invasorScoutDemage, $local, Ship::SHIP_CRUISER_HP, count($locals), $effects, 'cruiser');
+        } else if ($local->stealth > 0)  {
+          $local = $this->applyDemage($invasorScoutDemage, $local, Ship::SHIP_STEALTH_HP, count($locals), $effects, 'stealth');
+        } else {
+          $local = $this->applyDemage($invasorScoutDemage, $local, Ship::SHIP_FLAGSHIP_HP, count($locals), $effects, 'flagship');
         }
       }
-      $invasorStealthDemage += $invasorScoutDemage;
 
       if ($invasorStealthDemage > 0) {
         if ($local->stealth > 0) {
           $local = $this->applyDemage($invasorStealthDemage, $local, Ship::SHIP_STEALTH_HP, count($locals), $effects, 'stealth');
-          $invasorStealthDemage = 0;
+        } else if ($local->craft > 0) {
+          $local = $this->applyDemage($invasorStealthDemage, $local, Ship::SHIP_CRAFT_HP, count($locals), $effects, 'craft');
+        } else if ($local->bomber > 0) {
+          $local = $this->applyDemage($invasorStealthDemage, $local, Ship::SHIP_BOMBER_HP, count($locals), $effects, 'bomber');
+        } else if ($local->cruiser > 0) {
+          $local = $this->applyDemage($invasorStealthDemage, $local, Ship::SHIP_CRUISER_HP, count($locals), $effects, 'cruiser');
+        } else if ($local->scout > 0)  {
+          $local = $this->applyDemage($invasorStealthDemage, $local, Ship::SHIP_SCOUT_HP, count($locals), $effects, 'scout');
+        } else {
+          $local = $this->applyDemage($invasorStealthDemage, $local, Ship::SHIP_FLAGSHIP_HP, count($locals), $effects, 'flagship');
         }
       }
-      $invasorFlagshipDemage += $invasorStealthDemage;
 
       if ($localFlagshipDemage > 0) {
         if ($local->flagship > 0) {
           $local = $this->applyDemage($invasorFlagshipDemage, $local, Ship::SHIP_FLAGSHIP_HP, count($locals), $effects, 'flagship');
-          $invasorFlagshipDemage = 0;
+        } else if ($local->craft > 0) {
+          $local = $this->applyDemage($invasorFlagshipDemage, $local, Ship::SHIP_CRAFT_HP, count($locals), $effects, 'craft');
+        } else if ($local->bomber > 0) {
+          $local = $this->applyDemage($invasorFlagshipDemage, $local, Ship::SHIP_BOMBER_HP, count($locals), $effects, 'bomber');
+        } else if ($local->cruiser > 0) {
+          $local = $this->applyDemage($invasorFlagshipDemage, $local, Ship::SHIP_CRUISER_HP, count($locals), $effects, 'cruiser');
+        } else if ($local->scout > 0)  {
+          $local = $this->applyDemage($invasorFlagshipDemage, $local, Ship::SHIP_SCOUT_HP, count($locals), $effects, 'scout');
+        } else if ($local->stealth > 0)  {
+          $local = $this->applyDemage($invasorFlagshipDemage, $local, Ship::SHIP_STEALTH_HP, count($locals), $effects, 'stealth');
         }
       }
 
@@ -907,42 +1016,97 @@ class SpaceCombatService
       }
       $localBomberDemage += $localCraftDemage;
 
-      if ($localBomberDemage > 0) {
-        if ($invasor->bomber > 0) {
-          $invasor = $this->applyDemage($localBomberDemage, $invasor, Ship::SHIP_BOMBER_HP, count($invasors), $effects, 'bomber');
-          $localBomberDemage = 0;
+      if ($localCraftDemage > 0) {
+        if ($invasor->craft > 0) {
+          $invasor = $this->applyDemage($localCraftDemage, $invasor, Ship::SHIP_CRAFT_HP, count($invasors), $effects, 'craft');
+        } else if ($local->bomber > 0) {
+          $invasor = $this->applyDemage($localCraftDemage, $invasor, Ship::SHIP_BOMBER_HP, count($invasors), $effects, 'bomber');
+        } else if ($local->cruiser > 0) {
+          $invasor = $this->applyDemage($localCraftDemage, $invasor, Ship::SHIP_CRUISER_HP, count($invasors), $effects, 'cruiser');
+        } else if ($local->scout > 0)  {
+          $invasor = $this->applyDemage($localCraftDemage, $invasor, Ship::SHIP_SCOUT_HP, count($invasors), $effects, 'scout');
+        } else if ($local->stealth > 0)  {
+          $invasor = $this->applyDemage($localCraftDemage, $invasor, Ship::SHIP_STEALTH_HP, count($invasors), $effects, 'stealth');
+        } else {
+          $invasor = $this->applyDemage($localCraftDemage, $invasor, Ship::SHIP_FLAGSHIP_HP, count($invasors), $effects, 'flagship');
         }
       }
-      $localCruiserDemage += $localBomberDemage;
+
+      if ($localBomberDemage > 0) {
+        if ($invasor->bomber > 0) {
+          $invasor = $this->applyDemage($localBomberDemage, $invasor, Ship::SHIP_CRAFT_HP, count($invasors), $effects, 'craft');
+        } else if ($invasor->craft > 0) {
+          $invasor = $this->applyDemage($localBomberDemage, $invasor, Ship::SHIP_CRAFT_HP, count($invasors), $effects, 'craft');
+        } else if ($local->cruiser > 0) {
+          $invasor = $this->applyDemage($localBomberDemage, $invasor, Ship::SHIP_CRUISER_HP, count($invasors), $effects, 'cruiser');
+        } else if ($local->scout > 0) {
+          $invasor = $this->applyDemage($localBomberDemage, $invasor, Ship::SHIP_SCOUT_HP, count($invasors), $effects, 'scout');
+        } else if ($local->stealth > 0) {
+          $invasor = $this->applyDemage($localBomberDemage, $invasor, Ship::SHIP_STEALTH_HP, count($invasors), $effects, 'stealth');
+        } else {
+          $invasor = $this->applyDemage($localBomberDemage, $invasor, Ship::SHIP_FLAGSHIP_HP, count($invasors), $effects, 'flagship');
+        }
+      }
 
       if ($localCruiserDemage > 0) {
         if ($invasor->cruiser > 0) {
           $invasor = $this->applyDemage($localCruiserDemage, $invasor, Ship::SHIP_CRUISER_HP, count($invasors), $effects, 'cruiser');
-          $localCruiserDemage = 0;
+        } else if ($invasor->craft > 0) {
+          $invasor = $this->applyDemage($localCruiserDemage, $invasor, Ship::SHIP_CRAFT_HP, count($invasors), $effects, 'craft');
+        } else if ($local->bomber > 0) {
+          $invasor = $this->applyDemage($localCruiserDemage, $invasor, Ship::SHIP_BOMBER_HP, count($invasors), $effects, 'bomber');
+        } else if ($local->scout > 0)  {
+          $invasor = $this->applyDemage($localCruiserDemage, $invasor, Ship::SHIP_SCOUT_HP, count($invasors), $effects, 'scout');
+        } else if ($local->stealth > 0)  {
+          $invasor = $this->applyDemage($localCruiserDemage, $invasor, Ship::SHIP_STEALTH_HP, count($invasors), $effects, 'stealth');
+        } else {
+          $invasor = $this->applyDemage($localCruiserDemage, $invasor, Ship::SHIP_FLAGSHIP_HP, count($invasors), $effects, 'flagship');
         }
       }
-      $localScoutDemage += $localCruiserDemage;
 
       if ($localScoutDemage > 0) {
         if ($invasor->scout > 0) {
           $invasor = $this->applyDemage($localScoutDemage, $invasor, Ship::SHIP_SCOUT_HP, count($invasors), $effects, 'scout');
-          $localScoutDemage = 0;
+        } else if ($invasor->craft > 0) {
+          $invasor = $this->applyDemage($localScoutDemage, $invasor, Ship::SHIP_CRAFT_HP, count($invasors), $effects, 'craft');
+        } else if ($local->bomber > 0) {
+          $invasor = $this->applyDemage($localScoutDemage, $invasor, Ship::SHIP_BOMBER_HP, count($invasors), $effects, 'bomber');
+        } else if ($local->cruiser > 0) {
+          $invasor = $this->applyDemage($localScoutDemage, $invasor, Ship::SHIP_CRUISER_HP, count($invasors), $effects, 'cruiser');
+        } else if ($local->stealth > 0)  {
+          $invasor = $this->applyDemage($localScoutDemage, $invasor, Ship::SHIP_STEALTH_HP, count($invasors), $effects, 'stealth');
+        } else {
+          $invasor = $this->applyDemage($localScoutDemage, $invasor, Ship::SHIP_FLAGSHIP_HP, count($invasors), $effects, 'flagship');
         }
       }
-      $localStealthDemage += $localScoutDemage;
 
       if ($localStealthDemage > 0) {
         if ($invasor->stealth > 0) {
           $invasor = $this->applyDemage($localStealthDemage, $invasor, Ship::SHIP_STEALTH_HP, count($invasors), $effects, 'stealth');
-          $localStealthDemage = 0;
+        } else if ($invasor->craft > 0) {
+          $invasor = $this->applyDemage($localStealthDemage, $invasor, Ship::SHIP_CRAFT_HP, count($invasors), $effects, 'craft');
+        } else if ($local->bomber > 0) {
+          $invasor = $this->applyDemage($localStealthDemage, $invasor, Ship::SHIP_BOMBER_HP, count($invasors), $effects, 'bomber');
+        } else if ($local->cruiser > 0) {
+          $invasor = $this->applyDemage($localStealthDemage, $invasor, Ship::SHIP_CRUISER_HP, count($invasors), $effects, 'cruiser');
+        } else if ($local->scout > 0)  {
+          $invasor = $this->applyDemage($localStealthDemage, $invasor, Ship::SHIP_SCOUT_HP, count($invasors), $effects, 'scout');
+        } else {
+          $invasor = $this->applyDemage($localStealthDemage, $invasor, Ship::SHIP_FLAGSHIP_HP, count($invasors), $effects, 'flagship');
         }
       }
-      $localFlagshipDemage += $localStealthDemage;
 
       if ($localFlagshipDemage > 0) {
         if ($invasor->flagship > 0) {
           $invasor = $this->applyDemage($localFlagshipDemage, $invasor, Ship::SHIP_FLAGSHIP_HP, count($invasors), $effects, 'flagship');
-          $localFlagshipDemage = 0;
+        } else if ($invasor->craft > 0) {
+          $invasor = $this->applyDemage($localFlagshipDemage, $invasor, Ship::SHIP_CRAFT_HP, count($invasors), $effects, 'craft');
+        } else if ($local->bomber > 0) {
+          $invasor = $this->applyDemage($localFlagshipDemage, $invasor, Ship::SHIP_BOMBER_HP, count($invasors), $effects, 'bomber');
+        } else if ($local->cruiser > 0) {
+          $invasor = $this->applyDemage($localFlagshipDemage, $invasor, Ship::SHIP_CRUISER_HP, count($invasors), $effects, 'cruiser');
+        } else if ($local->scout > 0)  {
+          $invasor = $this->applyDemage($localFlagshipDemage, $invasor, Ship::SHIP_SCOUT_HP, count($invasors), $effects, 'scout');
         }
       }
 
