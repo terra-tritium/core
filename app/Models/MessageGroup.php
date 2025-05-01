@@ -39,7 +39,8 @@ class MessageGroup extends Model
                 DB::raw("CASE WHEN mg.remetenteId = $idRementente THEN true ELSE false END AS sender")
             )
             ->where('cg.idAliance', '=', $idAliance)
-            ->orderBy('mg.createdAt', 'ASC') 
+            ->orderBy('mg.createdAt', 'DESC')
+            ->limit(100)
             ->get();
         return $messages;    
     }
