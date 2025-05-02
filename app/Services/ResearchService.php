@@ -178,9 +178,19 @@ class ResearchService
         }
     }
 
-    public function isResearched($player, $code)
-    {
-        $researched = Researched::where([['player', $player->id], ['code', $code]])->first();
+    public function isResearched($player, $code) {
+        
+        // Extrai o ID se for um objeto com atributo 'id'; senão usa o valor direto
+        $playerId = is_object($player) && isset($player->id) ? $player->id : $player;
+
+        // Se o ID for nulo, vazio ou inválido, retorna false
+        if (empty($playerId) || empty($code)) {
+            return false;
+        }
+
+        $researched = Researched::where([['player', $playerId], ['code', $code]])->first();
+
         return $researched ? true : false;
     }
+
 }

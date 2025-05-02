@@ -238,7 +238,7 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
       }
     }
 
-    if ($researchService->isResearched($p1, 600) || $researchService->isResearched($p2, 600)) {
+    if ($researchService->isResearched($originModel->player, 600) || $researchService->isResearched($destinyModel->player, 600)) {
       $peso -= 180;
     }
 
