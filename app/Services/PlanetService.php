@@ -218,7 +218,8 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
     $originModel     = Planet::findOrFail($origin);
     $destinyModel    = Planet::findOrFail($destiny);
 
-    $loggedPlayer = Player::getPlayerLogged();
+    $p1 = Player::find($originModel->player);
+    $p2 = Player::find($destinyModel->player);
 
     $regionOrigin  = $originModel->region ;
     $regionDestiny =  $destinyModel->region ;
@@ -237,7 +238,7 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
       }
     }
 
-    if ($researchService->isResearched($loggedPlayer, 600)) {
+    if ($researchService->isResearched($p1, 600) || $researchService->isResearched($p2, 600)) {
       $peso -= 180;
     }
 
