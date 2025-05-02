@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Models\Planet;
 use App\Models\Building;
 use App\Models\Build;
+use App\Models\Player;
 use App\Services\RankingService;
+use App\Services\ResearchService;
 
 class PlanetService
 {
@@ -205,6 +207,7 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
   }
 
   public function calculeDistance($origin, $destiny, $peso = null) {
+    $researchService = new ResearchService();
 
     $peso  = is_null($peso) ? $this->pesoCaluleDistance :  $peso ;
 
@@ -214,6 +217,8 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
 
     $originModel     = Planet::findOrFail($origin);
     $destinyModel    = Planet::findOrFail($destiny);
+
+    $loggedPlayer = Player::getPlayerLogged();
 
     $regionOrigin  = $originModel->region ;
     $regionDestiny =  $destinyModel->region ;
@@ -231,6 +236,11 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
         $result = abs($q1 - $q2 );
       }
     }
+
+    if ($researchService->isResearched($loggedPlayer, 600)) {
+      $peso -= 180;
+    }
+
     return $result * $peso;
   }
 
