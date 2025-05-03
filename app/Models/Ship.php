@@ -52,4 +52,14 @@ class Ship extends Model
     public static function getHP(string $type): int {
     return constant("self::SHIP_" . strtoupper($type) . "_HP");
     }
+
+    /**
+     * 
+     * update ships set attack = 6, defense = 0, hp = 10 where id = 1; -- Craft
+     * update ships set attack = 22, defense = 2, hp = 20 where id = 2; -- Bomber
+     * update ships set attack = 14, defense = 5, hp = 35 where id = 3; -- Cruiser
+     * update ships set attack = 15, defense = 3, hp = 15 where id = 4; -- Scout
+     * update ships set attack = 8, defense = 6, hp = 25 where id = 5; -- Stealth
+     * update ships set attack = 45, defense = 10, hp = 60 where id = 6; -- Flagship
+     */
 }
