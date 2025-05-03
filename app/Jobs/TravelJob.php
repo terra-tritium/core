@@ -95,6 +95,7 @@ class TravelJob implements ShouldQueue
                     break;
                 case Travel::MISSION_COLONIZATION:
                     $this->travelService->missionColonization($currentTravel);
+                    break;
                 case Travel::MISSION_SPIONAGE:
                     $espitionService = new EspionadeService();
                     $espitionService->finallySpy($currentTravel);

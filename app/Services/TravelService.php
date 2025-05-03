@@ -13,6 +13,7 @@ use App\Models\Fleet;
 use App\Models\Unit;
 use App\Models\Player;
 use App\Services\LogService;
+use App\Services\PlanetService;
 use Carbon\Carbon;
 
 
@@ -311,12 +312,73 @@ class TravelService
         TravelJob::dispatch($this,$newTravel->id,true)->delay(now()->addSeconds($travelTime));
     }
 
+    private function qtdMyPlanets($playerId) {
+        return Planet::where('player', $playerId)->count();
+    }
+
     public function colonizePlanet($planetId, $playerId) {
+
+        $qtdPlanets = $this->qtdMyPlanets($playerId);
+
+        $custMetal = 0;
+        $custUranium = 0;
+        $custCrystal = 0;
+
+        if ($qtdPlanets <= 1) {
+            $custMetal = 100000;
+            $custUranium = 50000;
+            $custCrystal = 50000;
+        }
+
+        if ($qtdPlanets == 2) {
+            $custMetal = 200000;
+            $custUranium = 100000;
+            $custCrystal = 100000;
+        }
+
+        if ($qtdPlanets == 3) {
+            $custMetal = 300000;
+            $custUranium = 150000;
+            $custCrystal = 150000;
+        }
+
+        if ($qtdPlanets == 4) {
+            $custMetal = 500000;
+            $custUranium = 250000;
+            $custCrystal = 250000;
+        }
+
+        if ($qtdPlanets == 5) {
+            $custMetal = 1000000;
+            $custUranium = 500000;
+            $custCrystal = 500000;
+        }
+
+        if ($qtdPlanets == 6) {
+            $custMetal = 3000000;
+            $custUranium = 1500000;
+            $custCrystal = 1500000;
+        }
+
+        if ($qtdPlanets == 7) {
+            $custMetal = 5000000;
+            $custUranium = 2500000;
+            $custCrystal = 2500000;
+        }
+
+        if ($qtdPlanets == 8) {
+            $custMetal = 25000000;
+            $custUranium = 5000000;
+            $custCrystal = 5000000;
+        }
+
+        $totalPoints = ($custMetal + $custUranium + $custCrystal) / 100;
+
         $planetColony = Planet::find($planetId);
         $planetFrom = Planet::where(['player' => $playerId])->firstOrFail();
-        $planetFrom->metal -= 100000;
-        $planetFrom->uranium -= 50000;
-        $planetFrom->crystal -= 50000;
+        $planetFrom->metal -= $custMetal;
+        $planetFrom->uranium -= $custUranium;
+        $planetFrom->crystal -= $custCrystal;
 
         if ($planetFrom->metal < 0 || $planetFrom->uranium < 0 || $planetFrom->crystal < 0) { return false;  }
 
@@ -333,6 +395,11 @@ class TravelService
         $travel->arrival = time() + $travelTime;
         $travel->status = Travel::STATUS_ON_LOAD;
         $travel->save();
+
+        # adiciona a pontuacao ao jogador
+        $player = Player::find($playerId);
+        $player->score += $totalPoints;
+        $player->save();
 
         TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
     }

@@ -16,9 +16,13 @@ class EspionadeService
     {
         $spyModel = Espionage::where('travel',$travel->id)->first();
 
+        if (!$spyModel) {
+            return;
+        }
+
         $spyModel->success = $this->calculionProbabilisticSuccess($spyModel);
 
-        if($spyModel->success)
+        if (property_exists($spyModel, 'success') && $spyModel->success)
         {
             $planetModel = Planet::findOrFail($spyModel->planet);
             switch($spyModel->typeSpy)
