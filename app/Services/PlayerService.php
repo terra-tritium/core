@@ -387,4 +387,17 @@ class PlayerService
 
     return true;
   }
+
+  public function endTour($player) {
+    $playerModel = Player::find($player);
+    $planet = Planet::where('player', $player)->firstOrFail();
+
+    if ($planet->metal == 1300 && $planet->uranium == 0 && $planet->crystal == 0 && $playerModel->score == 2) {
+      $planet->metal += 5000;
+      $planet->save();
+      return "ok";
+    }
+
+    return "Not credit bonus, player no elegible";
+  }
 }
