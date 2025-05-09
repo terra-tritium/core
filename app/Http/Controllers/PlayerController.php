@@ -334,4 +334,19 @@ class PlayerController extends Controller
         }
 
     }
+
+    public function endTour() {
+        try {
+            $player = Player::getPlayerLogged();
+            if (!$player) {
+                return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $result = $this->playerService->endTour($player->id);
+
+            return response()->json($result, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -86,6 +86,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/new', [PlayerController::class, 'register']);
         Route::post('/list-name/{id}', [PlayerController::class, 'getNameUser']);
         Route::post('/change-name', [PlayerController::class, 'changeName']);
+        Route::post('/end-tour', [PlayerController::class, 'endTour']);
     });
 
     Route::group(['prefix' => 'build', 'middleware' => 'throttle:240,1'], function () {
