@@ -249,7 +249,7 @@ return [
     'tritium_market_status_pending' => env('TRITIUM_MARKET_STATUS_PENDING', 3),
     'tritium_market_status_finished' => env('TRITIUM_MARKET_STATUS_FINISHED', 2),
     'tritium_max_planet_player' => env('TRITIUM_MAX_PLANET_PLAYER', 7),
-    'tritium_combat_stage_time' => env('TRITIUM_COMBAT_STAGE_TIME', 300),
+    'tritium_combat_stage_time' => env('TRITIUM_COMBAT_STAGE_TIME', 900),
     'tritium_weight_time_second' => env('TRITIUM_WEIGHT_TIME_SECOND', 18),
     'tritium_travel_mission_spionage_cost' => env('TRITIUM_TRAVEL_MISSION_SPIONAGE_COST', 1000),
     'tritium_charging_speed' => env('TRITIUM_CHARGING_SPEED', 100),
