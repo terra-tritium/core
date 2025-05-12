@@ -41,6 +41,7 @@ class Message extends Model
             ->select('us.name as sender', 'ur.name as recipient', 'm.*')
             ->join('users as us', 'us.id', '=', 'm.senderId')
             ->join('users as ur', 'ur.id', '=', 'm.recipientId')
+            ->limit(100)
             ->get();
         return $msgs;
     }
@@ -52,7 +53,9 @@ class Message extends Model
             ->join('users as us', 'us.id', '=', 'm.senderId')
             ->where('senderId', $senderId)
             ->groupBy('m.senderId')
-            ->orderBy('m.createdAt')->get();
+            ->orderBy('m.createdAt')
+            ->limit(100)
+            ->get();
         return $msg;
     }
 
@@ -69,6 +72,7 @@ class Message extends Model
             ->groupBy('u.id', 'm.senderId', 'u.name')
             ->orderBy('read', 'ASC')
             ->orderBy('createdAt', 'DESC')
+            ->limit(100)
             ->get();
         return $msgs;
     }
@@ -82,6 +86,7 @@ class Message extends Model
             ->where('senderId', $senderId)
             ->where('read', false)
             ->orderBy('createdAt', 'desc')
+            ->limit(100)
             ->first();
         return $msg;
     }
@@ -94,6 +99,7 @@ class Message extends Model
             ->where('recipientId', $recipientId)
             ->groupBy(['m.senderId', 'us.name'])
             ->orderBy('us.name')
+            ->limit(100)
             ->get();
         return $msg;
     }
@@ -101,7 +107,9 @@ class Message extends Model
     {
         $msgs = DB::table($this->table . ' as m')
             ->where([['m.recipientId', '=', $recipientId], ['m.senderId', '=', $senderId]])
-            ->orderBy('m.createdAt')->get();
+            ->orderBy('m.createdAt')
+            ->limit(100)
+            ->get();
         return $msgs;
     }
 
@@ -125,6 +133,7 @@ class Message extends Model
             ->groupBy('users.id', 'users.name')
             ->orderByDesc('countNotRead')
             ->orderByDesc('createdAt')
+            ->limit(100)
             ->get();
 
         return $users;
@@ -146,6 +155,7 @@ class Message extends Model
                     ->where('recipientId', $senderId);
             })
             ->orderBy('createdAt')
+            ->limit(100)
             ->get();
         return $messages;
     }
@@ -164,6 +174,7 @@ class Message extends Model
         $users = User::whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
             ->where('id', '!=', $id)
             ->select('id', 'name', 'email','id as userId')
+            ->limit(100)
             ->get();
         return $users;
     }
@@ -172,6 +183,7 @@ class Message extends Model
         $users = User::whereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%'])
             ->where('id', '!=', $id)
             ->select('id', 'name', 'email', 'id as userId')
+            ->limit(100)
             ->get();
         return $users;
     }
