@@ -15,6 +15,7 @@ use App\Models\Player;
 use App\Services\LogService;
 use App\Services\PlanetService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 
 class TravelService
@@ -48,6 +49,12 @@ class TravelService
 
         if ($travel->from == $travel->to) {
             return "Impossible travel";
+        }
+
+        $isAlienTravel = $this->isAlienAtack($travel->to);
+
+        if ($isAlienTravel && ($travel->action != Travel::ATTACK_FLEET)) {
+            return "Action no permission for alien travel";
         }
 
         if (!$this->validateTransportShip($player, $travel->transportShips)) {
@@ -84,15 +91,24 @@ class TravelService
             }
         }
 
+        # Populate Travel
         $now = time();
-        $travelTime = $this->planetService->calculeDistance($travel->from, $travel->to);
+        if ($isAlienTravel) {
+            $travelTime = 300;
+        } else {
+            $travelTime = $this->planetService->calculeDistance($travel->from, $travel->to);
+        }
         $newTravel->from = $travel->from;
         $newTravel->to = $travel->to;
         $newTravel->action = $travel->action;
         $newTravel->player = $player;
         $newTravel->start = $now;
         $newTravel->arrival = $now + $travelTime;
-        $newTravel->receptor = $this->getReceptor($travel->to);
+        if (!$isAlienTravel) {
+            $newTravel->receptor = $this->getReceptor($travel->to);
+        } else {
+            $newTravel->receptor = 0;
+        }
         $newTravel->strategy = $travel->strategy;
         $newTravel->transportShips = $travel->transportShips;
         $newTravel->status = Travel::STATUS_ON_LOAD;
@@ -101,7 +117,9 @@ class TravelService
             case Travel::ATTACK_FLEET:
                 $newTravel = $this->startAttackFleet($newTravel, $travel, $player);
                 $newTravel->status = Travel::STATUS_ON_GOING;
-                $this->planetService->onFire($travel->to);
+                if (!$isAlienTravel) {
+                    $this->planetService->onFire($travel->to);
+                }
                 break;
             case Travel::DEFENSE_FLEET:
                 $newTravel = $this->startDefenseFleet($newTravel, $travel, $player);
@@ -140,11 +158,21 @@ class TravelService
             $newTravel->transportShips = 0;
         }
 
-        $newTravel->save();
+        try {
+            $newTravel->save();
+        } catch(\Exception $exception) {
+            Log::error('Erro ao executar gravar uma travel: ' . $exception->getMessage());
+        }
 
         TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
 
         return "success";
+    }
+
+    private function isAlienAtack($destiny) {
+        $code = explode('#', $destiny)[0]; // pega só a parte antes do '#'
+    
+        return in_array($code, ["9996", "9997", "9998", "9999"]);
     }
 
     private function validateReturnFleet ($player) {

@@ -19,6 +19,7 @@ use App\Services\LogService;
 use App\Jobs\SpaceCombatJob;
 use App\Jobs\TravelJob;
 use App\Models\Logbook;
+use App\Models\AlienInfo;
 use Illuminate\Support\Facades\Log;
 class SpaceCombatService
 {
@@ -37,6 +38,17 @@ class SpaceCombatService
   }
 
   public function createNewCombat ($travel) {
+
+    $isAlianAttack = $this->isAlienAtack($travel->to);
+    $alienCode = 0;
+
+    Log::info("Travel alien? " . $isAlianAttack);
+
+    if ($isAlianAttack) {
+      $alienCode = $travel->to;
+      $travel->to .= "#".$travel->player;
+      Log::info("Alien Code: " . $alienCode);
+    }
 
     $currentCombat = $this->currentCombat($travel->to);
     $player = Player::find($travel->player);
@@ -59,6 +71,7 @@ class SpaceCombatService
     # se ja existe o esse jogador no combate entao junta as naves a frota que ele ja tem
     if ($fighter) {
       $this->joinFleet($combat, $fighter, $travel, $player);
+      Log::info("Tinha outro combatente: " . $fighter);
     } else {
       # se nao existe o jogador nesta batalha ele cria o jogador e insere no combate
       $player1 = new Fighters();
@@ -84,72 +97,108 @@ class SpaceCombatService
       $this->logStage($combat, $player->name . ' joined the invaders side and arrived with '.$tShips.' ships');
     }
 
-    $planet = Planet::find($travel->to);
+    Log::info("Travel " . $travel);
 
-    if ($currentCombat == false) {
+    Log::info("Alien ataque 2? " . $isAlianAttack);
 
-      $playerDefensor = Player::find($planet->player);
+    if (!$isAlianAttack) {   
+      $planet = Planet::find($travel->to);
+      if ($currentCombat == false) {
 
-      $player2 = new Fighters();
-      $player2->combat = $combat->id;
-      $player2->player = $planet->player;
-      $player2->side = Combat::SIDE_LOCAL;
-      if ($planet->defenseStrategy) {
-        $player2->strategy = $planet->defenseStrategy;
-      } else {
-        $player2->strategy = 1;
-      }
-      $player2->demage = 0;
-      $player2->start = time();
-      $player2->stage = 0;
-      $player2->planet = $travel->to;
-      $player2->transportShips = $travel->transportShips;
-      $player2->cruiser = 0;
-      $player2->craft = 0;
-      $player2->bomber = 0;
-      $player2->scout = 0;
-      $player2->stealth = 0;
-      $player2->flagship = 0;
-      $fleet = Fleet::where('planet', $travel->to)->get();
-      if ($fleet) {
-        foreach ($fleet as $ship) {
-          switch ($ship->unit) {
-            case Ship::SHIP_CRUISER:
-              $player2->cruiser = $ship->quantity;
-              break;
-            case Ship::SHIP_CRAFT:
-              $player2->craft = $ship->quantity;
-              break;
-            case Ship::SHIP_BOMBER:
-              $player2->bomber = $ship->quantity;
-              break;
-            case Ship::SHIP_SCOUT:
-              $player2->scout = $ship->quantity;
-              break;
-            case Ship::SHIP_STEALTH:
-              $player2->stealth = $ship->quantity;
-              break;
-            case Ship::SHIP_FLAGSHIP:
-              $player2->flagship = $ship->quantity;
-              break;
+        $playerDefensor = Player::find($planet->player);
+  
+        $player2 = new Fighters();
+        $player2->combat = $combat->id;
+        $player2->player = $planet->player;
+        $player2->side = Combat::SIDE_LOCAL;
+        if ($planet->defenseStrategy) {
+          $player2->strategy = $planet->defenseStrategy;
+        } else {
+          $player2->strategy = 1;
+        }
+        $player2->demage = 0;
+        $player2->start = time();
+        $player2->stage = 0;
+        $player2->planet = $travel->to;
+        $player2->transportShips = $travel->transportShips;
+        $player2->cruiser = 0;
+        $player2->craft = 0;
+        $player2->bomber = 0;
+        $player2->scout = 0;
+        $player2->stealth = 0;
+        $player2->flagship = 0;
+        $fleet = Fleet::where('planet', $travel->to)->get();
+        if ($fleet) {
+          foreach ($fleet as $ship) {
+            switch ($ship->unit) {
+              case Ship::SHIP_CRUISER:
+                $player2->cruiser = $ship->quantity;
+                break;
+              case Ship::SHIP_CRAFT:
+                $player2->craft = $ship->quantity;
+                break;
+              case Ship::SHIP_BOMBER:
+                $player2->bomber = $ship->quantity;
+                break;
+              case Ship::SHIP_SCOUT:
+                $player2->scout = $ship->quantity;
+                break;
+              case Ship::SHIP_STEALTH:
+                $player2->stealth = $ship->quantity;
+                break;
+              case Ship::SHIP_FLAGSHIP:
+                $player2->flagship = $ship->quantity;
+                break;
+            }
           }
         }
+        $player2->save();
+  
+        $tShips = $player2->cruiser + $player2->craft + $player2->bomber + $player2->scout + $player2->stealth + $player2->flagship;
+  
+        $nameDefensor = "";
+  
+        if (is_array($playerDefensor)) {
+          $nameDefensor = $playerDefensor['name'];
+        } elseif (is_object($playerDefensor)) {
+            $nameDefensor = $playerDefensor->name;
+        } else {
+            $nameDefensor = 'Unknown'; // fallback de segurança, caso não seja nem array nem objeto
+        }
+  
+        $this->logStage($combat, $nameDefensor . ' joined the defenders side with '.$tShips.' ships');
       }
-      $player2->save();
+    
+    # Carrega formação do Alien atack
+    } else {
+      if ($currentCombat == false) {
+        $alien = new Fighters();
+        $alien->combat = $combat->id;
+        $alien->player = $alienCode;
+        $alien->side = Combat::SIDE_LOCAL;
+        $alien->strategy = $this->getAlienStrategy($alienCode);
+        $alien->demage = 0;
+        $alien->start = time();
+        $alien->stage = 0;
+        $alien->planet = $travel->to;
+        $alien->transportShips = 0;
 
-      $tShips = $player2->cruiser + $player2->craft + $player2->bomber + $player2->scout + $player2->stealth + $player2->flagship;
+        $alienInfo = AlienInfo::get($alienCode, $this->getAlienLevel($alienCode, $player));
 
-      $nameDefensor = "";
-
-      if (is_array($playerDefensor)) {
-        $nameDefensor = $playerDefensor['name'];
-      } elseif (is_object($playerDefensor)) {
-          $nameDefensor = $playerDefensor->name;
-      } else {
-          $nameDefensor = 'Unknown'; // fallback de segurança, caso não seja nem array nem objeto
+        $alien->cruiser = $alienInfo->cruiser;
+        $alien->craft = $alienInfo->craft;
+        $alien->bomber = $alienInfo->bomber;
+        $alien->scout = $alienInfo->scout;
+        $alien->stealth = $alienInfo->stealth;
+        $alien->flagship = $alienInfo->flagship;
+        $alien->save();
+  
+        $tShips = $alien->cruiser + $alien->craft + $alien->bomber + $alien->scout + $alien->stealth + $alien->flagship;
+  
+        $nameDefensor = $this->getAlienName($alienCode);
+  
+        $this->logStage($combat, $nameDefensor . ' joined the defenders side with '.$tShips.' ships');
       }
-
-      $this->logStage($combat, $nameDefensor . ' joined the defenders side with '.$tShips.' ships');
     }
 
     $defenderMembers = Fighters::where([["planet", $travel->to], ["side", Combat::SIDE_LOCAL], ["combat", $combat->id]])->get();
@@ -166,6 +215,38 @@ class SpaceCombatService
     $this->ajustBatleField();
 
     $this->startCombat($combat->id);
+  }
+
+  private function isAlienAtack($destiny) {
+      $code = explode('#', $destiny)[0]; // pega só a parte antes do '#'
+      return in_array($code, ["9996", "9997", "9998", "9999"]);
+  }
+
+  private function getAlienName($alienCode) {
+    switch($alienCode) {
+      case "9996" : return "Infesta Alien";
+      case "9997" : return "Simbion Alien";
+      case "9998" : return "Tantra Alien";
+      case "9999" : return "Xantii Alien";
+    }
+  }
+
+  private function getAlienLevel($alienCode, $player) {
+    switch($alienCode) {
+      case "9996" : return $player->infesta;
+      case "9997" : return $player->simbion;
+      case "9998" : return $player->tantra;
+      case "9999" : return $player->xantii;
+    }
+  }
+
+  private function getAlienStrategy($alienCode) {
+    switch($alienCode) {
+      case "9996" : return 1;
+      case "9997" : return 2;
+      case "9998" : return 3;
+      case "9999" : return 4;
+    }
   }
 
   // Recarrega as naves que foram criadas durante o ultimo stage e joga para a batalha
@@ -333,79 +414,84 @@ class SpaceCombatService
   public function excuteStage($combatId) {
     $combat = Combat::find($combatId);
 
-    $planetOwn = Planet::find($combat->planet);
-    $fighterOwn = Fighters::where(['combat'=>$combatId, 'player'=> $planetOwn->player])->first();
+    if (!$this->isAlienAtack($combat->planet)) {
 
-    $contAddShip = $this->reloadFleet($planetOwn, $fighterOwn);
+      $planetOwn = Planet::find($combat->planet);
+      $fighterOwn = Fighters::where(['combat'=>$combatId, 'player'=> $planetOwn->player])->first();
 
-    if ($contAddShip > 0) {
-      $this->logStage($combat, 'Defender joined with '.$contAddShip.' ships');
-    }
+      $contAddShip = $this->reloadFleet($planetOwn, $fighterOwn);
 
-    if ($combat->status == Combat::STATUS_CREATE) {
-      $this->startCombat($combatId);
-    }
+      if ($contAddShip > 0) {
+        $this->logStage($combat, 'Defender joined with '.$contAddShip.' ships');
+      }
 
-    $invasors = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
-    $locals = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_LOCAL])->get();
-
-    # Locals no more players
-    if ($locals->count() == 0) {
-      $this->finishCombat($combatId, Combat::SIDE_INVASOR);
-      return true;
-    }
-
-    # Invasors no more players
-    if ($invasors->count() == 0) {
-      $this->finishCombat($combatId, Combat::SIDE_LOCAL);
-      return true;
-    }
-
-    if ($this->haveShips($locals)) {
-      $this->resolve($combat, $invasors, $locals);
     } else {
-      # Invasors win
-      $this->finishCombat($combatId, Combat::SIDE_INVASOR);
-      return true;
+
+      if ($combat->status == Combat::STATUS_CREATE) {
+        $this->startCombat($combatId);
+      }
+
+      $invasors = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
+      $locals = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_LOCAL])->get();
+
+      # Locals no more players
+      if ($locals->count() == 0) {
+        $this->finishCombat($combatId, Combat::SIDE_INVASOR);
+        return true;
+      }
+
+      # Invasors no more players
+      if ($invasors->count() == 0) {
+        $this->finishCombat($combatId, Combat::SIDE_LOCAL);
+        return true;
+      }
+
+      if ($this->haveShips($locals)) {
+        $this->resolve($combat, $invasors, $locals, $this->isAlienAtack($combat->planet));
+      } else {
+        # Invasors win
+        $this->finishCombat($combatId, Combat::SIDE_INVASOR);
+        return true;
+      }
+
+      if ($this->haveShips($invasors)) {
+        $this->resolve($combat, $locals, $invasors, $this->isAlienAtack($combat->planet));
+      } else {
+        # Locals win
+        $this->finishCombat($combatId, Combat::SIDE_LOCAL);
+        return true;
+      }
+
+      $playerService = new PlayerService();
+
+      # Apply scores
+      foreach ($locals as $local) {
+          $damagePerLocal = max(0, $this->totalDemageInvasor / floor(count($locals)));
+          $playerService->addAttackScore($local->player, $damagePerLocal);
+      }
+
+      foreach ($invasors as $invasor) {
+          $damagePerInvasor = max(0, $this->totalDemageLocal / floor(count($invasors)));
+          $playerService->addAttackScore($invasor->player, $damagePerInvasor);
+      }
+
+      # Log stage informations
+      $this->logStage(
+        $combat,
+        "Invaders Kills: " . $this->totalKillInvasor . " - Defensors Kills: " . $this->totalKilllocal,
+        $this->totalKillInvasor,
+        $this->totalKilllocal,
+        $this->totalDemageInvasor,
+        $this->totalDemageLocal
+      );
+
+      $combat->stage++;
+      $combat->nextStage = time() + config("app.tritium_combat_stage_time");
+      $combat->save();
+
+      # Queue next stage
+      SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds( config("app.tritium_combat_stage_time")));
     }
-
-    if ($this->haveShips($invasors)) {
-      $this->resolve($combat, $locals, $invasors);
-    } else {
-      # Locals win
-      $this->finishCombat($combatId, Combat::SIDE_LOCAL);
-      return true;
-    }
-
-    $playerService = new PlayerService();
-
-    # Apply scores
-    foreach ($locals as $local) {
-        $damagePerLocal = max(0, $this->totalDemageInvasor / floor(count($locals)));
-        $playerService->addAttackScore($local->player, $damagePerLocal);
-    }
-
-    foreach ($invasors as $invasor) {
-        $damagePerInvasor = max(0, $this->totalDemageLocal / floor(count($invasors)));
-        $playerService->addAttackScore($invasor->player, $damagePerInvasor);
-    }
-
-    # Log stage informations
-    $this->logStage(
-      $combat,
-      "Invaders Kills: " . $this->totalKillInvasor . " - Defensors Kills: " . $this->totalKilllocal,
-      $this->totalKillInvasor,
-      $this->totalKilllocal,
-      $this->totalDemageInvasor,
-      $this->totalDemageLocal
-    );
-
-    $combat->stage++;
-    $combat->nextStage = time() + config("app.tritium_combat_stage_time");
-    $combat->save();
-
-    # Queue next stage
-    SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds( config("app.tritium_combat_stage_time")));
   }
 
   private function logStage($combat, $message, $killInvasor = 0, $killLocal = 0, $demageInvasor = 0, $demageLocal = 0) {
@@ -422,6 +508,8 @@ class SpaceCombatService
 
   public function leave($combatId, $player) {
     $combat = Combat::find($combatId);
+
+    $isAlianAttack = $this->isAlienAtack($combat->planet);
 
     $planetService = new PlanetService();
     $now = time();
@@ -449,7 +537,11 @@ class SpaceCombatService
     $travel->stealth = $figther->stealth;
     $travel->flagship = $figther->flagship;
     $travel->start = $now;
-    $travelTime = $planetService->calculeDistance($travel->from, $travel->to);
+    if ($isAlianAttack) {
+      $travelTime = 300;
+    } else {
+      $travelTime = $planetService->calculeDistance($travel->from, $travel->to);
+    }
     $travel->arrival = $now + $travelTime;
     $travel->status = Travel::STATUS_ON_GOING;
     $travel->save();
@@ -497,6 +589,8 @@ class SpaceCombatService
 
   private function initiateReturn($combat, $timeInvasor) {
 
+    $isAlianAttack = $this->isAlienAtack($combat->planet);
+
     foreach ($timeInvasor as $fighter) {
       $planetService = new PlanetService();
       $now = time();
@@ -508,6 +602,9 @@ class SpaceCombatService
       $travel->action = Travel::RETURN_FLEET;
       $travel->transportShips = $fighter->transportShips;
       $travelTime = $planetService->calculeDistance($travel->from, $travel->to);
+      if ($isAlianAttack) {
+        $travelTime = 300;
+      }
       $travel->metal = 0;
       $travel->crystal = 0;
       $travel->uranium = 0;
@@ -593,7 +690,88 @@ class SpaceCombatService
     return $figther;
   }
 
+  private function pillageAlien($combat, $invasors) {
+    $planetService = new PlanetService();
+    $stolen = 0;
+
+    $capacity = $invasors[0]->transportShips * config("app.tritium_transportship_capacity");
+    $metal = 0;
+    $crystal = 0;
+    $uranium = 0;
+
+    $player = Player::find($invasors[0]->player);
+
+    $alienCode = explode('#', $combat->planet)[0];
+    $alienInfo = AlienInfo::get($alienCode, $this->getAlienLevel($alienCode, $player));
+
+    if ($alienInfo->metal >= $capacity && $alienInfo->metal > 0) {
+      $alienInfo->metal -= $capacity;
+      $stolen += $capacity;
+      $metal = $capacity;
+      $capacity = 0;
+    } elseif($alienInfo->metal > 0) {
+      $stolen += $alienInfo->metal;
+      $metal = $alienInfo->metal;
+      $capacity -= $alienInfo->metal;
+    }
+
+    if ($alienInfo->cristal >= $capacity && $alienInfo->cristal > 0) {
+      $alienInfo->cristal -= $capacity;
+      $stolen += $capacity;
+      $crystal = $capacity;
+      $capacity = 0;
+    } elseif($alienInfo->cristal > 0) {
+      $stolen += $alienInfo->cristal;
+      $crystal = $alienInfo->cristal;
+      $capacity -= $alienInfo->cristal;
+    }
+
+    if ($alienInfo->uranium >= $capacity && $alienInfo->uranium > 0) {
+      $alienInfo->uranium -= $capacity;
+      $stolen += $capacity;
+      $uranium = $capacity;
+      $capacity = 0;
+    } elseif($alienInfo->uranium > 0) {
+      $stolen += $alienInfo->uranium;
+      $uranium = $alienInfo->uranium;
+      $capacity -= $alienInfo->uranium;
+    }
+
+    $now = time();
+    $travel = new Travel();
+    $travel->player = $invasors[0]->player;
+    $travel->receptor = $invasors[0]->player;
+    $travel->from = $combat->planet;
+    $travel->to = $invasors[0]->planet;
+    $travel->action = Travel::RETURN_FLEET;
+    $travel->transportShips = $invasors[0]->transportShips;
+    $travel->cruiser = $invasors[0]->cruiser;
+    $travel->craft = $invasors[0]->craft;
+    $travel->bomber = $invasors[0]->bomber;
+    $travel->scout = $invasors[0]->scout;
+    $travel->stealth = $invasors[0]->stealth;
+    $travel->flagship = $invasors[0]->flagship;
+    $travel->start = $now;
+    $travelTime = 300;
+    $travel->arrival = $now + $travelTime;
+    $travel->status = Travel::STATUS_ON_GOING;
+    $travel->metal = $metal;
+    $travel->crystal = $crystal;
+    $travel->uranium = $uranium;
+    $travel->save();
+
+    TravelJob::dispatch($this, $travel->id, false)->delay(now()->addSeconds($travelTime));
+
+    return $stolen;
+  }
+
   private function pillage($combat, $invasors) {
+
+    if($this->isAlienAtack($combat->planet)) {
+      $stolen = $this->pillageAlien($combat, $invasors);
+      return $stolen;
+    }
+
     $planet = Planet::find($combat->planet);
     $buildWhareHouse    = 9;
     $metalProtected     = 0 ;
@@ -794,7 +972,7 @@ class SpaceCombatService
     return 0;
   }
 
-  private function resolve($combat, $invasors, $locals) {
+  private function resolve($combat, $invasors, $locals, $alien = false) {
 
     $invasorCraftAttack = 0;
     $localCraftAttack = 0;
@@ -996,7 +1174,7 @@ class SpaceCombatService
       }
 
       // Sincroniza a frota de naves do dono do planeta
-      if ($combat->planet == $local->planet) {
+      if (($combat->planet == $local->planet) && !$alien) {
         $planet = Planet::find($combat->planet);
         $this->sincronizeFleet($planet, $local);
       }

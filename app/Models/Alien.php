@@ -4,18 +4,18 @@ namespace App\Models;
 
 class Alien
 {
-  protected $code;
-  protected $name;
-  protected $level;
-  protected $metal;
-  protected $uranium;
-  protected $cristal;
-  protected $craft;
-  protected $bomber;
-  protected $cruiser;
-  protected $scout;
-  protected $stealth;
-  protected $flagship;
+  public $code;
+  public $name;
+  public $level;
+  public $metal;
+  public $uranium;
+  public $cristal;
+  public $craft;
+  public $bomber;
+  public $cruiser;
+  public $scout;
+  public $stealth;
+  public $flagship;
 
   public function __construct($code, $name, $level, $metal, $uranium, $cristal, $craft, $bomber, $cruiser, $scout, $stealth, $flagship) {
     $this->code = $code;

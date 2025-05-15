@@ -90,6 +90,22 @@ class CombatController extends Controller
             ->orderBy('c.id', 'desc')
             ->get();
 
+        $combatsAlien = DB::table('combats as c')
+            ->join('fighters as f', 'c.id', '=', 'f.combat')
+            ->where('f.player', $player->id)
+            ->select('c.*')
+            ->limit(5)
+            ->orderBy('c.id', 'desc')
+            ->get();
+
+        if ($combatsAlien) {
+            foreach($combatsAlien as $cAlien){
+                $combats->push($cAlien);
+            }
+        }
+
+        $combats = $combats->merge($combatsAlien)->unique('id')->sortByDesc('id')->values();
+
         return response()->json($combats);
     }
 
