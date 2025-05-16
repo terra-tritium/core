@@ -207,6 +207,13 @@ public function currentBalance($p1, $type, $energyLevel = 1) {
   }
 
   public function calculeDistance($origin, $destiny, $peso = null) {
+
+    # Viagem alien distancia fixa
+    $codeAlien = explode('#', $destiny)[0]; // pega só a parte antes do '#'
+    if (in_array($codeAlien, ["9996", "9997", "9998", "9999"])) {
+      return 300;
+    }
+
     $researchService = new ResearchService();
 
     $peso  = is_null($peso) ? $this->pesoCaluleDistance :  $peso ;
