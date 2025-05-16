@@ -421,79 +421,77 @@ class SpaceCombatService
       if ($contAddShip > 0) {
         $this->logStage($combat, 'Defender joined with '.$contAddShip.' ships');
       }
-
-    } else {
-
-      if ($combat->status == Combat::STATUS_CREATE) {
-        $this->startCombat($combatId);
-      }
-
-      $invasors = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
-      $locals = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_LOCAL])->get();
-
-      Log::info($invasors);
-      Log::info("Invasor Player: " . $invasors[0]->player);
-
-      # Locals no more players
-      if ($locals->count() == 0) {
-        $this->finishCombat($combatId, Combat::SIDE_INVASOR, $invasors[0]->player);
-        return true;
-      }
-
-      # Invasors no more players
-      if ($invasors->count() == 0) {
-        $this->finishCombat($combatId, Combat::SIDE_LOCAL, $invasors[0]->player);
-        return true;
-      }
-
-      if ($this->haveShips($locals)) {
-        $this->resolve($combat, $invasors, $locals, $this->isAlienAtack($combat->planet));
-      } else {
-        # Invasors win
-        $this->finishCombat($combatId, Combat::SIDE_INVASOR, $invasors[0]->player);
-        return true;
-      }
-
-      if ($this->haveShips($invasors)) {
-        $this->resolve($combat, $locals, $invasors, $this->isAlienAtack($combat->planet));
-      } else {
-        # Locals win
-        $this->finishCombat($combatId, Combat::SIDE_LOCAL, $invasors[0]->player);
-        return true;
-      }
-
-      $playerService = new PlayerService();
-
-      # Apply scores
-      if(!$this->isAlienAtack($combat->planet)) {
-        foreach ($locals as $local) {
-          $damagePerLocal = max(0, $this->totalDemageInvasor / floor(count($locals)));
-          $playerService->addAttackScore($local->player, $damagePerLocal);
-        }
-
-        foreach ($invasors as $invasor) {
-            $damagePerInvasor = max(0, $this->totalDemageLocal / floor(count($invasors)));
-            $playerService->addAttackScore($invasor->player, $damagePerInvasor);
-        }
-      }
-      
-      # Log stage informations
-      $this->logStage(
-        $combat,
-        "Invaders Kills: " . $this->totalKillInvasor . " - Defensors Kills: " . $this->totalKilllocal,
-        $this->totalKillInvasor,
-        $this->totalKilllocal,
-        $this->totalDemageInvasor,
-        $this->totalDemageLocal
-      );
-
-      $combat->stage++;
-      $combat->nextStage = time() + config("app.tritium_combat_stage_time");
-      $combat->save();
-
-      # Queue next stage
-      SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds( config("app.tritium_combat_stage_time")));
     }
+
+    if ($combat->status == Combat::STATUS_CREATE) {
+      $this->startCombat($combatId);
+    }
+
+    $invasors = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
+    $locals = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_LOCAL])->get();
+
+    Log::info($invasors);
+    Log::info("Invasor Player: " . $invasors[0]->player);
+
+    # Locals no more players
+    if ($locals->count() == 0) {
+      $this->finishCombat($combatId, Combat::SIDE_INVASOR, $invasors[0]->player);
+      return true;
+    }
+
+    # Invasors no more players
+    if ($invasors->count() == 0) {
+      $this->finishCombat($combatId, Combat::SIDE_LOCAL, $invasors[0]->player);
+      return true;
+    }
+
+    if ($this->haveShips($locals)) {
+      $this->resolve($combat, $invasors, $locals, $this->isAlienAtack($combat->planet));
+    } else {
+      # Invasors win
+      $this->finishCombat($combatId, Combat::SIDE_INVASOR, $invasors[0]->player);
+      return true;
+    }
+
+    if ($this->haveShips($invasors)) {
+      $this->resolve($combat, $locals, $invasors, $this->isAlienAtack($combat->planet));
+    } else {
+      # Locals win
+      $this->finishCombat($combatId, Combat::SIDE_LOCAL, $invasors[0]->player);
+      return true;
+    }
+
+    $playerService = new PlayerService();
+
+    # Apply scores
+    if(!$this->isAlienAtack($combat->planet)) {
+      foreach ($locals as $local) {
+        $damagePerLocal = max(0, $this->totalDemageInvasor / floor(count($locals)));
+        $playerService->addAttackScore($local->player, $damagePerLocal);
+      }
+
+      foreach ($invasors as $invasor) {
+          $damagePerInvasor = max(0, $this->totalDemageLocal / floor(count($invasors)));
+          $playerService->addAttackScore($invasor->player, $damagePerInvasor);
+      }
+    }
+      
+    # Log stage informations
+    $this->logStage(
+      $combat,
+      "Invaders Kills: " . $this->totalKillInvasor . " - Defensors Kills: " . $this->totalKilllocal,
+      $this->totalKillInvasor,
+      $this->totalKilllocal,
+      $this->totalDemageInvasor,
+      $this->totalDemageLocal
+    );
+
+    $combat->stage++;
+    $combat->nextStage = time() + config("app.tritium_combat_stage_time");
+    $combat->save();
+
+    # Queue next stage
+    SpaceCombatJob::dispatch($combatId)->delay(now()->addSeconds( config("app.tritium_combat_stage_time")));
   }
 
   private function logStage($combat, $message, $killInvasor = 0, $killLocal = 0, $demageInvasor = 0, $demageLocal = 0) {
@@ -575,15 +573,6 @@ class SpaceCombatService
     $combat->save();
     $this->logStage($combat, 'Combat finish, winner: ' . $winner);
 
-    Log::info("Vamos aumentar o level do alien");
-    # Ser for batalha contra alien aumenta o level para proxima batalha
-    if ($this->isAlienAtack($combat->planet)) {
-      Log::info("Preparando level do alien");
-      Log::info("PlayerId: " . $playerId);
-      Log::info("CombatPlanet:". $combat->planet);
-      $this->upgradeAlienLevel($playerId, $combat->planet);
-    }
-
     $timeInvasor = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
 
     // Venceu a batalha entao pilha o planeta atacado
@@ -595,6 +584,14 @@ class SpaceCombatService
     // Perdeu a batalha então pega o caminho de volta de maos vazias
     if ($winner == Combat::SIDE_LOCAL) {
       $this->initiateReturn($combat, $timeInvasor);
+    }
+
+    # Ser for batalha contra alien aumenta o level para proxima batalha
+    if ($this->isAlienAtack($combat->planet)) {
+      Log::info("Preparando level do alien");
+      Log::info("PlayerId: " . $playerId);
+      Log::info("CombatPlanet:". $combat->planet);
+      $this->upgradeAlienLevel($playerId, $combat->planet);
     }
   }
 
