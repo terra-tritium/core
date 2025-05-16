@@ -81,33 +81,27 @@ class CombatController extends Controller
         }
 
         $combats = DB::table('combats as c')
-            ->join('fighters as f', 'c.id', '=', 'f.combat')
-            ->join('planets as p', 'c.planet', '=', 'p.id')
-            ->join('players as u', 'p.player', '=', 'u.id')
+            ->join('fighters as f', 'f.combat', '=', 'c.id')
+            ->leftJoin('planets as p', 'c.planet', '=', 'p.id')
+            ->leftJoin('players as u', 'p.player', '=', 'u.id')
             ->where('f.player', $player->id)
-            ->select('c.*', 'p.name as planetName', 'p.quadrant as quadrant', 'p.position as position', 'p.region as region', 'u.name as player')
+            ->select(
+                'c.id',
+                'c.planet',
+                'c.status',
+                'p.name as planetName',
+                'p.quadrant',
+                'p.position',
+                'p.region',
+                'u.name as player'
+            )
+            ->orderByDesc('c.id')
             ->limit(20)
-            ->orderBy('c.id', 'desc')
             ->get();
-
-        $combatsAlien = DB::table('combats as c')
-            ->join('fighters as f', 'c.id', '=', 'f.combat')
-            ->where('f.player', $player->id)
-            ->select('c.*')
-            ->limit(10)
-            ->orderBy('c.id', 'desc')
-            ->get();
-
-        if ($combatsAlien) {
-            foreach($combatsAlien as $cAlien){
-                $combats->push($cAlien);
-            }
-
-            $combats = $combats->merge($combatsAlien)->unique('id')->sortByDesc('id')->values();
-        }
 
         return response()->json($combats);
     }
+
 
     public function figthers($combatId)
     {
