@@ -42,12 +42,9 @@ class SpaceCombatService
     $isAlianAttack = $this->isAlienAtack($travel->to);
     $alienCode = 0;
 
-    Log::info("Travel alien? " . $isAlianAttack);
-
     if ($isAlianAttack) {
       $alienCode = $travel->to;
       $travel->to .= "#".$travel->player;
-      Log::info("Alien Code: " . $alienCode);
     }
 
     $currentCombat = $this->currentCombat($travel->to);
@@ -71,7 +68,6 @@ class SpaceCombatService
     # se ja existe o esse jogador no combate entao junta as naves a frota que ele ja tem
     if ($fighter) {
       $this->joinFleet($combat, $fighter, $travel, $player);
-      Log::info("Tinha outro combatente: " . $fighter);
     } else {
       # se nao existe o jogador nesta batalha ele cria o jogador e insere no combate
       $player1 = new Fighters();
@@ -96,10 +92,6 @@ class SpaceCombatService
 
       $this->logStage($combat, $player->name . ' joined the invaders side and arrived with '.$tShips.' ships');
     }
-
-    Log::info("Travel " . $travel);
-
-    Log::info("Alien ataque 2? " . $isAlianAttack);
 
     if (!$isAlianAttack) {   
       $planet = Planet::find($travel->to);
@@ -183,8 +175,13 @@ class SpaceCombatService
         $alien->planet = $travel->to;
         $alien->transportShips = 0;
 
-        $alienInfo = AlienInfo::get($alienCode, $this->getAlienLevel($alienCode, $player));
+        Log::info("Level: " . $this->getAlienLevel($alienCode, $player));
+        Log::info("alienCode: " . $alienCode);
+        Log::info("player: ");
+        Log::info($player);
 
+        $alienInfo = AlienInfo::get($alienCode, $this->getAlienLevel($alienCode, $player));
+        Log::info("alien info: ");
         $alien->cruiser = $alienInfo->cruiser;
         $alien->craft = $alienInfo->craft;
         $alien->bomber = $alienInfo->bomber;
@@ -434,15 +431,18 @@ class SpaceCombatService
       $invasors = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
       $locals = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_LOCAL])->get();
 
+      Log::info($invasors);
+      Log::info("Invasor Player: " . $invasors[0]->player);
+
       # Locals no more players
       if ($locals->count() == 0) {
-        $this->finishCombat($combatId, Combat::SIDE_INVASOR);
+        $this->finishCombat($combatId, Combat::SIDE_INVASOR, $invasors[0]->player);
         return true;
       }
 
       # Invasors no more players
       if ($invasors->count() == 0) {
-        $this->finishCombat($combatId, Combat::SIDE_LOCAL);
+        $this->finishCombat($combatId, Combat::SIDE_LOCAL, $invasors[0]->player);
         return true;
       }
 
@@ -450,7 +450,7 @@ class SpaceCombatService
         $this->resolve($combat, $invasors, $locals, $this->isAlienAtack($combat->planet));
       } else {
         # Invasors win
-        $this->finishCombat($combatId, Combat::SIDE_INVASOR);
+        $this->finishCombat($combatId, Combat::SIDE_INVASOR, $invasors[0]->player);
         return true;
       }
 
@@ -458,23 +458,25 @@ class SpaceCombatService
         $this->resolve($combat, $locals, $invasors, $this->isAlienAtack($combat->planet));
       } else {
         # Locals win
-        $this->finishCombat($combatId, Combat::SIDE_LOCAL);
+        $this->finishCombat($combatId, Combat::SIDE_LOCAL, $invasors[0]->player);
         return true;
       }
 
       $playerService = new PlayerService();
 
       # Apply scores
-      foreach ($locals as $local) {
+      if(!$this->isAlienAtack($combat->planet)) {
+        foreach ($locals as $local) {
           $damagePerLocal = max(0, $this->totalDemageInvasor / floor(count($locals)));
           $playerService->addAttackScore($local->player, $damagePerLocal);
-      }
+        }
 
-      foreach ($invasors as $invasor) {
-          $damagePerInvasor = max(0, $this->totalDemageLocal / floor(count($invasors)));
-          $playerService->addAttackScore($invasor->player, $damagePerInvasor);
+        foreach ($invasors as $invasor) {
+            $damagePerInvasor = max(0, $this->totalDemageLocal / floor(count($invasors)));
+            $playerService->addAttackScore($invasor->player, $damagePerInvasor);
+        }
       }
-
+      
       # Log stage informations
       $this->logStage(
         $combat,
@@ -566,12 +568,21 @@ class SpaceCombatService
     }
   }
 
-  private function finishCombat($combatId, $winner) {
+  private function finishCombat($combatId, $winner, $playerId) {
     $combat = Combat::find($combatId);
     $combat->status = Combat::STATUS_FINISH;
     $combat->winner = $winner;
     $combat->save();
     $this->logStage($combat, 'Combat finish, winner: ' . $winner);
+
+    Log::info("Vamos aumentar o level do alien");
+    # Ser for batalha contra alien aumenta o level para proxima batalha
+    if ($this->isAlienAtack($combat->planet)) {
+      Log::info("Preparando level do alien");
+      Log::info("PlayerId: " . $playerId);
+      Log::info("CombatPlanet:". $combat->planet);
+      $this->upgradeAlienLevel($playerId, $combat->planet);
+    }
 
     $timeInvasor = Fighters::where(['combat'=>$combatId, 'side'=>Combat::SIDE_INVASOR])->get();
 
@@ -585,6 +596,37 @@ class SpaceCombatService
     if ($winner == Combat::SIDE_LOCAL) {
       $this->initiateReturn($combat, $timeInvasor);
     }
+  }
+
+  private function upgradeAlienLevel($playerId, $alienCode) {
+    $code = explode('#', $alienCode)[0]; // Pega apenas o que vem antes do '#'
+
+    $player = Player::find($playerId);
+    Log::info("Jogador antes: ");
+    Log::info($player);
+
+    switch ((int) $code) {
+        case 9996:
+            $player->infesta = ((int) $player->infesta) + 1;
+            $player->infesta_time = time() + 14400;
+            break;
+        case 9997:
+            $player->simbion = ((int) $player->simbion) + 1;
+            $player->simbion_time = time() + 14400;
+            break;
+        case 9998:
+            $player->tantra = ((int) $player->tantra) + 1;
+            $player->tantra_time = time() + 14400;
+            break;
+        case 9999:
+            $player->xantii = ((int) $player->xantii) + 1;
+            $player->xantii_time = time() + 14400;
+            break;
+    }
+
+    Log::info("Jogador depois: ");
+    Log::info($player);
+    $player->save();
   }
 
   private function initiateReturn($combat, $timeInvasor) {

@@ -94,7 +94,7 @@ class CombatController extends Controller
             ->join('fighters as f', 'c.id', '=', 'f.combat')
             ->where('f.player', $player->id)
             ->select('c.*')
-            ->limit(5)
+            ->limit(10)
             ->orderBy('c.id', 'desc')
             ->get();
 
@@ -102,9 +102,9 @@ class CombatController extends Controller
             foreach($combatsAlien as $cAlien){
                 $combats->push($cAlien);
             }
-        }
 
-        $combats = $combats->merge($combatsAlien)->unique('id')->sortByDesc('id')->values();
+            $combats = $combats->merge($combatsAlien)->unique('id')->sortByDesc('id')->values();
+        }
 
         return response()->json($combats);
     }
@@ -116,6 +116,19 @@ class CombatController extends Controller
             ->where('f.combat', $combatId)
             ->select('f.*', 'p.name as player', 'p.id as playerId')
             ->get();
+
+        $fightersAlien = DB::table('fighters as f')
+            ->where('f.combat', $combatId)
+            ->select('f.*')
+            ->get();
+
+        if ($fightersAlien) {
+            foreach($fightersAlien as $fAlien){
+                $fighters->push($fAlien);
+            }
+
+            $fighters = $fighters->merge($fightersAlien)->unique('id')->sortByDesc('id')->values();
+        }
 
         return response()->json($fighters);
     }
