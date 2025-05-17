@@ -522,11 +522,11 @@ class TradingService
                 }
                 if($keyResource == "crystal"){
                     $planet->crystal -= $trading->quantity;
-                    $planet->timeCrystal = now();
+                    $planet->timeCrystal = time();
                 }
                 if($keyResource == "uranium"){
                     $planet->uranium -= $trading->quantity;
-                    $planet->timeUranium = now();
+                    $planet->timeUranium = time();
                 }
 
                 $planet->save();
