@@ -798,7 +798,7 @@ class TravelService
         $planetTarget->crystal += $travelModel->crystal;
 
         $planetTarget->save();
-        $this->logService->notify($planetTarget->player, "You received a resource: Metal [".$travelModel->metal."] Uranium [".$travelModel->uranium."] Crystal [".$travelModel->crystal."]", "Mission");
+        $this->logService->notify($planetTarget->player, "You received a resource: Metal ".$travelModel->metal." Uranium ".$travelModel->uranium." Crystal ".$travelModel->crystal, "Mission");
         $this->back($travel);
     }
 
@@ -808,7 +808,7 @@ class TravelService
         $playerOrige = Player::findOrFail($travelModel->player);
         $playerOrige->transportShips += $travelModel->transportShips;
         $playerOrige->save();
-        $this->logService->notify($playerOrige->id, "Your freighter has returned from its trip, TransportShips [".$travelModel->transportShips."]", "Mission");
+        $this->logService->notify($playerOrige->id, "Your freighter has returned from its trip, TransportShips ".$travelModel->transportShips, "Mission");
     }
 
     public function getCurrent($player)
