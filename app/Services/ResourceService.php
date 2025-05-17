@@ -77,7 +77,7 @@ class ResourceService
 
         $log = new Logbook();
         $log->player = $planetOrigin->player;
-        $log->text = "Resource loading process started, expected to be ready " . now()->addSeconds($timeLoad);
+        $log->text = "Resource loading process started";
         $log->type = "Transport";
         $log->save();
 
