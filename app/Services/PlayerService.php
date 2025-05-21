@@ -392,7 +392,7 @@ class PlayerService
     $playerModel = Player::find($player);
     $planet = Planet::where('player', $player)->firstOrFail();
 
-    if ($planet->metal == 1300 && $planet->uranium == 0 && $planet->crystal == 0 && $playerModel->score == 2) {
+    if ($planet->metal < 10000 && $planet->uranium < 10000 && $planet->crystal < 10000 && $playerModel->score < 100) {
       $planet->metal += 5000;
       $planet->save();
       return "ok";
