@@ -36,7 +36,8 @@ class AlianceMember extends Model
                 'p.name',
                 'rm.id as idRank',
                 'rm.level',
-                'rm.rankName'
+                'rm.rankName',
+                'p.score'
             )
             ->join('players as p', 'p.id', '=', 'am.player_id')
             ->leftJoin('rank_member as rm', 'rm.id', '=', 'am.idRank')
