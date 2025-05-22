@@ -97,6 +97,32 @@ class ProductionService
     return true;
   }
 
+  public function hasHumanoids($unit, $planet) {
+    if (isset($unit["quantity"])) {
+      $planet = Planet::findOrFail($planet);
+      if ($planet) {
+        if ($planet->workersWaiting >= $unit["quantity"]) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public function spendHumanoids($planet, $unit) {
+    if (!isset($unit["quantity"])) {
+      return false;
+    }
+
+    $planet = Planet::findOrFail($planet);
+    $qtdHumanoids = $unit["quantity"];
+
+    $planet->workers -= $qtdHumanoids;
+    $planet->workersWaiting -= $qtdHumanoids;
+    $planet->save();
+    return true;
+  }
+
   public function spendFunds($planet, $unit, $type) {
     $metal = 0;
     $uranium = 0;
