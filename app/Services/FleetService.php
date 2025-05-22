@@ -22,13 +22,15 @@ class FleetService
     }
 
     public function production ($player, $planet, $ship) {
-        if ($this->productionService->hasFunds($ship, $planet, "fleet")) {
+        if ($this->productionService->hasFunds($ship, $planet, "fleet") && $this->productionService->hasHumanoids($ship, $planet)) {
             $this->productionService->add($player, $planet, $ship, "fleet");
             $this->productionService->spendFunds($planet, $ship, "fleet");
+            $this->productionService->spendHumanoids($planet, $ship);
         } else {
-            return "No suficients Funds";
+            return "No suficients Funds or Humanoids";
         }
     }
+    
     public function getFleetPlayer($player){
         $fleet = new Fleet();
         $fleets = $fleet->getFleetPlayer($player);
