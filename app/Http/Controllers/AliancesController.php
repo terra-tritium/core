@@ -95,6 +95,38 @@ class AliancesController extends Controller
         }
     }
 
+    public function readMessage($id) {
+        
+        try {
+            $player = Player::find($id);
+            $player->aliance_new_message = 0;
+            $player->save();
+            return response()->json("OK", Response::HTTP_OK);
+        } catch (Throwable $exception) {
+            Log::error($exception);
+
+            return response()->json(
+                ['message' => 'Erro ao setar mensagem da alianca como lida'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    public function newMessage($id) {
+        try {
+            $player = Player::find($id);
+            Player::where('aliance', $player->aliance)->update(['aliance_new_message' => 1]);
+            return response()->json("OK", Response::HTTP_OK);
+        } catch (Throwable $exception) {
+            Log::error($exception);
+
+            return response()->json(
+                ['message' => 'Erro ao setar mensagem da alianca como lida'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     /**
      *
      *@OA\Post(
@@ -824,6 +856,7 @@ class AliancesController extends Controller
             return response()->json(['message' => 'Erro ao buscar convites '.$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }      
     }
+
     public function acceptInvite(Request $request){
         try{
             $loggedPlayer = Player::getPlayerLogged();
