@@ -110,6 +110,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
 
     Route::group(['prefix' => 'planet', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [PlanetController::class, 'list']);
+        Route::get('/listById/{id}', [PlanetController::class, 'listById']);
         Route::get('/show/{id}', [PlanetController::class, 'show']);
         Route::get('/{quadrant}/{position}', [PlanetController::class, 'find']);
         Route::post('/edit/{planet}', [PlanetController::class, 'update']);

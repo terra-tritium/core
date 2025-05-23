@@ -284,6 +284,22 @@ class PlanetController extends Controller
         return response()->json($planets, Response::HTTP_OK);
     }
 
+    // Lista todos os planetas por um jogador especifico
+    public function listById($id) {
+
+        # busca todos os planetas que o jogador possui e tmb os planetas onde ele tem naves em modo de defesa
+        $planets = Planet::where('player', $id)
+                    ->orWhereIn('id', function ($query) use ($id) {
+                        $query->select('planet')
+                            ->from('fighters')
+                            ->where('player', $id)
+                            ->where('combat', 0);
+                    })
+                    ->get();
+
+        return response()->json($planets, Response::HTTP_OK);
+    }
+
     /**
      *  * @OA\Get(
      *     path="/planet/calcule-distance/{origin}/{destiny}",
