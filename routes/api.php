@@ -110,6 +110,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
 
     Route::group(['prefix' => 'planet', 'middleware' => 'throttle:240,1'], function () {
         Route::get('/list', [PlanetController::class, 'list']);
+        Route::get('/listById/{id}', [PlanetController::class, 'listById']);
         Route::get('/show/{id}', [PlanetController::class, 'show']);
         Route::get('/{quadrant}/{position}', [PlanetController::class, 'find']);
         Route::post('/edit/{planet}', [PlanetController::class, 'update']);
@@ -273,6 +274,8 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/chat/{idMessage}',[AliancesController::class, 'delMessage']);
         Route::post('/chat-aliance',[AliancesController::class, 'newMessageAliance']);
         Route::get('/chat-with-aliance/{destino}',[AliancesController::class, 'getMessageWithAliance']);
+        Route::post('/read-message/{id}',[AliancesController::class, 'readMessage']);
+        Route::post('/new-message/{id}',[AliancesController::class, 'newMessage']);
 
         Route::get('/search-usuer/{string}',[AliancesController::class,'searchUser']);
         Route::post('/invite',[AliancesController::class, 'invite']);
