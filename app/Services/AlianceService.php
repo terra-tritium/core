@@ -40,6 +40,31 @@ class AlianceService
         return true;
     }
 
+    public function donate($code, $qtd, $alianceId) {
+        $maxDonate = 250000;
+
+        $aliance = Aliance::find($alianceId);
+        switch ($code) {
+            case "1" : 
+                $aliance->jump_qtd += $qtd;
+                if ($aliance->jump_qtd >= $maxDonate) {
+                    $aliance->jump_qtd -= $maxDonate;
+                    $aliance->jump = time();
+                }
+                break;
+            case "2" :
+                $aliance->firepower_qtd += $qtd;
+                if ($aliance->firepower_qtd >= $maxDonate) {
+                    $aliance->firepower_qtd -= $maxDonate;
+                    $aliance->firepower = time();
+                }
+                break;
+            
+        }
+        $aliance->save();
+        return "Ok";
+    }
+
     public function founderAliance(Request $request)
     {
         try {

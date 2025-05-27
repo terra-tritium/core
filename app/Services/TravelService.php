@@ -6,12 +6,12 @@ use App\Models\Travel;
 use App\Models\Ship;
 use App\Jobs\TravelJob;
 use App\Models\Espionage;
-use App\Models\Position;
 use App\Models\Planet;
 use App\Models\Troop;
 use App\Models\Fleet;
 use App\Models\Unit;
 use App\Models\Player;
+use App\Models\Aliance;
 use App\Services\LogService;
 use App\Services\PlanetService;
 use Carbon\Carbon;
@@ -98,6 +98,9 @@ class TravelService
         } else {
             $travelTime = $this->planetService->calculeDistance($travel->from, $travel->to);
         }
+        if ($this->isJumpActivate($player)) {
+            $travelTime = 10;
+        }
         $newTravel->from = $travel->from;
         $newTravel->to = $travel->to;
         $newTravel->action = $travel->action;
@@ -167,6 +170,24 @@ class TravelService
         TravelJob::dispatch($this,$newTravel->id, false)->delay(now()->addSeconds($travelTime));
 
         return "success";
+    }
+
+    private function isJumpActivate($playerId) {
+        $player = Player::find($playerId);
+        if (empty($player->aliance)) {
+            return false;
+        }
+
+        $umDia = 86400;
+        $agora = time();
+
+        $aliance = Aliance::find($player->aliance);
+
+        # assegura validade de 24 horas de ativacao do efeito
+        if ($aliance->jump > ($agora - $umDia)) {
+            return true;
+        }
+        return false;
     }
 
     private function isAlienAtack($destiny) {

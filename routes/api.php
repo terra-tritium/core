@@ -249,6 +249,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/join', [AliancesController::class,'joinAliance']);
         Route::post('/request', [AliancesController::class,'handlePlayerRequest']);
         Route::post('/leave',[AliancesController::class,'leaveAliance']);
+        Route::post('/donate/{code}/{qtd}',[AliancesController::class,'donate']);
 
         Route::post('/kickplayer', [AliancesController::class, 'kickPlayer']);
         Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
