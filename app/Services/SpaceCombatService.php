@@ -1076,6 +1076,7 @@ class SpaceCombatService
 
       if ($this->isFirepowerActive($invasor->player)) {
         $firePowerAtack = 2;
+        $this->logStage($combat, "FirePower activated! more 2 damage to each attacking ship");
       }
 
       # Calculate attack and defense
