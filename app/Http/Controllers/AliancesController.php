@@ -127,6 +127,21 @@ class AliancesController extends Controller
         }
     }
 
+    public function donate($code, $planet, $qtd) {
+        try {
+            $loggedPlayer = Player::getPlayerLogged();
+            $result = $this->alianceService->donate($code, $planet, $qtd, $loggedPlayer->aliance);
+            return response()->json($result, Response::HTTP_OK);
+        } catch (Throwable $exception) {
+            Log::error($exception);
+
+            return response()->json(
+                ['message' => 'Erro ao setar mensagem da alianca como lida'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     /**
      *
      *@OA\Post(

@@ -13,6 +13,7 @@ use App\Models\Ship;
 use App\Models\Fleet;
 use App\Models\Strategy;
 use App\Models\Travel;
+use App\Models\Aliance;
 use App\Services\PlanetService;
 use App\Services\PlayerService;
 use App\Services\LogService;
@@ -1011,6 +1012,24 @@ class SpaceCombatService
     return 0;
   }
 
+  private function isFirepowerActive($playerId) {
+    $player = Player::find($playerId);
+    if (empty($player->aliance)) {
+        return false;
+    }
+
+    $umDia = 86400;
+    $agora = time();
+
+    $aliance = Aliance::find($player->aliance);
+
+    # assegura validade de 24 horas de ativacao do efeito
+    if ($aliance->firepower > ($agora - $umDia)) {
+        return true;
+    }
+    return false;
+  }
+
   private function resolve($combat, $invasors, $locals, $alien = false) {
 
     $invasorCraftAttack = 0;
@@ -1053,19 +1072,26 @@ class SpaceCombatService
       $invasorStealthInBattle = $invasor->stealth > $this->battleFieldSize ? $this->battleFieldSize : $invasor->stealth;
       $invasorFlagshipInBattle = $invasor->flagship > $this->battleFieldSize ? $this->battleFieldSize : $invasor->flagship;
 
+      $firePowerAtack = 0;
+
+      if ($this->isFirepowerActive($invasor->player)) {
+        $firePowerAtack = 2;
+        $this->logStage($combat, "FirePower activated! more 2 damage to each attacking ship");
+      }
+
       # Calculate attack and defense
-      $invasorCraftAttack     += ($invasorCraftInBattle    * Ship::SHIP_CRAFT_ATTACK     ) + rand($this->randStart, $this->randEnd);
-      $invasorCraftDefense    += ($invasorCraftInBattle    * Ship::SHIP_CRAFT_DEFENSE    ) + rand($this->randStart, $this->randEnd);
-      $invasorBomberAttack    += ($invasorBomberInBattle   * Ship::SHIP_BOMBER_ATTACK    ) + rand($this->randStart, $this->randEnd);
-      $invasorBomberDefense   += ($invasorBomberInBattle   * Ship::SHIP_BOMBER_DEFENSE   ) + rand($this->randStart, $this->randEnd);
-      $invasorCruiserAttack   += ($invasorCruiserInBattle  * Ship::SHIP_CRUISER_ATTACK   ) + rand($this->randStart, $this->randEnd);
-      $invasorCruiserDefense  += ($invasorCruiserInBattle  * Ship::SHIP_CRUISER_DEFENSE  ) + rand($this->randStart, $this->randEnd);
-      $invasorScoutAttack     += ($invasorScoutInBattle    * Ship::SHIP_SCOUT_ATTACK     ) + rand($this->randStart, $this->randEnd);
-      $invasorScoutDefense    += ($invasorScoutInBattle    * Ship::SHIP_SCOUT_DEFENSE    ) + rand($this->randStart, $this->randEnd);
-      $invasorStealthAttack   += ($invasorStealthInBattle  * Ship::SHIP_STEALTH_ATTACK   ) + rand($this->randStart, $this->randEnd);
-      $invasorStealthDefense  += ($invasorStealthInBattle  * Ship::SHIP_STEALTH_DEFENSE  ) + rand($this->randStart, $this->randEnd);
-      $invasorFlagshipAttack  += ($invasorFlagshipInBattle * Ship::SHIP_FLAGSHIP_ATTACK  ) + rand($this->randStart, $this->randEnd);
-      $invasorFlagshipDefense += ($invasorFlagshipInBattle * Ship::SHIP_FLAGSHIP_DEFENSE ) + rand($this->randStart, $this->randEnd);
+      $invasorCraftAttack     += ($invasorCraftInBattle    * ($firePowerAtack + Ship::SHIP_CRAFT_ATTACK     )) + rand($this->randStart, $this->randEnd);
+      $invasorCraftDefense    += ($invasorCraftInBattle    * ($firePowerAtack + Ship::SHIP_CRAFT_DEFENSE    )) + rand($this->randStart, $this->randEnd);
+      $invasorBomberAttack    += ($invasorBomberInBattle   * ($firePowerAtack + Ship::SHIP_BOMBER_ATTACK    )) + rand($this->randStart, $this->randEnd);
+      $invasorBomberDefense   += ($invasorBomberInBattle   * ($firePowerAtack + Ship::SHIP_BOMBER_DEFENSE   )) + rand($this->randStart, $this->randEnd);
+      $invasorCruiserAttack   += ($invasorCruiserInBattle  * ($firePowerAtack + Ship::SHIP_CRUISER_ATTACK   )) + rand($this->randStart, $this->randEnd);
+      $invasorCruiserDefense  += ($invasorCruiserInBattle  * ($firePowerAtack + Ship::SHIP_CRUISER_DEFENSE  )) + rand($this->randStart, $this->randEnd);
+      $invasorScoutAttack     += ($invasorScoutInBattle    * ($firePowerAtack + Ship::SHIP_SCOUT_ATTACK     )) + rand($this->randStart, $this->randEnd);
+      $invasorScoutDefense    += ($invasorScoutInBattle    * ($firePowerAtack + Ship::SHIP_SCOUT_DEFENSE    )) + rand($this->randStart, $this->randEnd);
+      $invasorStealthAttack   += ($invasorStealthInBattle  * ($firePowerAtack + Ship::SHIP_STEALTH_ATTACK   )) + rand($this->randStart, $this->randEnd);
+      $invasorStealthDefense  += ($invasorStealthInBattle  * ($firePowerAtack + Ship::SHIP_STEALTH_DEFENSE  )) + rand($this->randStart, $this->randEnd);
+      $invasorFlagshipAttack  += ($invasorFlagshipInBattle * ($firePowerAtack + Ship::SHIP_FLAGSHIP_ATTACK  )) + rand($this->randStart, $this->randEnd);
+      $invasorFlagshipDefense += ($invasorFlagshipInBattle * ($firePowerAtack + Ship::SHIP_FLAGSHIP_DEFENSE )) + rand($this->randStart, $this->randEnd);
     }
 
     foreach ($locals as $local) {
