@@ -8,6 +8,7 @@ use App\Models\AlianceRequest;
 use App\Models\Logbook;
 use App\Models\Player;
 use App\Models\RankMember;
+use App\Models\Planet;
 use DateTime;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -40,10 +41,16 @@ class AlianceService
         return true;
     }
 
-    public function donate($code, $qtd, $alianceId) {
+    public function donate($code, $planetId, $qtd, $alianceId) {
         $maxDonate = 250000;
 
         $aliance = Aliance::find($alianceId);
+        $planet = Planet::find($planetId);
+
+        if (!$planet) {
+            return "Planeta não existe";
+        }
+
         switch ($code) {
             case "1" : 
                 $aliance->jump_qtd += $qtd;
@@ -59,8 +66,13 @@ class AlianceService
                     $aliance->firepower = time();
                 }
                 break;
+            default: 
+                return "Code não existe";
+                break;
             
         }
+        $planet->crystal -= $qtd;
+        $planet->save();
         $aliance->save();
         return "Ok";
     }
