@@ -17,6 +17,7 @@ use App\Models\Aliance;
 use App\Services\PlanetService;
 use App\Services\PlayerService;
 use App\Services\LogService;
+use App\Services\DominationService;
 use App\Jobs\SpaceCombatJob;
 use App\Jobs\TravelJob;
 use App\Models\Logbook;
@@ -39,6 +40,11 @@ class SpaceCombatService
   }
 
   public function createNewCombat ($travel) {
+
+    if ($this->isInexploredPlanet($travel->to) && (!$this->isDominatedPlanet($travel->to))) {
+      $this->dominatePlanet($travel);
+      return "dominate";
+    }
 
     $isAlianAttack = $this->isAlienAtack($travel->to);
     $alienCode = 0;
@@ -213,6 +219,33 @@ class SpaceCombatService
     $this->ajustBatleField();
 
     $this->startCombat($combat->id);
+  }
+
+  private function isInexploredPlanet($planetId) {
+    $planet = Planet::find($planetId);
+    if (!$planet) { return false; }
+
+    if ($planet->player == null && $planet->dominator == 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private function isDominatedPlanet($planetId) {
+    $planet = Planet::find($planetId);
+    if (!$planet) { return false; }
+
+    if ($planet->dominator != 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private function dominatePlanet($travel) {
+    $dominationService = new DominationService();
+    $dominationService->dominatePlanet($travel);
   }
 
   private function isAlienAtack($destiny) {

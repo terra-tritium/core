@@ -512,7 +512,12 @@ class TravelService
     public function getReceptor($planetId) {
         $planet = Planet::where(['id' => $planetId])->firstOrFail();
         if ($planet) {
-            return $planet->player;
+            if (!empty($planet->player)) {
+                return $planet->player;
+            } else {
+                return 0;
+            }
+            
         } else {
             return 0;
         }

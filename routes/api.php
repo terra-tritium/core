@@ -254,6 +254,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
         Route::post('/kickplayer', [AliancesController::class, 'kickPlayer']);
         Route::get('/{alianceId}/players', [AliancesController::class,'listPlayers']);
         Route::get('/my-aliance', [AliancesController::class,'myAliance']);
+        Route::get('/find/{id}', [AliancesController::class,'find']);
         Route::get('/myaliance/details', [AliancesController::class, 'alianceDetailsCreated']);
         Route::get('/members/{alianceId}', [AliancesController::class,'listMembers']);
         Route::get('/members/pending/{alianceId}',[AliancesController::class, 'listMembersPending']);

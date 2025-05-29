@@ -708,12 +708,19 @@ class AliancesController extends Controller
         $player = Player::getPlayerLogged();
         return Planet::where('player', $player->id)->get();
     }
+
+    public function find($id) {
+        $player = Player::find($id);
+        $aliance = Aliance::find($player->aliance);
+        return response()->json($aliance, Response::HTTP_OK);
+    }
+
     public function myAliance()
     {
         $player = Player::getPlayerLogged();
         $aliance = Aliance::find($player->aliance);
         if (!$aliance) {
-            //nenhuma aliança viinculada
+            //nenhuma aliança vinculada
             $alianceMemberPending = AlianceMember::where([['player_id', '=', $player->id], ['status', '=', 'P']])->first();
             if ($alianceMemberPending) {
                 return response()->json($alianceMemberPending, Response::HTTP_OK);
