@@ -363,9 +363,13 @@ class PlayerService
     return $details;
   }
 
-  public function iSplayerOwnerPlanet($player, $planet)
+  public function isPlayerOwnerPlanet($player, $planetId)
   {
-    $planet = Planet::where(['player' => $player, 'id' => $planet])->first();
+    $planet = Planet::where(['player' => $player, 'id' => $planetId])->first();
+    if ($planet) {
+      return true;
+    }
+    $planet = Planet::where(['dominator' => $player, 'id' => $planetId])->first();
     if ($planet) {
       return true;
     }

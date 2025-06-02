@@ -12,6 +12,7 @@ use App\Models\Travel;
 use App\Services\SpaceCombatService;
 use App\Services\EspionadeService;
 use App\Services\TradingService;
+use App\Services\DominationService;
 
 class TravelJob implements ShouldQueue
 {
@@ -99,6 +100,10 @@ class TravelJob implements ShouldQueue
                 case Travel::MISSION_SPIONAGE:
                     $espitionService = new EspionadeService();
                     $espitionService->finallySpy($currentTravel);
+                    break;
+                case Travel::DOMAIN_RETURN:
+                    $dominationService = new DominationService();
+                    $dominationService->leaveDomination($currentTravel);
                     break;
             }
         }

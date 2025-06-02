@@ -39,7 +39,7 @@ class TravelService
 
         $newTravel = new Travel();
 
-        if ($travel->action < 1 || $travel->action > 11) {
+        if (($travel->action < 1 || $travel->action > 11) && $travel->action != 18) {
             return "Invalid action type";
         }
 
@@ -154,6 +154,10 @@ class TravelService
             case Travel::MISSION_SPIONAGE:
                 $newTravel->status = Travel::STATUS_ON_GOING;
                 break;
+            case Travel::DOMAIN_RETURN:
+                $newTravel->status = Travel::STATUS_ON_GOING;
+                break;
+
         }
 
         # Merchant Ships
@@ -747,6 +751,7 @@ class TravelService
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::MISSION_CHALLANGE]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_CHALLANGE]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_RETURN]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DOMAIN_RETURN]]);
 
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_FLEET]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_FLEET]]);
@@ -754,6 +759,7 @@ class TravelService
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_TROOP]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::RETURN_FLEET]]);
                             $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::RETURN_TROOP]]);
+                            $query->orWhere([['from', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DOMAIN_RETURN]]);
 
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::ATTACK_FLEET]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_FLEET]]);
@@ -764,6 +770,7 @@ class TravelService
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::MISSION_CHALLANGE]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::RETURN_CHALLANGE]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DEFENSE_RETURN]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_GOING], ['action', Travel::DOMAIN_RETURN]]);
 
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::ATTACK_FLEET]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_FLEET]]);
@@ -771,6 +778,7 @@ class TravelService
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DEFENSE_TROOP]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::RETURN_FLEET]]);
                             $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::RETURN_TROOP]]);
+                            $query->orWhere([['to', $planet->id], ['status', Travel::STATUS_ON_LOAD],  ['action', Travel::DOMAIN_RETURN]]);
                         }
                     })
                     ->orderBy('start', 'desc')

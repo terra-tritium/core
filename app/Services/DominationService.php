@@ -29,6 +29,34 @@ class DominationService
     return true;
   }
 
+  public function leaveDomination($travel) {
+    $planet = Planet::find($travel->from);
+    if (!$planet) { return false; }
+    $planet->dominator = 0;
+    $planet->onFire = 0;
+    $planet->save();
+    $this->landingShips($travel);
+    $this->removeShips($travel);
+    return true;
+  }
+
+  public function removeShips($travel) {
+    $this->removeShip($travel->player, $travel->from, Ship::SHIP_CRAFT,    );
+    $this->removeShip($travel->player, $travel->from, Ship::SHIP_BOMBER,   );
+    $this->removeShip($travel->player, $travel->from, Ship::SHIP_CRUISER,  );
+    $this->removeShip($travel->player, $travel->from, Ship::SHIP_SCOUT,    );
+    $this->removeShip($travel->player, $travel->from, Ship::SHIP_STEALTH,  );
+    $this->removeShip($travel->player, $travel->from, Ship::SHIP_FLAGSHIP, );
+  }
+
+  private function removeShip($player, $planet, $ship) {
+    $existentFleet = Fleet::where([['player', $player], ['planet', $planet], ['unit', $ship]])->first();
+    if ($existentFleet) {
+      $existentFleet->quantity = 0;
+      $existentFleet->save();
+    }
+  }
+
   public function landingShips($travel) {
     $this->landingShip($travel->player, $travel->to, Ship::SHIP_CRAFT,    $travel->craft);
     $this->landingShip($travel->player, $travel->to, Ship::SHIP_BOMBER,   $travel->bomber);

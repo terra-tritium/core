@@ -340,7 +340,7 @@ class CombatController extends Controller
 
     public function start($defense, $planet, $travel)
     {
-        $playerOwnerPlatet = $this->playerService->iSplayerOwnerPlanet($defense, $planet);
+        $playerOwnerPlatet = $this->playerService->isPlayerOwnerPlanet($defense, $planet);
 
         if ($playerOwnerPlatet) {
 
