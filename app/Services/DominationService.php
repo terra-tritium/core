@@ -35,9 +35,42 @@ class DominationService
     $planet->dominator = 0;
     $planet->onFire = 0;
     $planet->save();
+    $travel = $this->loadLocalShipsInTravel($travel, $planet);
+    $travel->save();
     $this->landingShips($travel);
     $this->removeShips($travel);
     return true;
+  }
+
+  private function loadLocalShipsInTravel($travel, $planet) {
+    $fleets = Fleet::where([['player', $travel->player], ['planet', $planet->id]])->get();
+
+    if (!$fleets) { return false; }
+
+    foreach ($fleets as $fleet) {
+      switch ($fleet->unit) {
+        case Ship::SHIP_CRAFT: 
+          $travel->craft = $fleet->quantity;
+          break;
+        case Ship::SHIP_BOMBER:
+          $travel->bomber = $fleet->quantity;
+          break;
+        case Ship::SHIP_CRUISER:
+          $travel->cruiser = $fleet->quantity;
+          break;
+        case Ship::SHIP_SCOUT:
+          $travel->scout = $fleet->quantity;
+          break;
+        case Ship::SHIP_STEALTH:
+          $travel->stealth = $fleet->quantity;
+          break;
+        case Ship::SHIP_FLAGSHIP:
+          $travel->flagship = $fleet->quantity;
+          break;
+      }
+    }
+
+    return $travel;
   }
 
   public function removeShips($travel) {
